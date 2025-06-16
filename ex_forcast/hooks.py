@@ -145,6 +145,15 @@ app_license = "mit"
 # 	}
 # }
 
+doc_events = {
+    "Doctype1": {
+        "on_update": "ex_forcast.api.year.get_year_options"
+    },
+    "Doctype2": {
+        "on_update": "ex_forcast.api.expense_estimate.estimate_display"
+    }
+}
+
 # Scheduled Tasks
 # ---------------
 
@@ -242,3 +251,5 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+
+website_route_rules = [{'from_route': '/forcast_desk/<path:app_path>', 'to_route': 'forcast_desk'},]

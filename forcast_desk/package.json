@@ -1,0 +1,26 @@
+{
+  "name": "frappe-ui-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --base=/assets/ex_forcast/forcast_desk/ && yarn copy-html-entry",
+    "preview": "vite preview",
+    "copy-html-entry": "cp ../ex_forcast/public/forcast_desk/index.html ../ex_forcast/www/forcast_desk.html"
+  },
+  "dependencies": {
+    "feather-icons": "^4.29.2",
+    "frappe-ui": "^0.1.72",
+    "lucide-vue-next": "^0.513.0",
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.5",
+    "sass-embedded": "^1.89.2",
+    "tailwindcss": "^3.4.14",
+    "vite": "^5.4.10"
+  }
+}

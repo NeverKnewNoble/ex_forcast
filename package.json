@@ -1,0 +1,15 @@
+{
+  "name": "ex_forcast",
+  "version": "1.0.0",
+  "description": "forcast in vue",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "cd forcast_desk && yarn install",
+    "dev": "cd forcast_desk && yarn dev",
+    "build": "cd forcast_desk && yarn build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
