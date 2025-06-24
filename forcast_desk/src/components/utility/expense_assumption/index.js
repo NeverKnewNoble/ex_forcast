@@ -55,3 +55,13 @@ export {
   getMonthOptions,
   months
 } from './filter_utils.js'; 
+
+// Get Expenses and Revenue List From Accounts
+export { 
+  getExpenseList 
+} from './expense_list.js';
+
+// Get Expense Field Options
+export { 
+  getExpenseFieldOptions 
+} from './expense_options.js';

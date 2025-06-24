@@ -134,7 +134,7 @@
             <p class="text-lg text-violet-600 font-semibold">
               {{ fromYear && !toYear ? 'Please select a "To Year"' : !fromYear && toYear ? 'Please select a "From Year"' : 'No years selected' }}
             </p>
-              <p class="text-sm text-gray-500 mt-1 text-center max-w-md">
+            <p class="text-sm text-gray-500 mt-1 text-center max-w-md">
               {{ fromYear && !toYear ? 'You have selected a From Year, now please select a To Year to display the expense table.' : 
                  !fromYear && toYear ? 'You have selected a To Year, now please select a From Year to display the expense table.' :
                    'Please select both "From Year" and "To Year" in the left panel to display the expense table.' }}
@@ -248,6 +248,8 @@
                 <thead class="bg-gradient-to-r from-violet-600 to-violet-700 text-white sticky top-0">
                   <tr>
                     <th class="text-left px-6 py-4 font-semibold">Expense Name</th>
+                    <th v-if="hospitalityExperience" class="text-left px-6 py-4 font-semibold">Category</th>
+                    <th class="text-left px-6 py-4 font-semibold">Cost Type</th>
                     <th class="text-left px-6 py-4 font-semibold">Amount</th>
                     <th class="w-16"></th>
                   </tr>
@@ -258,24 +260,52 @@
                     :key="'expense-row-' + index" 
                     class="hover:bg-violet-50/50 transition-colors"
                   >
-                    <td class="px-6 py-4">
-                      <input
-                        type="text"
+                  
+                    <td class="px-2 py-4">
+                      <select
                         v-model="row.expense"
                         class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
-                        placeholder="Enter expense name"
-                      />
+                      >
+                        <option disabled value="">Select expense</option>
+                        <option v-for="option in expenseOptions" :key="option.value" :value="option.value">
+                          {{ option.label }}
+                        </option>
+                      </select>
                     </td>
-                    <td class="px-6 py-4">
+                    <td v-if="hospitalityExperience" class="px-2 py-4">
+                      <select
+                        v-model="row.category"
+                        class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+                      >
+                        <option disabled value="">Select Category</option>
+                        <option v-for="option in categoryOptions" :key="option.value" :value="option.value">
+                          {{ option.label }}
+                        </option>
+                      </select>
+                    </td>
+                    <td class="px-2 py-4">
+                      <select
+                        v-model="row.costType"
+                        class="w-full px-2 mr-20 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+                      >
+                        <option disabled value="">Select Cost Type</option>
+                        <option v-for="option in costTypeOptions" :key="option.value" :value="option.value">
+                          {{ option.label }}
+                        </option>
+                      </select>
+                    </td>
+                    <td class="px-2 py-4">
                       <input
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                        v-model.number="row.amount"
-                        class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-right"
+                        type="text"
+                        v-model="row.amountDisplay"
+                        @input="formatAmountInput(index)"
+                        @blur="cleanAmountValue(index)"
+                        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-left"
                         placeholder="0.00"
                       />
                     </td>
+
+
                     <td class="px-6 py-4">
                       <button 
                         @click="removeExpenseRow(index)"
@@ -329,12 +359,12 @@
 
 
 
+
+
 <script setup>
 import { ref, onMounted, computed, watch } from "vue";
 import Sidebar from "@/components/ui/Sidebar.vue";
 import { CircleAlert } from 'lucide-vue-next';
-
-// Import all expense assumption utilities from the main index file
 import {
   // Core expense calculations
   getVisibleYears,
@@ -369,8 +399,16 @@ import {
   
   // Filter and validation utilities
   getMonthOptions,
-  months
+  months,
+
+  // Expense List
+  getExpenseList,
+  
+  // Expense Field Options
+  getExpenseFieldOptions
 } from "@/components/utility/expense_assumption/index.js";
+import { getExpenseList as expenseList } from "@/components/utility/expense_assumption/expense_list.js";
+
 
 // Reactive state
 const years = ref([]);
@@ -381,11 +419,19 @@ const expenses = ref([]);
 const expenseData = ref({});
 const showAdvanced = ref(false);
 const advancedModes = ref({});
+const expenseOptions = ref([]);
+const hospitalityExperience = ref(
+  localStorage.getItem('hospitalityExperience') === null
+    ? true
+    : localStorage.getItem('hospitalityExperience') === 'true'
+);
+const categoryOptions = ref([]);
+const costTypeOptions = ref([]);
 
 // Computed properties
 const visibleYears = computed(() => {
   const years = getVisibleYears(fromYear.value, toYear.value);
-  console.log('Visible years:', years, 'from:', fromYear.value, 'to:', toYear.value);
+  // console.log('Visible years:', years, 'from:', fromYear.value, 'to:', toYear.value);
   return years;
 });
 
@@ -404,7 +450,7 @@ const getColumnLabelsForYearLocal = (year) => {
 
 // Watch for changes in visible years to initialize advanced modes
 watch(visibleYears, () => {
-  console.log('Visible years changed:', visibleYears.value);
+  // console.log('Visible years changed:', visibleYears.value);
   visibleYears.value.forEach(year => {
     if (!advancedModes.value[year]) {
       advancedModes.value[year] = displayMode.value;
@@ -414,15 +460,72 @@ watch(visibleYears, () => {
 
 // Watch for changes in year selections
 watch(fromYear, (newValue, oldValue) => {
-  console.log('From Year changed:', { newValue, oldValue, type: typeof newValue });
+  // console.log('From Year changed:', { newValue, oldValue, type: typeof newValue });
 });
 
 watch(toYear, (newValue, oldValue) => {
-  console.log('To Year changed:', { newValue, oldValue, type: typeof newValue });
+  // console.log('To Year changed:', { newValue, oldValue, type: typeof newValue });
 });
+
+// Watch for hospitality experience changes
+watch(hospitalityExperience, (newValue) => {
+  localStorage.setItem('hospitalityExperience', newValue);
+});
+
+// Watch for localStorage changes to sync with sidebar
+const checkHospitalityExperience = () => {
+  const stored = localStorage.getItem('hospitalityExperience');
+  const newValue = stored === null ? true : stored === 'true';
+  if (hospitalityExperience.value !== newValue) {
+    hospitalityExperience.value = newValue;
+  }
+};
+
+// Check for changes periodically
+setInterval(checkHospitalityExperience, 1000);
 
 function applyAdvancedSettings() {
   showAdvanced.value = false;
+}
+
+// Format amount input to show commas for better readability
+function formatAmountInput(index) {
+  const row = addExpenseForm.value.rows[index];
+  let value = row.amountDisplay;
+  
+  // Remove all non-numeric characters except decimal point
+  value = value.replace(/[^\d.]/g, '');
+  
+  // Ensure only one decimal point
+  const parts = value.split('.');
+  if (parts.length > 2) {
+    value = parts[0] + '.' + parts.slice(1).join('');
+  }
+  
+  // Convert to number and format with commas
+  const numValue = parseFloat(value) || 0;
+  row.amountDisplay = numValue.toLocaleString('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  });
+  
+  // Update the actual amount value (without commas)
+  row.amount = numValue;
+}
+
+// Clean amount value when input loses focus
+function cleanAmountValue(index) {
+  const row = addExpenseForm.value.rows[index];
+  const numValue = parseFloat(row.amountDisplay.replace(/[^\d.]/g, '')) || 0;
+  
+  // Format with commas and ensure proper decimal places
+  row.amountDisplay = numValue.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+  
+  // Update the actual amount value
+  row.amount = numValue;
 }
 
 // Create expense document
@@ -454,15 +557,33 @@ async function submitAddExpense() {
 // Load data on mount
 onMounted(async () => {
   try {
-    console.log('Loading data...');
+    // console.log('Loading data...');
     years.value = await loadYearOptions();
-    console.log('Years loaded:', years.value);
+    // console.log('Years loaded:', years.value);
     
     expenseData.value = await loadExpenseData();
-    console.log('Expense data loaded:', expenseData.value);
+    // console.log('Expense data loaded:', expenseData.value);
     
     expenses.value = extractAllExpenses(expenseData.value);
-    console.log('All expenses extracted:', expenses.value);
+    // console.log('All expenses extracted:', expenses.value);
+
+    expenseOptions.value = (await getExpenseList())?.map(name => ({
+      label: name,
+      value: name
+    })) || [];
+    // console.log('Expense options:', expenseOptions.value);
+
+    // Load expense field options
+    const fieldOptions = await getExpenseFieldOptions();
+    categoryOptions.value = fieldOptions.hospitality_category.map(category => ({
+      label: category,
+      value: category
+    }));
+    costTypeOptions.value = fieldOptions.cost_type.map(costType => ({
+      label: costType,
+      value: costType
+    }));
+    // console.log('Field options loaded:', { categoryOptions: categoryOptions.value, costTypeOptions: costTypeOptions.value });
   } catch (err) {
     console.error("Error loading data:", err);
   }

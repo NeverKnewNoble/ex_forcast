@@ -34,7 +34,8 @@ export function calculateTotal(expenseData, expense, year, displayMode) {
   const months = getColumnLabels(displayMode);
   let total = 0;
   for (const month of months) {
-    const amt = parseFloat(getAmount(expenseData, expense, year, month));
+    const rawAmount = getAmount(expenseData, expense, year, month);
+    const amt = parseFloat(rawAmount.toString().replace(/,/g, ''));
     if (!isNaN(amt)) total += amt;
   }
   return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });

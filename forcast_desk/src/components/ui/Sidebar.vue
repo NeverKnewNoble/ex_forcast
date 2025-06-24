@@ -41,13 +41,35 @@
     <!-- Footer Greeting -->
     <div class="mt-auto pb-4 px-4">
       <span v-if="is_expanded" class="font-semibold text-[16px]">Welcome, {{ session.user }}</span>
+      <hr v-if="is_expanded" class="my-3 border-t border-gray-200" />
+      <div v-if="is_expanded" class="flex flex-col mt-2">
+        <div class="flex items-center group relative">
+          <label for="hospitality-experience" class="text-sm mr-3 select-none cursor-pointer">Hospitality Experience</label>
+          <button
+            type="button"
+            class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 bg-gray-200"
+            :class="hospitalityExperience ? 'bg-violet-500' : 'bg-gray-200'"
+            @click="hospitalityExperience = !hospitalityExperience"
+            :aria-checked="hospitalityExperience"
+            role="switch"
+            :title="hospitalityExperience ? 'Enabled' : 'Disabled'"
+          >
+            <span
+              class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform"
+              :class="hospitalityExperience ? 'translate-x-5' : 'translate-x-1'"
+            />
+          </button>
+          <span class="ml-2 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity absolute left-full top-1/2 -translate-y-1/2 whitespace-nowrap bg-white border border-gray-200 px-2 py-1 rounded shadow z-10">Toggle your hospitality experience preference</span>
+        </div>
+        <span class="text-xs text-gray-500 mt-1 ml-1">Enhance recommendations with your industry experience.</span>
+      </div>
     </div>
 
   </aside>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import logoURL from '@/assets/images/icon_logo.png'
 import logoURL2 from '@/assets/images/ex_forest_logo.png'
 import { session } from '@/data/session' 
@@ -79,4 +101,14 @@ const menuItems = [
   { text: "Banquet Revenue Forcast", route: "/", icon: TrendingUpDown  },
   { text: "Profit & Loss Statement", route: "/", icon: BanknoteArrowUp  },
 ]
+
+const hospitalityExperience = ref(
+  localStorage.getItem('hospitalityExperience') === null
+    ? true
+    : localStorage.getItem('hospitalityExperience') === 'true'
+)
+
+watch(hospitalityExperience, (newVal) => {
+  localStorage.setItem('hospitalityExperience', newVal)
+})
 </script>
