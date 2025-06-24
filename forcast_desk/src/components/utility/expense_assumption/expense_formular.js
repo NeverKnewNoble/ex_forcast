@@ -1,4 +1,3 @@
-
 // ** Get year ranges function
 export function getVisibleYears(from, to) {
   const fromYear = parseInt(from);
@@ -8,6 +7,7 @@ export function getVisibleYears(from, to) {
   for (let y = fromYear; y <= toYear; y++) range.push(y);
   return range;
 }
+
 
 // UI display for Monthly varaible
 export const monthLabels = [
@@ -26,7 +26,7 @@ export function getColumnLabels(displayMode) {
 export function getAmount(expenseData, expense, year, month) {
   const entries = expenseData?.[year]?.[month] || [];
   const found = entries.find(e => e.expense === expense);
-  return found ? parseFloat(found.amount).toFixed(2) : "0.00";
+  return found ? parseFloat(found.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00";
 }
 
 // Calculating Total function
@@ -37,7 +37,7 @@ export function calculateTotal(expenseData, expense, year, displayMode) {
     const amt = parseFloat(getAmount(expenseData, expense, year, month));
     if (!isNaN(amt)) total += amt;
   }
-  return total.toFixed(2);
+  return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 

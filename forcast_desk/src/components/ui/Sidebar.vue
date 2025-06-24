@@ -53,7 +53,16 @@ import logoURL2 from '@/assets/images/ex_forest_logo.png'
 import { session } from '@/data/session' 
 
 // Lucide icons
-import { Home, FileText, Users, Mail, CircleArrowRight, CircleArrowLeft  } from 'lucide-vue-next'
+import { 
+  Home, 
+  LayoutDashboard, 
+  ReceiptText, 
+  BanknoteArrowUp, 
+  CircleArrowRight,
+  MemoryStick, 
+  TrendingUpDown, 
+  CircleArrowLeft  
+} from 'lucide-vue-next'
 
 const is_expanded = ref(localStorage.getItem("is_expanded") === "true")
 
@@ -64,8 +73,10 @@ const ToggleMenu = () => {
 
 const menuItems = [
   { text: "Home", route: "/", icon: Home },
-  { text: "Dashboard", route: "/dashboard", icon: FileText },
-  { text: "Assumptions on Expenses", route: "/expense_estimate", icon: Users },
-  { text: "Contact", route: "/", icon: Mail }
+  { text: "Dashboard", route: "/dashboard", icon: LayoutDashboard  },
+  { text: "Expense Assumptions", route: "/expense_estimate", icon: ReceiptText  },
+  { text: "Room Revenue Budget", route: "/", icon: MemoryStick   },
+  { text: "Banquet Revenue Forcast", route: "/", icon: TrendingUpDown  },
+  { text: "Profit & Loss Statement", route: "/", icon: BanknoteArrowUp  },
 ]
 </script>

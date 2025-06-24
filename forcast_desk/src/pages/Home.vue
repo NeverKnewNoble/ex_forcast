@@ -2,7 +2,7 @@
   <div class="w-full min-h-screen bg-white text-gray-800">
     <!-- Hero Section -->
     <section
-      class="w-full min-h-screen flex flex-col justify-center items-center text-center bg-gradient-to-br from-white via-blue-50 to-blue-100 px-4"
+      class="w-ful min-h-screen flex justify-center items-center text-center bg-gradient-to-br from-white via-blue-50 to-blue-100 px-4"
     >
       <div class="max-w-4xl">
         <div class="flex items-center justify-center gap-4 flex-wrap text-center md:text-left">
@@ -36,11 +36,18 @@
           </button>
         </div>
       </div>
+
+      <div>
+        <img :src="hero" alt="logo" class="mx-auto mb-4 w-[4000px] object-contain md:w-[800px]" />
+      </div>
+
     </section>
+
   </div>
 </template>
 
 <script setup>
 import { session } from '@/data/session'
 import logo from '@/assets/images/icon_logo.png'
+import hero from '@/assets/images/hero.png'
 </script>
