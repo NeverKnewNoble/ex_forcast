@@ -9,9 +9,40 @@
         <div class="w-80 bg-white border-r border-violet-200 p-6 min-h-screen flex flex-col">
           <h1 class="text-[28px] font-extrabold text-gray-800 mb-6">Expense Assumptions</h1>
 
+          <!-- Unsaved Indicator and Save Button -->
+          <div class="flex justify-between items-center pb-4 border-b border-violet-200">
+            <div
+              v-if="!isSaved"
+              class="text-sm text-red-600 font-medium bg-red-200 px-3 py-1.5 rounded-full"
+            >
+              Unsaved
+            </div>
+            <div
+              v-else
+              class="text-sm text-green-600 font-medium bg-green-200 px-3 py-1.5 rounded-full"
+            >
+              Saved
+            </div>
+            <button
+              v-if="!isSaving && !isSaved"
+              :disabled="isSaving"
+              @click="saveChangesWrapper"
+              class="px-4 py-0.5 bg-black text-white hover:bg-gray-900 rounded-md transition-all"
+            >
+              Save
+            </button>
+            <button
+              v-if="isSaving"
+              class="px-4 py-0.5 bg-black text-white hover:bg-gray-900 rounded-md transition-all"
+            >
+              Saving...
+            </button>
+            <span v-if="saveError" class="ml-2 text-xs text-red-500">{{ saveError }}</span>
+          </div>
+          
           <!-- Action Buttons -->
           <div class="space-y-3 mb-6">
-            <button @click="showAddExpenseModal = true" class="w-full px-4 py-2 bg-violet-500 rounded-md hover:bg-black transition-all text-white">
+            <button @click="showAddExpenseModal = true" class="w-full px-4 py-2 mt-4 bg-violet-500 rounded-md hover:bg-black transition-all text-white">
             Add Expense
           </button>
         </div>
@@ -45,31 +76,7 @@
               Advanced Setting
             </button>
 
-            <!-- Unsaved Indicator and Save Button -->
-            <div class="flex justify-between items-center pt-4 border-t border-violet-200">
-              <div
-                v-if="!isSaved"
-                class="text-sm text-red-600 font-medium bg-red-200 px-3 py-1 rounded-full"
-              >
-                Unsaved
-              </div>
-              <div
-                v-else
-                class="text-sm text-green-600 font-medium bg-green-200 px-3 py-1 rounded-full"
-              >
-                Saved
-              </div>
-              <button
-                v-if="!isSaving && !isSaved"
-                :disabled="isSaving"
-                @click="saveChangesWrapper"
-                class="px-4 py-1 bg-black text-white hover:border hover:border-violet-500 hover:text-violet-700 hover:bg-violet-100 rounded-md transition-all"
-              >
-                Save
-              </button>
-              <span v-if="isSaving" class="ml-2 text-xs text-gray-500">Saving...</span>
-              <span v-if="saveError" class="ml-2 text-xs text-red-500">{{ saveError }}</span>
-            </div>
+
           </div>
         </div>
 
@@ -222,7 +229,7 @@
       </div>
     </div>
   </div>
-  
+
 
   <!-- Advanced Setting Modal -->
   <transition name="fade">
@@ -447,19 +454,15 @@
 
 
 
-
-
 <script setup>
 import { ref, onMounted, computed, watch } from "vue";
 import Sidebar from "@/components/ui/Sidebar.vue";
 import { CircleAlert, AlertTriangle } from 'lucide-vue-next';
-// import alertService from "@/components/ui/alertService.js";
+
 import {
   // Core expense calculations
   getVisibleYears,
   getColumnLabels,
-  // getAmount,
-  // calculateTotal,
   
   // Modal and form management
   showAddExpenseModal,
@@ -469,29 +472,21 @@ import {
   cancelAddExpense,
   resetExpenseForm,
   
-  // Document creation
-  // createExpenseDocument,
-  
   // Data loading and API services
   loadYearOptions,
   loadExpenseData,
   extractAllExpenses,
   
   // Table display and interaction
-  // collapsedYears,
   toggleCollapse,
   isYearCollapsed,
-  // getFilteredExpenses,
+
   getExpensesGroupedByCategory,
   getExpenseDetails,
   getAmountForExpense,
   calculateTotalForExpense,
   
-  // Advanced settings management
-  // initializeAdvancedModes,
-  
-  // Filter and validation utilities
-  // getMonthOptions,
+  // Filter and validation utilities,
   months,
 
   // Expense List
@@ -500,8 +495,7 @@ import {
   // Expense Field Options
   getExpenseFieldOptions
 } from "@/components/utility/expense_assumption/index.js";
-// import { getExpenseList as expenseList } from "@/components/utility/expense_assumption/expense_list.js";
-// import { cloneDeep, isEqual } from 'lodash-es';
+
 import { cloneDeep } from 'lodash-es';
 import {
   calculateCategoryTotal,
@@ -610,9 +604,12 @@ onMounted(async () => {
     originalExpenseData.value = cloneDeep(expenseData.value); // Store original
     expenses.value = extractAllExpenses(expenseData.value);
     expenseOptions.value = (await getExpenseList())?.map(name => ({ label: name, value: name })) || [];
+    
+    // Use the options API for modal dropdowns (shows all available options)
     const fieldOptions = await getExpenseFieldOptions();
     categoryOptions.value = fieldOptions.hospitality_category.map(category => ({ label: category, value: category }));
     costTypeOptions.value = fieldOptions.cost_type.map(costType => ({ label: costType, value: costType }));
+    
     // Restore years from localStorage
     fromYear.value = localStorage.getItem('expenseEstimateFromYear') || "";
     toYear.value = localStorage.getItem('expenseEstimateToYear') || "";

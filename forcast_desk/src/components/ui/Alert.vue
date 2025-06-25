@@ -3,11 +3,11 @@
     <div
       v-if="isVisible"
       :class="alertClasses"
-      class="fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 max-w-sm"
+      class="fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 max-w-sm"
     >
       <div class="flex items-center">
-        <component :is="iconComponent" class="w-5 h-5 mr-2" />
-        <span class="font-medium">{{ message }}</span>
+        <component :is="getIconComponent()" class="w-5 h-5 mr-2" />
+        <span class="font-medium mr-2">{{ message }}</span>
         <button
           v-if="dismissible"
           @click="dismiss"
@@ -24,6 +24,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { CheckCircle, X, AlertTriangle, Info } from 'lucide-vue-next'; 
+
 
 const props = defineProps({
   type: {
@@ -58,46 +60,14 @@ const alertClasses = computed(() => {
   return `${baseClasses} ${typeClasses[props.type]}`
 })
 
-const iconComponent = computed(() => {
+const getIconComponent = () => {
   const icons = {
-    success: 'CheckIcon',
-    error: 'XIcon',
-    warning: 'AlertTriangleIcon',
-    info: 'InfoIcon'
+    success: CheckCircle,
+    error: X,
+    warning: AlertTriangle,
+    info: Info
   }
   return icons[props.type]
-})
-
-const CheckIcon = {
-  template: `
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-    </svg>
-  `
-}
-
-const XIcon = {
-  template: `
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-    </svg>
-  `
-}
-
-const AlertTriangleIcon = {
-  template: `
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-    </svg>
-  `
-}
-
-const InfoIcon = {
-  template: `
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-    </svg>
-  `
 }
 
 const dismiss = () => {

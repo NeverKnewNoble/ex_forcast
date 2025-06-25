@@ -34,7 +34,7 @@ export function getExpensesGroupedByCategory(expenseData, visibleYears) {
     const yearData = expenseData[year] || {}
     for (const month in yearData) {
       yearData[month].forEach(entry => {
-        const category = entry.category || 'Other'
+        const category = entry.hospitality_category || 'Other'
         if (!categoryMap.has(category)) {
           categoryMap.set(category, new Set())
         }
@@ -72,7 +72,7 @@ export function getExpensesGroupedByCategory(expenseData, visibleYears) {
   return groupedExpenses
 }
 
-// Get expense details (code, cost type) for a specific expense
+// Get expense details (code, cost type, hospitality category) for a specific expense
 export function getExpenseDetails(expenseData, expense, visibleYears) {
   for (const year of visibleYears) {
     const yearData = expenseData[year] || {}
@@ -81,12 +81,38 @@ export function getExpenseDetails(expenseData, expense, visibleYears) {
       if (entry) {
         return {
           code: entry.code || '',
-          costType: entry['cost type'] || ''
+          costType: entry['cost_type'] || '',
+          hospitalityCategory: entry['hospitality_category'] || ''
         }
       }
     }
   }
-  return { code: '', costType: '' }
+  return { code: '', costType: '', hospitalityCategory: '' }
+}
+
+// Extract unique cost_type and hospitality_category values from expense data
+export function extractFieldOptionsFromData(expenseData) {
+  const hospitalityCategories = new Set()
+  const costTypes = new Set()
+  
+  for (const year in expenseData) {
+    const yearData = expenseData[year] || {}
+    for (const month in yearData) {
+      yearData[month].forEach(entry => {
+        if (entry.hospitality_category) {
+          hospitalityCategories.add(entry.hospitality_category)
+        }
+        if (entry.cost_type) {
+          costTypes.add(entry.cost_type)
+        }
+      })
+    }
+  }
+  
+  return {
+    hospitality_category: [...hospitalityCategories].sort(),
+    cost_type: [...costTypes].sort()
+  }
 }
 
 // Get amount for a specific expense, year, and month/quarter

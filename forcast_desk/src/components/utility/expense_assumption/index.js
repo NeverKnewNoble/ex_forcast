@@ -40,7 +40,8 @@ export {
   getExpensesGroupedByCategory,
   getExpenseDetails,
   getAmountForExpense,
-  calculateTotalForExpense
+  calculateTotalForExpense,
+  extractFieldOptionsFromData
 } from './table_utils.js';
 
 // Advanced settings management
