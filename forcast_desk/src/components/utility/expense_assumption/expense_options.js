@@ -13,7 +13,7 @@ export async function getExpenseFieldOptions() {
     }
 
     const result = await response.json();
-    console.log("Expense options API response:", result);
+    // console.log("Expense options API response:", result);
 
     // Handle the nested data structure
     const data = result.data || result;

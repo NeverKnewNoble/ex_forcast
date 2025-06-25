@@ -36,7 +36,11 @@ export {
   collapsedYears,
   toggleCollapse,
   isYearCollapsed,
-  getFilteredExpenses
+  getFilteredExpenses,
+  getExpensesGroupedByCategory,
+  getExpenseDetails,
+  getAmountForExpense,
+  calculateTotalForExpense
 } from './table_utils.js';
 
 // Advanced settings management

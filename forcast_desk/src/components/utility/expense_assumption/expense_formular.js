@@ -50,3 +50,10 @@ export function yearsCount(from, to) {
   if (!fromYear || !toYear || fromYear > toYear) return 0;
   return toYear - fromYear + 1;
 }
+
+export const quarterToMonths = {
+  "Jan-Mar": ["Jan", "Feb", "Mar"],
+  "Apr-Jun": ["Apr", "May", "Jun"],
+  "Jul-Sep": ["Jul", "Aug", "Sep"],
+  "Oct-Dec": ["Oct", "Nov", "Dec"]
+};
