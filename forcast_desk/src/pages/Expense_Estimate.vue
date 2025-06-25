@@ -17,7 +17,7 @@
         </div>
 
           <!-- Filters Section -->
-          <div class="space-y-4 mb-6">
+          <div class="space-y-3 mb-6">
             <h3 class="text-lg font-semibold text-gray-700">Year Range</h3>
             
             <div class="flex gap-3">
@@ -38,18 +38,37 @@
               </div>
             </div>
 
+            <button @click="clearYearSelection" class="w-full px-4 py-2 bg-black text-white hover:bg-violet-500 rounded-md">
+              Clear
+            </button>
             <button @click="showAdvanced = true" class="w-full px-4 py-2 bg-white border border-violet-500 text-violet-700 hover:bg-violet-100 rounded-md">
               Advanced Setting
             </button>
 
             <!-- Unsaved Indicator and Save Button -->
             <div class="flex justify-between items-center pt-4 border-t border-violet-200">
-              <div class="text-sm text-red-600 font-medium bg-red-200 px-3 py-1 rounded-full">
+              <div
+                v-if="!isSaved"
+                class="text-sm text-red-600 font-medium bg-red-200 px-3 py-1 rounded-full"
+              >
                 Unsaved
               </div>
-              <button class="px-4 py-1 bg-black text-white hover:border hover:border-violet-500 hover:text-violet-700 hover:bg-violet-100 rounded-md transition-all">
+              <div
+                v-else
+                class="text-sm text-green-600 font-medium bg-green-200 px-3 py-1 rounded-full"
+              >
+                Saved
+              </div>
+              <button
+                v-if="!isSaving && !isSaved"
+                :disabled="isSaving"
+                @click="saveChangesWrapper"
+                class="px-4 py-1 bg-black text-white hover:border hover:border-violet-500 hover:text-violet-700 hover:bg-violet-100 rounded-md transition-all"
+              >
                 Save
               </button>
+              <span v-if="isSaving" class="ml-2 text-xs text-gray-500">Saving...</span>
+              <span v-if="saveError" class="ml-2 text-xs text-red-500">{{ saveError }}</span>
             </div>
           </div>
         </div>
@@ -62,7 +81,9 @@
             <table class="table-auto border-violet-300 rounded-xl overflow-hidden">
               <thead class="bg-violet-600 text-white">
                 <tr>
+                  <th rowspan="2" class="px-4 py-3 text-left align-middle border-r border-violet-400">Code</th>
                   <th rowspan="2" class="px-4 py-3 text-left align-middle border-r border-violet-400">Expense</th>
+                  <th rowspan="2" class="px-4 py-3 text-left align-middle border-r border-violet-400">Cost Type</th>
                   <th
                     v-for="year in visibleYears"
                     :key="'header-' + year"
@@ -94,33 +115,89 @@
               </thead>
 
               <tbody class="text-gray-700 bg-white">
-                <tr
-                  v-for="expense in filteredExpenses"
-                  :key="expense"
-                  class="even:bg-violet-50 hover:bg-violet-100 transition"
-                >
-                  <td class="px-4 py-3 font-medium border-r border-violet-200">{{ expense }}</td>
-                  <template v-for="year in visibleYears" :key="'row-' + year + '-' + expense">
-                    <template v-if="!isYearCollapsed(year)">
-                      <td
-                            v-for="label in getColumnLabelsForYearLocal(year)"
-                        :key="'cell-' + year + '-' + label"
-                        contenteditable="true"
-                        class="px-2 py-2 text-right border border-violet-200"
-                      >
-                        {{ getAmount(expenseData, expense, year, label) }}
-                      </td>
-                      <td class="px-2 py-2 text-right border border-violet-200">
-                        {{ calculateTotal(expenseData, expense, year, advancedModes[year] || displayMode) }}
-                      </td>
+                <template v-for="categoryGroup in groupedExpenses" :key="'category-' + categoryGroup.category">
+                  <!-- Category Header Row -->
+                  <tr class="bg-violet-100 border-b-1 border-violet-300">
+                    <td colspan="3" class="px-4 py-3 font-bold text-violet-800 border-r border-violet-300">
+                      {{ categoryGroup.category }}
+                    </td>
+                    <template v-for="year in visibleYears" :key="'category-header-' + year">
+                      <template v-if="!isYearCollapsed(year)">
+                        <td
+                          v-for="label in getColumnLabelsForYearLocal(year)"
+                          :key="'category-cell-' + year + '-' + label"
+                          class="px-2 py-2 text-center border border-violet-200 bg-violet-100"
+                        ></td>
+                        <td class="px-2 py-2 text-center border border-violet-200 bg-violet-100"></td>
+                      </template>
+                      <template v-else>
+                        <td class="px-2 py-2 text-center border border-violet-200 bg-violet-100"></td>
+                      </template>
                     </template>
-                    <template v-else>
-                      <td class="px-2 py-2 text-right border border-violet-200">
-                        {{ calculateTotal(expenseData, expense, year, advancedModes[year] || displayMode) }}
-                      </td>
+                  </tr>
+                  
+                  <!-- Expense Rows for this Category -->
+                  <tr
+                    v-for="expense in categoryGroup.expenses"
+                    :key="'expense-' + expense"
+                    class="even:bg-violet-50 hover:bg-violet-100 transition"
+                  >
+                    <td class="px-4 py-3 font-medium border-r border-violet-200 text-gray-600">
+                      {{ getExpenseDetails(expenseData, expense, visibleYears).code }}
+                    </td>
+                    <td class="px-4 py-3 font-medium border-r border-violet-200">{{ expense }}</td>
+                    <td class="px-4 py-3 font-medium border-r border-violet-200 text-gray-600">
+                      {{ getExpenseDetails(expenseData, expense, visibleYears).costType }}
+                    </td>
+                    <template v-for="year in visibleYears" :key="'row-' + year + '-' + expense">
+                      <template v-if="!isYearCollapsed(year)">
+                        <td
+                              v-for="label in getColumnLabelsForYearLocal(year)"
+                          :key="'cell-' + year + '-' + label"
+                          contenteditable="true"
+                          class="px-2 py-2 text-right border border-violet-200"
+                          @input="handleCellInput({ year, label, expense, event: $event })"
+                          @focus="handleCellFocus({ year, label, expense, event: $event })"
+                          @blur="handleCellEditWrapper({ year, label, expense, event: $event })"
+                        >
+                          {{ getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode) }}
+                        </td>
+                        <td class="px-2 py-2 text-right border border-violet-200 font-semibold">
+                          {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
+                        </td>
+                      </template>
+                      <template v-else>
+                        <td class="px-2 py-2 text-right border border-violet-200 font-semibold">
+                          {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
+                        </td>
+                      </template>
                     </template>
-                  </template>
-                </tr>
+                  </tr>
+                  
+                  <!-- Category Total Row -->
+                  <tr class="bg-violet-100 border-y-2 border-violet-400">
+                    <td colspan="3" class="px-4 py-3 font-bold text-violet-900 border-r border-violet-300">
+                      Total
+                    </td>
+                    <template v-for="year in visibleYears" :key="'category-total-' + year">
+                      <template v-if="!isYearCollapsed(year)">
+                        <td
+                          v-for="label in getColumnLabelsForYearLocal(year)"
+                          :key="'category-total-cell-' + year + '-' + label"
+                          class="px-2 py-2 text-center border border-violet-300 bg-violet-200"
+                        ></td>
+                        <td class="px-2 py-2 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
+                          {{ calculateCategoryTotal(expenseData, categoryGroup.expenses, year, advancedModes[year] || displayMode) }}
+                        </td>
+                      </template>
+                      <template v-else>
+                        <td class="px-2 py-2 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
+                          {{ calculateCategoryTotal(expenseData, categoryGroup.expenses, year, advancedModes[year] || displayMode) }}
+                        </td>
+                      </template>
+                    </template>
+                  </tr>
+                </template>
               </tbody>
             </table>
               </div>
@@ -156,7 +233,15 @@
       <div class="bg-white rounded-xl p-6 w-[90%] max-w-lg shadow-xl border border-violet-200">
         <h2 class="text-xl font-semibold text-violet-700 mb-4">Advanced Display Mode Settings</h2>
 
-        <div class="space-y-4 max-h-[60vh] overflow-auto pr-2">
+        <!-- Message when no years selected -->
+        <div v-if="!visibleYears.length" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div class="flex items-center gap-2">
+            <AlertTriangle class="w-15 h-15 mr-2 text-yellow-600" />
+            <p class="text-yellow-800 font-medium">Please select both "From Year" and "To Year" to configure advanced settings.</p>
+          </div>
+        </div>
+
+        <div v-if="visibleYears.length" class="space-y-4 max-h-[60vh] overflow-auto pr-2">
           <div
             v-for="year in visibleYears"
             :key="'adv-' + year"
@@ -164,7 +249,7 @@
           >
             <span class="font-medium text-gray-700">{{ year }}</span>
             <select
-              v-model="advancedModes[year]"
+              v-model="tempAdvancedModes[year]"
               class="px-6 py-2 border rounded-md focus:ring-violet-500"
             >
               <option value="monthly">Monthly</option>
@@ -175,12 +260,13 @@
 
         <div class="flex justify-end gap-3 mt-6">
           <button
-            @click="showAdvanced = false"
+            @click="cancelAdvancedSettings"
             class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700"
           >
             Cancel
           </button>
           <button
+            v-if="visibleYears.length"
             @click="applyAdvancedSettings"
             class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700"
           >
@@ -298,8 +384,8 @@
                       <input
                         type="text"
                         v-model="row.amountDisplay"
-                        @input="formatAmountInput(index)"
-                        @blur="cleanAmountValue(index)"
+                        @input="formatAmountInputWrapper(index, $event)"
+                        @blur="cleanAmountValueWrapper(index)"
                         class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-left"
                         placeholder="0.00"
                       />
@@ -343,7 +429,7 @@
                 Cancel
               </button>
               <button 
-                @click="submitAddExpense" 
+                @click="submitAddExpenseWrapper" 
                 class="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-all font-medium"
               >
                 Submit
@@ -361,16 +447,19 @@
 
 
 
+
+
 <script setup>
 import { ref, onMounted, computed, watch } from "vue";
 import Sidebar from "@/components/ui/Sidebar.vue";
-import { CircleAlert } from 'lucide-vue-next';
+import { CircleAlert, AlertTriangle } from 'lucide-vue-next';
+// import alertService from "@/components/ui/alertService.js";
 import {
   // Core expense calculations
   getVisibleYears,
   getColumnLabels,
-  getAmount,
-  calculateTotal,
+  // getAmount,
+  // calculateTotal,
   
   // Modal and form management
   showAddExpenseModal,
@@ -381,7 +470,7 @@ import {
   resetExpenseForm,
   
   // Document creation
-  createExpenseDocument,
+  // createExpenseDocument,
   
   // Data loading and API services
   loadYearOptions,
@@ -389,16 +478,20 @@ import {
   extractAllExpenses,
   
   // Table display and interaction
-  collapsedYears,
+  // collapsedYears,
   toggleCollapse,
   isYearCollapsed,
-  getFilteredExpenses,
+  // getFilteredExpenses,
+  getExpensesGroupedByCategory,
+  getExpenseDetails,
+  getAmountForExpense,
+  calculateTotalForExpense,
   
   // Advanced settings management
-  initializeAdvancedModes,
+  // initializeAdvancedModes,
   
   // Filter and validation utilities
-  getMonthOptions,
+  // getMonthOptions,
   months,
 
   // Expense List
@@ -407,7 +500,19 @@ import {
   // Expense Field Options
   getExpenseFieldOptions
 } from "@/components/utility/expense_assumption/index.js";
-import { getExpenseList as expenseList } from "@/components/utility/expense_assumption/expense_list.js";
+// import { getExpenseList as expenseList } from "@/components/utility/expense_assumption/expense_list.js";
+// import { cloneDeep, isEqual } from 'lodash-es';
+import { cloneDeep } from 'lodash-es';
+import {
+  calculateCategoryTotal,
+  formatAmountInput,
+  cleanAmountValue,
+  handleCellEdit,
+  handleCellInput,
+  handleCellFocus
+} from "@/components/utility/expense_assumption/expense_estimate_utils.js";
+import { saveChanges } from "@/components/utility/expense_assumption/save_changes.js";
+import { submitAddExpense } from "@/components/utility/expense_assumption/submit_add_expense.js";
 
 
 // Reactive state
@@ -419,6 +524,7 @@ const expenses = ref([]);
 const expenseData = ref({});
 const showAdvanced = ref(false);
 const advancedModes = ref({});
+const tempAdvancedModes = ref({});
 const expenseOptions = ref([]);
 const hospitalityExperience = ref(
   localStorage.getItem('hospitalityExperience') === null
@@ -427,6 +533,11 @@ const hospitalityExperience = ref(
 );
 const categoryOptions = ref([]);
 const costTypeOptions = ref([]);
+const isSaved = ref(false);
+const originalExpenseData = ref({});
+const changedCells = ref([]); // {year, label, expense, newValue}
+const isSaving = ref(false);
+const saveError = ref("");
 
 // Computed properties
 const visibleYears = computed(() => {
@@ -435,13 +546,11 @@ const visibleYears = computed(() => {
   return years;
 });
 
-const filteredExpenses = computed(() => {
-  const expenses = getFilteredExpenses(expenseData.value, visibleYears.value);
-  console.log('Filtered expenses:', expenses, 'expenseData:', expenseData.value);
-  return expenses;
+
+const groupedExpenses = computed(() => {
+  return getExpensesGroupedByCategory(expenseData.value, visibleYears.value);
 });
 
-const monthOptions = computed(() => getMonthOptions());
 
 // Computed property to get column labels for a specific year
 const getColumnLabelsForYearLocal = (year) => {
@@ -458,14 +567,6 @@ watch(visibleYears, () => {
   });
 });
 
-// Watch for changes in year selections
-watch(fromYear, (newValue, oldValue) => {
-  // console.log('From Year changed:', { newValue, oldValue, type: typeof newValue });
-});
-
-watch(toYear, (newValue, oldValue) => {
-  // console.log('To Year changed:', { newValue, oldValue, type: typeof newValue });
-});
 
 // Watch for hospitality experience changes
 watch(hospitalityExperience, (newValue) => {
@@ -484,110 +585,96 @@ const checkHospitalityExperience = () => {
 // Check for changes periodically
 setInterval(checkHospitalityExperience, 1000);
 
+// When opening the modal, copy the current settings
+watch(showAdvanced, (val) => {
+  if (val) {
+    tempAdvancedModes.value = { ...advancedModes.value };
+  }
+});
+
 function applyAdvancedSettings() {
+  advancedModes.value = { ...tempAdvancedModes.value };
   showAdvanced.value = false;
 }
 
-// Format amount input to show commas for better readability
-function formatAmountInput(index) {
-  const row = addExpenseForm.value.rows[index];
-  let value = row.amountDisplay;
-  
-  // Remove all non-numeric characters except decimal point
-  value = value.replace(/[^\d.]/g, '');
-  
-  // Ensure only one decimal point
-  const parts = value.split('.');
-  if (parts.length > 2) {
-    value = parts[0] + '.' + parts.slice(1).join('');
-  }
-  
-  // Convert to number and format with commas
-  const numValue = parseFloat(value) || 0;
-  row.amountDisplay = numValue.toLocaleString('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2
-  });
-  
-  // Update the actual amount value (without commas)
-  row.amount = numValue;
+function cancelAdvancedSettings() {
+  showAdvanced.value = false;
 }
 
-// Clean amount value when input loses focus
-function cleanAmountValue(index) {
-  const row = addExpenseForm.value.rows[index];
-  const numValue = parseFloat(row.amountDisplay.replace(/[^\d.]/g, '')) || 0;
-  
-  // Format with commas and ensure proper decimal places
-  row.amountDisplay = numValue.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
-  
-  // Update the actual amount value
-  row.amount = numValue;
-}
-
-// Create expense document
-async function submitAddExpense() {
-  const { year, month, rows } = addExpenseForm.value
-
-  if (!year || !month || rows.length === 0) {
-    alert('Please select year, month, and add at least one expense.')
-    return
-  }
-
-  const cleanRows = rows.filter(r => r.expense && r.amount > 0)
-
-  const result = await createExpenseDocument({
-    year,
-    month,
-    expenses: cleanRows
-  })
-
-  if (result.success) {
-    alert(`Expense document created: ${result.name}`)
-    showAddExpenseModal.value = false
-    resetExpenseForm()
-  } else {
-    alert('Failed to create document: ' + (result.error?.message || result.error))
-  }
-}
-
-// Load data on mount
+// On mount, initialize years from localStorage if available
 onMounted(async () => {
   try {
-    // console.log('Loading data...');
     years.value = await loadYearOptions();
-    // console.log('Years loaded:', years.value);
-    
     expenseData.value = await loadExpenseData();
-    // console.log('Expense data loaded:', expenseData.value);
-    
+    // console.log('Loaded expense data structure:', expenseData.value); // Debug log
+    originalExpenseData.value = cloneDeep(expenseData.value); // Store original
     expenses.value = extractAllExpenses(expenseData.value);
-    // console.log('All expenses extracted:', expenses.value);
-
-    expenseOptions.value = (await getExpenseList())?.map(name => ({
-      label: name,
-      value: name
-    })) || [];
-    // console.log('Expense options:', expenseOptions.value);
-
-    // Load expense field options
+    expenseOptions.value = (await getExpenseList())?.map(name => ({ label: name, value: name })) || [];
     const fieldOptions = await getExpenseFieldOptions();
-    categoryOptions.value = fieldOptions.hospitality_category.map(category => ({
-      label: category,
-      value: category
-    }));
-    costTypeOptions.value = fieldOptions.cost_type.map(costType => ({
-      label: costType,
-      value: costType
-    }));
-    // console.log('Field options loaded:', { categoryOptions: categoryOptions.value, costTypeOptions: costTypeOptions.value });
+    categoryOptions.value = fieldOptions.hospitality_category.map(category => ({ label: category, value: category }));
+    costTypeOptions.value = fieldOptions.cost_type.map(costType => ({ label: costType, value: costType }));
+    // Restore years from localStorage
+    fromYear.value = localStorage.getItem('expenseEstimateFromYear') || "";
+    toYear.value = localStorage.getItem('expenseEstimateToYear') || "";
+    isSaved.value = true;
   } catch (err) {
     console.error("Error loading data:", err);
   }
 });
+
+// Watchers to persist year selection
+watch(fromYear, (newValue) => {
+  localStorage.setItem('expenseEstimateFromYear', newValue);
+});
+watch(toYear, (newValue) => {
+  localStorage.setItem('expenseEstimateToYear', newValue);
+});
+
+function clearYearSelection() {
+  fromYear.value = "";
+  toYear.value = "";
+  localStorage.removeItem('expenseEstimateFromYear');
+  localStorage.removeItem('expenseEstimateToYear');
+  isSaved.value = false;
+}
+
+function handleCellEditWrapper({ year, label, expense, event }) {
+  handleCellEdit({
+    year,
+    label,
+    expense,
+    event,
+    originalExpenseData,
+    changedCells,
+    expenseData,
+    isSaved
+  });
+}
+
+// ! Wrapper functions to ensure addExpenseForm is properly initialized
+const formatAmountInputWrapper = (index, event) => {
+  if (addExpenseForm && addExpenseForm.value && addExpenseForm.value.rows) {
+    formatAmountInput(index, addExpenseForm, event);
+  }
+};
+
+const cleanAmountValueWrapper = (index) => {
+  if (addExpenseForm && addExpenseForm.value && addExpenseForm.value.rows) {
+    cleanAmountValue(index, addExpenseForm);
+  }
+};
+
+// Wrapper function for submitAddExpense
+const submitAddExpenseWrapper = async () => {
+  if (addExpenseForm && addExpenseForm.value) {
+    await submitAddExpense(addExpenseForm, showAddExpenseModal, resetExpenseForm, isSaved);
+  }
+};
+
+// Wrapper function for saveChanges
+const saveChangesWrapper = async () => {
+  await saveChanges(changedCells, isSaving, saveError, expenseData, originalExpenseData, isSaved, loadExpenseData);
+};
 </script>
 
 
