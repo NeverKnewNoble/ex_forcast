@@ -447,6 +447,44 @@
       </div>
     </div>
   </transition>
+
+  <!-- Unsaved Changes Warning Modal -->
+  <transition name="fade">
+    <div
+      v-if="showUnsavedWarning"
+      class="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+    >
+      <div class="bg-white rounded-xl p-6 w-[90%] max-w-md shadow-xl border border-red-200">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-gray-800">Unsaved Changes</h2>
+        </div>
+        
+        <p class="text-gray-600 mb-6">
+          You have unsaved changes that may be discarded if you leave this page. Are you sure you want to continue?
+        </p>
+        
+        <div class="flex justify-end gap-3">
+          <button
+            @click="cancelNavigation"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium"
+          >
+            Stay on Page
+          </button>
+          <button
+            @click="confirmNavigation"
+            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all font-medium"
+          >
+            Leave Anyway
+          </button>
+        </div>
+      </div>
+    </div>
+  </transition>
 </template>
 
 
@@ -455,7 +493,7 @@
 
 
 <script setup>
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import Sidebar from "@/components/ui/Sidebar.vue";
 import { CircleAlert, AlertTriangle } from 'lucide-vue-next';
 
@@ -532,6 +570,8 @@ const originalExpenseData = ref({});
 const changedCells = ref([]); // {year, label, expense, newValue}
 const isSaving = ref(false);
 const saveError = ref("");
+const showUnsavedWarning = ref(false);
+const pendingNavigation = ref(null); // Store the pending navigation action
 
 // Computed properties
 const visibleYears = computed(() => {
@@ -560,7 +600,6 @@ watch(visibleYears, () => {
     }
   });
 });
-
 
 // Watch for hospitality experience changes
 watch(hospitalityExperience, (newValue) => {
@@ -672,6 +711,48 @@ const submitAddExpenseWrapper = async () => {
 const saveChangesWrapper = async () => {
   await saveChanges(changedCells, isSaving, saveError, expenseData, originalExpenseData, isSaved, loadExpenseData);
 };
+
+
+// ! Unsaved Changes Warning Modal
+// ! Watch for unsaved changes to show warning on page refresh
+watch(isSaved, (newValue) => {
+  if (!newValue) {
+    // Add beforeunload event listener when there are unsaved changes
+    window.addEventListener('beforeunload', handleBeforeUnload);
+  } else {
+    // Remove beforeunload event listener when changes are saved
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+  }
+});
+
+// Handle beforeunload event to show warning
+function handleBeforeUnload(event) {
+  if (!isSaved.value) {
+    // Standard browser warning
+    event.preventDefault();
+    event.returnValue = 'You have unsaved changes that may be discarded if not saved. Are you sure you want to leave?';
+    return event.returnValue;
+  }
+}
+
+// Handle navigation cancellation
+function cancelNavigation() {
+  showUnsavedWarning.value = false;
+}
+
+// Handle navigation confirmation
+function confirmNavigation() {
+  showUnsavedWarning.value = false;
+  // Allow the navigation to proceed by removing the event listener temporarily
+  window.removeEventListener('beforeunload', handleBeforeUnload);
+  // Trigger the actual navigation (refresh, close, etc.)
+  window.location.reload();
+}
+
+// Clean up event listeners when component is unmounted
+onUnmounted(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload);
+});
 </script>
 
 
