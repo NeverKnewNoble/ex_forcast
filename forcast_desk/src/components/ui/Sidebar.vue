@@ -1,5 +1,5 @@
 <template>
-  <aside :class="['flex flex-col min-h-screen transition-all duration-200 ease-in-out border border-r-violet-400 bg-white text-gray-800 shadow', is_expanded ? 'w-64' : 'w-16']">
+  <aside :class="['flex-shrink-0 flex-col min-h-screen transition-all duration-200 ease-in-out border border-r-violet-400 bg-white text-gray-800 shadow', is_expanded ? 'w-64' : 'w-16']">
     <!-- Logo -->
     <div class="p-4 justify-center">
       <img v-if="!is_expanded" :src="logoURL" alt="Ex Forecast" class="w-8 mx-auto" />
@@ -8,6 +8,7 @@
 
     <!-- Toggle -->
     <div class="flex justify-center px-2">
+      <span v-if="is_expanded" class="font-bold mr-6 text-[16px]">Welcome, {{ session.user }}</span>
       <button v-if="!is_expanded" @click="ToggleMenu" class="transition-transform duration-200 hover:text-violet-400">
         <CircleArrowRight />
       </button>
@@ -40,7 +41,7 @@
 
     <!-- Footer Greeting -->
     <div class="mt-auto pb-4 px-4">
-      <span v-if="is_expanded" class="font-semibold text-[16px]">Welcome, {{ session.user }}</span>
+
       <hr v-if="is_expanded" class="my-3 border-t border-gray-200" />
       <div v-if="is_expanded" class="flex flex-col mt-2">
         <div class="flex items-center group relative">
@@ -97,7 +98,7 @@ const menuItems = [
   { text: "Home", route: "/", icon: Home },
   { text: "Dashboard", route: "/dashboard", icon: LayoutDashboard  },
   { text: "Expense Assumptions", route: "/expense_estimate", icon: ReceiptText  },
-  { text: "Room Revenue Budget", route: "/", icon: MemoryStick   },
+  { text: "Room Revenue Assumptions", route: "/room_revenue_assumptions", icon: MemoryStick   },
   { text: "Banquet Revenue Forcast", route: "/", icon: TrendingUpDown  },
   { text: "Profit & Loss Statement", route: "/", icon: BanknoteArrowUp  },
 ]

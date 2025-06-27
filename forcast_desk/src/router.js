@@ -28,6 +28,11 @@ const routes = [
     path: '/expense_estimate',
     component: () => import('@/pages/Expense_Estimate.vue'),
   },
+  {
+    name: 'Room_Revenue',
+    path: '/room_revenue_assumptions',
+    component: () => import('@/pages/Room_Revenue.vue'),
+  },
 ]
 
 let router = createRouter({

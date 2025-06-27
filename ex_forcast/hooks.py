@@ -151,6 +151,12 @@ doc_events = {
     },
     "Doctype2": {
         "on_update": "ex_forcast.api.expense_estimate.estimate_display"
+    },
+    "Doctype3": {
+        "on_update": "ex_forcast.api.create_expense.create_document"
+    },
+    "Doctype4": {
+        "on_update": "ex_forcast.api.expense_options.get_expense_field_options"
     }
 }
 
@@ -251,5 +257,8 @@ doc_events = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+fixtures = [
+            {"doctype": "Room Packages", "filters": [["module" , "in" , ("Ex Forcast" )]]},
+]
 
 website_route_rules = [{'from_route': '/forcast_desk/<path:app_path>', 'to_route': 'forcast_desk'},]

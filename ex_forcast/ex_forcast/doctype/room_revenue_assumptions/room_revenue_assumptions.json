@@ -1,24 +1,18 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:ExE-{#####}",
- "creation": "2025-06-10 11:41:12.001549",
+ "autoname": "format:RRA-{#####}",
+ "creation": "2025-06-26 12:01:29.248880",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "expense_information_section",
   "year",
-  "column_break_rtve",
+  "column_break_neuz",
   "month",
-  "section_break_kykx",
-  "expense_items"
+  "section_break_saeg",
+  "room_details"
  ],
  "fields": [
-  {
-   "fieldname": "expense_information_section",
-   "fieldtype": "Section Break",
-   "label": "Expense Information"
-  },
   {
    "fieldname": "year",
    "fieldtype": "Select",
@@ -27,7 +21,7 @@
    "options": "\n2020\n2021\n2022\n2023\n2024\n2025\n2026\n2027\n2028\n2029\n2030\n2031\n2032\n2033\n2034\n2035\n2036\n2037\n2038\n2039\n2040\n2041\n2042\n2043\n2044\n2045\n2046\n2047\n2048\n2049\n2050\n2051\n2052\n2053\n2054\n2055\n2056\n2057\n2058\n2059\n2060"
   },
   {
-   "fieldname": "column_break_rtve",
+   "fieldname": "column_break_neuz",
    "fieldtype": "Column Break"
   },
   {
@@ -38,22 +32,22 @@
    "options": "\nJan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec"
   },
   {
-   "fieldname": "section_break_kykx",
+   "fieldname": "section_break_saeg",
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "expense_items",
+   "fieldname": "room_details",
    "fieldtype": "Table",
-   "label": "Expense Items",
-   "options": "Expense Items"
+   "label": "Room Details",
+   "options": "Room Revenue Items"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-13 23:33:34.498758",
+ "modified": "2025-06-26 17:01:24.237752",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
- "name": "Expense Estimation",
+ "name": "Room Revenue Assumptions",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
