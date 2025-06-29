@@ -127,7 +127,7 @@ export function handleRoomCellFocus({ year, label, roomType, field, event }) {
 
 // Save changes to room revenue data
 export async function saveRoomChanges(changedCells, isSaving, saveError, roomData, originalRoomData, isSaved) {
-  if (changedCells.length === 0) {
+  if (changedCells.value.length === 0) {
     isSaved.value = true
     return
   }
@@ -136,18 +136,71 @@ export async function saveRoomChanges(changedCells, isSaving, saveError, roomDat
   saveError.value = ""
   
   try {
-    // Here you would implement the actual API call to save the changes
-    // For now, we'll just update the original data
-    originalRoomData.value = cloneDeep(roomData.value)
-    changedCells.length = 0
-    isSaved.value = true
+    // Import the API functions and alert service
+    const { saveRoomRevenueChanges, testAPI } = await import('./data_service.js')
+    const alertService = await import('@/components/ui/alertService.js').then(m => m.default)
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // Test if API is accessible
+    try {
+      const testResult = await testAPI()
+      console.log('API test result:', testResult)
+    } catch (testError) {
+      console.error('API test failed:', testError)
+      throw new Error('API endpoint is not accessible. Please check your connection.')
+    }
+    
+    // Transform the data to match API expectations
+    const transformedChanges = changedCells.value.map(change => {
+      if (change.field === 'room_count') {
+        // Room package count update
+        return {
+          roomType: change.roomType,
+          field: 'room_count',
+          newValue: change.newValue
+        }
+      } else {
+        // Room revenue data update
+        return {
+          year: change.year,
+          month: change.label, // label is the month
+          room_package: change.roomType, // roomType is the package name
+          rate: change.field === 'rate' ? change.newValue : undefined,
+          occupied_beds: change.field === 'occupied_beds' ? change.newValue : undefined
+        }
+      }
+    })
+    
+    // Call the API to save changes
+    const result = await saveRoomRevenueChanges(transformedChanges)
+    
+    // Handle the response structure - API returns { data: { status, results, summary } }
+    const apiResult = result.data || result
+    
+    if (apiResult.status === 'success') {
+      // Update the original data to reflect the saved state
+      originalRoomData.value = cloneDeep(roomData.value)
+      changedCells.value.length = 0
+      isSaved.value = true
+      
+      console.log('Changes saved successfully:', apiResult.summary)
+      
+      // Show success alert
+      alertService.success("Saved successfully")
+    } else {
+      throw new Error(apiResult.message || 'Failed to save changes')
+    }
     
   } catch (error) {
     console.error('Error saving room revenue changes:', error)
-    saveError.value = "Failed to save changes. Please try again."
+    saveError.value = error.message || "Failed to save changes. Please try again."
+    
+    // Show error alert
+    try {
+      const alertService = await import('@/components/ui/alertService.js').then(m => m.default)
+      alertService.error(error.message || "Failed to save changes. Please try again.")
+    } catch (alertError) {
+      console.error('Could not show error alert:', alertError)
+    }
   } finally {
     isSaving.value = false
   }

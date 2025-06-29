@@ -1,4 +1,3 @@
-import code
 import frappe
 from collections import defaultdict
 import json
@@ -50,79 +49,154 @@ def room_revenue_display():
         return {"error": str(err)}
 
 
+@frappe.whitelist()
+def test_api():
+    """Simple test endpoint to verify API is working"""
+    return {"status": "success", "message": "API is working"}
 
-
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def upsert_room_revenue_items(changes):
     """
     changes: JSON string or list of dicts, each with:
-      - year
-      - month
-      - expense (expense_name)
-      - code
-      - amount
-      - (optionally: category/hospitality_category, cost_type)
+      For room revenue data:
+        - year
+        - month  
+        - room_package
+        - rate
+        - occupied_beds
+      For room count updates:
+        - roomType (package name)
+        - field: 'room_count'
+        - newValue (number_of_rooms)
     """
     try:
+        # Debug logging
+        frappe.logger().info(f"Received changes: {changes}")
+        
         if isinstance(changes, str):
             changes = json.loads(changes)
+        
+        frappe.logger().info(f"Parsed changes: {changes}")
 
         results = []
+        room_revenue_changes = []
+        room_package_changes = []
 
+        # Separate the changes by type
         for change in changes:
+            if 'field' in change and change['field'] == 'room_count':
+                # This is a room package count update
+                room_package_changes.append(change)
+            else:
+                # This is a room revenue data update
+                room_revenue_changes.append(change)
+        
+        frappe.logger().info(f"Room revenue changes: {room_revenue_changes}")
+        frappe.logger().info(f"Room package changes: {room_package_changes}")
+
+        # Process room revenue changes
+        for change in room_revenue_changes:
             year = change.get("year")
             month = change.get("month")
-            expense_name = change.get("expense")
-            amount = change.get("amount")
-            hospitality_category = change.get("hospitality_category")
-            cost_type = change.get("cost_type")
+            room_package = change.get("room_package")
+            rate = change.get("rate")
+            occupied_beds = change.get("occupied_beds")
+
+            if not all([year, month, room_package]):
+                frappe.logger().warning(f"Skipping invalid change: {change}")
+                continue
 
             # Find or create parent document
             parent = frappe.db.get_value(
-                "Expense Assumptions",
+                "Room Revenue Assumptions",
                 {"year": year, "month": month},
                 "name"
             )
             if not parent:
                 parent_doc = frappe.get_doc({
-                    "doctype": "Expense Assumptions",
+                    "doctype": "Room Revenue Assumptions",
                     "year": year,
                     "month": month,
-                    "expense_items": []
+                    "room_details": []
                 })
                 parent_doc.insert()
                 parent = parent_doc.name
 
-            # Check if child exists based on expense_name
+            # Check if child exists based on room_package
             child = frappe.db.get_value(
-                "Expense Items",
-                {"parent": parent, "expense_name": expense_name},
+                "Room Revenue Items",
+                {"parent": parent, "room_package": room_package},
                 "name"
             )
 
             if child:
-                # Update amount only
-                child_doc = frappe.get_doc("Expense Items", child)
-                child_doc.amount = amount
+                # Update existing child
+                child_doc = frappe.get_doc("Room Revenue Items", child)
+                if rate is not None:
+                    child_doc.rate = rate
+                if occupied_beds is not None:
+                    child_doc.occupied_beds = occupied_beds
                 child_doc.save()
-                results.append({"action": "updated_amount_only", "name": child_doc.name})
+                results.append({"action": "updated", "name": child_doc.name, "type": "room_revenue"})
             else:
-                # Create new child with all fields
-                parent_doc = frappe.get_doc("Expense Assumptions", parent)
-                new_child = parent_doc.append("expense_items", {
-                    "expense_name": expense_name,
-                    "amount": amount,
-                    "hospitality_category": hospitality_category,
-                    "cost_type": cost_type
+                # Create new child
+                parent_doc = frappe.get_doc("Room Revenue Assumptions", parent)
+                new_child = parent_doc.append("room_details", {
+                    "room_package": room_package,
+                    "rate": rate or 0,
+                    "occupied_beds": occupied_beds or 0
                 })
                 parent_doc.save()
-                results.append({"action": "created", "name": new_child.name})
+                results.append({"action": "created", "name": new_child.name, "type": "room_revenue"})
+
+        # Process room package changes
+        for change in room_package_changes:
+            room_type = change.get("roomType")  # This is the package name
+            new_value = change.get("newValue")  # This is the number_of_rooms
+
+            if not room_type or new_value is None:
+                frappe.logger().warning(f"Skipping invalid room package change: {change}")
+                continue
+
+            # Find the room package by package_name
+            room_package = frappe.db.get_value(
+                "Room Packages",
+                {"package_name": room_type},
+                "name"
+            )
+
+            if room_package:
+                # Update existing room package
+                room_package_doc = frappe.get_doc("Room Packages", room_package)
+                room_package_doc.number_of_rooms = new_value
+                room_package_doc.save()
+                results.append({"action": "updated", "name": room_package_doc.name, "type": "room_package"})
+            else:
+                # Create new room package
+                room_package_doc = frappe.get_doc({
+                    "doctype": "Room Packages",
+                    "package_name": room_type,
+                    "number_of_rooms": new_value
+                })
+                room_package_doc.insert()
+                results.append({"action": "created", "name": room_package_doc.name, "type": "room_package"})
 
         frappe.db.commit()
-        return {"status": "success", "results": results}
+        frappe.logger().info(f"Successfully processed {len(results)} changes")
+        
+        return {
+            "status": "success", 
+            "results": results,
+            "summary": {
+                "room_revenue_processed": len(room_revenue_changes),
+                "room_packages_processed": len(room_package_changes),
+                "total_processed": len(results)
+            }
+        }
 
     except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "upsert_expense_items failed")
+        frappe.log_error(frappe.get_traceback(), "upsert_room_revenue_items failed")
+        frappe.logger().error(f"Error in upsert_room_revenue_items: {str(e)}")
         return {"status": "error", "message": str(e)}
 
 
