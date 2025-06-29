@@ -1,0 +1,46 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-06-26 12:03:10.961398",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "room_package",
+  "rate",
+  "occupied_beds"
+ ],
+ "fields": [
+  {
+   "fieldname": "room_package",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Room Package",
+   "options": "Room Packages"
+  },
+  {
+   "fieldname": "rate",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Rate"
+  },
+  {
+   "fieldname": "occupied_beds",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Occupied Beds"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-06-29 00:11:23.197071",
+ "modified_by": "Administrator",
+ "module": "Ex Forcast",
+ "name": "Room Revenue Items",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

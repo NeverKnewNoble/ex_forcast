@@ -1,5 +1,5 @@
 <template>
-  <aside :class="['flex flex-col min-h-screen transition-all duration-200 ease-in-out border border-r-violet-400 bg-white text-gray-800 shadow', is_expanded ? 'w-64' : 'w-16']">
+  <aside :class="['flex-shrink-0 flex-col min-h-screen transition-all duration-200 ease-in-out border border-r-violet-400 bg-white text-gray-800 shadow', is_expanded ? 'w-64' : 'w-16']">
     <!-- Logo -->
     <div class="p-4 justify-center">
       <img v-if="!is_expanded" :src="logoURL" alt="Ex Forecast" class="w-8 mx-auto" />
@@ -8,6 +8,7 @@
 
     <!-- Toggle -->
     <div class="flex justify-center px-2">
+      <span v-if="is_expanded" class="font-bold mr-6 text-[16px]">Welcome, {{ session.user }}</span>
       <button v-if="!is_expanded" @click="ToggleMenu" class="transition-transform duration-200 hover:text-violet-400">
         <CircleArrowRight />
       </button>
@@ -22,7 +23,7 @@
     <!-- Menu Links -->
 	<div class="mt-2 flex-1 space-y-1">
 		<router-link
-			v-for="item in menuItems"
+			v-for="item in filteredMenuItems"
 			:key="item.text"
 			:to="item.route"
 			:class="[
@@ -40,7 +41,7 @@
 
     <!-- Footer Greeting -->
     <div class="mt-auto pb-4 px-4">
-      <span v-if="is_expanded" class="font-semibold text-[16px]">Welcome, {{ session.user }}</span>
+
       <hr v-if="is_expanded" class="my-3 border-t border-gray-200" />
       <div v-if="is_expanded" class="flex flex-col mt-2">
         <div class="flex items-center group relative">
@@ -69,7 +70,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import logoURL from '@/assets/images/icon_logo.png'
 import logoURL2 from '@/assets/images/ex_forest_logo.png'
 import { session } from '@/data/session' 
@@ -79,9 +80,9 @@ import {
   Home, 
   LayoutDashboard, 
   ReceiptText, 
-  BanknoteArrowUp, 
+  ChartNoAxesCombined, 
   CircleArrowRight,
-  MemoryStick, 
+  SquareKanban, 
   TrendingUpDown, 
   CircleArrowLeft  
 } from 'lucide-vue-next'
@@ -97,9 +98,9 @@ const menuItems = [
   { text: "Home", route: "/", icon: Home },
   { text: "Dashboard", route: "/dashboard", icon: LayoutDashboard  },
   { text: "Expense Assumptions", route: "/expense_estimate", icon: ReceiptText  },
-  { text: "Room Revenue Budget", route: "/", icon: MemoryStick   },
+  { text: "Room Revenue Assumptions", route: "/room_revenue_assumptions", icon: SquareKanban },
   { text: "Banquet Revenue Forcast", route: "/", icon: TrendingUpDown  },
-  { text: "Profit & Loss Statement", route: "/", icon: BanknoteArrowUp  },
+  { text: "Profit & Loss Statement", route: "/", icon: ChartNoAxesCombined  },
 ]
 
 const hospitalityExperience = ref(
@@ -110,5 +111,14 @@ const hospitalityExperience = ref(
 
 watch(hospitalityExperience, (newVal) => {
   localStorage.setItem('hospitalityExperience', newVal)
+})
+
+const filteredMenuItems = computed(() => {
+  return menuItems.filter(item => {
+    if (item.text === "Room Revenue Assumptions" && !hospitalityExperience.value) {
+      return false;
+    }
+    return true;
+  });
 })
 </script>

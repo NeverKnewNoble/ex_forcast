@@ -4,7 +4,7 @@ from collections import defaultdict
 import json
 
 @frappe.whitelist(allow_guest=True)
-def estimate_display():
+def room_revenue_display():
     try:
         # Define month order for SQL ordering
         month_order = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -15,16 +15,13 @@ def estimate_display():
             SELECT 
                 parent.year,
                 parent.month,
-                child.expense_name,
-                child.code,
-                child.root_type,
-                child.hospitality_category,
-                child.cost_type,
-                child.amount
+                child.room_package,
+                child.rate,
+                child.occupied_beds
             FROM 
-                `tabExpense Assumptions` AS parent
+                `tabRoom Revenue Assumptions` AS parent
             INNER JOIN 
-                `tabExpense Items` AS child
+                `tabRoom Revenue Items` AS child
             ON 
                 child.parent = parent.name
             ORDER BY 
@@ -39,12 +36,9 @@ def estimate_display():
 
         for row in raw_results:
             grouped_data[row['year']][row['month']].append({
-                "expense": row['expense_name'],
-                "code": row['code'],
-                "root type": row['root_type'],
-                "hospitality_category": row['hospitality_category'],
-                "cost_type": row['cost_type'],
-                "amount": row['amount']
+                "room_package": row['room_package'],
+                "rate": row['rate'],
+                "occupied_beds": row['occupied_beds']
             })
 
         # Convert defaultdicts to normal dicts for JSON serialization
@@ -52,14 +46,14 @@ def estimate_display():
         return result
 
     except Exception as err:
-        frappe.log_error(frappe.get_traceback(), "estimate_display failed")
+        frappe.log_error(frappe.get_traceback(), "room_revenue_display failed")
         return {"error": str(err)}
 
 
 
 
 @frappe.whitelist(allow_guest=True)
-def upsert_expense_items(changes):
+def upsert_room_revenue_items(changes):
     """
     changes: JSON string or list of dicts, each with:
       - year
@@ -132,4 +126,5 @@ def upsert_expense_items(changes):
         return {"status": "error", "message": str(e)}
 
 
-#  http://127.0.0.1:8000/api/v2/method/ex_forcast.api.expense_estimate.estimate_display
+#  http://127.0.0.1:8000/api/v2/method/ex_forcast.api.room_revenue_display.room_revenue_display
+#  http://127.0.0.1:8000/api/v2/method/ex_forcast.api.room_revenue_display.upsert_room_revenue_items

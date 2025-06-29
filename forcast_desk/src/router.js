@@ -28,6 +28,11 @@ const routes = [
     path: '/expense_estimate',
     component: () => import('@/pages/Expense_Estimate.vue'),
   },
+  {
+    name: 'Room_Revenue',
+    path: '/room_revenue_assumptions',
+    component: () => import('@/pages/Room_Revenue.vue'),
+  },
 ]
 
 let router = createRouter({
@@ -53,6 +58,18 @@ router.beforeEach(async (to, from, next) => {
   } else if (isLoggedIn && to.name === 'Login') {
     // If logged in and trying to go to login, redirect to home
     next({ name: 'Home' })
+  } else if (to.name === 'Room_Revenue') {
+    // Check if hospitality experience is enabled for room revenue assumptions
+    const hospitalityExperience = localStorage.getItem('hospitalityExperience')
+    const isHospitalityEnabled = hospitalityExperience === null ? true : hospitalityExperience === 'true'
+    
+    if (!isHospitalityEnabled) {
+      // Redirect to home if hospitality experience is disabled
+      next({ name: 'Home' })
+    } else {
+      // Proceed to room revenue page
+      next()
+    }
   } else {
     // Proceed to route
     next()

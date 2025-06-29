@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestExpenseEstimation(FrappeTestCase):
+class TestExpenseAssumptions(FrappeTestCase):
 	pass

@@ -3,7 +3,7 @@ from frappe import _
 
 @frappe.whitelist(allow_guest=True)  # Capitalize True
 def get_year_options():
-    meta = frappe.get_meta("Expense Estimation")
+    meta = frappe.get_meta("Expense Assumptions")
     year_field = next((df for df in meta.fields if df.fieldname == "year"), None)
 
     if not year_field or year_field.fieldtype != "Select":

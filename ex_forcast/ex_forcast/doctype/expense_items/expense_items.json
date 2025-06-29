@@ -6,28 +6,67 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "section_break_vsnl",
   "expense_name",
+  "code",
+  "root_type",
+  "hospitality_category",
+  "cost_type",
   "amount"
  ],
  "fields": [
   {
    "fieldname": "expense_name",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Expense Name",
-   "options": "Per Expenses"
+   "options": "Account"
   },
   {
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Amount"
+  },
+  {
+   "fetch_from": "expense_name.account_number",
+   "fieldname": "code",
+   "fieldtype": "Data",
+   "label": "Code",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "expense_name.root_type",
+   "fieldname": "root_type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Root Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cost_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Cost Type",
+   "options": "\nPer Occupied Room\nPer Available Room\nFixed Amount\nPercentage of Revenue"
+  },
+  {
+   "fieldname": "section_break_vsnl",
+   "fieldtype": "Section Break",
+   "options": "\nRooms Expenses\nFood & Beverage Expenses\nSPA\nAdministrative & General\nInformation & Telecommunication Systems\nSales & Marketing\nProperty Operation & management\nUtilities\nHouse Laundry\nMisc."
+  },
+  {
+   "fieldname": "hospitality_category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Hospitality Category",
+   "options": "\nRooms Expenses\nFood & Beverage Expenses\nSPA\nAdministrative & General\nInformation & Telecommunication Systems\nSales & Marketing\nProperty Operation & Management\nUtilities\nHouse Laundry\nMisc"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-10 13:30:46.822391",
+ "modified": "2025-06-24 19:36:31.751086",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Expense Items",

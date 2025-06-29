@@ -1,5 +1,5 @@
 <template>
-  <div class="flex">
+  <div class="flex ">
     <Sidebar />
 
     <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
