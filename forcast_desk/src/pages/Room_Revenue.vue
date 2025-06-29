@@ -102,149 +102,444 @@
   
           <!-- Right Side - Table Area -->
           <div class="flex-1 p-6">
-          <template v-if="visibleYears.length">
-              <div class="overflow-x-auto">
-            <div class="min-w-full w-max">
-              <table class="table-auto border-violet-300 rounded-xl overflow-hidden">
-                <thead class="bg-violet-600 text-white">
-                  <tr>
-                    <th rowspan="2" class="px-4 py-3 text-left align-middle border-r border-violet-400">Code</th>
-                    <th rowspan="2" class="px-4 py-3 text-left align-middle border-r border-violet-400">Expense</th>
-                    <th rowspan="2" class="px-4 py-3 text-left align-middle border-r border-violet-400">Cost Type</th>
-                    <th
-                      v-for="year in visibleYears"
-                      :key="'header-' + year"
-                          :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
-                      class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-violet-700 transition"
-                      @click="toggleCollapse(year)"
-                      title="Click to collapse/expand"
-                    >
-                      {{ year }}
-                    </th>
-                  </tr>
-                  <tr class="bg-violet-500 text-sm">
-                    <template v-for="year in visibleYears" :key="'months-' + year">
-                      <template v-if="!isYearCollapsed(year)">
-                        <th
-                              v-for="label in getColumnLabelsForYearLocal(year)"
-                          :key="year + '-' + label"
-                          class="px-4 py-2 text-center border border-violet-300 min-w-[110px]"
-                        >
-                          {{ label }}
-                        </th>
-                        <th class="px-4 py-2 text-center border border-violet-300 min-w-[120px]">Total</th>
-                      </template>
-                      <template v-else>
-                        <th class="px-4 py-2 text-center border border-violet-300 min-w-[120px]">Total</th>
-                      </template>
-                    </template>
-                  </tr>
-                </thead>
-  
-                <tbody class="text-gray-700 bg-white">
-                  <template v-for="categoryGroup in groupedExpenses" :key="'category-' + categoryGroup.category">
-                    <!-- Category Header Row -->
-                    <tr class="bg-violet-100 border-b-1 border-violet-300">
-                      <td colspan="3" class="px-4 py-3 font-bold text-violet-800 border-r border-violet-300">
-                        {{ categoryGroup.category }}
-                      </td>
-                      <template v-for="year in visibleYears" :key="'category-header-' + year">
-                        <template v-if="!isYearCollapsed(year)">
-                          <td
-                            v-for="label in getColumnLabelsForYearLocal(year)"
-                            :key="'category-cell-' + year + '-' + label"
-                            class="px-2 py-2 text-center border border-violet-200 bg-violet-100"
-                          ></td>
-                          <td class="px-2 py-2 text-center border border-violet-200 bg-violet-100"></td>
-                        </template>
-                        <template v-else>
-                          <td class="px-2 py-2 text-center border border-violet-200 bg-violet-100"></td>
-                        </template>
-                      </template>
-                    </tr>
-                    
-                    <!-- Expense Rows for this Category -->
-                    <tr
-                      v-for="expense in categoryGroup.expenses"
-                      :key="'expense-' + expense"
-                      class="even:bg-violet-50 hover:bg-violet-100 transition"
-                    >
-                      <td class="px-4 py-3 font-medium border-r border-violet-200 text-gray-600">
-                        {{ getExpenseDetails(expenseData, expense, visibleYears).code }}
-                      </td>
-                      <td class="px-4 py-3 font-medium border-r border-violet-200">{{ expense }}</td>
-                      <td class="px-4 py-3 font-medium border-r border-violet-200 text-gray-600">
-                        {{ getExpenseDetails(expenseData, expense, visibleYears).costType }}
-                      </td>
-                      <template v-for="year in visibleYears" :key="'row-' + year + '-' + expense">
-                        <template v-if="!isYearCollapsed(year)">
-                          <td
+            <template v-if="visibleYears.length">
+              <div class="space-y-8">
+                <!-- Table 1: Available Beds -->
+                <div class="bg-white rounded-xl shadow-sm border border-violet-200 overflow-hidden">
+                  <div class="bg-gradient-to-r from-violet-600 to-violet-700 text-white px-6 py-4">
+                    <h2 class="text-xl font-bold">Available Beds</h2>
+                    <p class="text-violet-100 text-sm">Number of rooms available</p>
+                  </div>
+                  <div class="overflow-x-auto">
+                    <table class="w-full">
+                      <thead class="bg-violet-50">
+                        <tr>
+                          <th class="px-4 py-3 text-left font-semibold text-violet-800 border-r border-violet-200">Room Type</th>
+                          <th class="px-4 py-3 text-left font-semibold text-violet-800 border-r border-violet-200">No. of Rooms</th>
+                          <template v-for="year in visibleYears" :key="'available-header-' + year">
+                            <th
+                              :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
+                              class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-violet-100 transition"
+                              @click="toggleCollapse(year)"
+                              title="Click to collapse/expand"
+                            >
+                              {{ year }}
+                            </th>
+                          </template>
+                        </tr>
+                        <tr class="bg-violet-100 text-sm">
+                          <th class="px-4 py-2 border-r border-violet-200"></th>
+                          <th class="px-4 py-2 border-r border-violet-200 font-bold">
+                            {{ calculateTotalRoomCount(roomPackages, roomData) }}
+                          </th>
+                          <template v-for="year in visibleYears" :key="'available-months-' + year">
+                            <template v-if="!isYearCollapsed(year)">
+                              <th
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                            :key="'cell-' + year + '-' + label"
+                                :key="year + '-available-' + label"
+                                class="px-4 py-2 text-center border border-violet-300 min-w-[110px]"
+                              >
+                                {{ label }}
+                              </th>
+                              <th class="px-4 py-2 text-center border border-violet-300 min-w-[120px]">Total</th>
+                            </template>
+                            <template v-else>
+                              <th class="px-4 py-2 text-center border border-violet-300 min-w-[120px]">Total</th>
+                            </template>
+                          </template>
+                        </tr>
+                      </thead>
+                      <tbody class="text-gray-700">
+                        <tr
+                          v-for="roomType in ROOM_TYPES"
+                          :key="'available-' + roomType"
+                          class="even:bg-violet-50 hover:bg-violet-100 transition"
+                        >
+                          <td class="px-4 py-3 font-medium border-r border-violet-200">{{ roomType }}</td>
+                          <td 
+                            class="px-4 py-3 font-medium border-r border-violet-200 text-gray-600"
                             contenteditable="true"
-                            class="px-2 py-2 text-right border border-violet-200"
-                            @input="handleCellInput({ year, label, expense, event: $event })"
-                            @focus="handleCellFocus({ year, label, expense, event: $event })"
-                            @blur="handleCellEditWrapper({ year, label, expense, event: $event })"
+                            @input="handleRoomCellInput({ roomType, field: 'room_count', event: $event })"
+                            @focus="handleRoomCellFocus({ roomType, field: 'room_count', event: $event })"
+                            @blur="handleRoomCountEditWrapper({ roomType, event: $event })"
                           >
-                            {{ getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode) }}
+                            {{ getNumberOfRoomsForType(roomPackages, roomType, roomData) }}
                           </td>
-                          <td class="px-2 py-2 text-right border border-violet-200 font-semibold">
-                            {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
+                          <template v-for="year in visibleYears" :key="'available-row-' + year + '-' + roomType">
+                            <template v-if="!isYearCollapsed(year)">
+                              <td
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="'available-cell-' + year + '-' + label + '-' + roomType"
+                                contenteditable="true"
+                                class="px-2 py-2 text-right border border-violet-200"
+                                @input="handleRoomCellInput({ year, label, roomType, field: 'number_of_rooms', event: $event })"
+                                @focus="handleRoomCellFocus({ year, label, roomType, field: 'number_of_rooms', event: $event })"
+                                @blur="handleRoomCellEditWrapper({ year, label, roomType, field: 'number_of_rooms', event: $event })"
+                              >
+                                {{ getAvailableBeds(roomData, roomType, year, label, advancedModes[year] || displayMode, roomPackages) }}
+                              </td>
+                              <td class="px-2 py-2 text-right border border-violet-200 font-semibold">
+                                {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'available_beds', roomPackages) }}
+                              </td>
+                            </template>
+                            <template v-else>
+                              <td class="px-2 py-2 text-right border border-violet-200 font-semibold">
+                                {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'available_beds', roomPackages) }}
+                              </td>
+                            </template>
+                          </template>
+                        </tr>
+                      </tbody>
+                      <!-- Total Row -->
+                      <tfoot class="bg-violet-100 border-t-2 border-violet-300">
+                        <tr class="font-bold text-violet-900">
+                          <td class="px-4 py-3 border-r border-violet-200">Total</td>
+                          <td class="px-4 py-3 border-r border-violet-200 font-bold">
+                            {{ calculateTotalRoomCount(roomPackages, roomData) }}
                           </td>
-                        </template>
-                        <template v-else>
-                          <td class="px-2 py-2 text-right border border-violet-200 font-semibold">
-                            {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
-                          </td>
-                        </template>
-                      </template>
-                    </tr>
-                    
-                    <!-- Category Total Row -->
-                    <tr class="bg-violet-100 border-y-2 border-violet-400">
-                      <td colspan="3" class="px-4 py-3 font-bold text-violet-900 border-r border-violet-300">
-                        Total
-                      </td>
-                      <template v-for="year in visibleYears" :key="'category-total-' + year">
-                        <template v-if="!isYearCollapsed(year)">
-                          <td
-                            v-for="label in getColumnLabelsForYearLocal(year)"
-                            :key="'category-total-cell-' + year + '-' + label"
-                            class="px-2 py-2 text-center border border-violet-300 bg-violet-200"
-                          ></td>
-                          <td class="px-2 py-2 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                            {{ calculateCategoryTotal(expenseData, categoryGroup.expenses, year, advancedModes[year] || displayMode) }}
-                          </td>
-                        </template>
-                        <template v-else>
-                          <td class="px-2 py-2 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                            {{ calculateCategoryTotal(expenseData, categoryGroup.expenses, year, advancedModes[year] || displayMode) }}
-                          </td>
-                        </template>
-                      </template>
-                    </tr>
-                  </template>
-                </tbody>
-              </table>
+                          <template v-for="year in visibleYears" :key="'available-total-' + year">
+                            <template v-if="!isYearCollapsed(year)">
+                              <td
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="'available-total-cell-' + year + '-' + label"
+                                class="px-2 py-2 text-right border border-violet-200 font-bold"
+                              >
+                                {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'available_beds', roomPackages) }}
+                              </td>
+                              <td class="px-2 py-2 text-right border border-violet-200 font-bold text-violet-800">
+                                {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'available_beds', roomPackages) }}
+                              </td>
+                            </template>
+                            <template v-else>
+                              <td class="px-2 py-2 text-right border border-violet-200 font-bold text-violet-800">
+                                {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'available_beds', roomPackages) }}
+                              </td>
+                            </template>
+                          </template>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
                 </div>
-            </div>
-          </template>
+
+                <!-- Table 2: Occupied Beds -->
+                <div class="bg-white rounded-xl shadow-sm border border-violet-200 overflow-hidden">
+                  <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4">
+                    <h2 class="text-xl font-bold">Occupied Beds</h2>
+                    <p class="text-blue-100 text-sm">Percentage of beds occupied</p>
+                  </div>
+                  <div class="overflow-x-auto">
+                    <table class="w-full">
+                      <thead class="bg-blue-50">
+                        <tr>
+                          <th class="px-4 py-3 text-left font-semibold text-blue-800 border-r border-blue-200">Room Type</th>
+                          <template v-for="year in visibleYears" :key="'occupied-header-' + year">
+                            <th
+                              :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
+                              class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-blue-100 transition"
+                              @click="toggleCollapse(year)"
+                              title="Click to collapse/expand"
+                            >
+                              {{ year }}
+                            </th>
+                          </template>
+                        </tr>
+                        <tr class="bg-blue-100 text-sm">
+                          <th class="px-4 py-2 border-r border-blue-200"></th>
+                          <template v-for="year in visibleYears" :key="'occupied-months-' + year">
+                            <template v-if="!isYearCollapsed(year)">
+                              <th
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="year + '-occupied-' + label"
+                                class="px-4 py-2 text-center border border-blue-300 min-w-[110px]"
+                              >
+                                {{ label }}
+                              </th>
+                              <th class="px-4 py-2 text-center border border-blue-300 min-w-[120px]">Total</th>
+                            </template>
+                            <template v-else>
+                              <th class="px-4 py-2 text-center border border-blue-300 min-w-[120px]">Total</th>
+                            </template>
+                          </template>
+                        </tr>
+                      </thead>
+                      <tbody class="text-gray-700">
+                        <tr
+                          v-for="roomType in ROOM_TYPES"
+                          :key="'occupied-' + roomType"
+                          class="even:bg-blue-50 hover:bg-blue-100 transition"
+                        >
+                          <td class="px-4 py-3 font-medium border-r border-blue-200">{{ roomType }}</td>
+                          <template v-for="year in visibleYears" :key="'occupied-row-' + year + '-' + roomType">
+                            <template v-if="!isYearCollapsed(year)">
+                              <td
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="'occupied-cell-' + year + '-' + label + '-' + roomType"
+                                contenteditable="true"
+                                class="px-2 py-2 text-right border border-blue-200"
+                                @input="handleRoomCellInput({ year, label, roomType, field: 'occupied_beds', event: $event })"
+                                @focus="handleRoomCellFocus({ year, label, roomType, field: 'occupied_beds', event: $event })"
+                                @blur="handleRoomCellEditWrapper({ year, label, roomType, field: 'occupied_beds', event: $event })"
+                              >
+                                {{ getOccupiedBeds(roomData, roomType, year, label, advancedModes[year] || displayMode) }}
+                              </td>
+                              <td class="px-2 py-2 text-right border border-blue-200 font-semibold">
+                                {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'occupied_beds') }}
+                              </td>
+                            </template>
+                            <template v-else>
+                              <td class="px-2 py-2 text-right border border-blue-200 font-semibold">
+                                {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'occupied_beds') }}
+                              </td>
+                            </template>
+                          </template>
+                        </tr>
+                      </tbody>
+                      <!-- Total Row -->
+                      <tfoot class="bg-blue-100 border-t-2 border-blue-300">
+                        <tr class="font-bold text-blue-900">
+                          <td class="px-4 py-3 border-r border-blue-200">Total</td>
+                          <template v-for="year in visibleYears" :key="'occupied-total-' + year">
+                            <template v-if="!isYearCollapsed(year)">
+                              <td
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="'occupied-total-cell-' + year + '-' + label"
+                                class="px-2 py-2 text-right border border-blue-200 font-bold"
+                              >
+                                {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'occupied_beds') }}
+                              </td>
+                              <td class="px-2 py-2 text-right border border-blue-200 font-bold text-blue-800">
+                                {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'occupied_beds') }}
+                              </td>
+                            </template>
+                            <template v-else>
+                              <td class="px-2 py-2 text-right border border-blue-200 font-bold text-blue-800">
+                                {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'occupied_beds') }}
+                              </td>
+                            </template>
+                          </template>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Table 3: Rate -->
+                <div class="bg-white rounded-xl shadow-sm border border-violet-200 overflow-hidden">
+                  <div class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4">
+                    <h2 class="text-xl font-bold">Rate</h2>
+                    <p class="text-green-100 text-sm">Room rates per night</p>
+                  </div>
+                  <div class="overflow-x-auto">
+                    <table class="w-full">
+                      <thead class="bg-green-50">
+                        <tr>
+                          <th class="px-4 py-3 text-left font-semibold text-green-800 border-r border-green-200">Room Type</th>
+                          <template v-for="year in visibleYears" :key="'rate-header-' + year">
+                            <th
+                              :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
+                              class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-green-100 transition"
+                              @click="toggleCollapse(year)"
+                              title="Click to collapse/expand"
+                            >
+                              {{ year }}
+                            </th>
+                          </template>
+                        </tr>
+                        <tr class="bg-green-100 text-sm">
+                          <th class="px-4 py-2 border-r border-green-200"></th>
+                          <template v-for="year in visibleYears" :key="'rate-months-' + year">
+                            <template v-if="!isYearCollapsed(year)">
+                              <th
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="year + '-rate-' + label"
+                                class="px-4 py-2 text-center border border-green-300 min-w-[110px]"
+                              >
+                                {{ label }}
+                              </th>
+                              <th class="px-4 py-2 text-center border border-green-300 min-w-[120px]">Total</th>
+                            </template>
+                            <template v-else>
+                              <th class="px-4 py-2 text-center border border-green-300 min-w-[120px]">Total</th>
+                            </template>
+                          </template>
+                        </tr>
+                      </thead>
+                      <tbody class="text-gray-700">
+                        <tr
+                          v-for="roomType in ROOM_TYPES"
+                          :key="'rate-' + roomType"
+                          class="even:bg-green-50 hover:bg-green-100 transition"
+                        >
+                          <td class="px-4 py-3 font-medium border-r border-green-200">{{ roomType }}</td>
+                          <template v-for="year in visibleYears" :key="'rate-row-' + year + '-' + roomType">
+                            <template v-if="!isYearCollapsed(year)">
+                              <td
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="'rate-cell-' + year + '-' + label + '-' + roomType"
+                                contenteditable="true"
+                                class="px-2 py-2 text-right border border-green-200"
+                                @input="handleRoomCellInput({ year, label, roomType, field: 'rate', event: $event })"
+                                @focus="handleRoomCellFocus({ year, label, roomType, field: 'rate', event: $event })"
+                                @blur="handleRoomCellEditWrapper({ year, label, roomType, field: 'rate', event: $event })"
+                              >
+                                {{ getRate(roomData, roomType, year, label, advancedModes[year] || displayMode) }}
+                              </td>
+                              <td class="px-2 py-2 text-right border border-green-200 font-semibold">
+                                {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'rate') }}
+                              </td>
+                            </template>
+                            <template v-else>
+                              <td class="px-2 py-2 text-right border border-green-200 font-semibold">
+                                {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'rate') }}
+                              </td>
+                            </template>
+                          </template>
+                        </tr>
+                      </tbody>
+                      <!-- Total Row -->
+                      <tfoot class="bg-green-100 border-t-2 border-green-300">
+                        <tr class="font-bold text-green-900">
+                          <td class="px-4 py-3 border-r border-green-200">Total</td>
+                          <template v-for="year in visibleYears" :key="'rate-total-' + year">
+                            <template v-if="!isYearCollapsed(year)">
+                              <td
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="'rate-total-cell-' + year + '-' + label"
+                                class="px-2 py-2 text-right border border-green-200 font-bold"
+                              >
+                                {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'rate') }}
+                              </td>
+                              <td class="px-2 py-2 text-right border border-green-200 font-bold text-green-800">
+                                {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'rate') }}
+                              </td>
+                            </template>
+                            <template v-else>
+                              <td class="px-2 py-2 text-right border border-green-200 font-bold text-green-800">
+                                {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'rate') }}
+                              </td>
+                            </template>
+                          </template>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Table 4: Revenue -->
+                <div class="bg-white rounded-xl shadow-sm border border-violet-200 overflow-hidden">
+                  <div class="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-4">
+                    <h2 class="text-xl font-bold">Revenue</h2>
+                    <p class="text-orange-100 text-sm">Calculated revenue (Available Beds × Occupied Beds % × Rate)</p>
+                  </div>
+                  <div class="overflow-x-auto">
+                    <table class="w-full">
+                      <thead class="bg-orange-50">
+                        <tr>
+                          <th class="px-4 py-3 text-left font-semibold text-orange-800 border-r border-orange-200">Room Type</th>
+                          <template v-for="year in visibleYears" :key="'revenue-header-' + year">
+                            <th
+                              :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
+                              class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-orange-100 transition"
+                              @click="toggleCollapse(year)"
+                              title="Click to collapse/expand"
+                            >
+                              {{ year }}
+                            </th>
+                          </template>
+                        </tr>
+                        <tr class="bg-orange-100 text-sm">
+                          <th class="px-4 py-2 border-r border-orange-200"></th>
+                          <template v-for="year in visibleYears" :key="'revenue-months-' + year">
+                            <template v-if="!isYearCollapsed(year)">
+                              <th
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="year + '-revenue-' + label"
+                                class="px-4 py-2 text-center border border-orange-300 min-w-[110px]"
+                              >
+                                {{ label }}
+                              </th>
+                              <th class="px-4 py-2 text-center border border-orange-300 min-w-[120px]">Total</th>
+                            </template>
+                            <template v-else>
+                              <th class="px-4 py-2 text-center border border-orange-300 min-w-[120px]">Total</th>
+                            </template>
+                          </template>
+                        </tr>
+                      </thead>
+                      <tbody class="text-gray-700">
+                        <tr
+                          v-for="roomType in ROOM_TYPES"
+                          :key="'revenue-' + roomType"
+                          class="even:bg-orange-50 hover:bg-orange-100 transition"
+                        >
+                          <td class="px-4 py-3 font-medium border-r border-orange-200">{{ roomType }}</td>
+                          <template v-for="year in visibleYears" :key="'revenue-row-' + year + '-' + roomType">
+                            <template v-if="!isYearCollapsed(year)">
+                              <td
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="'revenue-cell-' + year + '-' + label + '-' + roomType"
+                                class="px-2 py-2 text-right border border-orange-200 font-semibold"
+                              >
+                                {{ calculateRevenue(roomData, roomType, year, label, advancedModes[year] || displayMode, roomPackages) }}
+                              </td>
+                              <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800">
+                                {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'revenue', roomPackages) }}
+                              </td>
+                            </template>
+                            <template v-else>
+                              <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800">
+                                {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'revenue', roomPackages) }}
+                              </td>
+                            </template>
+                          </template>
+                        </tr>
+                      </tbody>
+                      <!-- Total Row -->
+                      <tfoot class="bg-orange-100 border-t-2 border-orange-300">
+                        <tr class="font-bold text-orange-900">
+                          <td class="px-4 py-3 border-r border-orange-200">Total</td>
+                          <template v-for="year in visibleYears" :key="'revenue-total-' + year">
+                            <template v-if="!isYearCollapsed(year)">
+                              <td
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="'revenue-total-cell-' + year + '-' + label"
+                                class="px-2 py-2 text-right border border-orange-200 font-bold"
+                              >
+                                {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'revenue', roomPackages) }}
+                              </td>
+                              <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800">
+                                {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'revenue', roomPackages) }}
+                              </td>
+                            </template>
+                            <template v-else>
+                              <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800">
+                                {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'revenue', roomPackages) }}
+                              </td>
+                            </template>
+                          </template>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </template>
   
-          <!-- No Years Selected -->
-          <template v-else>
+            <!-- No Years Selected -->
+            <template v-else>
               <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border border-dashed border-violet-300 rounded-xl shadow-sm">
-              <CircleAlert class="w-12 h-12 text-violet-400 mb-4" />
-              <p class="text-lg text-violet-600 font-semibold">
-                {{ fromYear && !toYear ? 'Please select a "To Year"' : !fromYear && toYear ? 'Please select a "From Year"' : 'No years selected' }}
-              </p>
-              <p class="text-sm text-gray-500 mt-1 text-center max-w-md">
-                {{ fromYear && !toYear ? 'You have selected a From Year, now please select a To Year to display the expense table.' : 
-                   !fromYear && toYear ? 'You have selected a To Year, now please select a From Year to display the expense table.' :
-                     'Please select both "From Year" and "To Year" in the left panel to display the expense table.' }}
-              </p>
-            </div>
-          </template>
+                <CircleAlert class="w-12 h-12 text-violet-400 mb-4" />
+                <p class="text-lg text-violet-600 font-semibold">
+                  {{ fromYear && !toYear ? 'Please select a "To Year"' : !fromYear && toYear ? 'Please select a "From Year"' : 'No years selected' }}
+                </p>
+                <p class="text-sm text-gray-500 mt-1 text-center max-w-md">
+                  {{ fromYear && !toYear ? 'You have selected a From Year, now please select a To Year to display the room revenue tables.' : 
+                     !fromYear && toYear ? 'You have selected a To Year, now please select a From Year to display the room revenue tables.' :
+                       'Please select both "From Year" and "To Year" in the left panel to display the room revenue tables.' }}
+                </p>
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -307,7 +602,6 @@
                   <thead class="bg-gradient-to-r from-violet-600 to-violet-700 text-white sticky top-0">
                     <tr>
                       <th class="text-left px-6 py-4 font-semibold min-w-[300px]">Revenue Name</th>
-                      <th class="text-left px-6 py-4 font-semibold">Number Of Rooms</th>
                       <th class="text-left px-6 py-4 font-semibold">Rate</th>
                       <th class="text-left px-6 py-4 font-semibold min-w-[100px]">Occupied Beds(%)</th>
                       <th class="w-10"></th>
@@ -331,16 +625,6 @@
                             {{ room_package.label }}
                           </option>
                         </select>
-                      </td>
-                      <td v-if="hospitalityExperience" class="px-2 py-4">
-                        <input
-                          type="number"
-                          min="0"
-                          v-model="row.number_of_rooms"
-                          class="w-full px-2 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-left"
-                          :default="0"
-                          placeholder="0"
-                        />
                       </td>
                       <td class="px-2 py-4">
                         <input
@@ -518,73 +802,64 @@
   import Sidebar from "@/components/ui/Sidebar.vue";
   import { CircleAlert, AlertTriangle } from 'lucide-vue-next';
   import alertService from "@/components/ui/alertService.js";
+
+  // Import room revenue utilities
   import {
-    // Core expense calculations
+    // Core room revenue utilities
+    ROOM_TYPES,
     getVisibleYears,
-    getColumnLabels,  
-    
-    // Data loading and API services
-    loadYearOptions,
-    
-    // Table display and interaction
+    getColumnLabels,
     toggleCollapse,
     isYearCollapsed,
-  
-    getExpensesGroupedByCategory,
-    getExpenseDetails,
-    getAmountForExpense,
-    calculateTotalForExpense,
+    getAvailableBeds,
+    getOccupiedBeds,
+    getRate,
+    calculateRevenue,
+    calculateRoomTypeTotal,
+    calculateMonthlyTotal,
+    calculateGrandTotal,
+    calculateTableTotal,
+    getNumberOfRoomsForType,
+    calculateTotalRoomCount,
     
-    // Filter and validation utilities,
-    months,
-  
-  } from "@/components/utility/expense_assumption/index.js";
-
-  import { cloneDeep } from 'lodash-es';
-  import {
-    calculateCategoryTotal,
-    formatAmountInput,
-    cleanAmountValue,
-    handleCellEdit,
-    handleCellInput,
-    handleCellFocus
-  } from "@/components/utility/expense_assumption/expense_estimate_utils.js";
-  import { saveChanges } from "@/components/utility/expense_assumption/save_changes.js";
-  import { submitAddExpense } from "@/components/utility/expense_assumption/submit_add_expense.js";
-   
-  import { 
-    // Room Revenue Assumption
+    // Table utilities
+    handleRoomCellEdit,
+    handleRoomCellInput,
+    handleRoomCellFocus,
+    handleRoomCountEdit,
+    saveRoomChanges,
+    formatRoomAmountInput,
+    cleanRoomAmountValue,
+    
+    // Data services
+    getRoomRevenueList,
     getRoomPackagesList,
     createRoomRevenueAssumption,
-
-    // Room Revenue Modal
+    
+    // Modal utilities
     showAddRoomRevenueModal,
     addRoomRevenueForm,
     addRoomRevenueRow,
     removeRoomRevenueRow,
     resetRoomRevenueForm,
-    cancelAddRoomRevenue,
-
-    // Room Revenue List
-    getRoomRevenueList,
-    extractAllRoomRevenuePackages
+    cancelAddRoomRevenue
   } from "@/components/utility/room_revenue_assumpt./index.js";
-  
 
+  // Import year options utility
+  import { loadYearOptions, months } from "@/components/utility/expense_assumption/index.js";
 
-  
+  import { cloneDeep } from 'lodash-es';
+
   // Reactive state
   const years = ref([]);
   const fromYear = ref("");
   const toYear = ref("");
   const displayMode = ref("monthly");
-  const expenses = ref([]);
-  const expenseData = ref({});
+  const roomData = ref({});
   const showAdvanced = ref(false);
   const advancedModes = ref({});
   const tempAdvancedModes = ref({});
   const marketSegmentation = ref(false);
-
 
   const roomPackages = ref([]);
   const roomPackagesOptions = ref([]);
@@ -594,48 +869,37 @@
       : localStorage.getItem('hospitalityExperience') === 'true'
   );
 
-
   const isSaved = ref(false);
-  const originalExpenseData = ref({});
-  const changedCells = ref([]); // {year, label, expense, newValue}
+  const originalRoomData = ref({});
+  const changedCells = ref([]); // {year, label, roomType, field, newValue}
   const isSaving = ref(false);
   const saveError = ref("");
-  const showUnsavedWarning = ref(false);
+  const showUnsavedWarning = ref("");
 
-  
   // Computed properties
   const visibleYears = computed(() => {
-    const years = getVisibleYears(fromYear.value, toYear.value);
-    // console.log('Visible years:', years, 'from:', fromYear.value, 'to:', toYear.value);
-    return years;
+    return getVisibleYears(fromYear.value, toYear.value);
   });
 
-  
-
-  const groupedExpenses = computed(() => {
-    return getExpensesGroupedByCategory(expenseData.value, visibleYears.value);
-  });
-  
   // Computed property to get column labels for a specific year
   const getColumnLabelsForYearLocal = (year) => {
     return getColumnLabels(advancedModes.value[year] || displayMode.value);
   };
-  
+
   // Watch for changes in visible years to initialize advanced modes
   watch(visibleYears, () => {
-    // console.log('Visible years changed:', visibleYears.value);
     visibleYears.value.forEach(year => {
       if (!advancedModes.value[year]) {
         advancedModes.value[year] = displayMode.value;
       }
     });
   });
-  
+
   // Watch for hospitality experience changes
   watch(hospitalityExperience, (newValue) => {
     localStorage.setItem('hospitalityExperience', newValue);
   });
-  
+
   // Watch for localStorage changes to sync with sidebar
   const checkHospitalityExperience = () => {
     const stored = localStorage.getItem('hospitalityExperience');
@@ -644,10 +908,10 @@
       hospitalityExperience.value = newValue;
     }
   };
-  
+
   // Check for changes periodically
   setInterval(checkHospitalityExperience, 1000);
-  
+
   // When opening the modal, copy the current settings
   watch(showAdvanced, (val) => {
     if (val) {
@@ -663,14 +927,13 @@
   function cancelAdvancedSettings() {
     showAdvanced.value = false;
   }
-  
+
   // On mount, initialize years from localStorage if available
   onMounted(async () => {
     try {
       years.value = await loadYearOptions();
-      expenseData.value = await getRoomRevenueList();    
-      originalExpenseData.value = cloneDeep(expenseData.value); 
-      expenses.value = extractAllRoomRevenuePackages(expenseData.value);
+      roomData.value = await getRoomRevenueList();    
+      originalRoomData.value = cloneDeep(roomData.value); 
       
       // ** Room Packages List ** //
       const response = await getRoomPackagesList();
@@ -680,86 +943,68 @@
         value: room_package.name
       }));
       
-      // Use the options API for modal dropdowns (shows all available options)
-    //();
-
-      
       // Restore years from localStorage
-      fromYear.value = localStorage.getItem('expenseEstimateFromYear') || "";
-      toYear.value = localStorage.getItem('expenseEstimateToYear') || "";
+      fromYear.value = localStorage.getItem('roomRevenueFromYear') || "";
+      toYear.value = localStorage.getItem('roomRevenueToYear') || "";
       isSaved.value = true;
     } catch (err) {
       console.error("Error loading data:", err);
     }
   });
-  
-
 
   // Watchers to persist year selection
   watch(fromYear, (newValue) => {
-    localStorage.setItem('expenseEstimateFromYear', newValue);
+    localStorage.setItem('roomRevenueFromYear', newValue);
   });
   watch(toYear, (newValue) => {
-    localStorage.setItem('expenseEstimateToYear', newValue);
+    localStorage.setItem('roomRevenueToYear', newValue);
   });
-  
+
   function clearYearSelection() {
     fromYear.value = "";
     toYear.value = "";
-    localStorage.removeItem('expenseEstimateFromYear');
-    localStorage.removeItem('expenseEstimateToYear');
+    localStorage.removeItem('roomRevenueFromYear');
+    localStorage.removeItem('roomRevenueToYear');
     isSaved.value = false;
   }
-  
-  function handleCellEditWrapper({ year, label, expense, event }) {
-    handleCellEdit({
+
+  // Wrapper functions for room revenue cell editing
+  function handleRoomCellEditWrapper({ year, label, roomType, field, event }) {
+    handleRoomCellEdit({
       year,
       label,
-      expense,
+      roomType,
+      field,
       event,
-      originalExpenseData,
+      originalRoomData,
       changedCells,
-      expenseData,
+      roomData,
       isSaved
     });
   }
 
+  // Wrapper function for room count editing
+  function handleRoomCountEditWrapper({ roomType, event }) {
+    handleRoomCountEdit({
+      roomType,
+      event,
+      originalRoomData,
+      changedCells,
+      roomData,
+      isSaved
+    });
+  }
 
-
-
-  // ! Wrapper functions to ensure addRoomRevenueForm is properly initialized
+  // Wrapper functions for modal form handling
   const formatAmountInputWrapper = (index, event) => {
-    if (addRoomRevenueForm && addRoomRevenueForm.value && addRoomRevenueForm.value.rows) {
-      const row = addRoomRevenueForm.value.rows[index];
-      if (row) {
-        let value = event.target.value;
-        value = value.replace(/[^\d.]/g, '');
-        const parts = value.split('.');
-        if (parts.length > 2) {
-          value = parts[0] + '.' + parts.slice(1).join('');
-        }
-        if (parts.length === 2 && parts[1].length > 2) {
-          value = parts[0] + '.' + parts[1].substring(0, 2);
-        }
-        row.rate = value;
-      }
-    }
+    formatRoomAmountInput(index, addRoomRevenueForm, event);
   };
-  
+
   const cleanAmountValueWrapper = (index) => {
-    if (addRoomRevenueForm && addRoomRevenueForm.value && addRoomRevenueForm.value.rows) {
-      const row = addRoomRevenueForm.value.rows[index];
-      if (row) {
-        const numValue = parseFloat(row.rate.replace(/[^\d.]/g, '')) || 0;
-        row.rate = numValue.toLocaleString('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
-      }
-    }
+    cleanRoomAmountValue(index, addRoomRevenueForm);
   };
-  
-  // Wrapper function for submitAddExpense
+
+  // Wrapper function for submit room revenue
   const submitAddRoomRevenueWrapper = async () => {
     if (addRoomRevenueForm && addRoomRevenueForm.value) {
       try {
@@ -774,27 +1019,23 @@
           showAddRoomRevenueModal.value = false;
           resetRoomRevenueForm();
           // Show success message
-          alertService.success("Document created successfully!");
+          alertService.success("Room revenue assumption created successfully!");
         }
       } catch (error) {
-        console.error('Error creating room assumption:', error);
+        console.error('Error creating room revenue assumption:', error);
         // Show error message to user
-        alertService.error("Failed to create Room Assumption. Please try again.");
+        alertService.error("Failed to create Room Revenue Assumption. Please try again.");
       }
     }
   };
-  
+
   // Wrapper function for saveChanges
   const saveChangesWrapper = async () => {
-    await saveChanges(changedCells, isSaving, saveError, expenseData, originalExpenseData, isSaved);
+    await saveRoomChanges(changedCells, isSaving, saveError, roomData, originalRoomData, isSaved);
   };
-  
-  
 
-
-
-  // ! Unsaved Changes Warning Modal
-  // ! Watch for unsaved changes to show warning on page refresh
+  // Unsaved Changes Warning Modal
+  // Watch for unsaved changes to show warning on page refresh
   watch(isSaved, (newValue) => {
     if (!newValue) {
       // Add beforeunload event listener when there are unsaved changes
@@ -804,7 +1045,7 @@
       window.removeEventListener('beforeunload', handleBeforeUnload);
     }
   });
-  
+
   // Handle beforeunload event to show warning
   function handleBeforeUnload(event) {
     if (!isSaved.value) {
@@ -814,12 +1055,12 @@
       return event.returnValue;
     }
   }
-  
+
   // Handle navigation cancellation
   function cancelNavigation() {
     showUnsavedWarning.value = false;
   }
-  
+
   // Handle navigation confirmation
   function confirmNavigation() {
     showUnsavedWarning.value = false;
@@ -828,7 +1069,7 @@
     // Trigger the actual navigation (refresh, close, etc.)
     window.location.reload();
   }
-  
+
   // Clean up event listeners when component is unmounted
   onUnmounted(() => {
     window.removeEventListener('beforeunload', handleBeforeUnload);

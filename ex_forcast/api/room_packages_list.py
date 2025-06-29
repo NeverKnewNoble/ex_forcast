@@ -7,7 +7,7 @@ def get_room_packages():
     """
     try:
         # Get the Expense Items doctype
-        room_packages = frappe.get_all("Room Packages", fields=["name", "module"])
+        room_packages = frappe.get_all("Room Packages", fields=["name", "number_of_rooms", "module"])
         
         return {
             "success": True,

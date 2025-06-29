@@ -7,7 +7,6 @@
  "engine": "InnoDB",
  "field_order": [
   "room_package",
-  "number_of_rooms",
   "rate",
   "occupied_beds"
  ],
@@ -18,12 +17,6 @@
    "in_list_view": 1,
    "label": "Room Package",
    "options": "Room Packages"
-  },
-  {
-   "fieldname": "number_of_rooms",
-   "fieldtype": "Int",
-   "in_list_view": 1,
-   "label": "Number Of Rooms"
   },
   {
    "fieldname": "rate",
@@ -41,7 +34,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-26 12:08:29.572517",
+ "modified": "2025-06-29 00:11:23.197071",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Room Revenue Items",

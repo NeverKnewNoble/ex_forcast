@@ -23,7 +23,7 @@
     <!-- Menu Links -->
 	<div class="mt-2 flex-1 space-y-1">
 		<router-link
-			v-for="item in menuItems"
+			v-for="item in filteredMenuItems"
 			:key="item.text"
 			:to="item.route"
 			:class="[
@@ -70,7 +70,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import logoURL from '@/assets/images/icon_logo.png'
 import logoURL2 from '@/assets/images/ex_forest_logo.png'
 import { session } from '@/data/session' 
@@ -80,9 +80,9 @@ import {
   Home, 
   LayoutDashboard, 
   ReceiptText, 
-  BanknoteArrowUp, 
+  ChartNoAxesCombined, 
   CircleArrowRight,
-  MemoryStick, 
+  SquareKanban, 
   TrendingUpDown, 
   CircleArrowLeft  
 } from 'lucide-vue-next'
@@ -98,9 +98,9 @@ const menuItems = [
   { text: "Home", route: "/", icon: Home },
   { text: "Dashboard", route: "/dashboard", icon: LayoutDashboard  },
   { text: "Expense Assumptions", route: "/expense_estimate", icon: ReceiptText  },
-  { text: "Room Revenue Assumptions", route: "/room_revenue_assumptions", icon: MemoryStick   },
+  { text: "Room Revenue Assumptions", route: "/room_revenue_assumptions", icon: SquareKanban },
   { text: "Banquet Revenue Forcast", route: "/", icon: TrendingUpDown  },
-  { text: "Profit & Loss Statement", route: "/", icon: BanknoteArrowUp  },
+  { text: "Profit & Loss Statement", route: "/", icon: ChartNoAxesCombined  },
 ]
 
 const hospitalityExperience = ref(
@@ -111,5 +111,14 @@ const hospitalityExperience = ref(
 
 watch(hospitalityExperience, (newVal) => {
   localStorage.setItem('hospitalityExperience', newVal)
+})
+
+const filteredMenuItems = computed(() => {
+  return menuItems.filter(item => {
+    if (item.text === "Room Revenue Assumptions" && !hospitalityExperience.value) {
+      return false;
+    }
+    return true;
+  });
 })
 </script>

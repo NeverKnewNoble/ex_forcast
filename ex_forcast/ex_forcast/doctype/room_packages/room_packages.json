@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "package_name",
+  "number_of_rooms",
   "module"
  ],
  "fields": [
@@ -21,11 +22,16 @@
    "fieldtype": "Link",
    "label": "Module",
    "options": "Module Def"
+  },
+  {
+   "fieldname": "number_of_rooms",
+   "fieldtype": "Int",
+   "label": "Number Of Rooms"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-26 11:24:32.140303",
+ "modified": "2025-06-29 00:09:28.368983",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Room Packages",

@@ -11,16 +11,16 @@ export async function getRoomRevenueList() {
     const data = await response.json();
     return data.data;
   } catch (error) {
+    console.error('Error fetching room revenue data:', error);
     return {};
   }
 }
 
-
-export function extractAllRoomRevenuePackages(RoomRevenueData) {
+export function extractAllRoomRevenuePackages(roomRevenueData) {
   const all = new Set();
-  for (const year in RoomRevenueData) {
-    for (const month in RoomRevenueData[year]) {
-      RoomRevenueData[year][month].forEach(e => all.add(e.expense));
+  for (const year in roomRevenueData) {
+    for (const month in roomRevenueData[year]) {
+      roomRevenueData[year][month].forEach(e => all.add(e.room_package));
     }
   }
   return [...all].sort();

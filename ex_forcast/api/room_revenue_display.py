@@ -16,7 +16,6 @@ def room_revenue_display():
                 parent.year,
                 parent.month,
                 child.room_package,
-                child.number_of_rooms,
                 child.rate,
                 child.occupied_beds
             FROM 
@@ -38,7 +37,6 @@ def room_revenue_display():
         for row in raw_results:
             grouped_data[row['year']][row['month']].append({
                 "room_package": row['room_package'],
-                "number_of_rooms": row['number_of_rooms'],
                 "rate": row['rate'],
                 "occupied_beds": row['occupied_beds']
             })
