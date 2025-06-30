@@ -1,0 +1,47 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Room Packages",
+  "modified": "2025-06-29 00:10:29.902812",
+  "module": "Ex Forcast",
+  "name": "Deluxe",
+  "number_of_rooms": 14,
+  "package_name": "Deluxe"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Packages",
+  "modified": "2025-06-29 00:10:56.309193",
+  "module": "Ex Forcast",
+  "name": "Presidential",
+  "number_of_rooms": 2,
+  "package_name": "Presidential"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Packages",
+  "modified": "2025-06-29 22:23:09.548045",
+  "module": "Ex Forcast",
+  "name": "Superior",
+  "number_of_rooms": 45,
+  "package_name": "Superior"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Packages",
+  "modified": "2025-06-29 00:10:47.015971",
+  "module": "Ex Forcast",
+  "name": "Suite",
+  "number_of_rooms": 8,
+  "package_name": "Suite"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Packages",
+  "modified": "2025-06-29 22:21:54.352250",
+  "module": "Ex Forcast",
+  "name": "Standard",
+  "number_of_rooms": 95,
+  "package_name": "Standard"
+ }
+]
