@@ -672,6 +672,7 @@
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import Sidebar from "@/components/ui/Sidebar.vue";
 import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign } from 'lucide-vue-next';
+import alertService from "@/components/ui/alertService.js";
 
 import {
   // Core expense calculations
@@ -997,9 +998,10 @@ async function refreshTable() {
     isSaved.value = true;
     
     console.log("Table data refreshed successfully");
+    alertService.success("Page refreshed successfully");
   } catch (error) {
     console.error("Error refreshing table:", error);
-    alert("Failed to refresh data. Please try again.");
+    alertService.error("Failed to refresh data. Please try again.");
   }
 }
 </script>

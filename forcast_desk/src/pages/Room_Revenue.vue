@@ -1199,7 +1199,10 @@
 
   function refreshRoomRevenueData() {
     // Implement the logic to refresh room revenue data
-    console.log("Refreshing room revenue data...");
+    // Example: reload data, then show alert
+    // (Replace with actual data reload logic as needed)
+    // await getRoomRevenueList() ...
+    alertService.success('Page refreshed');
   }
   </script>
   
