@@ -79,10 +79,10 @@ import { session } from '@/data/session'
 import { 
   Home, 
   LayoutDashboard, 
-  ReceiptText, 
+  Calculator , 
   ChartNoAxesCombined, 
   CircleArrowRight,
-  SquareKanban, 
+  BedDouble, 
   TrendingUpDown, 
   CircleArrowLeft  
 } from 'lucide-vue-next'
@@ -97,8 +97,8 @@ const ToggleMenu = () => {
 const menuItems = [
   { text: "Home", route: "/", icon: Home },
   { text: "Dashboard", route: "/dashboard", icon: LayoutDashboard  },
-  { text: "Expense Assumptions", route: "/expense_estimate", icon: ReceiptText  },
-  { text: "Room Revenue Assumptions", route: "/room_revenue_assumptions", icon: SquareKanban },
+  { text: "Expense Assumptions", route: "/expense_estimate", icon: Calculator   },
+  { text: "Room Revenue Assumptions", route: "/room_revenue_assumptions", icon: BedDouble },
   { text: "Banquet Revenue Forcast", route: "/", icon: TrendingUpDown  },
   { text: "Profit & Loss Statement", route: "/", icon: ChartNoAxesCombined  },
 ]

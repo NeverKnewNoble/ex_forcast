@@ -24,10 +24,10 @@ export async function testAPI() {
     });
 
     const data = await response.json();
-    console.log('Test API response:', data);
+    // console.log('Test API response:', data);
     return data;
   } catch (error) {
-    console.error('Test API error:', error);
+    // console.error('Test API error:', error);
     throw error;
   }
 }
@@ -49,8 +49,8 @@ export async function saveRoomRevenueChanges(changes) {
       body: params,
     });
 
-    console.log('API Response status:', response.status)
-    console.log('API Response headers:', response.headers)
+    // console.log('API Response status:', response.status)
+    // console.log('API Response headers:', response.headers)
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -59,7 +59,7 @@ export async function saveRoomRevenueChanges(changes) {
     }
 
     const data = await response.json();
-    console.log('API Response data:', data)
+    // console.log('API Response data:', data)
     return data;
   } catch (error) {
     console.error('Error saving room revenue changes:', error);
