@@ -6,225 +6,397 @@
       <!-- Main Content Area -->
       <div class="flex">
         <!-- Left Sidebar - Filters and Controls -->
-        <div class="w-80 bg-white border-r border-violet-200 p-6 min-h-screen flex flex-col">
-          <h1 class="text-[28px] font-extrabold text-gray-800 mb-6">Expense Assumptions</h1>
+        <div class="w-80 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 p-6 min-h-screen flex flex-col shadow-sm">
+          <!-- Header Section -->
+          <div class="mb-8">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Calculator class="w-5 h-5 text-white" />
+              </div>
+              <h1 class="text-2xl font-bold text-gray-900">Expense Assumptions</h1>
+            </div>
+            <p class="text-sm text-gray-500">Manage and configure your expense data</p>
+          </div>
 
-          <!-- Unsaved Indicator and Save Button -->
-          <div class="flex justify-between items-center pb-4 border-b border-violet-200">
-            <div
-              v-if="!isSaved"
-              class="text-sm text-red-600 font-medium bg-red-200 px-3 py-1.5 rounded-full"
-            >
-              Unsaved
+          <!-- Save Status Section -->
+          <div class="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div
+                  v-if="!isSaved"
+                  class="flex items-center gap-2 text-sm font-medium text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-200"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                  </svg>
+                  Unsaved
+                </div>
+                <div
+                  v-else
+                  class="flex items-center gap-2 text-sm font-medium text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  All Saved
+                </div>
+              </div>
+              
+              <button
+                v-if="!isSaving && !isSaved"
+                :disabled="isSaving"
+                @click="saveChangesWrapper"
+                class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                </svg>
+                Save
+              </button>
+              <button
+                v-if="isSaving"
+                class="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg cursor-not-allowed"
+              >
+                <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Saving...
+              </button>
             </div>
-            <div
-              v-else
-              class="text-sm text-green-600 font-medium bg-green-200 px-3 py-1.5 rounded-full"
-            >
-              Saved
-            </div>
-            <button
-              v-if="!isSaving && !isSaved"
-              :disabled="isSaving"
-              @click="saveChangesWrapper"
-              class="px-4 py-0.5 bg-black text-white hover:bg-gray-900 rounded-md transition-all"
-            >
-              Save
-            </button>
-            <button
-              v-if="isSaving"
-              class="px-4 py-0.5 bg-black text-white hover:bg-gray-900 rounded-md transition-all"
-            >
-              Saving...
-            </button>
-            <span v-if="saveError" class="ml-2 text-xs text-red-500">{{ saveError }}</span>
+            <span v-if="saveError" class="mt-2 text-xs text-red-500 flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              {{ saveError }}
+            </span>
           </div>
           
-          <!-- Action Buttons -->
-          <div class="space-y-3 mb-6">
-            <button @click="showAddExpenseModal = true" class="w-full px-4 py-2 mt-4 bg-violet-500 rounded-md hover:bg-black transition-all text-white">
-            Add Expense
-          </button>
-        </div>
+          <!-- Action Buttons Section -->
+          <div class="mb-8">
+            <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Quick Actions
+            </h3>
+            <button 
+              @click="showAddExpenseModal = true" 
+              class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-xl hover:from-violet-600 hover:to-violet-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 font-medium"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Add New Expense
+            </button>
+            
+            <div class="flex gap-2 mt-3">
+              <button 
+                @click="refreshTable"
+                class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white border border-violet-200 text-violet-700 rounded-lg hover:bg-violet-50 transition-all text-sm font-medium"
+              >
+                <RefreshCw class="w-4 h-4" />
+                Refresh
+              </button>
+            </div>
+          </div>
 
           <!-- Filters Section -->
-          <div class="space-y-3 mb-6">
-            <h3 class="text-lg font-semibold text-gray-700">Year Range</h3>
-            
-            <div class="flex gap-3">
-              <div class="flex-1">
-                <label class="block text-sm font-medium text-gray-600 mb-1">From Year</label>
-                <select v-model="fromYear" class="w-full px-4 py-2 rounded-md border focus:border-violet-500">
-                  <option value="">Select Year</option>
-                  <option v-for="year in years" :key="'from-' + year" :value="year">{{ year }}</option>
-                </select>
-              </div>
+          <div class="flex-1">
+            <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+              <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                </svg>
+                Year Range Filter
+              </h3>
+              
+              <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                      <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                      From Year
+                    </label>
+                    <select 
+                      v-model="fromYear" 
+                      class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                    >
+                      <option value="">Select Year</option>
+                      <option v-for="year in years" :key="'from-' + year" :value="year">{{ year }}</option>
+                    </select>
+                  </div>
 
-              <div class="flex-1">
-                <label class="block text-sm font-medium text-gray-600 mb-1">To Year</label>
-                <select v-model="toYear" class="w-full px-4 py-2 rounded-md border focus:border-violet-500">
-                  <option value="">Select Year</option>
-                  <option v-for="year in years" :key="'to-' + year" :value="year">{{ year }}</option>
-                </select>
+                  <div>
+                    <label class="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                      <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                      To Year
+                    </label>
+                    <select 
+                      v-model="toYear" 
+                      class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                    >
+                      <option value="">Select Year</option>
+                      <option v-for="year in years" :key="'to-' + year" :value="year">{{ year }}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="flex gap-2">
+                  <button 
+                    @click="clearYearSelection" 
+                    class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 text-sm font-medium"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Clear
+                  </button>
+                  <button 
+                    @click="showAdvanced = true" 
+                    class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Advanced
+                  </button>
+                </div>
               </div>
             </div>
-
-            <button @click="clearYearSelection" class="w-full px-4 py-2 bg-black text-white hover:bg-violet-500 rounded-md">
-              Clear
-            </button>
-            <button @click="showAdvanced = true" class="w-full px-4 py-2 bg-white border border-violet-500 text-violet-700 hover:bg-violet-100 rounded-md">
-              Advanced Setting
-            </button>
-
-
           </div>
         </div>
 
         <!-- Right Side - Table Area -->
-        <div class="flex-1 p-6">
-        <template v-if="visibleYears.length">
-            <div class="overflow-x-auto">
-          <div class="min-w-full w-max">
-            <table class="table-auto border-violet-300 rounded-xl overflow-hidden">
-              <thead class="bg-violet-600 text-white">
-                <tr>
-                  <th rowspan="2" class="px-4 py-3 text-left align-middle border-r border-violet-400">Code</th>
-                  <th rowspan="2" class="px-4 py-3 text-left align-middle border-r border-violet-400">Expense</th>
-                  <th rowspan="2" class="px-4 py-3 text-left align-middle border-r border-violet-400">Cost Type</th>
-                  <th
-                    v-for="year in visibleYears"
-                    :key="'header-' + year"
-                        :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
-                    class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-violet-700 transition"
-                    @click="toggleCollapse(year)"
-                    title="Click to collapse/expand"
-                  >
-                    {{ year }}
-                  </th>
-                </tr>
-                <tr class="bg-violet-500 text-sm">
-                  <template v-for="year in visibleYears" :key="'months-' + year">
-                    <template v-if="!isYearCollapsed(year)">
-                      <th
-                            v-for="label in getColumnLabelsForYearLocal(year)"
-                        :key="year + '-' + label"
-                        class="px-4 py-2 text-center border border-violet-300 min-w-[110px]"
-                      >
-                        {{ label }}
-                      </th>
-                      <th class="px-4 py-2 text-center border border-violet-300 min-w-[120px]">Total</th>
-                    </template>
-                    <template v-else>
-                      <th class="px-4 py-2 text-center border border-violet-300 min-w-[120px]">Total</th>
-                    </template>
-                  </template>
-                </tr>
-              </thead>
-
-              <tbody class="text-gray-700 bg-white">
-                <template v-for="categoryGroup in groupedExpenses" :key="'category-' + categoryGroup.category">
-                  <!-- Category Header Row -->
-                  <tr class="bg-violet-100 border-b-1 border-violet-300">
-                    <td colspan="3" class="px-4 py-3 font-bold text-violet-800 border-r border-violet-300">
-                      {{ categoryGroup.category }}
-                    </td>
-                    <template v-for="year in visibleYears" :key="'category-header-' + year">
-                      <template v-if="!isYearCollapsed(year)">
-                        <td
-                          v-for="label in getColumnLabelsForYearLocal(year)"
-                          :key="'category-cell-' + year + '-' + label"
-                          class="px-2 py-2 text-center border border-violet-200 bg-violet-100"
-                        ></td>
-                        <td class="px-2 py-2 text-center border border-violet-200 bg-violet-100"></td>
-                      </template>
-                      <template v-else>
-                        <td class="px-2 py-2 text-center border border-violet-200 bg-violet-100"></td>
-                      </template>
-                    </template>
-                  </tr>
-                  
-                  <!-- Expense Rows for this Category -->
-                  <tr
-                    v-for="expense in categoryGroup.expenses"
-                    :key="'expense-' + expense"
-                    class="even:bg-violet-50 hover:bg-violet-100 transition"
-                  >
-                    <td class="px-4 py-3 font-medium border-r border-violet-200 text-gray-600">
-                      {{ getExpenseDetails(expenseData, expense, visibleYears).code }}
-                    </td>
-                    <td class="px-4 py-3 font-medium border-r border-violet-200">{{ expense }}</td>
-                    <td class="px-4 py-3 font-medium border-r border-violet-200 text-gray-600">
-                      {{ getExpenseDetails(expenseData, expense, visibleYears).costType }}
-                    </td>
-                    <template v-for="year in visibleYears" :key="'row-' + year + '-' + expense">
-                      <template v-if="!isYearCollapsed(year)">
-                        <td
-                              v-for="label in getColumnLabelsForYearLocal(year)"
-                          :key="'cell-' + year + '-' + label"
-                          contenteditable="true"
-                          class="px-2 py-2 text-right border border-violet-200"
-                          @input="handleCellInput({ year, label, expense, event: $event })"
-                          @focus="handleCellFocus({ year, label, expense, event: $event })"
-                          @blur="handleCellEditWrapper({ year, label, expense, event: $event })"
-                        >
-                          {{ getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode) }}
-                        </td>
-                        <td class="px-2 py-2 text-right border border-violet-200 font-semibold">
-                          {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
-                        </td>
-                      </template>
-                      <template v-else>
-                        <td class="px-2 py-2 text-right border border-violet-200 font-semibold">
-                          {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
-                        </td>
-                      </template>
-                    </template>
-                  </tr>
-                  
-                  <!-- Category Total Row -->
-                  <tr class="bg-violet-100 border-y-2 border-violet-400">
-                    <td colspan="3" class="px-4 py-3 font-bold text-violet-900 border-r border-violet-300">
-                      Total
-                    </td>
-                    <template v-for="year in visibleYears" :key="'category-total-' + year">
-                      <template v-if="!isYearCollapsed(year)">
-                        <td
-                          v-for="label in getColumnLabelsForYearLocal(year)"
-                          :key="'category-total-cell-' + year + '-' + label"
-                          class="px-2 py-2 text-center border border-violet-300 bg-violet-200"
-                        ></td>
-                        <td class="px-2 py-2 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                          {{ calculateCategoryTotal(expenseData, categoryGroup.expenses, year, advancedModes[year] || displayMode) }}
-                        </td>
-                      </template>
-                      <template v-else>
-                        <td class="px-2 py-2 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                          {{ calculateCategoryTotal(expenseData, categoryGroup.expenses, year, advancedModes[year] || displayMode) }}
-                        </td>
-                      </template>
-                    </template>
-                  </tr>
-                </template>
-              </tbody>
-            </table>
+        <div class="flex-1 p-4">
+          <!-- Table Header with Stats -->
+          <template v-if="visibleYears.length">
+            <div class="mb-4">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
+                  <Table class="w-3 h-3 text-white" />
+                </div>
+                <h2 class="text-lg font-bold text-gray-800">Expense Overview</h2>
               </div>
-          </div>
-        </template>
+            </div>
 
-        <!-- No Years Selected -->
-        <template v-else>
-            <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border border-dashed border-violet-300 rounded-xl shadow-sm">
-            <CircleAlert class="w-12 h-12 text-violet-400 mb-4" />
-            <p class="text-lg text-violet-600 font-semibold">
-              {{ fromYear && !toYear ? 'Please select a "To Year"' : !fromYear && toYear ? 'Please select a "From Year"' : 'No years selected' }}
-            </p>
-            <p class="text-sm text-gray-500 mt-1 text-center max-w-md">
-              {{ fromYear && !toYear ? 'You have selected a From Year, now please select a To Year to display the expense table.' : 
-                 !fromYear && toYear ? 'You have selected a To Year, now please select a From Year to display the expense table.' :
-                   'Please select both "From Year" and "To Year" in the left panel to display the expense table.' }}
-            </p>
-          </div>
-        </template>
+            <!-- Modern Table Container -->
+            <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden">
+              <div class="overflow-x-auto">
+                <div class="min-w-full w-max">
+                  <table class="w-full">
+                    <!-- Enhanced Table Header -->
+                    <thead class="bg-gradient-to-r from-violet-600 to-violet-700 text-white">
+                      <tr>
+                        <th rowspan="2" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
+                          <div class="flex items-center gap-1">
+                            <Hash class="w-3 h-3" />
+                            Code
+                          </div>
+                        </th>
+                        <th rowspan="2" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
+                          <div class="flex items-center gap-1">
+                            <Receipt class="w-3 h-3" />
+                            Expense
+                          </div>
+                        </th>
+                        <th rowspan="2" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
+                          <div class="flex items-center gap-1">
+                            <Tag class="w-3 h-3" />
+                            Cost Type
+                          </div>
+                        </th>
+                        <th
+                          v-for="year in visibleYears"
+                          :key="'header-' + year"
+                          :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
+                          class="px-2 py-2 text-center border-x-2 border-white cursor-pointer select-none hover:bg-violet-700 transition-all duration-200 group text-sm"
+                          @click="toggleCollapse(year)"
+                          title="Click to collapse/expand"
+                        >
+                          <div class="flex items-center justify-center gap-1">
+                            <span class="font-semibold">{{ year }}</span>
+                            <ChevronDown 
+                              v-if="!isYearCollapsed(year)" 
+                              class="w-3 h-3 transition-transform group-hover:scale-110" 
+                            />
+                            <ChevronRight 
+                              v-else 
+                              class="w-3 h-3 transition-transform group-hover:scale-110" 
+                            />
+                          </div>
+                        </th>
+                      </tr>
+                      <tr class="bg-violet-500/90 text-xs">
+                        <template v-for="year in visibleYears" :key="'months-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <th
+                              v-for="label in getColumnLabelsForYearLocal(year)"
+                              :key="year + '-' + label"
+                              class="px-2 py-1 text-center border border-violet-300 min-w-[100px] font-medium"
+                            >
+                              {{ label }}
+                            </th>
+                            <th class="px-2 py-1 text-center border border-violet-300 min-w-[110px] font-semibold">
+                              <div class="flex items-center justify-center gap-1">
+                                <Calculator class="w-2 h-2" />
+                                Total
+                              </div>
+                            </th>
+                          </template>
+                          <template v-else>
+                            <th class="px-2 py-1 text-center border border-violet-300 min-w-[110px] font-semibold">
+                              <div class="flex items-center justify-center gap-1">
+                                <Calculator class="w-2 h-2" />
+                                Total
+                              </div>
+                            </th>
+                          </template>
+                        </template>
+                      </tr>
+                    </thead>
+
+                    <!-- Enhanced Table Body -->
+                    <tbody class="text-gray-700 bg-white text-sm">
+                      <template v-for="categoryGroup in groupedExpenses" :key="'category-' + categoryGroup.category">
+                        <!-- Category Header Row -->
+                        <tr class="bg-gradient-to-r from-violet-50 to-violet-100 border-b border-violet-200">
+                          <td colspan="3" class="px-3 py-2 font-bold text-violet-800 border-r border-violet-300">
+                            <div class="flex items-center gap-1">
+                              <FolderOpen class="w-3 h-3" />
+                              {{ categoryGroup.category }}
+                            </div>
+                          </td>
+                          <template v-for="year in visibleYears" :key="'category-header-' + year">
+                            <template v-if="!isYearCollapsed(year)">
+                              <td
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="'category-cell-' + year + '-' + label"
+                                class="px-1 py-1 text-center border border-violet-200 bg-violet-50"
+                              ></td>
+                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-50"></td>
+                            </template>
+                            <template v-else>
+                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-50"></td>
+                            </template>
+                          </template>
+                        </tr>
+                        
+                        <!-- Expense Rows for this Category -->
+                        <tr
+                          v-for="expense in categoryGroup.expenses"
+                          :key="'expense-' + expense"
+                          class="even:bg-gray-50 hover:bg-violet-50 transition-all duration-200 border-b border-gray-100"
+                        >
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-600">
+                            <div class="flex items-center gap-1">
+                              <Hash class="w-2 h-2 text-gray-400" />
+                              {{ getExpenseDetails(expenseData, expense, visibleYears).code }}
+                            </div>
+                          </td>
+                          <td class="px-3 py-2 font-medium border-r border-violet-200">
+                            <div class="flex items-center gap-1">
+                              <Receipt class="w-3 h-3 text-violet-500" />
+                              {{ expense }}
+                            </div>
+                          </td>
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-600">
+                            <div class="flex items-center gap-1">
+                              <Tag class="w-2 h-2 text-gray-400" />
+                              {{ getExpenseDetails(expenseData, expense, visibleYears).costType }}
+                            </div>
+                          </td>
+                          <template v-for="year in visibleYears" :key="'row-' + year + '-' + expense">
+                            <template v-if="!isYearCollapsed(year)">
+                              <td
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="'cell-' + year + '-' + label"
+                                contenteditable="true"
+                                class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
+                                @input="handleCellInput({ year, label, expense, event: $event })"
+                                @focus="handleCellFocus({ year, label, expense, event: $event })"
+                                @blur="handleCellEditWrapper({ year, label, expense, event: $event })"
+                              >
+                                <span class="font-mono text-xs">{{ getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode) }}</span>
+                              </td>
+                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
+                                <span class="font-mono text-xs text-violet-700">
+                                  {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
+                                </span>
+                              </td>
+                            </template>
+                            <template v-else>
+                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
+                                <span class="font-mono text-xs text-violet-700">
+                                  {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
+                                </span>
+                              </td>
+                            </template>
+                          </template>
+                        </tr>
+                        
+                        <!-- Category Total Row -->
+                        <tr class="bg-gradient-to-r from-violet-100 to-violet-200 border-y-2 border-violet-400">
+                          <td colspan="3" class="px-3 py-2 font-bold text-violet-900 border-r border-violet-300">
+                            <div class="flex items-center gap-1">
+                              <Calculator class="w-3 h-3" />
+                              Total
+                            </div>
+                          </td>
+                          <template v-for="year in visibleYears" :key="'category-total-' + year">
+                            <template v-if="!isYearCollapsed(year)">
+                              <td
+                                v-for="label in getColumnLabelsForYearLocal(year)"
+                                :key="'category-total-cell-' + year + '-' + label"
+                                class="px-1 py-1 text-center border border-violet-300 bg-violet-200"
+                              ></td>
+                              <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
+                                <span class="font-mono text-xs">
+                                  {{ calculateCategoryTotal(expenseData, categoryGroup.expenses, year, advancedModes[year] || displayMode) }}
+                                </span>
+                              </td>
+                            </template>
+                            <template v-else>
+                              <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
+                                <span class="font-mono text-xs">
+                                  {{ calculateCategoryTotal(expenseData, categoryGroup.expenses, year, advancedModes[year] || displayMode) }}
+                                </span>
+                              </td>
+                            </template>
+                          </template>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <!-- Enhanced No Years Selected State -->
+          <template v-else>
+            <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
+              <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
+                <CircleAlert class="w-8 h-8 text-violet-500" />
+              </div>
+              <h3 class="text-lg text-violet-700 font-semibold mb-2">
+                {{ fromYear && !toYear ? 'Select "To Year"' : !fromYear && toYear ? 'Select "From Year"' : 'No Years Selected' }}
+              </h3>
+              <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
+                {{ fromYear && !toYear ? 'You have selected a From Year, now please select a To Year to display the expense table.' : 
+                   !fromYear && toYear ? 'You have selected a To Year, now please select a From Year to display the expense table.' :
+                     'Please select both "From Year" and "To Year" in the left panel to display the expense table.' }}
+              </p>
+              <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
+                <ArrowLeft class="w-3 h-3" />
+                <span>Use the filters on the left to get started</span>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -235,48 +407,59 @@
   <transition name="fade">
     <div
       v-if="showAdvanced"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
     >
-      <div class="bg-white rounded-xl p-6 w-[90%] max-w-lg shadow-xl border border-violet-200">
-        <h2 class="text-xl font-semibold text-violet-700 mb-4">Advanced Display Mode Settings</h2>
-
-        <!-- Message when no years selected -->
-        <div v-if="!visibleYears.length" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <div class="flex items-center gap-2">
-            <AlertTriangle class="w-15 h-15 mr-2 text-yellow-600" />
-            <p class="text-yellow-800 font-medium">Please select both "From Year" and "To Year" to configure advanced settings.</p>
-          </div>
+      <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-lg p-0 overflow-hidden">
+        <!-- Modal Header -->
+        <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
+          <Settings class="w-6 h-6 text-white" />
+          <h2 class="text-xl font-bold text-white">Advanced Display Mode Settings</h2>
         </div>
 
-        <div v-if="visibleYears.length" class="space-y-4 max-h-[60vh] overflow-auto pr-2">
-          <div
-            v-for="year in visibleYears"
-            :key="'adv-' + year"
-            class="flex justify-between items-center border-b pb-2"
-          >
-            <span class="font-medium text-gray-700">{{ year }}</span>
-            <select
-              v-model="tempAdvancedModes[year]"
-              class="px-6 py-2 border rounded-md focus:ring-violet-500"
+        <!-- Modal Body -->
+        <div class="p-8 pt-6">
+          <!-- Message when no years selected -->
+          <div v-if="!visibleYears.length" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
+            <AlertTriangle class="w-6 h-6 text-yellow-600" />
+            <span class="text-yellow-800 font-medium">Please select both \"From Year\" and \"To Year\" to configure advanced settings.</span>
+          </div>
+
+          <div v-if="visibleYears.length" class="space-y-4 max-h-[50vh] overflow-auto pr-2">
+            <div
+              v-for="year in visibleYears"
+              :key="'adv-' + year"
+              class="flex justify-between items-center border-b pb-2"
             >
-              <option value="monthly">Monthly</option>
-              <option value="quarterly">Quarterly</option>
-            </select>
+              <span class="font-medium text-gray-700 flex items-center gap-2">
+                <Calendar class="w-4 h-4 text-violet-600" />
+                {{ year }}
+              </span>
+              <select
+                v-model="tempAdvancedModes[year]"
+                class="px-6 py-2 border rounded-md focus:ring-violet-500"
+              >
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        <div class="flex justify-end gap-3 mt-6">
+        <!-- Modal Footer -->
+        <div class="flex justify-end gap-3 px-8 py-4 bg-gray-50 border-t border-violet-100">
           <button
             @click="cancelAdvancedSettings"
-            class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700"
+            class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2"
           >
+            <X class="w-4 h-4" />
             Cancel
           </button>
           <button
             v-if="visibleYears.length"
             @click="applyAdvancedSettings"
-            class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700"
+            class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2"
           >
+            <Check class="w-4 h-4" />
             Apply
           </button>
         </div>
@@ -289,25 +472,24 @@
   <transition name="fade">
     <div
       v-if="showAddExpenseModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
     >
-      <div class="bg-white rounded-2xl shadow-2xl border border-violet-100 w-[95%] max-w-5xl max-h-[90vh] overflow-hidden">
+      <div class="bg-white rounded-2xl shadow-2xl border border-violet-100 w-[95%] max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         <!-- Modal Header -->
-        <div class="bg-gradient-to-r from-violet-600 to-violet-700 text-white px-8 py-6">
-          <div class="flex justify-between items-center">
+        <div class="flex items-center justify-between px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
+          <div class="flex items-center gap-3">
+            <PlusCircle class="w-7 h-7 text-white" />
             <div>
-              <h2 class="text-2xl font-bold">Add New Expense</h2>
-              <p class="text-violet-100 mt-1">Enter expense details for the selected period</p>
+              <h2 class="text-2xl font-bold text-white">Add New Expense</h2>
+              <p class="text-violet-100 mt-1 text-sm">Enter expense details for the selected period</p>
             </div>
-            <button 
-              @click="cancelAddExpense"
-              class="text-violet-100 hover:text-white transition-colors p-2 rounded-full hover:bg-violet-600"
-            >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
           </div>
+          <button 
+            @click="cancelAddExpense"
+            class="text-violet-100 hover:text-white transition-colors p-2 rounded-full hover:bg-violet-600"
+          >
+            <X class="w-6 h-6" />
+          </button>
         </div>
 
         <!-- Modal Body -->
@@ -340,10 +522,10 @@
               <table class="w-full">
                 <thead class="bg-gradient-to-r from-violet-600 to-violet-700 text-white sticky top-0">
                   <tr>
-                    <th class="text-left px-6 py-4 font-semibold">Expense Name</th>
-                    <th v-if="hospitalityExperience" class="text-left px-6 py-4 font-semibold">Category</th>
-                    <th class="text-left px-6 py-4 font-semibold">Cost Type</th>
-                    <th class="text-left px-6 py-4 font-semibold">Amount</th>
+                    <th class="text-left px-6 py-4 font-semibold"><Receipt class="w-4 h-4 inline mr-1" /> Expense Name</th>
+                    <th v-if="hospitalityExperience" class="text-left px-6 py-4 font-semibold"><FolderOpen class="w-4 h-4 inline mr-1" /> Category</th>
+                    <th class="text-left px-6 py-4 font-semibold"><Tag class="w-4 h-4 inline mr-1" /> Cost Type</th>
+                    <th class="text-left px-6 py-4 font-semibold"><DollarSign class="w-4 h-4 inline mr-1" /> Amount</th>
                     <th class="w-16"></th>
                   </tr>
                 </thead>
@@ -353,7 +535,6 @@
                     :key="'expense-row-' + index" 
                     class="hover:bg-violet-50/50 transition-colors"
                   >
-                  
                     <td class="px-2 py-4">
                       <select
                         v-model="row.expense"
@@ -397,17 +578,13 @@
                         placeholder="0.00"
                       />
                     </td>
-
-
                     <td class="px-6 py-4">
                       <button 
                         @click="removeExpenseRow(index)"
                         class="text-red-400 hover:text-red-600 transition-colors p-1 rounded-full hover:bg-red-50"
                         v-if="addExpenseForm.rows.length > 1"
                       >
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
+                        <Trash2 class="w-5 h-5" />
                       </button>
                     </td>
                   </tr>
@@ -422,23 +599,22 @@
               @click="addExpenseRow" 
               class="flex items-center gap-2 px-4 py-2 bg-violet-500 text-white rounded-lg hover:bg-violet-600 transition-all font-medium"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
+              <Plus class="w-5 h-5" />
               Add Row
             </button>
-
             <div class="flex gap-3">
               <button
                 @click="cancelAddExpense"
-                class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium"
+                class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium flex items-center gap-2"
               >
+                <X class="w-5 h-5" />
                 Cancel
               </button>
               <button 
                 @click="submitAddExpenseWrapper" 
-                class="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-all font-medium"
+                class="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-all font-medium flex items-center gap-2"
               >
+                <Check class="w-5 h-5" />
                 Submit
               </button>
             </div>
@@ -495,7 +671,7 @@
 <script setup>
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import Sidebar from "@/components/ui/Sidebar.vue";
-import { CircleAlert, AlertTriangle } from 'lucide-vue-next';
+import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign } from 'lucide-vue-next';
 
 import {
   // Core expense calculations
@@ -753,6 +929,79 @@ function confirmNavigation() {
 onUnmounted(() => {
   window.removeEventListener('beforeunload', handleBeforeUnload);
 });
+
+// Export table data functionality
+function exportTableData() {
+  try {
+    // Create CSV content
+    let csvContent = "data:text/csv;charset=utf-8,";
+    
+    // Add headers
+    const headers = ["Code", "Expense", "Cost Type"];
+    visibleYears.value.forEach(year => {
+      if (!isYearCollapsed(year)) {
+        getColumnLabelsForYearLocal(year).forEach(label => {
+          headers.push(`${year} - ${label}`);
+        });
+      }
+      headers.push(`${year} - Total`);
+    });
+    csvContent += headers.join(",") + "\n";
+    
+    // Add data rows
+    groupedExpenses.value.forEach(categoryGroup => {
+      categoryGroup.expenses.forEach(expense => {
+        const row = [
+          getExpenseDetails(expenseData.value, expense, visibleYears.value).code,
+          expense,
+          getExpenseDetails(expenseData.value, expense, visibleYears.value).costType
+        ];
+        
+        visibleYears.value.forEach(year => {
+          if (!isYearCollapsed(year)) {
+            getColumnLabelsForYearLocal(year).forEach(label => {
+              row.push(getAmountForExpense(expenseData.value, expense, year, label, advancedModes.value[year] || displayMode.value));
+            });
+          }
+          row.push(calculateTotalForExpense(expenseData.value, expense, year, advancedModes.value[year] || displayMode.value, getColumnLabelsForYearLocal));
+        });
+        
+        csvContent += row.join(",") + "\n";
+      });
+    });
+    
+    // Download the file
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `expense_data_${fromYear.value}_${toYear.value}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error("Error exporting data:", error);
+    alert("Failed to export data. Please try again.");
+  }
+}
+
+// Refresh table functionality
+async function refreshTable() {
+  try {
+    // Reload expense data
+    expenseData.value = await loadExpenseData();
+    originalExpenseData.value = cloneDeep(expenseData.value);
+    expenses.value = extractAllExpenses(expenseData.value);
+    
+    // Reset any unsaved changes
+    changedCells.value = [];
+    isSaved.value = true;
+    
+    console.log("Table data refreshed successfully");
+  } catch (error) {
+    console.error("Error refreshing table:", error);
+    alert("Failed to refresh data. Please try again.");
+  }
+}
 </script>
 
 
