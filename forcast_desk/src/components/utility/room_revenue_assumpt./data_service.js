@@ -17,20 +17,20 @@ export async function getRoomRevenueList() {
 }
 
 // Test API endpoint
-export async function testAPI() {
-  try {
-    const response = await fetch('/api/v2/method/ex_forcast.api.room_revenue_display.test_api', {
-      method: 'GET',
-    });
+// export async function testAPI() {
+  // try {
+  //   const response = await fetch('/api/v2/method/ex_forcast.api.room_revenue_display.test_api', {
+  //     method: 'GET',
+  //   });
 
-    const data = await response.json();
-    // console.log('Test API response:', data);
-    return data;
-  } catch (error) {
-    // console.error('Test API error:', error);
-    throw error;
-  }
-}
+  //   const data = await response.json();
+  //   // console.log('Test API response:', data);
+  //   return data;
+  // } catch (error) {
+  //   // console.error('Test API error:', error);
+  //   throw error;
+  // }
+// }
 
 // Custom API call to save Room Revenue changes
 export async function saveRoomRevenueChanges(changes) {

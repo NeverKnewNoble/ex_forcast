@@ -10,7 +10,9 @@
   "column_break_neuz",
   "month",
   "section_break_saeg",
-  "room_details"
+  "room_details",
+  "market_segment_tab",
+  "market_segment"
  ],
  "fields": [
   {
@@ -40,11 +42,22 @@
    "fieldtype": "Table",
    "label": "Room Details",
    "options": "Room Revenue Items"
+  },
+  {
+   "fieldname": "market_segment_tab",
+   "fieldtype": "Tab Break",
+   "label": "Market Segment"
+  },
+  {
+   "fieldname": "market_segment",
+   "fieldtype": "Table",
+   "label": "Market segment",
+   "options": "Market Segement Table Data"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-26 17:01:24.237752",
+ "modified": "2025-07-03 19:33:06.599813",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Room Revenue Assumptions",

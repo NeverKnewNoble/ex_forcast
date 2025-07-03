@@ -157,7 +157,13 @@ doc_events = {
     },
     "Doctype4": {
         "on_update": "ex_forcast.api.expense_options.get_expense_field_options"
-    }
+    },
+    "Doctype5": {
+        "on_update": "ex_forcast.api.room_segment_display.get_room_market_segments"
+    },
+    "Doctype6": {
+        "on_update": "ex_forcast.api.room_segment_display.get_segment_categories"
+    }    
 }
 
 # Scheduled Tasks
@@ -259,6 +265,8 @@ doc_events = {
 
 fixtures = [
             {"doctype": "Room Packages", "filters": [["module" , "in" , ("Ex Forcast" )]]},
+            {"doctype": "Segment Category", "filters": [["module" , "in" , ("Ex Forcast" )]]},
+            {"doctype": "Room Market Segment", "filters": [["module" , "in" , ("Ex Forcast" )]]},
 ]
 
 website_route_rules = [{'from_route': '/forcast_desk/<path:app_path>', 'to_route': 'forcast_desk'},]
