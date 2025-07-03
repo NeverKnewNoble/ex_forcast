@@ -1,0 +1,52 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-07-03 19:26:49.322099",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "room_nights",
+  "room_rate_usd",
+  "average_daily_rate",
+  "room_revenue"
+ ],
+ "fields": [
+  {
+   "fieldname": "room_nights",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Room Nights"
+  },
+  {
+   "fieldname": "room_rate_usd",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Room Rate (USD)"
+  },
+  {
+   "fieldname": "average_daily_rate",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Average Daily Rate"
+  },
+  {
+   "fieldname": "room_revenue",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Room Revenue"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-07-03 19:32:57.422274",
+ "modified_by": "Administrator",
+ "module": "Ex Forcast",
+ "name": "Market Segement Table Data",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

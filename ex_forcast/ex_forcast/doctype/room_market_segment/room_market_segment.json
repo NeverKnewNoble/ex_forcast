@@ -1,20 +1,27 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:category_name",
- "creation": "2025-06-30 12:56:20.634798",
+ "autoname": "field:market_segment",
+ "creation": "2025-07-01 12:52:51.808572",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "category_name",
+  "market_segment",
+  "segment_category",
   "module"
  ],
  "fields": [
   {
-   "fieldname": "category_name",
+   "fieldname": "market_segment",
    "fieldtype": "Data",
-   "label": "Category Name",
+   "label": "Market Segment",
    "unique": 1
+  },
+  {
+   "fieldname": "segment_category",
+   "fieldtype": "Link",
+   "label": "Segment Category ",
+   "options": "Segment Category"
   },
   {
    "fieldname": "module",
@@ -25,10 +32,10 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-30 14:57:49.410339",
+ "modified": "2025-07-01 12:59:47.912247",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
- "name": "Segment Category",
+ "name": "Room Market Segment",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
