@@ -19,13 +19,14 @@
   {
    "fieldname": "module",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Module",
    "options": "Module Def"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-30 14:57:49.410339",
+ "modified": "2025-07-04 20:07:32.623955",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Segment Category",

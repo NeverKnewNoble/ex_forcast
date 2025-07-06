@@ -24,8 +24,19 @@ export {
 // Data Service
 export {
     getRoomRevenueList,
-    extractAllRoomRevenuePackages
+    extractAllRoomRevenuePackages,
+    getMarketSegmentList,
+    saveMarketSegmentChanges
 } from './data_service.js';
+
+// Market Segment Table Utilities
+export {
+    handleMarketSegmentCellInput,
+    handleMarketSegmentCellFocus,
+    handleMarketSegmentCellEdit,
+    getMarketSegmentValue,
+    calculateMarketSegmentTotal
+} from './market_segment_table_utils.js';
 
 // Core Room Revenue Utilities
 export {
