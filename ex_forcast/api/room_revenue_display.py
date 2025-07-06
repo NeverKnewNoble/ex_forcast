@@ -49,6 +49,62 @@ def room_revenue_display():
         return {"error": str(err)}
 
 
+@frappe.whitelist(allow_guest=True)
+def market_segment_display():
+    """Fetch market segment data from Room Revenue Assumptions doctype"""
+    try:
+        # Define month order for SQL ordering
+        month_order = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+        # SQL query to get market segment data with market segment names
+        query = """
+            SELECT 
+                parent.year,
+                parent.month,
+                segment.market_segment,
+                child.room_nights,
+                child.room_rate_usd
+            FROM 
+                `tabRoom Revenue Assumptions` AS parent
+            INNER JOIN 
+                `tabMarket Segement Table Data` AS child
+            ON 
+                child.parent = parent.name
+            INNER JOIN
+                `tabRoom Market Segment` AS segment
+            ON
+                child.market_segment = segment.name
+            ORDER BY 
+                CAST(parent.year AS UNSIGNED) ASC,
+                FIELD(parent.month, {month_order})
+        """.format(month_order="'" + "', '".join(month_order) + "'")
+
+        raw_results = frappe.db.sql(query, as_dict=True)
+
+        # Nested dict: year -> market_segment -> month -> data
+        grouped_data = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
+
+        for row in raw_results:
+            grouped_data[row['year']][row['market_segment']][row['month']] = {
+                "room_nights": row['room_nights'] or 0,
+                "room_rate": row['room_rate_usd'] or 0
+            }
+
+        # Convert defaultdicts to normal dicts for JSON serialization
+        result = {}
+        for year in grouped_data:
+            result[year] = {}
+            for segment in grouped_data[year]:
+                result[year][segment] = dict(grouped_data[year][segment])
+
+        return result
+
+    except Exception as err:
+        frappe.log_error(frappe.get_traceback(), "market_segment_display failed")
+        return {"error": str(err)}
+
+
 @frappe.whitelist()
 def test_api():
     """Simple test endpoint to verify API is working"""
@@ -200,5 +256,118 @@ def upsert_room_revenue_items(changes):
         return {"status": "error", "message": str(e)}
 
 
+@frappe.whitelist()
+def upsert_market_segment_items(changes):
+    """
+    changes: JSON string or list of dicts, each with:
+      - year
+      - month
+      - market_segment
+      - field: 'room_nights' or 'room_rate'
+      - value
+    """
+    try:
+        # Debug logging
+        frappe.logger().info(f"Received market segment changes: {changes}")
+        
+        if isinstance(changes, str):
+            changes = json.loads(changes)
+        
+        frappe.logger().info(f"Parsed market segment changes: {changes}")
+
+        results = []
+
+        # Process market segment changes
+        for change in changes:
+            year = change.get("year")
+            month = change.get("month")
+            market_segment_name = change.get("market_segment")
+            field = change.get("field")  # 'room_nights' or 'room_rate'
+            value = change.get("value")
+
+            if not all([year, month, market_segment_name, field]):
+                frappe.logger().warning(f"Skipping invalid market segment change: {change}")
+                continue
+
+            # Find the market segment document by name
+            market_segment_doc = frappe.db.get_value(
+                "Room Market Segment",
+                {"market_segment": market_segment_name},
+                "name"
+            )
+            
+            if not market_segment_doc:
+                frappe.logger().warning(f"Market segment '{market_segment_name}' not found, skipping change")
+                continue
+
+            # Find or create parent document
+            parent = frappe.db.get_value(
+                "Room Revenue Assumptions",
+                {"year": year, "month": month},
+                "name"
+            )
+            if not parent:
+                parent_doc = frappe.get_doc({
+                    "doctype": "Room Revenue Assumptions",
+                    "year": year,
+                    "month": month,
+                    "market_segment": []
+                })
+                parent_doc.insert()
+                parent = parent_doc.name
+
+            # Check if child exists based on market_segment
+            child = frappe.db.get_value(
+                "Market Segement Table Data",
+                {"parent": parent, "market_segment": market_segment_doc},
+                "name"
+            )
+
+            if child:
+                # Update existing child
+                child_doc = frappe.get_doc("Market Segement Table Data", child)
+                if field == 'room_nights':
+                    child_doc.room_nights = value
+                elif field == 'room_rate':
+                    child_doc.room_rate_usd = value
+                child_doc.save()
+                results.append({"action": "updated", "name": child_doc.name, "type": "market_segment"})
+            else:
+                # Create new child
+                parent_doc = frappe.get_doc("Room Revenue Assumptions", parent)
+                new_child_data = {
+                    "market_segment": market_segment_doc,
+                    "room_nights": 0,
+                    "room_rate_usd": 0
+                }
+                if field == 'room_nights':
+                    new_child_data["room_nights"] = value
+                elif field == 'room_rate':
+                    new_child_data["room_rate_usd"] = value
+                
+                new_child = parent_doc.append("market_segment", new_child_data)
+                parent_doc.save()
+                results.append({"action": "created", "name": new_child.name, "type": "market_segment"})
+
+        frappe.db.commit()
+        frappe.logger().info(f"Successfully processed {len(results)} market segment changes")
+        
+        return {
+            "status": "success", 
+            "results": results,
+            "summary": {
+                "market_segment_processed": len(changes),
+                "total_processed": len(results)
+            }
+        }
+
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "upsert_market_segment_items failed")
+        frappe.logger().error(f"Error in upsert_market_segment_items: {str(e)}")
+        return {"status": "error", "message": str(e)}
+
+
 #  http://127.0.0.1:8000/api/v2/method/ex_forcast.api.room_revenue_display.room_revenue_display
 #  http://127.0.0.1:8000/api/v2/method/ex_forcast.api.room_revenue_display.upsert_room_revenue_items
+#  http://127.0.0.1:8000/api/v2/method/ex_forcast.api.room_revenue_display.market_segment_display
+#  http://127.0.0.1:8000/api/v2/method/ex_forcast.api.room_revenue_display.upsert_market_segment_items

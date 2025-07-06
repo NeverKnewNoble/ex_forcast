@@ -26,13 +26,14 @@
   {
    "fieldname": "module",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Module",
    "options": "Module Def"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-01 12:59:47.912247",
+ "modified": "2025-07-04 21:36:01.163708",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Room Market Segment",

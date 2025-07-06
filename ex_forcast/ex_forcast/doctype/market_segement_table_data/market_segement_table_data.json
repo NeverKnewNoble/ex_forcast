@@ -6,10 +6,10 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "market_segment",
   "room_nights",
   "room_rate_usd",
-  "average_daily_rate",
-  "room_revenue"
+  "service_charge"
  ],
  "fields": [
   {
@@ -25,22 +25,23 @@
    "label": "Room Rate (USD)"
   },
   {
-   "fieldname": "average_daily_rate",
-   "fieldtype": "Data",
+   "fieldname": "market_segment",
+   "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Average Daily Rate"
+   "label": "Market Segment",
+   "options": "Room Market Segment"
   },
   {
-   "fieldname": "room_revenue",
-   "fieldtype": "Data",
+   "fieldname": "service_charge",
+   "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Room Revenue"
+   "label": "Service Charge"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-03 19:32:57.422274",
+ "modified": "2025-07-06 02:13:30.054168",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Market Segement Table Data",

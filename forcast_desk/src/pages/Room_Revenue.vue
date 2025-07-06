@@ -16,7 +16,7 @@
             <transition name="fade">
               <div v-show="!sidebarCollapsed">
                 <!-- Header Section -->
-                <div class="mb-8">
+                <div class="mb-6">
                   <div class="flex items-center gap-3 mb-2">
                     <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
                       <BedDouble class="w-5 h-5 mx-3 text-white" />
@@ -26,8 +26,10 @@
                   <p class="text-sm text-gray-500">Manage and configure your room revenue data</p>
                 </div>
 
+
+
                 <!-- Save Status Section -->
-                <div class="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
+                <div class="bg-white rounded-xl p-4 mb-2 border border-gray-200 shadow-sm">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                       <div
@@ -68,32 +70,8 @@
                   </span>
                 </div>
 
-                <!-- Action Buttons Section -->
-                <div class="mb-8">
-                  <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                    <Plus class="w-4 h-4 text-violet-600" />
-                    Quick Actions
-                  </h3>
-                  <button 
-                    @click="showAddRoomRevenueModal = true" 
-                    class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-xl hover:from-violet-600 hover:to-violet-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 font-medium"
-                  >
-                    <PlusCircle class="w-5 h-5" />
-                    {{ marketSegmentation ? 'Add Market Segment' : 'Add Room Revenue' }}
-                  </button>
-                  <div class="flex gap-2 mt-3">
-                    <button 
-                      @click="refreshRoomRevenueData"
-                      class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white border border-violet-200 text-violet-700 rounded-lg hover:bg-violet-50 transition-all text-sm font-medium"
-                    >
-                      <RefreshCw class="w-4 h-4" />
-                      Refresh
-                    </button>
-                  </div>
-                </div>
-
                 <!-- Display Format Switch -->
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-500 mb-6">
+                <div class="flex items-center justify-between p-3 bg-white rounded-lg border shadow-sm border-gray-200 mb-10">
                   <div>
                     <label class="text-sm font-medium text-gray-700">Display Format</label>
                     <p class="text-xs text-black">Market segmentation</p>
@@ -113,6 +91,32 @@
                     ></span>
                   </button>
                 </div>
+
+                <!-- Action Buttons Section -->
+                <div class="mb-6">
+                  <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <Plus class="w-4 h-4 text-violet-600" />
+                    Quick Actions
+                  </h3>
+                  <button 
+                    v-if="!marketSegmentation"
+                    @click="showAddRoomRevenueModal = true" 
+                    class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-xl hover:from-violet-600 hover:to-violet-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 font-medium"
+                  >
+                    <PlusCircle class="w-5 h-5" />
+                    Add Room Revenue
+                  </button>
+                  <div class="flex gap-2 mt-3">
+                    <button 
+                      @click="refreshRoomRevenueData"
+                      class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white border border-violet-200 text-violet-700 rounded-lg hover:bg-violet-50 transition-all text-sm font-medium"
+                    >
+                      <RefreshCw class="w-4 h-4" />
+                      Refresh
+                    </button>
+                  </div>
+                </div>
+
 
 
                 <!-- Filters Section -->
@@ -173,7 +177,7 @@
 
 
                 <!-- Total Number of Rooms Section (Market Segmentation Only) -->
-                <div v-if="marketSegmentation" class="mb-6">
+                <div v-if="marketSegmentation" class="mt-4">
                   <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                       <BedDouble class="w-5 h-5 text-violet-600" />
@@ -239,17 +243,15 @@
               :toggle-collapse="toggleCollapse"
               :is-year-collapsed="isYearCollapsed"
               :market-segment-data="marketSegmentData"
-              :handle-market-segment-cell-input="handleMarketSegmentCellInput"
-              :handle-market-segment-cell-focus="handleMarketSegmentCellFocus"
-              :handle-market-segment-cell-edit-wrapper="handleMarketSegmentCellEditWrapper"
-              :get-market-segment-value="getMarketSegmentValue"
-              :calculate-market-segment-total="calculateMarketSegmentTotal"
               :room-packages="roomPackages"
               :room-data="roomData"
               :total-number-of-rooms="totalNumberOfRooms"
               :vat-by-year="vatByYear"
               :breakfast-by-year="breakfastByYear"
               :exchange-rate-by-year="exchangeRateByYear"
+              @market-segment-changed="handleMarketSegmentDataChanged"
+              @data-loaded="handleMarketSegmentDataLoaded"
+              ref="marketSegmentationTablesRef"
             />
             <div v-else>
               <!-- Table Header with Stats -->
@@ -1261,6 +1263,8 @@ import {
   getRoomRevenueList,
   getRoomPackagesList,
   createRoomRevenueAssumption,
+  getMarketSegmentList,
+  saveMarketSegmentChanges,
   
   // Modal utilities
   showAddRoomRevenueModal,
@@ -1319,6 +1323,9 @@ const isAddingRoomType = ref(false);
 
 // Add reactive state for market segmentation data
 const marketSegmentData = ref({});
+const marketSegmentChanges = ref([]); // Track market segment changes
+const originalMarketSegmentData = ref({});
+const marketSegmentationTablesRef = ref(null);
 
 // Add reactive state for total number of rooms
 const totalNumberOfRooms = ref(
@@ -1393,6 +1400,11 @@ onMounted(async () => {
     years.value = await loadYearOptions();
     roomData.value = await getRoomRevenueList();    
     originalRoomData.value = cloneDeep(roomData.value); 
+    
+    // Load market segment data
+    const marketSegmentResponse = await getMarketSegmentList();
+    marketSegmentData.value = marketSegmentResponse || {};
+    originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
     
     // ** Room Packages List ** //
     const response = await getRoomPackagesList();
@@ -1501,6 +1513,31 @@ const submitAddRoomRevenueWrapper = async () => {
 // Wrapper function for saveChanges
 const saveChangesWrapper = async () => {
   await saveRoomChanges(changedCells, isSaving, saveError, roomData, originalRoomData, isSaved);
+  
+  // Also save market segment changes if any
+  if (marketSegmentationTablesRef.value && marketSegmentationTablesRef.value.marketSegmentChanges) {
+    const segmentChanges = marketSegmentationTablesRef.value.marketSegmentChanges;
+    if (segmentChanges.length > 0) {
+      try {
+        const result = await saveMarketSegmentChanges(segmentChanges);
+        // Handle both direct response and wrapped response structures
+        const responseData = result.data || result;
+        if (responseData && responseData.status === 'success') {
+          console.log('Market segment changes saved successfully:', responseData);
+          // Clear changes after successful save
+          marketSegmentationTablesRef.value.marketSegmentChanges = [];
+          originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
+          alertService.success('All changes saved successfully!');
+        } else {
+          console.error('Failed to save market segment changes:', result);
+          alertService.error('Failed to save market segment changes. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error saving market segment changes:', error);
+        alertService.error('Error saving market segment changes: ' + error.message);
+      }
+    }
+  }
 };
 
 // Unsaved Changes Warning Modal
@@ -1612,12 +1649,58 @@ function calculateMarketSegmentTotal(data, segment, year, field) {
 }
 function handleMarketSegmentCellInput({ year, label, segment, field, event }) {
   // Handle input event for market segment cell
+  const value = event.target.innerText.replace(/[^\d.]/g, '');
+  
+  // Update the data structure
+  if (!marketSegmentData.value[year]) marketSegmentData.value[year] = {};
+  if (!marketSegmentData.value[year][segment.market_segment]) marketSegmentData.value[year][segment.market_segment] = {};
+  if (!marketSegmentData.value[year][segment.market_segment][label]) marketSegmentData.value[year][segment.market_segment][label] = {};
+  
+  marketSegmentData.value[year][segment.market_segment][label][field] = value;
+  
+  // Track changes for saving
+  const change = {
+    year,
+    month: label,
+    market_segment: segment.market_segment,
+    field,
+    value
+  };
+  
+  // Check if this change already exists
+  const existingIndex = marketSegmentChanges.value.findIndex(
+    c => c.year === year && c.month === label && c.market_segment === segment.market_segment && c.field === field
+  );
+  
+  if (existingIndex >= 0) {
+    marketSegmentChanges.value[existingIndex] = change;
+  } else {
+    marketSegmentChanges.value.push(change);
+  }
+  
+  // Mark as unsaved
+  isSaved.value = false;
 }
-function handleMarketSegmentCellFocus({ year, label, segment, field, event }) {
+
+function handleMarketSegmentCellFocus({ event }) {
   // Handle focus event for market segment cell
+  if (event.target && typeof event.target.select === 'function') {
+    event.target.select();
+  }
 }
+
 function handleMarketSegmentCellEditWrapper({ year, label, segment, field, event }) {
   // Handle blur/edit event for market segment cell
+  const value = event.target.innerText.replace(/[^\d.]/g, '');
+  
+  if (!marketSegmentData.value[year]) marketSegmentData.value[year] = {};
+  if (!marketSegmentData.value[year][segment.market_segment]) marketSegmentData.value[year][segment.market_segment] = {};
+  if (!marketSegmentData.value[year][segment.market_segment][label]) marketSegmentData.value[year][segment.market_segment][label] = {};
+  
+  marketSegmentData.value[year][segment.market_segment][label][field] = value;
+  
+  // Mark as unsaved
+  isSaved.value = false;
 }
 
 import MarketSegmentationTables from '@/components/ui/MarketSegmentationTables.vue';
@@ -1637,6 +1720,18 @@ watch(exchangeRateByYear, (newValue) => {
 }, { deep: true });
 
 const sidebarCollapsed = ref(false);
+
+// Handle market segment data changes
+function handleMarketSegmentDataChanged(newData) {
+  marketSegmentData.value = newData;
+  isSaved.value = false;
+}
+
+// Handle market segment data loaded
+function handleMarketSegmentDataLoaded(data) {
+  marketSegmentData.value = data;
+  originalMarketSegmentData.value = cloneDeep(data);
+}
 </script>
   
   
