@@ -210,15 +210,22 @@
                           @click="showBreakfastModal = true" 
                           class="flex items-center gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
                         >
-                          <DollarSign class="w-4 h-4" />
+                          <Coffee  class="w-4 h-4" />
                           Breakfast Allocation
                         </button>
                         <button 
                           @click="showExchangeRateModal = true" 
                           class="flex items-center gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
                         >
-                          <DollarSign class="w-4 h-4" />
+                          <BadgeCent  class="w-4 h-4" />
                           Exchange Rate
+                        </button>
+                        <button 
+                          @click="showServiceChargeModal = true" 
+                          class="flex items-center gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
+                        >
+                          <DollarSign  class="w-4 h-4" />
+                          Service Charge
                         </button>
                       </div>
                     </div>
@@ -249,6 +256,7 @@
               :vat-by-year="vatByYear"
               :breakfast-by-year="breakfastByYear"
               :exchange-rate-by-year="exchangeRateByYear"
+              :service-charge-by-year="serviceChargeByYear"
               @market-segment-changed="handleMarketSegmentDataChanged"
               @data-loaded="handleMarketSegmentDataLoaded"
               ref="marketSegmentationTablesRef"
@@ -1218,6 +1226,66 @@
       </div>
     </div>
   </transition>
+
+  <!-- Service Charge Modal -->
+  <transition name="fade">
+    <div
+      v-if="showServiceChargeModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+    >
+      <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-lg p-0 overflow-hidden">
+        <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
+          <DollarSign class="w-6 h-6 text-white" />
+          <h2 class="text-xl font-bold text-white">Service Charge</h2>
+        </div>
+        <div class="p-8 pt-6">
+          <div v-if="!visibleYears.length" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
+            <AlertTriangle class="w-6 h-6 text-yellow-600" />
+            <span class="text-yellow-800 font-medium">Please select both \"From Year\" and \"To Year\" to configure service charge.</span>
+          </div>
+          <div v-if="visibleYears.length" class="space-y-4 max-h-[50vh] overflow-auto pr-2">
+            <div
+              v-for="year in visibleYears"
+              :key="'service-charge-' + year"
+              class="flex justify-between items-center border-b pb-2"
+            >
+              <span class="font-medium text-gray-700 flex items-center gap-2">
+                <Calendar class="w-4 h-4 text-violet-600" />
+                {{ year }}
+              </span>
+              <div class="flex items-center gap-2">
+                <input
+                  v-model="serviceChargeByYear[year]"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  class="px-6 py-2 border rounded-md focus:ring-violet-500 w-32"
+                  placeholder="Amount"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end gap-3 px-8 py-4 bg-gray-50 border-t border-violet-100">
+          <button
+            @click="showServiceChargeModal = false"
+            class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2"
+          >
+            <X class="w-4 h-4" />
+            Close
+          </button>
+          <button
+            v-if="visibleYears.length"
+            @click="showServiceChargeModal = false"
+            class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2"
+          >
+            <Check class="w-4 h-4" />
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </transition>
 </template>
   
   
@@ -1228,7 +1296,7 @@
 <script setup>
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import Sidebar from "@/components/ui/Sidebar.vue";
-import { CircleAlert, AlertTriangle, BedDouble, Plus, PlusCircle, DollarSign, Calculator, Settings, Calendar, X, Check, Save, Loader2, RefreshCw, ChevronDown, ChevronRight, ArrowLeft, ChevronLeft } from 'lucide-vue-next';
+import { CircleAlert, BadgeCent, Coffee, AlertTriangle, BedDouble, Plus, PlusCircle, DollarSign, Calculator, Settings, Calendar, X, Check, Save, Loader2, RefreshCw, ChevronDown, ChevronRight, ArrowLeft, ChevronLeft } from 'lucide-vue-next';
 import alertService from "@/components/ui/alertService.js";
 
 // Import room revenue utilities
@@ -1344,6 +1412,10 @@ const breakfastByYear = ref({});
 const showExchangeRateModal = ref(false);
 const exchangeRateByYear = ref({});
 
+// Add reactive state for service charge
+const showServiceChargeModal = ref(false);
+const serviceChargeByYear = ref({});
+
 // Computed properties
 const visibleYears = computed(() => {
   return getVisibleYears(fromYear.value, toYear.value);
@@ -1428,6 +1500,10 @@ onMounted(async () => {
     // Restore Exchange Rate from localStorage
     const storedExchangeRate = localStorage.getItem('exchangeRateByYear');
     if (storedExchangeRate) exchangeRateByYear.value = JSON.parse(storedExchangeRate);
+
+    // Restore Service Charge from localStorage
+    const storedServiceCharge = localStorage.getItem('serviceChargeByYear');
+    if (storedServiceCharge) serviceChargeByYear.value = JSON.parse(storedServiceCharge);
   } catch (err) {
     console.error("Error loading data:", err);
   }
@@ -1717,6 +1793,11 @@ watch(breakfastByYear, (newValue) => {
 // Persist Exchange Rate to localStorage
 watch(exchangeRateByYear, (newValue) => {
   localStorage.setItem('exchangeRateByYear', JSON.stringify(newValue));
+}, { deep: true });
+
+// Persist Service Charge to localStorage
+watch(serviceChargeByYear, (newValue) => {
+  localStorage.setItem('serviceChargeByYear', JSON.stringify(newValue));
 }, { deep: true });
 
 const sidebarCollapsed = ref(false);

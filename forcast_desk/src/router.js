@@ -33,6 +33,11 @@ const routes = [
     path: '/room_revenue_assumptions',
     component: () => import('@/pages/Room_Revenue.vue'),
   },
+  {
+    name: 'F&B_Revenue_Assumptions',
+    path: '/f&b_revenue_assumptions',
+    component: () => import('@/pages/F&B_Revenue_Assumpt.vue'),
+  },
 ]
 
 let router = createRouter({
