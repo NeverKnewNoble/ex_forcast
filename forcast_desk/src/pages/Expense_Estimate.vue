@@ -6,9 +6,17 @@
       <!-- Main Content Area -->
       <div class="flex">
         <!-- Left Sidebar - Filters and Controls -->
-        <div class="w-80 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 p-6 min-h-screen flex flex-col shadow-sm">
-          <!-- Header Section -->
-          <div class="mb-8">
+        <div :class="['bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 min-h-screen flex flex-col shadow-sm transition-all duration-300', sidebarCollapsed ? 'w-14 p-2' : 'w-80 p-6']">
+          <!-- Collapse/Expand Button -->
+          <button @click="sidebarCollapsed = !sidebarCollapsed" class="mb-4 flex items-center gap-2 px-2 py-1 bg-violet-100 hover:bg-violet-200 rounded transition-all">
+            <ChevronLeft v-if="!sidebarCollapsed" class="w-5 h-5 text-violet-700" />
+            <ChevronRight v-else class="w-5 h-5 text-violet-700" />
+            <span v-if="!sidebarCollapsed" class="text-violet-700 text-sm font-medium">Collapse</span>
+          </button>
+          <transition name="fade">
+              <div v-show="!sidebarCollapsed">
+                <!-- Header Section -->
+                <div class="mb-8">
             <div class="flex items-center gap-3 mb-2">
               <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
                 <Calculator class="w-5 h-5 text-white" />
@@ -169,6 +177,8 @@
               </div>
             </div>
           </div>
+            </div>
+          </transition>
         </div>
 
         <!-- Right Side - Table Area -->
@@ -671,7 +681,7 @@
 <script setup>
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import Sidebar from "@/components/ui/Sidebar.vue";
-import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign } from 'lucide-vue-next';
+import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign } from 'lucide-vue-next';
 import alertService from "@/components/ui/alertService.js";
 
 import {
@@ -749,6 +759,7 @@ const isSaving = ref(false);
 const saveError = ref("");
 const showUnsavedWarning = ref(false);
 const pendingNavigation = ref(null); // Store the pending navigation action
+const sidebarCollapsed = ref(false);
 
 // Computed properties
 const visibleYears = computed(() => {

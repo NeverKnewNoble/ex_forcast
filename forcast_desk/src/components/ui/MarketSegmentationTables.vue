@@ -654,17 +654,9 @@
                       <td
                         v-for="label in getColumnLabelsForYearLocal(year)"
                         :key="'service-charge-cell-' + year + '-' + label"
-                        class="px-2 py-2 text-right border border-orange-200 hover:bg-orange-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                        class="px-2 py-2 text-right border border-orange-200"
                       >
-                        <div
-                          contenteditable="true"
-                          class="font-mono text-xs min-h-[1.2em] focus:outline-none"
-                          @input="handleServiceChargeCellInput({ year, label, event: $event })"
-                          @focus="handleServiceChargeCellFocus({ event: $event })"
-                          @blur="handleServiceChargeCellEditWrapper({ year, label, event: $event })"
-                        >
-                          {{ getServiceChargeValue(year, label) }}
-                        </div>
+                        <span class="font-mono text-xs">{{ getServiceChargeValue(year, label) }}</span>
                       </td>
                       <td class="px-2 py-2 text-right border border-orange-200 font-semibold bg-orange-50">
                         <span class="font-mono text-xs text-orange-700">
@@ -1002,6 +994,10 @@ const props = defineProps({
   exchangeRateByYear: {
     type: Object,
     default: () => ({})
+  },
+  serviceChargeByYear: {
+    type: Object,
+    default: () => ({})
   }
 });
 
@@ -1177,8 +1173,8 @@ function updateMarketSegmentData({ year, label, segment, field, value }) {
 function getTotalRevenue(year, label) {
   // Get Room Revenue (calculated)
   const roomRevenue = parseFloat(getTotalRoomRevenue(year, label).replace(/,/g, ''));
-  // Get Service Charge
-  const serviceCharge = Number(props.marketSegmentData?.[year]?.['service_charge']?.[label]?.value || 0);
+  // Get Service Charge from props (monthly value)
+  const serviceCharge = parseFloat(getServiceChargeValue(year, label).replace(/,/g, ''));
   // Calculate Total Revenue = Room Revenue + Service Charge
   const totalRevenue = roomRevenue + serviceCharge;
   return totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -1380,81 +1376,17 @@ function getTotalRoomRevenueYear(year) {
 
 // --- Service Charge Functions ---
 function getServiceChargeValue(year, label) {
-  return props.marketSegmentData?.[year]?.['service_charge']?.[label]?.value || '0.00';
+  // Get service charge from props (yearly value) - show full amount for each month
+  const yearlyServiceCharge = Number(props.serviceChargeByYear?.[year] || 0);
+  if (yearlyServiceCharge === 0) return '0.00';
+  
+  return yearlyServiceCharge.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function getServiceChargeTotal(year) {
-  let total = 0;
-  for (const label of props.getColumnLabelsForYearLocal(year)) {
-    const value = Number(props.marketSegmentData?.[year]?.['service_charge']?.[label]?.value || 0);
-    total += value;
-  }
-  return total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-// Service Charge Handlers
-function handleServiceChargeCellInput({ year, label, event }) {
-  const value = event.target.textContent.replace(/[^\d.]/g, '');
-  // Store cursor position
-  const selection = window.getSelection();
-  const range = selection.getRangeAt(0);
-  const cursorPosition = range.startOffset;
-  
-  updateServiceChargeData({ year, label, value });
-  
-  // Restore cursor position after Vue updates the DOM
-  nextTick(() => {
-    if (event.target && event.target.textContent) {
-      const newRange = document.createRange();
-      const textNode = event.target.firstChild || event.target;
-      const newPosition = Math.min(cursorPosition, textNode.textContent.length);
-      newRange.setStart(textNode, newPosition);
-      newRange.setEnd(textNode, newPosition);
-      selection.removeAllRanges();
-      selection.addRange(newRange);
-    }
-  });
-}
-
-function handleServiceChargeCellFocus({ event }) {
-  if (event.target && typeof event.target.select === 'function') {
-    event.target.select();
-  }
-}
-
-function handleServiceChargeCellEditWrapper({ year, label, event }) {
-  const value = event.target.textContent.replace(/[^\d.]/g, '');
-  updateServiceChargeData({ year, label, value });
-}
-
-function updateServiceChargeData({ year, label, value }) {
-  if (!props.marketSegmentData[year]) props.marketSegmentData[year] = {};
-  if (!props.marketSegmentData[year]['service_charge']) props.marketSegmentData[year]['service_charge'] = {};
-  if (!props.marketSegmentData[year]['service_charge'][label]) props.marketSegmentData[year]['service_charge'][label] = {};
-  props.marketSegmentData[year]['service_charge'][label].value = value;
-  
-  // Track changes for saving
-  const change = {
-    year,
-    month: label,
-    market_segment: 'service_charge',
-    field: 'value',
-    value
-  };
-  
-  // Check if this change already exists
-  const existingIndex = marketSegmentChanges.value.findIndex(
-    c => c.year === year && c.month === label && c.market_segment === 'service_charge' && c.field === 'value'
-  );
-  
-  if (existingIndex >= 0) {
-    marketSegmentChanges.value[existingIndex] = change;
-  } else {
-    marketSegmentChanges.value.push(change);
-  }
-  
-  // Emit change event to parent
-  emit('market-segment-changed', props.marketSegmentData);
+  // Return the yearly service charge value
+  const yearlyServiceCharge = Number(props.serviceChargeByYear?.[year] || 0);
+  return yearlyServiceCharge.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function getADRTotal(year, label) {
