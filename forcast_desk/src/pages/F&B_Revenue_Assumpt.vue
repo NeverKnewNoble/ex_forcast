@@ -230,7 +230,7 @@
                         <div class="mt-3">
                           <button 
                             @click="showDoubleOccupancyModal = true"
-                            class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
+                            class="w-full flex items-center justify-left gap-2 px-4 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
                           >
                             <Users class="w-4 h-4" />
                             Double Occupancy
@@ -251,26 +251,27 @@
           <!-- Right Side - Content Area -->
           <div class="flex-1 p-4">
             <!-- Table Header with Stats -->
-            <div class="mb-4 flex items-center gap-2">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
-                  <UtensilsCrossed class="w-3 h-3 text-white" />
+            <template v-if="visibleYears.length">
+              <div class="mb-4 flex items-center gap-2">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
+                    <UtensilsCrossed class="w-3 h-3 text-white" />
+                    </div>
+                    <h2 class="text-lg font-bold text-gray-800">F&amp;B Revenue Overview</h2>
                   </div>
-                  <h2 class="text-lg font-bold text-gray-800">F&amp;B Revenue Overview</h2>
-                </div>
-            </div>
-            <!-- Move Create Restaurant button here -->
-            <div class="mb-4">
-                <button
-                  @click="showCreateRestaurantModal = true"
-                class="flex items-center gap-2 px-4 py-1 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg font-medium"
-                >
-                  <PlusCircle class="w-4 h-4" />
-                  Create Restaurant
-                </button>
               </div>
-              <!-- Modern Table Container -->
-              <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden">
+              <!-- Move Create Restaurant button here -->
+              <div class="mb-4">
+                  <button
+                    @click="showCreateRestaurantModal = true"
+                  class="flex items-center gap-2 px-4 py-1 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg font-medium"
+                  >
+                    <PlusCircle class="w-4 h-4" />
+                    Create Restaurant
+                  </button>
+                </div>
+                <!-- Modern Table Container -->
+                <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
                   <div class="min-w-full w-max">
                     <table class="w-full">
@@ -340,8 +341,8 @@
                               (row === 'Number of rooms' || row === 'Days of the Month' || row === 'Number of rooms available' || row === 'Number of Rooms Sold (excl.)' || row === 'Occupancy (excl.) %' || row === 'Number of guests' || row === 'Average Room Rate' || row === 'Revenue Per Available Room') ? 'bg-violet-50/30' : ''
                             ]"
                         >
-                          <td class="px-4 py-2 font-medium border-r border-violet-200 flex items-center gap-2">
-                            {{ row }}
+                          <td class="px-4 py-2 font-medium border-r border-violet-200 flex items-center justify-between">
+                            <span>{{ row }}</span>
                             <span v-if="row === 'Number of rooms' || row === 'Days of the Month' || row === 'Number of rooms available' || row === 'Number of Rooms Sold (excl.)' || row === 'Occupancy (excl.) %' || row === 'Number of guests' || row === 'Average Room Rate' || row === 'Revenue Per Available Room'" class="text-xs bg-violet-600 text-white px-2 py-0.5 rounded-full">
                               Auto
                             </span>
@@ -390,25 +391,9 @@
                         <template v-for="restaurant in restaurantList" :key="restaurant.name">
                           <!-- Restaurant name row -->
                           <tr>
-                            <td class="bg-violet-50 text-violet-900 text-lg font-bold border-b border-violet-200 py-2 px-2 pl-4 text-balance">
+                            <td class="bg-violet-50 text-violet-900 text-lg font-bold border-b border-violet-200 py-2 px-2 pl-4 text-balance" :colspan="1 + visibleYears.length * (getColumnLabelsForYearLocal(visibleYears[0])?.length + 1)">
                               {{ restaurant.cover_name || restaurant.name }}
                             </td>
-                            <template v-for="year in visibleYears" :key="'restaurant-row-' + restaurant.name + '-' + year">
-                              <template v-if="!isYearCollapsed(year)">
-                                <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'restaurant-row-cell-' + restaurant.name + '-' + year + '-' + label"
-                                  contenteditable="true"
-                                  class="px-2 py-2 text-right border border-violet-200 hover:bg-violet-50 editable-cell font-mono text-xs"
-                                  @input="handleFnbCellInput(fnbData.value, { row: restaurant.name + '-' + label, year, label, event: $event })"
-                                  @keypress="allowOnlyNumbers($event)"
-                                >
-                                  <span class="font-mono text-xs">{{ getFnbCellValue(fnbData.value, restaurant.name, year, label) }}</span>
-                                </td>
-                                <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">{{ calculateFnbTotal(fnbData.value, restaurant.name, year, getColumnLabelsForYearLocal(year)) }}</td>
-                              </template>
-                              <template v-else>
-                                <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">{{ calculateFnbTotal(fnbData.value, restaurant.name, year, getColumnLabelsForYearLocal(year)) }}</td>
-                              </template>
-                            </template>
                           </tr>
                           <template v-for="section in defaultRestaurantRows" :key="section.section">
                             <!-- Section header row -->
@@ -500,7 +485,29 @@
             <!-- Leave 2 empty rows as space -->
             <div style="height: 3.5rem;"></div>
             <div style="height: 3.5rem;"></div>
+            </template>
+
+            <!-- Enhanced No Years Selected State -->
+            <template v-else>
+              <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
+                <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
+                  <CircleAlert class="w-8 h-8 text-violet-500" />
+                </div>
+                <h3 class="text-lg text-violet-700 font-semibold mb-2">
+                  {{ fromYear && !toYear ? 'Select "To Year"' : !fromYear && toYear ? 'Select "From Year"' : 'No Years Selected' }}
+                </h3>
+                <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
+                  {{ fromYear && !toYear ? 'You have selected a From Year, now please select a To Year to display the F&B revenue table.' : 
+                     !fromYear && toYear ? 'You have selected a To Year, now please select a From Year to display the F&B revenue table.' :
+                       'Please select both "From Year" and "To Year" in the left panel to display the F&B revenue table.' }}
+                </p>
+                <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
+                  <ArrowLeft class="w-3 h-3" />
+                  <span>Use the filters on the left to get started</span>
+                </div>
               </div>
+            </template>
+          </div>
         </div>
       </div>
     </div>
@@ -745,6 +752,8 @@
     Calculator,  
     BedDouble,
     Users,
+    CircleAlert,
+    ArrowLeft,
   } from 'lucide-vue-next';
   import alertService from "@/components/ui/alertService.js";
   import {
