@@ -18,8 +18,8 @@
                 <!-- Header Section -->
                 <div class="mb-6">
                   <div class="flex items-center gap-3 mb-2">
-                    <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
-                      <BedDouble class="w-5 h-5 mx-3 text-white" />
+                    <div class="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
+                      <BedDouble class="w-7 h-7 mx-2 text-white" />
                     </div>
                     <h1 class="text-2xl font-bold text-gray-900">Room Revenue Assumptions</h1>
                   </div>
