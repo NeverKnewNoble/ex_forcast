@@ -267,6 +267,8 @@ fixtures = [
             {"doctype": "Room Packages", "filters": [["module" , "in" , ("Ex Forcast" )]]},
             {"doctype": "Segment Category", "filters": [["module" , "in" , ("Ex Forcast" )]]},
             {"doctype": "Room Market Segment", "filters": [["module" , "in" , ("Ex Forcast" )]]},
+            {"doctype": "Cover Details", "filters": [["module" , "in" , ("Ex Forcast" )]]},
 ]
+
 
 website_route_rules = [{'from_route': '/forcast_desk/<path:app_path>', 'to_route': 'forcast_desk'},]

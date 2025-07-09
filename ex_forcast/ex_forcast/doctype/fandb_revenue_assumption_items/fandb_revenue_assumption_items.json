@@ -1,0 +1,55 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-07-08 11:28:45.980001",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "dining_cover",
+  "cover_detail",
+  "cover_category",
+  "amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "dining_cover",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Restaurant",
+   "options": "Restaurant"
+  },
+  {
+   "fieldname": "cover_detail",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Cover Detail",
+   "options": "Cover Details"
+  },
+  {
+   "fetch_from": "cover_detail.cover_category",
+   "fieldname": "cover_category",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Cover Category"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-07-08 12:32:28.250672",
+ "modified_by": "Administrator",
+ "module": "Ex Forcast",
+ "name": "FandB Revenue Assumption Items",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
