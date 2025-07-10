@@ -335,6 +335,7 @@
                       </thead>
                       <!-- Table Body -->
                       <tbody class="text-gray-700 bg-white text-sm">
+                        <!-- Robust, expense-style cell handling for all editable cells -->
                         <tr v-for="row in fnbRows" :key="'fnb-row-' + row" 
                             :class="[
                               'even:bg-gray-50 hover:bg-violet-50 transition-all duration-200 border-b border-gray-100',
@@ -351,52 +352,38 @@
                             <template v-if="!isYearCollapsed(year)">
                               <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'cell-' + year + '-' + label + '-' + row"
                                 :contenteditable="row !== 'Number of rooms' && row !== 'Days of the Month' && row !== 'Number of rooms available' && row !== 'Number of Rooms Sold (excl.)' && row !== 'Occupancy (excl.) %' && row !== 'Number of guests' && row !== 'Average Room Rate' && row !== 'Revenue Per Available Room'"
-                              class="px-2 py-2 text-right border border-violet-200 hover:bg-violet-50 editable-cell font-mono text-xs"
+                                class="px-2 py-2 text-right border border-violet-200 hover:bg-violet-50 editable-cell font-mono text-xs"
                                 :class="{ 'bg-violet-50 cursor-not-allowed': row === 'Number of rooms' || row === 'Days of the Month' || row === 'Number of rooms available' || row === 'Number of Rooms Sold (excl.)' || row === 'Occupancy (excl.) %' || row === 'Number of guests' || row === 'Average Room Rate' || row === 'Revenue Per Available Room' }"
-                                @input="(row !== 'Number of rooms' && row !== 'Days of the Month' && row !== 'Number of rooms available' && row !== 'Number of Rooms Sold (excl.)' && row !== 'Occupancy (excl.) %' && row !== 'Number of guests' && row !== 'Average Room Rate' && row !== 'Revenue Per Available Room') ? handleFnbCellInput(fnbData.value, { row, year, label, event: $event }) : null"
+                                @input="(row !== 'Number of rooms' && row !== 'Days of the Month' && row !== 'Number of rooms available' && row !== 'Number of Rooms Sold (excl.)' && row !== 'Occupancy (excl.) %' && row !== 'Number of guests' && row !== 'Average Room Rate' && row !== 'Revenue Per Available Room') ? handleFnbCellInput({ row, year, label, event: $event, fnbData: fnbData, changedCells, isSaved }) : null"
+                                @focus="(row !== 'Number of rooms' && row !== 'Days of the Month' && row !== 'Number of rooms available' && row !== 'Number of Rooms Sold (excl.)' && row !== 'Occupancy (excl.) %' && row !== 'Number of guests' && row !== 'Average Room Rate' && row !== 'Revenue Per Available Room') ? handleFnbCellFocus({ row, year, label, event: $event }) : null"
+                                @blur="(row !== 'Number of rooms' && row !== 'Days of the Month' && row !== 'Number of rooms available' && row !== 'Number of Rooms Sold (excl.)' && row !== 'Occupancy (excl.) %' && row !== 'Number of guests' && row !== 'Average Room Rate' && row !== 'Revenue Per Available Room') ? handleFnbCellEdit({ row, year, label, event: $event, fnbData: fnbData, changedCells, isSaved }) : null"
                                 @keypress="(row !== 'Number of rooms' && row !== 'Days of the Month' && row !== 'Number of rooms available' && row !== 'Number of Rooms Sold (excl.)' && row !== 'Occupancy (excl.) %' && row !== 'Number of guests' && row !== 'Average Room Rate' && row !== 'Revenue Per Available Room') ? allowOnlyNumbers($event) : null"
                               >
-                                <span class="font-mono text-xs">{{ getFnbCellValue(fnbData.value, row, year, label, totalRooms) }}</span>
+                                <span class="font-mono text-xs">{{ getFnbCellValue(fnbData, row, year, label, totalRooms) }}</span>
                               </td>
                               <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
                                 <span class="font-mono text-xs text-violet-700">
-                                  {{ calculateFnbTotal(fnbData.value, row, year, getColumnLabelsForYearLocal(year), totalRooms) }}
+                                  {{ calculateFnbTotal(fnbData, row, year, getColumnLabelsForYearLocal(year), totalRooms) }}
                                 </span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
                                 <span class="font-mono text-xs text-violet-700">
-                                  {{ calculateFnbTotal(fnbData.value, row, year, getColumnLabelsForYearLocal(year), totalRooms) }}
+                                  {{ calculateFnbTotal(fnbData, row, year, getColumnLabelsForYearLocal(year), totalRooms) }}
                                 </span>
                               </td>
                             </template>
                           </template>
                         </tr>
-                        <!-- Two empty rows for spacing -->
-                        <tr>
-                          <td class="py-2" :colspan="1 + visibleYears.length * (getColumnLabelsForYearLocal(visibleYears[0])?.length + 1)"></td>
-                        </tr>
-                        <tr>
-                          <td class="py-2" :colspan="1 + visibleYears.length * (getColumnLabelsForYearLocal(visibleYears[0])?.length + 1)"></td>
-                        </tr>
-                        <!-- Restaurants title row (Details column only) -->
-                        <tr>
-                          <td class="bg-gradient-to-r from-violet-100 to-violet-200 text-violet-800 text-2xl font-bold border-y-2 border-violet-400 py-2 text-left pl-4 align-middle" style="vertical-align: middle;" :colspan="1 + visibleYears.length * (getColumnLabelsForYearLocal(visibleYears[0])?.length + 1)">
-                            <UtensilsCrossed class="inline w-6 h-6 mr-2 align-middle text-violet-600" />
-                            Restaurants
-                          </td>
-                        </tr>
-                        <!-- Render each restaurant with default rows (Details column only) -->
+                        <!-- Restaurant rows -->
                         <template v-for="restaurant in restaurantList" :key="restaurant.name">
-                          <!-- Restaurant name row -->
                           <tr>
                             <td class="bg-violet-50 text-violet-900 text-lg font-bold border-b border-violet-200 py-2 px-2 pl-4 text-balance" :colspan="1 + visibleYears.length * (getColumnLabelsForYearLocal(visibleYears[0])?.length + 1)">
                               {{ restaurant.cover_name || restaurant.name }}
                             </td>
                           </tr>
                           <template v-for="section in defaultRestaurantRows" :key="section.section">
-                            <!-- Section header row -->
                             <tr>
                               <td class="bg-violet-100 text-violet-700 font-semibold border-b border-violet-100 py-2 pl-8">
                                 {{ section.section }}
@@ -406,19 +393,20 @@
                                   <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'section-row-cell-' + restaurant.name + '-' + section.section + '-' + year + '-' + label"
                                     contenteditable="true"
                                     class="px-2 py-2 text-right border border-violet-200 hover:bg-violet-50 editable-cell font-mono text-xs"
-                                    @input="handleFnbCellInput(fnbData.value, { row: restaurant.name + '-' + section.section + '-' + label, year, label, event: $event })"
+                                    @input="handleFnbCellInput({ row: restaurant.name + '-' + section.section + '-' + label, year, label, event: $event, fnbData: fnbData, changedCells, isSaved })"
+                                    @focus="handleFnbCellFocus({ row: restaurant.name + '-' + section.section + '-' + label, year, label, event: $event })"
+                                    @blur="handleFnbCellEdit({ row: restaurant.name + '-' + section.section + '-' + label, year, label, event: $event, fnbData: fnbData, changedCells, isSaved })"
                                     @keypress="allowOnlyNumbers($event)"
                                   >
-                                    <span class="font-mono text-xs">{{ getFnbCellValue(fnbData.value, restaurant.name + '-' + section.section + '-' + label, year, label) }}</span>
+                                    <span class="font-mono text-xs">{{ getFnbCellValue(fnbData, restaurant.name + '-' + section.section + '-' + label, year, label) }}</span>
                                   </td>
-                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">{{ calculateFnbTotal(fnbData.value, restaurant.name + '-' + section.section, year, getColumnLabelsForYearLocal(year)) }}</td>
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">{{ calculateFnbTotal(fnbData, restaurant.name + '-' + section.section, year, getColumnLabelsForYearLocal(year)) }}</td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">{{ calculateFnbTotal(fnbData.value, restaurant.name + '-' + section.section, year, getColumnLabelsForYearLocal(year)) }}</td>
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">{{ calculateFnbTotal(fnbData, restaurant.name + '-' + section.section, year, getColumnLabelsForYearLocal(year)) }}</td>
                                 </template>
                               </template>
                             </tr>
-                            <!-- Section rows -->
                             <tr v-for="row in section.rows" :key="row">
                               <td class="pl-12 py-1 text-gray-700 border-b border-gray-50">
                                 {{ row }}
@@ -426,17 +414,24 @@
                               <template v-for="year in visibleYears" :key="'section-row-detail-' + restaurant.name + '-' + section.section + '-' + row + '-' + year">
                                 <template v-if="!isYearCollapsed(year)">
                                   <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'section-row-detail-cell-' + restaurant.name + '-' + section.section + '-' + row + '-' + year + '-' + label"
-                                    contenteditable="true"
-                                    class="px-2 py-2 text-right border border-violet-200 hover:bg-violet-50 editable-cell font-mono text-xs"
-                                    @input="handleFnbCellInput(fnbData.value, { row: restaurant.name + '-' + section.section + '-' + row + '-' + label, year, label, event: $event })"
-                                    @keypress="allowOnlyNumbers($event)"
+                                    :contenteditable="row !== 'Monthly Cover'"
+                                    class="px-2 py-2 text-right border border-violet-200 font-mono text-xs"
+                                    :class="[
+                                      row === 'Monthly Cover' 
+                                        ? 'bg-violet-50 cursor-not-allowed' 
+                                        : 'hover:bg-violet-50 editable-cell'
+                                    ]"
+                                    @input="row !== 'Monthly Cover' ? handleFnbCellInput({ row: restaurant.name + '-' + section.section + '-' + row + '-' + label, year, label, event: $event, fnbData: fnbData, changedCells, isSaved }) : null"
+                                    @focus="row !== 'Monthly Cover' ? handleFnbCellFocus({ row: restaurant.name + '-' + section.section + '-' + row + '-' + label, year, label, event: $event }) : null"
+                                    @blur="row !== 'Monthly Cover' ? handleFnbCellEdit({ row: restaurant.name + '-' + section.section + '-' + row + '-' + label, year, label, event: $event, fnbData: fnbData, changedCells, isSaved }) : null"
+                                    @keypress="row !== 'Monthly Cover' ? allowOnlyNumbers($event) : null"
                                   >
-                                    <span class="font-mono text-xs">{{ getFnbCellValue(fnbData.value, restaurant.name + '-' + section.section + '-' + row + '-' + label, year, label) }}</span>
+                                    <span class="font-mono text-xs">{{ getFnbCellValue(fnbData, restaurant.name + '-' + section.section + '-' + row + '-' + label, year, label) }}</span>
                                   </td>
-                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">{{ calculateFnbTotal(fnbData.value, restaurant.name + '-' + section.section + '-' + row, year, getColumnLabelsForYearLocal(year)) }}</td>
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">{{ calculateFnbTotal(fnbData, restaurant.name + '-' + section.section + '-' + row, year, getColumnLabelsForYearLocal(year)) }}</td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">{{ calculateFnbTotal(fnbData.value, restaurant.name + '-' + section.section + '-' + row, year, getColumnLabelsForYearLocal(year)) }}</td>
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">{{ calculateFnbTotal(fnbData, restaurant.name + '-' + section.section + '-' + row, year, getColumnLabelsForYearLocal(year)) }}</td>
                                 </template>
                               </template>
                             </tr>
@@ -734,7 +729,7 @@
   
   
   <script setup>
-  import { ref, onMounted, computed, watch, onUnmounted } from "vue";
+  import { ref, onMounted, computed, watch, onUnmounted, reactive } from "vue";
   import Sidebar from "@/components/ui/Sidebar.vue";
   import {  
     AlertTriangle, 
@@ -778,7 +773,8 @@
     getFnbCellValue as originalGetFnbCellValue,
     setFnbCellValue,
     handleFnbCellInput,
-    handleFnbCellEditWrapper,
+    handleFnbCellEdit,
+    handleFnbCellFocus,
     calculateFnbTotal
   } from "@/components/utility/f&b_revenue_assumpt/index.js";
   import { getMarketSegmentList } from "@/components/utility/room_revenue_assumpt./data_service.js";
@@ -838,7 +834,10 @@
     "Average Room Rate",
     "Revenue Per Available Room"
   ]
-  const fnbData = ref({}); // { [rowLabel]: { [year]: { [month]: value, ... } } }
+  const fnbData = reactive({}); // { [rowLabel]: { [year]: { [month]: value, ... } } }
+  
+  // Debug: Log fnbData initialization
+  // console.log('fnbData initialized:', fnbData.value, typeof fnbData.value);
   // const fnbChangedCells = ref([]); // {row, year, label, newValue}
   // const fnbIsSaved = ref(true);
   const restaurantList = ref([]);
@@ -1085,7 +1084,6 @@
       changedCells.value = [];
       isSaved.value = true;
       
-      console.log("Data refreshed successfully");
       alertService.success("Page refreshed successfully");
     } catch (error) {
       console.error("Error refreshing data:", error);
@@ -1359,10 +1357,19 @@
 
   // After data refresh or load, ensure fnbData is always an object
   watch(expenseData, () => {
-    if (!fnbData.value || typeof fnbData.value !== 'object') {
-      fnbData.value = {};
+    // console.log('expenseData watcher triggered, fnbData before:', fnbData, typeof fnbData);
+    if (!fnbData || typeof fnbData !== 'object') {
+      console.log('fnbData is invalid, resetting to empty object');
+      fnbData = {};
     }
+    // console.log('fnbData after:', fnbData, typeof fnbData);
   });
+
+  // Wrapper function to handle cell input with proper reactive reference
+  function handleFnbCellInputWrapper(params) {
+    // console.log('Wrapper called with fnbData:', fnbData, typeof fnbData);
+    return handleFnbCellInput({ ...params, fnbData });
+  }
 
   </script>
   
@@ -1403,5 +1410,4 @@
     box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
   }
   </style>
-  
   
