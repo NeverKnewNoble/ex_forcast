@@ -975,8 +975,8 @@
       costTypeOptions.value = fieldOptions.cost_type.map(costType => ({ label: costType, value: costType }));
       
       // Restore years from localStorage
-      fromYear.value = localStorage.getItem('expenseEstimateFromYear') || "";
-      toYear.value = localStorage.getItem('expenseEstimateToYear') || "";
+      fromYear.value = localStorage.getItem('fnbRevenueFromYear') || "";
+      toYear.value = localStorage.getItem('fnbRevenueToYear') || "";
       isSaved.value = true;
       restaurantList.value = await getRestaurants();
       
@@ -1004,10 +1004,10 @@
   
   // Watchers to persist year selection
   watch(fromYear, (newValue) => {
-    localStorage.setItem('expenseEstimateFromYear', newValue);
+    localStorage.setItem('fnbRevenueFromYear', newValue);
   });
   watch(toYear, (newValue) => {
-    localStorage.setItem('expenseEstimateToYear', newValue);
+    localStorage.setItem('fnbRevenueToYear', newValue);
   });
   
   // Watch for total rooms changes to persist to localStorage
@@ -1019,8 +1019,8 @@
   function clearYearSelection() {
     fromYear.value = "";
     toYear.value = "";
-    localStorage.removeItem('expenseEstimateFromYear');
-    localStorage.removeItem('expenseEstimateToYear');
+    localStorage.removeItem('fnbRevenueFromYear');
+    localStorage.removeItem('fnbRevenueToYear');
     isSaved.value = false;
   }
   
