@@ -178,3 +178,4 @@ export function calculateFnbTotal(fnbData, row, year, labels, totalRooms = null)
   }
   return sum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 } 
+
