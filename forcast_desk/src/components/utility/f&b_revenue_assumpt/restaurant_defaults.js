@@ -3,6 +3,7 @@ export function getDefaultRestaurantRows() {
     {
       section: 'Breakfast Revenue',
       rows: [
+        'Breakfast Revenue',
         'Breakfast covers',
         'Average check breakfast'
       ]
@@ -10,17 +11,19 @@ export function getDefaultRestaurantRows() {
     {
       section: 'Lunch Revenue',
       rows: [
+        'Lunch Revenue',
         'Daily Cover',
         'Monthly Cover',
         'Average check food',
         'Average check beverage',
         'Lunch food revenue',
-        'Lunchy beverage revenue'
+        'Lunch beverage revenue'
       ]
     },
     {
       section: 'Dinner Revenue',
       rows: [
+        'Dinner Revenue',
         'Daily Cover',
         'Monthly Cover',
         'Average check food',
