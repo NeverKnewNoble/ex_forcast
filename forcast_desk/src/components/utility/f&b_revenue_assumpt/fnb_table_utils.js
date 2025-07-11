@@ -1,6 +1,69 @@
 // Utility functions for F&B table operations
 import { getDaysInMonth } from '../room_revenue_assumpt./room_revenue_utils.js'
 
+// Helper function to create structured row keys
+function createRowKey(restaurantName, section, type, label = null) {
+  const rowKey = {
+    restaurant: restaurantName,
+    section: section,
+    type: type,
+    label: label
+  };
+  return JSON.stringify(rowKey);
+}
+
+// Helper function to parse row key back to object
+function parseRowKey(rowKeyString) {
+  // Only try to parse if the string looks like JSON (starts with { and ends with })
+  if (typeof rowKeyString === 'string' && rowKeyString.trim().startsWith('{') && rowKeyString.trim().endsWith('}')) {
+    try {
+      return JSON.parse(rowKeyString);
+    } catch (error) {
+      console.warn('Failed to parse row key:', rowKeyString);
+      return null;
+    }
+  }
+  // If it's not a JSON string, return null (this is a simple string row name)
+  return null;
+}
+
+// Helper function to calculate Monthly Cover without recursion
+function calculateMonthlyCoverDirectly(fnbData, restaurantName, section, year, label) {
+  // Construct the Daily Cover row key
+  const dailyCoverRowKey = createRowKey(restaurantName, section, 'Daily Cover', label);
+  
+  // Get the Daily Cover value
+  const dailyCoverRaw = fnbData?.[dailyCoverRowKey]?.[year]?.[label];
+
+  if (dailyCoverRaw !== undefined && dailyCoverRaw !== null && dailyCoverRaw !== "") {
+    const dailyCover = parseFloat(dailyCoverRaw.toString().replace(/,/g, '')) || 0;
+    
+    // Get the number of days for this month/quarter
+    let days = 0;
+    if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
+      // Quarterly mode - sum up days for all 3 months in the quarter
+      const quarterMonths = {
+        "Jan-Mar": ["Jan", "Feb", "Mar"],
+        "Apr-Jun": ["Apr", "May", "Jun"],
+        "Jul-Sep": ["Jul", "Aug", "Sep"],
+        "Oct-Dec": ["Oct", "Nov", "Dec"]
+      };
+      
+      const months = quarterMonths[label];
+      for (const month of months) {
+        days += getDaysInMonth(year, month);
+      }
+    } else {
+      // Monthly mode - get days for single month
+      days = getDaysInMonth(year, label);
+    }
+    
+    // Calculate Monthly Cover = Daily Cover × Days
+    return dailyCover * days;
+  }
+  return 0;
+}
+
 export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
   // If this is the "Number of rooms" row, return the total rooms value
   if (row === "Number of rooms" && totalRooms !== null) {
@@ -58,47 +121,240 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
     return roomsAvailable.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   }
   
-  // Auto-calculate Monthly Cover based on Daily Cover
-  if (row.includes('Monthly Cover')) {
-    // Extract restaurant name and section from the row
-    const parts = row.split('-');
-    if (parts.length >= 3) {
-      const restaurantName = parts[0];
-      const section = parts[1];
-      
-      // Construct the Daily Cover row name with the month label
-      const dailyCoverRow = `${restaurantName}-${section}-Daily Cover-${label}`;
-      
-      // Get the Daily Cover value
-      const dailyCoverRaw = fnbData?.[dailyCoverRow]?.[year]?.[label];
+  // For restaurant data, first try to parse the row key to see if it's a structured key
+  let rowKeyObj = null;
+  let rowType = null;
+  
+  try {
+    rowKeyObj = parseRowKey(row);
+    if (rowKeyObj) {
+      rowType = rowKeyObj.type;
+    }
+  } catch (error) {
+    // If parsing fails, treat as legacy string format
+    rowType = row;
+  }
 
-      if (dailyCoverRaw !== undefined && dailyCoverRaw !== null && dailyCoverRaw !== "") {
-        const dailyCover = parseFloat(dailyCoverRaw.toString().replace(/,/g, '')) || 0;
+  // Auto-calculate Monthly Cover based on Daily Cover
+  if (rowType === 'Monthly Cover') {
+    if (rowKeyObj) {
+      const monthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, rowKeyObj.section, year, label);
+      return monthlyCover.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  }
+
+  // Auto-calculate Lunch food revenue: Monthly Cover × Average check food
+  if (rowType === 'Lunch food revenue') {
+    if (rowKeyObj) {
+      // Get Monthly Cover value using helper function to avoid recursion
+      const monthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, rowKeyObj.section, year, label);
+      
+      // Get Average check food value
+      const avgCheckFoodRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check food', label);
+      const avgCheckFoodRaw = fnbData?.[avgCheckFoodRowKey]?.[year]?.[label];
+      
+      if (avgCheckFoodRaw !== undefined && avgCheckFoodRaw !== null && avgCheckFoodRaw !== "") {
+        const avgCheckFood = parseFloat(avgCheckFoodRaw.toString().replace(/,/g, '')) || 0;
         
-        // Get the number of days for this month/quarter
-        let days = 0;
-        if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
-          // Quarterly mode - sum up days for all 3 months in the quarter
-          const quarterMonths = {
-            "Jan-Mar": ["Jan", "Feb", "Mar"],
-            "Apr-Jun": ["Apr", "May", "Jun"],
-            "Jul-Sep": ["Jul", "Aug", "Sep"],
-            "Oct-Dec": ["Oct", "Nov", "Dec"]
-          };
-          
-          const months = quarterMonths[label];
-          for (const month of months) {
-            days += getDaysInMonth(year, month);
-          }
-        } else {
-          // Monthly mode - get days for single month
-          days = getDaysInMonth(year, label);
-        }
-        
-        // Calculate Monthly Cover = Daily Cover × Days
-        const monthlyCover = dailyCover * days;
-        return monthlyCover.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        // Calculate Lunch food revenue = Monthly Cover × Average check food
+        const lunchFoodRevenue = monthlyCover * avgCheckFood;
+        return lunchFoodRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
+    }
+  }
+
+  // Auto-calculate Lunch beverage revenue: Monthly Cover × Average check beverage
+  if (rowType === 'Lunch beverage revenue') {
+    if (rowKeyObj) {
+      // Get Monthly Cover value using helper function to avoid recursion
+      const monthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, rowKeyObj.section, year, label);
+      
+      // Get Average check beverage value
+      const avgCheckBeverageRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check beverage', label);
+      const avgCheckBeverageRaw = fnbData?.[avgCheckBeverageRowKey]?.[year]?.[label];
+      
+      if (avgCheckBeverageRaw !== undefined && avgCheckBeverageRaw !== null && avgCheckBeverageRaw !== "") {
+        const avgCheckBeverage = parseFloat(avgCheckBeverageRaw.toString().replace(/,/g, '')) || 0;
+        
+        // Calculate Lunch beverage revenue = Monthly Cover × Average check beverage
+        const lunchBeverageRevenue = monthlyCover * avgCheckBeverage;
+        return lunchBeverageRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+    }
+  }
+
+  // Auto-calculate Dinner food revenue: Monthly Cover × Average check food
+  if (rowType === 'Dinner food revenue') {
+    if (rowKeyObj) {
+      // Get Monthly Cover value using helper function to avoid recursion
+      const monthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, rowKeyObj.section, year, label);
+      
+      // Get Average check food value
+      const avgCheckFoodRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check food', label);
+      const avgCheckFoodRaw = fnbData?.[avgCheckFoodRowKey]?.[year]?.[label];
+      
+      if (avgCheckFoodRaw !== undefined && avgCheckFoodRaw !== null && avgCheckFoodRaw !== "") {
+        const avgCheckFood = parseFloat(avgCheckFoodRaw.toString().replace(/,/g, '')) || 0;
+        
+        // Calculate Dinner food revenue = Monthly Cover × Average check food
+        const dinnerFoodRevenue = monthlyCover * avgCheckFood;
+        return dinnerFoodRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+    }
+  }
+
+  // Auto-calculate Dinner beverage revenue: Monthly Cover × Average check beverage
+  if (rowType === 'Dinner beverage revenue') {
+    if (rowKeyObj) {
+      // Get Monthly Cover value using helper function to avoid recursion
+      const monthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, rowKeyObj.section, year, label);
+      
+      // Get Average check beverage value
+      const avgCheckBeverageRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check beverage', label);
+      const avgCheckBeverageRaw = fnbData?.[avgCheckBeverageRowKey]?.[year]?.[label];
+      
+      if (avgCheckBeverageRaw !== undefined && avgCheckBeverageRaw !== null && avgCheckBeverageRaw !== "") {
+        const avgCheckBeverage = parseFloat(avgCheckBeverageRaw.toString().replace(/,/g, '')) || 0;
+        const dinnerBeverageRevenue = monthlyCover * avgCheckBeverage;
+        return dinnerBeverageRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+    }
+  }
+
+  // Auto-calculate Lunch Revenue: Lunch food revenue + Lunch beverage revenue
+  if (rowType === 'Lunch Revenue') {
+    if (rowKeyObj) {
+      // Calculate Lunch food revenue directly to avoid recursion
+      const monthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, rowKeyObj.section, year, label);
+      const avgCheckFoodRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check food', label);
+      const avgCheckFoodRaw = fnbData?.[avgCheckFoodRowKey]?.[year]?.[label];
+      const avgCheckFood = parseFloat(avgCheckFoodRaw?.toString().replace(/,/g, '')) || 0;
+      const lunchFoodRevenue = monthlyCover * avgCheckFood;
+      
+      // Calculate Lunch beverage revenue directly to avoid recursion
+      const avgCheckBeverageRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check beverage', label);
+      const avgCheckBeverageRaw = fnbData?.[avgCheckBeverageRowKey]?.[year]?.[label];
+      const avgCheckBeverage = parseFloat(avgCheckBeverageRaw?.toString().replace(/,/g, '')) || 0;
+      const lunchBeverageRevenue = monthlyCover * avgCheckBeverage;
+      
+      // Calculate Lunch Revenue = Lunch food revenue + Lunch beverage revenue
+      const lunchRevenue = lunchFoodRevenue + lunchBeverageRevenue;
+      return lunchRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  }
+
+  // Auto-calculate Dinner Revenue: Dinner food revenue + Dinner beverage revenue
+  if (rowType === 'Dinner Revenue') {
+    if (rowKeyObj) {
+      // Calculate Dinner food revenue directly to avoid recursion
+      const monthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, rowKeyObj.section, year, label);
+      const avgCheckFoodRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check food', label);
+      const avgCheckFoodRaw = fnbData?.[avgCheckFoodRowKey]?.[year]?.[label];
+      const avgCheckFood = parseFloat(avgCheckFoodRaw?.toString().replace(/,/g, '')) || 0;
+      const dinnerFoodRevenue = monthlyCover * avgCheckFood;
+      
+      // Calculate Dinner beverage revenue directly to avoid recursion
+      const avgCheckBeverageRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check beverage', label);
+      const avgCheckBeverageRaw = fnbData?.[avgCheckBeverageRowKey]?.[year]?.[label];
+      const avgCheckBeverage = parseFloat(avgCheckBeverageRaw?.toString().replace(/,/g, '')) || 0;
+      const dinnerBeverageRevenue = monthlyCover * avgCheckBeverage;
+      
+      // Calculate Dinner Revenue = Dinner food revenue + Dinner beverage revenue
+      const dinnerRevenue = dinnerFoodRevenue + dinnerBeverageRevenue;
+      return dinnerRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  }
+  
+  // Auto-calculate Total Cover: sum of Breakfast, Lunch, and Dinner Monthly Covers
+  if (rowType === 'Total Cover') {
+    if (rowKeyObj) {
+      const breakfastMonthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, 'Breakfast Revenue', year, label);
+      const lunchMonthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, 'Lunch Revenue', year, label);
+      const dinnerMonthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, 'Dinner Revenue', year, label);
+      const totalCover = breakfastMonthlyCover + lunchMonthlyCover + dinnerMonthlyCover;
+      return totalCover.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  }
+
+  // Auto-calculate Total Food Revenue: sum of Lunch food revenue, Dinner food revenue, and Breakfast Revenue
+  if (rowType === 'Total Food Revenue') {
+    if (rowKeyObj) {
+      // Lunch food revenue
+      const lunchFoodRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Lunch food revenue', label }),
+        year,
+        label
+      );
+      // Dinner food revenue
+      const dinnerFoodRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Dinner Revenue', type: 'Dinner food revenue', label }),
+        year,
+        label
+      );
+      // Breakfast Revenue (already a row type)
+      const breakfastRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast Revenue', label }),
+        year,
+        label
+      );
+      // Parse to float and sum
+      const total = [lunchFoodRevenue, dinnerFoodRevenue, breakfastRevenue]
+        .map(v => parseFloat((v || '0').toString().replace(/,/g, '')))
+        .reduce((a, b) => a + b, 0);
+      return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  }
+  
+  // Auto-calculate Total Beverage Revenue: sum of Lunch beverage revenue and Dinner beverage revenue
+  if (rowType === 'Total Beverage Revenue') {
+    if (rowKeyObj) {
+      // Lunch beverage revenue
+      const lunchBeverageRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Lunch beverage revenue', label }),
+        year,
+        label
+      );
+      // Dinner beverage revenue
+      const dinnerBeverageRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Dinner Revenue', type: 'Dinner beverage revenue', label }),
+        year,
+        label
+      );
+      // Parse to float and sum
+      const total = [lunchBeverageRevenue, dinnerBeverageRevenue]
+        .map(v => parseFloat((v || '0').toString().replace(/,/g, '')))
+        .reduce((a, b) => a + b, 0);
+      return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  }
+  
+  // Auto-calculate Total Revenue: sum of Total Food Revenue and Total Beverage Revenue
+  if (rowType === 'Total Revenue') {
+    if (rowKeyObj) {
+      // Total Food Revenue
+      const totalFoodRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Total', type: 'Total Food Revenue', label }),
+        year,
+        label
+      );
+      // Total Beverage Revenue
+      const totalBeverageRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Total', type: 'Total Beverage Revenue', label }),
+        year,
+        label
+      );
+      // Parse to float and sum
+      const total = [totalFoodRevenue, totalBeverageRevenue]
+        .map(v => parseFloat((v || '0').toString().replace(/,/g, '')))
+        .reduce((a, b) => a + b, 0);
+      return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
   }
   
