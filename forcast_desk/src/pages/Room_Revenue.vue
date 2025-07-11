@@ -1175,7 +1175,7 @@
       <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-lg p-0 overflow-hidden">
         <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
           <DollarSign class="w-6 h-6 text-white" />
-          <h2 class="text-xl font-bold text-white">Exchange Rate (USD)</h2>
+          <h2 class="text-xl font-bold text-white">Exchange Rate (To 1 USD)</h2>
         </div>
         <div class="p-8 pt-6">
           <div v-if="!visibleYears.length" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
@@ -1193,14 +1193,13 @@
                 {{ year }}
               </span>
               <div class="flex items-center gap-2">
-                <span class="text-gray-500 text-sm">$</span>
                 <input
                   v-model="exchangeRateByYear[year]"
                   type="number"
                   min="0"
                   step="0.0001"
                   class="px-6 py-2 border rounded-md focus:ring-violet-500 w-32"
-                  placeholder="USD"
+                  placeholder="0.00"
                 />
               </div>
             </div>

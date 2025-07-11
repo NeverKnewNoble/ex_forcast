@@ -236,6 +236,17 @@
                             Double Occupancy
                           </button>
                         </div>
+                        
+                        <!-- Set Default Breakfast Outlet Button -->
+                        <div class="mt-3">
+                          <button 
+                            @click="showDefaultBreakfastModal = true"
+                            class="w-full flex items-center justify-left gap-2 px-4 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
+                          >
+                            <UtensilsCrossed class="w-4 h-4" />
+                            Default Breakfast Outlet
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -339,37 +350,39 @@
                         <tr v-for="row in fnbRows" :key="'fnb-row-' + row" 
                             :class="[
                               'even:bg-gray-50 hover:bg-violet-50 transition-all duration-200 border-b border-gray-100',
-                              (row === 'Number of rooms' || row === 'Days of the Month' || row === 'Number of rooms available' || row === 'Number of Rooms Sold (excl.)' || row === 'Occupancy (excl.) %' || row === 'Number of guests' || row === 'Average Room Rate' || row === 'Revenue Per Available Room') ? 'bg-violet-50/30' : ''
+                              (row === 'Number of rooms' || row === 'Days of the Month' || row === 'Number of rooms available' || row === 'Number of Rooms Sold (excl.)' || row === 'Occupancy (excl.) %' || row === 'Number of guests' || row === 'Average Spent Per F&B Customer' || row === 'Average Room Rate' || row === 'Revenue Per Available Room') ? 'bg-violet-50/30' : ''
                             ]"
                         >
                           <td class="px-4 py-2 font-medium border-r border-violet-200 flex items-center justify-between">
                             <span>{{ row }}</span>
-                            <span v-if="row === 'Number of rooms' || row === 'Days of the Month' || row === 'Number of rooms available' || row === 'Number of Rooms Sold (excl.)' || row === 'Occupancy (excl.) %' || row === 'Number of guests' || row === 'Average Room Rate' || row === 'Revenue Per Available Room'" class="text-xs bg-violet-600 text-white px-2 py-0.5 rounded-full">
+                            <span v-if="row === 'Number of rooms' || row === 'Days of the Month' || row === 'Number of rooms available' || row === 'Number of Rooms Sold (excl.)' || row === 'Occupancy (excl.) %' || row === 'Number of guests' || row === 'Average Spent Per F&B Customer' || row === 'Average Room Rate' || row === 'Revenue Per Available Room'" class="text-xs bg-violet-600 text-white px-2 py-0.5 rounded-full">
                               Auto
                             </span>
                           </td>
                           <template v-for="year in visibleYears" :key="'row-' + year + '-' + row">
                             <template v-if="!isYearCollapsed(year)">
                               <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'cell-' + year + '-' + label + '-' + row"
-                                :contenteditable="row !== 'Number of rooms' && row !== 'Days of the Month' && row !== 'Number of rooms available' && row !== 'Number of Rooms Sold (excl.)' && row !== 'Occupancy (excl.) %' && row !== 'Number of guests' && row !== 'Average Room Rate' && row !== 'Revenue Per Available Room'"
-                                class="px-2 py-2 text-right border border-violet-200 hover:bg-violet-50 editable-cell font-mono text-xs"
-                                :class="{ 'bg-violet-50 cursor-not-allowed': row === 'Number of rooms' || row === 'Days of the Month' || row === 'Number of rooms available' || row === 'Number of Rooms Sold (excl.)' || row === 'Occupancy (excl.) %' || row === 'Number of guests' || row === 'Average Room Rate' || row === 'Revenue Per Available Room' }"
-                                @input="(row !== 'Number of rooms' && row !== 'Days of the Month' && row !== 'Number of rooms available' && row !== 'Number of Rooms Sold (excl.)' && row !== 'Occupancy (excl.) %' && row !== 'Number of guests' && row !== 'Average Room Rate' && row !== 'Revenue Per Available Room') ? handleFnbCellInput({ row, year, label, event: $event, fnbData: fnbData, changedCells, isSaved }) : null"
-                                @focus="(row !== 'Number of rooms' && row !== 'Days of the Month' && row !== 'Number of rooms available' && row !== 'Number of Rooms Sold (excl.)' && row !== 'Occupancy (excl.) %' && row !== 'Number of guests' && row !== 'Average Room Rate' && row !== 'Revenue Per Available Room') ? handleFnbCellFocus({ row, year, label, event: $event }) : null"
-                                @blur="(row !== 'Number of rooms' && row !== 'Days of the Month' && row !== 'Number of rooms available' && row !== 'Number of Rooms Sold (excl.)' && row !== 'Occupancy (excl.) %' && row !== 'Number of guests' && row !== 'Average Room Rate' && row !== 'Revenue Per Available Room') ? handleFnbCellEdit({ row, year, label, event: $event, fnbData: fnbData, changedCells, isSaved }) : null"
-                                @keypress="(row !== 'Number of rooms' && row !== 'Days of the Month' && row !== 'Number of rooms available' && row !== 'Number of Rooms Sold (excl.)' && row !== 'Occupancy (excl.) %' && row !== 'Number of guests' && row !== 'Average Room Rate' && row !== 'Revenue Per Available Room') ? allowOnlyNumbers($event) : null"
+                                :contenteditable="false"
+                                class="px-2 py-2 text-right border border-violet-200 hover:bg-violet-50 editable-cell font-mono text-xs bg-violet-50 cursor-not-allowed"
                               >
-                                <span class="font-mono text-xs">{{ getFnbCellValue(fnbData, row, year, label, totalRooms) }}</span>
+                                <span class="font-mono text-xs" v-if="row === 'Average Spent Per F&B Customer'">{{ getAverageSpentPerFnbCustomer(year, label) }}</span>
+                                <span class="font-mono text-xs" v-else>{{ getFnbCellValue(fnbData, row, year, label, totalRooms) }}</span>
                               </td>
                               <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
-                                <span class="font-mono text-xs text-violet-700">
+                                <span class="font-mono text-xs text-violet-700" v-if="row === 'Average Spent Per F&B Customer'">
+                                  {{ getAverageSpentPerFnbCustomer(year, 'Total') }}
+                                </span>
+                                <span class="font-mono text-xs text-violet-700" v-else>
                                   {{ calculateFnbTotal(fnbData, row, year, getColumnLabelsForYearLocal(year), totalRooms) }}
                                 </span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
-                                <span class="font-mono text-xs text-violet-700">
+                                <span class="font-mono text-xs text-violet-700" v-if="row === 'Average Spent Per F&B Customer'">
+                                  {{ getAverageSpentPerFnbCustomer(year, 'Total') }}
+                                </span>
+                                <span class="font-mono text-xs text-violet-700" v-else>
                                   {{ calculateFnbTotal(fnbData, row, year, getColumnLabelsForYearLocal(year), totalRooms) }}
                                 </span>
                               </td>
@@ -399,24 +412,24 @@
                             <tr v-for="row in section.rows" :key="row">
                               <td class="px-4 py-2 text-gray-700 border-b border-gray-50 flex items-center justify-between">
                                 <span class="ml-8">{{ row }}</span>
-                                <span v-if="isAutoCalculatedRow(row)" class="text-xs bg-violet-600 text-white px-2 py-0.5 rounded-full">
+                                <span v-if="isRestaurantRowAutoCalculated(restaurant.name, section.section, row)" class="text-xs bg-violet-600 text-white px-2 py-0.5 rounded-full">
                                   Auto
                                 </span>
                               </td>
                               <template v-for="year in visibleYears" :key="'section-row-detail-' + restaurant.name + '-' + section.section + '-' + row + '-' + year">
                                 <template v-if="!isYearCollapsed(year)">
                                   <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'section-row-detail-cell-' + restaurant.name + '-' + section.section + '-' + row + '-' + year + '-' + label"
-                                    :contenteditable="!isAutoCalculatedRow(row)"
+                                    :contenteditable="!isRestaurantRowAutoCalculated(restaurant.name, section.section, row)"
                                     class="px-2 py-2 text-right border border-violet-200 font-mono text-xs"
                                     :class="[
-                                      isAutoCalculatedRow(row)
+                                      isRestaurantRowAutoCalculated(restaurant.name, section.section, row)
                                         ? 'bg-violet-50 cursor-not-allowed' 
                                         : 'hover:bg-violet-50 editable-cell'
                                     ]"
-                                    @input="!isAutoCalculatedRow(row) ? handleFnbCellInput({ row: JSON.stringify({restaurant: restaurant.name, section: section.section, type: row, label: label}), year, label, event: $event, fnbData: fnbData, changedCells, isSaved }) : null"
-                                    @focus="!isAutoCalculatedRow(row) ? handleFnbCellFocus({ row: JSON.stringify({restaurant: restaurant.name, section: section.section, type: row, label: label}), year, label, event: $event }) : null"
-                                    @blur="!isAutoCalculatedRow(row) ? handleFnbCellEdit({ row: JSON.stringify({restaurant: restaurant.name, section: section.section, type: row, label: label}), year, label, event: $event, fnbData: fnbData, changedCells, isSaved }) : null"
-                                    @keypress="!isAutoCalculatedRow(row) ? allowOnlyNumbers($event) : null"
+                                    @input="!isRestaurantRowAutoCalculated(restaurant.name, section.section, row) ? handleFnbCellInput({ row: JSON.stringify({restaurant: restaurant.name, section: section.section, type: row, label: label}), year, label, event: $event, fnbData: fnbData, changedCells, isSaved }) : null"
+                                    @focus="!isRestaurantRowAutoCalculated(restaurant.name, section.section, row) ? handleFnbCellFocus({ row: JSON.stringify({restaurant: restaurant.name, section: section.section, type: row, label: label}), year, label, event: $event }) : null"
+                                    @blur="!isRestaurantRowAutoCalculated(restaurant.name, section.section, row) ? handleFnbCellEdit({ row: JSON.stringify({restaurant: restaurant.name, section: section.section, type: row, label: label}), year, label, event: $event, fnbData: fnbData, changedCells, isSaved }) : null"
+                                    @keypress="!isRestaurantRowAutoCalculated(restaurant.name, section.section, row) ? allowOnlyNumbers($event) : null"
                                   >
                                     <span class="font-mono text-xs">{{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: section.section, type: row, label: label}), year, label, totalRooms) }}</span>
                                   </td>
@@ -536,11 +549,29 @@
                           <td class="font-bold text-violet-900 bg-violet-100 border-b border-violet-200 px-4 py-2">{{ totalRow }}</td>
                           <template v-for="year in visibleYears" :key="'total-row-' + totalRow + '-' + year">
                             <template v-if="!isYearCollapsed(year)">
-                              <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'total-row-cell-' + totalRow + '-' + year + '-' + label" class="px-2 py-2 text-right border border-violet-200 font-mono text-xs">0.00</td>
-                              <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">0.00</td>
+                              <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'total-row-cell-' + totalRow + '-' + year + '-' + label" class="px-2 py-2 text-right border border-violet-200 font-mono text-xs">
+                                <span v-if="totalRow === 'Total Covers'">{{ calculateTotalCovers(year, label) }}</span>
+                                <span v-else-if="totalRow === 'Total Food Revenue'">{{ calculateTotalFoodRevenue(year, label) }}</span>
+                                <span v-else-if="totalRow === 'Total Beverage Revenue'">{{ calculateTotalBeverageRevenue(year, label) }}</span>
+                                <span v-else-if="totalRow === 'Total F&B Revenue'">{{ calculateTotalFnbRevenue(year, label) }}</span>
+                                <span v-else>0.00</span>
+                              </td>
+                              <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
+                                <span v-if="totalRow === 'Total Covers'">{{ calculateTotalCovers(year, 'Total') }}</span>
+                                <span v-else-if="totalRow === 'Total Food Revenue'">{{ calculateTotalFoodRevenue(year, 'Total') }}</span>
+                                <span v-else-if="totalRow === 'Total Beverage Revenue'">{{ calculateTotalBeverageRevenue(year, 'Total') }}</span>
+                                <span v-else-if="totalRow === 'Total F&B Revenue'">{{ calculateTotalFnbRevenue(year, 'Total') }}</span>
+                                <span v-else>0.00</span>
+                              </td>
                             </template>
                             <template v-else>
-                              <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">0.00</td>
+                              <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
+                                <span v-if="totalRow === 'Total Covers'">{{ calculateTotalCovers(year, 'Total') }}</span>
+                                <span v-else-if="totalRow === 'Total Food Revenue'">{{ calculateTotalFoodRevenue(year, 'Total') }}</span>
+                                <span v-else-if="totalRow === 'Total Beverage Revenue'">{{ calculateTotalBeverageRevenue(year, 'Total') }}</span>
+                                <span v-else-if="totalRow === 'Total F&B Revenue'">{{ calculateTotalFnbRevenue(year, 'Total') }}</span>
+                                <span v-else>0.00</span>
+                              </td>
                             </template>
                           </template>
                         </tr>
@@ -793,6 +824,91 @@
         </div>
       </div>
     </transition>
+  
+  
+    <!-- Default Breakfast Outlet Modal -->
+    <transition name="fade">
+      <div
+        v-if="showDefaultBreakfastModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      >
+        <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-lg p-0 overflow-hidden">
+          <!-- Modal Header -->
+          <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
+            <UtensilsCrossed class="w-6 h-6 text-white" />
+            <h2 class="text-xl font-bold text-white">Set Default Breakfast Outlet</h2>
+          </div>
+  
+          <!-- Modal Body -->
+          <div class="p-8 pt-6">
+            <!-- Message when no restaurants available -->
+            <div v-if="!restaurantList.length" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
+              <AlertTriangle class="w-6 h-6 text-yellow-600" />
+              <span class="text-yellow-800 font-medium">No restaurants available. Please create a restaurant first.</span>
+            </div>
+  
+            <div v-if="restaurantList.length" class="space-y-4 max-h-[50vh] overflow-auto pr-2">
+              <p class="text-sm text-gray-600 mb-4">
+                Select the restaurant that will serve as the default breakfast outlet for calculations:
+              </p>
+              
+              <div class="space-y-2">
+                <div
+                  v-for="restaurant in restaurantList"
+                  :key="'breakfast-outlet-' + restaurant.name"
+                  class="flex items-center gap-3 p-3 border rounded-lg hover:bg-violet-50 transition-all cursor-pointer"
+                  :class="tempDefaultBreakfastOutlet === restaurant.name ? 'border-violet-500 bg-violet-50' : 'border-gray-200'"
+                  @click="tempDefaultBreakfastOutlet = restaurant.name"
+                >
+                  <input
+                    type="radio"
+                    :name="'breakfast-outlet-' + restaurant.name"
+                    :value="restaurant.name"
+                    v-model="tempDefaultBreakfastOutlet"
+                    class="w-4 h-4 text-violet-600 border-gray-300 focus:ring-violet-500"
+                  />
+                  <div class="flex-1">
+                    <span class="font-medium text-gray-900">{{ restaurant.cover_name || restaurant.name }}</span>
+                    <p class="text-xs text-gray-500">Restaurant ID: {{ restaurant.name }}</p>
+                  </div>
+                  <div v-if="tempDefaultBreakfastOutlet === restaurant.name" class="w-5 h-5 bg-violet-600 rounded-full flex items-center justify-center">
+                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              
+              <div v-if="tempDefaultBreakfastOutlet" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p class="text-sm text-green-800">
+                  <strong>Selected:</strong> {{ restaurantList.find(r => r.name === tempDefaultBreakfastOutlet)?.cover_name || tempDefaultBreakfastOutlet }}
+                </p>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Modal Footer -->
+          <div class="flex justify-end gap-3 px-8 py-4 bg-gray-50 border-t border-violet-100">
+            <button
+              @click="cancelDefaultBreakfastSettings"
+              class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2"
+            >
+              <X class="w-4 h-4" />
+              Cancel
+            </button>
+            <button
+              v-if="restaurantList.length"
+              @click="applyDefaultBreakfastSettings"
+              :disabled="!tempDefaultBreakfastOutlet"
+              class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Check class="w-4 h-4" />
+              Apply
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </template>
   
   
@@ -894,6 +1010,12 @@
   const showDoubleOccupancyModal = ref(false);
   const doubleOccupancyByYear = ref({});
   const tempDoubleOccupancyByYear = ref({});
+  
+  // Default Breakfast Outlet Modal State
+  const showDefaultBreakfastModal = ref(false);
+  const defaultBreakfastOutlet = ref("");
+  const tempDefaultBreakfastOutlet = ref("");
+  
   const fnbRows = [
     "Number of rooms",
     "Days of the Month",
@@ -983,6 +1105,13 @@
     }
   });
   
+  // When opening the default breakfast outlet modal, copy the current setting
+  watch(showDefaultBreakfastModal, (val) => {
+    if (val) {
+      tempDefaultBreakfastOutlet.value = defaultBreakfastOutlet.value;
+    }
+  });
+  
   function applyAdvancedSettings() {
     advancedModes.value = { ...tempAdvancedModes.value };
     showAdvanced.value = false;
@@ -1001,6 +1130,18 @@
   
   function cancelDoubleOccupancySettings() {
     showDoubleOccupancyModal.value = false;
+  }
+  
+  function applyDefaultBreakfastSettings() {
+    defaultBreakfastOutlet.value = tempDefaultBreakfastOutlet.value;
+    // Save to localStorage for persistence
+    localStorage.setItem('defaultBreakfastOutlet', defaultBreakfastOutlet.value);
+    showDefaultBreakfastModal.value = false;
+    alertService.success('Default breakfast outlet updated successfully!');
+  }
+  
+  function cancelDefaultBreakfastSettings() {
+    showDefaultBreakfastModal.value = false;
   }
   
   // Input validation functions
@@ -1067,6 +1208,12 @@
         } catch (error) {
           console.error('Error parsing double occupancy data:', error);
         }
+      }
+      
+      // Load default breakfast outlet from localStorage
+      const savedDefaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+      if (savedDefaultBreakfastOutlet) {
+        defaultBreakfastOutlet.value = savedDefaultBreakfastOutlet;
       }
     } catch (err) {
       console.error("Error loading data:", err);
@@ -1424,7 +1571,30 @@
       return revpar.toFixed(2);
     }
     // fallback to original logic for other rows
-    return originalGetFnbCellValue(fnbData, row, year, label, totalRooms);
+    // Add debug for Total Cover row
+    try {
+      const rowKeyObj = JSON.parse(row);
+      if (rowKeyObj && rowKeyObj.type === 'Total Cover') {
+        const defaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+        if (defaultBreakfastOutlet === rowKeyObj.restaurant) {
+          // For default breakfast outlet, log all input values
+          const days = typeof getDaysInMonth === 'function' ? getDaysInMonth(year, label) : 0;
+          const totalRoomsValue = totalRooms?.value || totalRooms || 0; // Handle both ref and direct value
+          const roomsAvailable = days * totalRoomsValue;
+          const doubleOccupancyByYear = JSON.parse(localStorage.getItem('doubleOccupancyByYear') || '{}');
+          const doubleOccupancyValue = doubleOccupancyByYear[year];
+          let doubleOccupancy = 0;
+          if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null) {
+            doubleOccupancy = parseFloat(doubleOccupancyValue);
+          }
+          const breakfastCovers = doubleOccupancy * roomsAvailable;
+          // console.debug('[getFnbCellValue] Default Breakfast Outlet:', rowKeyObj.restaurant, 'Year:', year, 'Label:', label, 'days:', days, 'totalRooms:', totalRoomsValue, 'roomsAvailable:', roomsAvailable, 'doubleOccupancy:', doubleOccupancy, 'breakfastCovers:', breakfastCovers);
+        }
+      }
+    } catch (e) {
+      // Not a structured row key, skip
+    }
+    return originalGetFnbCellValue(fnbData, row, year, label, totalRooms?.value || totalRooms);
   }
 
   // After data refresh or load, ensure fnbData is always an object
@@ -1445,7 +1615,32 @@
            row === 'Lunch Revenue' ||
            row === 'Dinner food revenue' || 
            row === 'Dinner beverage revenue' ||
-           row === 'Dinner Revenue';
+           row === 'Dinner Revenue' ||
+           row === 'Average Spent Per F&B Customer';
+  }
+  
+  // Helper function to check if a specific restaurant row is auto-calculated
+  function isRestaurantRowAutoCalculated(restaurant, section, row) {
+    // Check if this is Breakfast Covers for the default breakfast outlet
+    if (row === 'Breakfast Covers' && section === 'Breakfast Revenue') {
+      const defaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+      return defaultBreakfastOutlet === restaurant;
+    }
+    
+    // Check if this is Breakfast Revenue for the default breakfast outlet
+    if (row === 'Breakfast Revenue' && section === 'Breakfast Revenue') {
+      const defaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+      return defaultBreakfastOutlet === restaurant;
+    }
+    
+    // Check if this is Average check breakfast for the default breakfast outlet
+    if (row === 'Average check breakfast' && section === 'Breakfast Revenue') {
+      const defaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+      return defaultBreakfastOutlet === restaurant;
+    }
+    
+    // For other rows, use the general auto-calculated check
+    return isAutoCalculatedRow(row);
   }
 
   // Wrapper function to handle cell input with proper reactive reference
@@ -1454,6 +1649,82 @@
     return handleFnbCellInput({ ...params, fnbData });
   }
 
+  // Function to calculate total covers across all restaurants
+  function calculateTotalCovers(year, label) {
+    let total = 0;
+    for (const restaurant of restaurantList.value) {
+      const restaurantTotalCover = getFnbCellValue(
+        fnbData, 
+        JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Cover', label: label}), 
+        year, 
+        label, 
+        totalRooms?.value || totalRooms
+      );
+      // console.debug('[TotalCovers] Restaurant:', restaurant.name, 'Total Cover:', restaurantTotalCover, 'Year:', year, 'Label:', label);
+      total += parseFloat((restaurantTotalCover || '0').toString().replace(/,/g, '')) || 0;
+    }
+    // console.debug('[TotalCovers] Final Total:', total, 'Year:', year, 'Label:', label);
+    return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // Function to calculate total food revenue across all restaurants
+  function calculateTotalFoodRevenue(year, label) {
+    let total = 0;
+    for (const restaurant of restaurantList.value) {
+      const restaurantTotalFoodRevenue = getFnbCellValue(
+        fnbData, 
+        JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Food Revenue', label: label}), 
+        year, 
+        label, 
+        totalRooms?.value || totalRooms
+      );
+      total += parseFloat((restaurantTotalFoodRevenue || '0').toString().replace(/,/g, '')) || 0;
+    }
+    return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // Function to calculate total beverage revenue across all restaurants
+  function calculateTotalBeverageRevenue(year, label) {
+    let total = 0;
+    for (const restaurant of restaurantList.value) {
+      const restaurantTotalBeverageRevenue = getFnbCellValue(
+        fnbData, 
+        JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Beverage Revenue', label: label}), 
+        year, 
+        label, 
+        totalRooms?.value || totalRooms
+      );
+      total += parseFloat((restaurantTotalBeverageRevenue || '0').toString().replace(/,/g, '')) || 0;
+    }
+    return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // Function to calculate total F&B revenue across all restaurants
+  function calculateTotalFnbRevenue(year, label) {
+    let total = 0;
+    for (const restaurant of restaurantList.value) {
+      const restaurantTotalRevenue = getFnbCellValue(
+        fnbData, 
+        JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Revenue', label: label}), 
+        year, 
+        label, 
+        totalRooms?.value || totalRooms
+      );
+      total += parseFloat((restaurantTotalRevenue || '0').toString().replace(/,/g, '')) || 0;
+    }
+    return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // Calculation for Average Spent Per F&B Customer
+  function getAverageSpentPerFnbCustomer(year, label) {
+    // Total F&B Revenue
+    const totalFnbRevenue = parseFloat((calculateTotalFnbRevenue(year, label) || '0').toString().replace(/,/g, '')) || 0;
+    // Total Covers
+    const totalCovers = parseFloat((calculateTotalCovers(year, label) || '0').toString().replace(/,/g, '')) || 0;
+    if (totalCovers === 0) return '0.00';
+    const avg = totalFnbRevenue / totalCovers;
+    return avg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
   </script>
   
   
