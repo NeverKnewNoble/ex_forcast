@@ -265,6 +265,99 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
     }
   }
   
+  // Auto-calculate Total Cover: sum of Breakfast, Lunch, and Dinner Monthly Covers
+  if (rowType === 'Total Cover') {
+    if (rowKeyObj) {
+      const breakfastMonthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, 'Breakfast Revenue', year, label);
+      const lunchMonthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, 'Lunch Revenue', year, label);
+      const dinnerMonthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, 'Dinner Revenue', year, label);
+      const totalCover = breakfastMonthlyCover + lunchMonthlyCover + dinnerMonthlyCover;
+      return totalCover.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  }
+
+  // Auto-calculate Total Food Revenue: sum of Lunch food revenue, Dinner food revenue, and Breakfast Revenue
+  if (rowType === 'Total Food Revenue') {
+    if (rowKeyObj) {
+      // Lunch food revenue
+      const lunchFoodRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Lunch food revenue', label }),
+        year,
+        label
+      );
+      // Dinner food revenue
+      const dinnerFoodRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Dinner Revenue', type: 'Dinner food revenue', label }),
+        year,
+        label
+      );
+      // Breakfast Revenue (already a row type)
+      const breakfastRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast Revenue', label }),
+        year,
+        label
+      );
+      // Parse to float and sum
+      const total = [lunchFoodRevenue, dinnerFoodRevenue, breakfastRevenue]
+        .map(v => parseFloat((v || '0').toString().replace(/,/g, '')))
+        .reduce((a, b) => a + b, 0);
+      return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  }
+  
+  // Auto-calculate Total Beverage Revenue: sum of Lunch beverage revenue and Dinner beverage revenue
+  if (rowType === 'Total Beverage Revenue') {
+    if (rowKeyObj) {
+      // Lunch beverage revenue
+      const lunchBeverageRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Lunch beverage revenue', label }),
+        year,
+        label
+      );
+      // Dinner beverage revenue
+      const dinnerBeverageRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Dinner Revenue', type: 'Dinner beverage revenue', label }),
+        year,
+        label
+      );
+      // Parse to float and sum
+      const total = [lunchBeverageRevenue, dinnerBeverageRevenue]
+        .map(v => parseFloat((v || '0').toString().replace(/,/g, '')))
+        .reduce((a, b) => a + b, 0);
+      return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  }
+  
+  // Auto-calculate Total Revenue: sum of Total Food Revenue and Total Beverage Revenue
+  if (rowType === 'Total Revenue') {
+    if (rowKeyObj) {
+      // Total Food Revenue
+      const totalFoodRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Total', type: 'Total Food Revenue', label }),
+        year,
+        label
+      );
+      // Total Beverage Revenue
+      const totalBeverageRevenue = getFnbCellValue(
+        fnbData,
+        JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Total', type: 'Total Beverage Revenue', label }),
+        year,
+        label
+      );
+      // Parse to float and sum
+      const total = [totalFoodRevenue, totalBeverageRevenue]
+        .map(v => parseFloat((v || '0').toString().replace(/,/g, '')))
+        .reduce((a, b) => a + b, 0);
+      return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  }
+  
   // For restaurant data, look up the specific row in fnbData
   const raw = fnbData?.[row]?.[year]?.[label];
   let num = parseFloat(raw?.toString().replace(/,/g, ''));

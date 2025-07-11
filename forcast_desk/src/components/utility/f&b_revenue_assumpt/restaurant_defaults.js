@@ -4,7 +4,8 @@ export function getDefaultRestaurantRows() {
       section: 'Breakfast Revenue',
       rows: [
         'Breakfast Revenue',
-        'Breakfast covers',
+        'Daily Cover',
+        'Monthly Cover',
         'Average check breakfast'
       ]
     },

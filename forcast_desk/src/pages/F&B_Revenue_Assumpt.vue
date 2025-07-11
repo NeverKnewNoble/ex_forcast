@@ -435,11 +435,91 @@
                             </td>
                             <template v-for="year in visibleYears" :key="'restaurant-total-row-' + restaurant.name + '-' + suffix + '-' + year">
                               <template v-if="!isYearCollapsed(year)">
-                                <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'restaurant-total-row-cell-' + restaurant.name + '-' + suffix + '-' + year + '-' + label" class="px-2 py-2 text-right border border-violet-200 font-mono text-xs">0.00</td>
-                                <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">0.00</td>
+                                <template v-if="suffix === 'Cover'">
+                                  <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'restaurant-total-row-cell-' + restaurant.name + '-' + suffix + '-' + year + '-' + label" class="px-2 py-2 text-right border border-violet-200 font-mono text-xs">
+                                    <span class="font-mono text-xs">
+                                      {{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Cover', label: label}), year, label, totalRooms) }}
+                                    </span>
+                                  </td>
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
+                                    <span class="font-mono text-xs text-violet-700">
+                                      {{ calculateFnbTotal(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Cover'}), year, getColumnLabelsForYearLocal(year), totalRooms) }}
+                                    </span>
+                                  </td>
+                                </template>
+                                <template v-else-if="suffix === 'Food Revenue'">
+                                  <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'restaurant-total-row-cell-' + restaurant.name + '-' + suffix + '-' + year + '-' + label" class="px-2 py-2 text-right border border-violet-200 font-mono text-xs">
+                                    <span class="font-mono text-xs">
+                                      {{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Food Revenue', label: label}), year, label, totalRooms) }}
+                                    </span>
+                                  </td>
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
+                                    <span class="font-mono text-xs text-violet-700">
+                                      {{ calculateFnbTotal(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Food Revenue'}), year, getColumnLabelsForYearLocal(year), totalRooms) }}
+                                    </span>
+                                  </td>
+                                </template>
+                                <template v-else-if="suffix === 'Beverage Revenue'">
+                                  <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'restaurant-total-row-cell-' + restaurant.name + '-' + suffix + '-' + year + '-' + label" class="px-2 py-2 text-right border border-violet-200 font-mono text-xs">
+                                    <span class="font-mono text-xs">
+                                      {{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Beverage Revenue', label: label}), year, label, totalRooms) }}
+                                    </span>
+                                  </td>
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
+                                    <span class="font-mono text-xs text-violet-700">
+                                      {{ calculateFnbTotal(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Beverage Revenue'}), year, getColumnLabelsForYearLocal(year), totalRooms) }}
+                                    </span>
+                                  </td>
+                                </template>
+                                <template v-else-if="suffix === 'Revenue'">
+                                  <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'restaurant-total-row-cell-' + restaurant.name + '-' + suffix + '-' + year + '-' + label" class="px-2 py-2 text-right border border-violet-200 font-mono text-xs">
+                                    <span class="font-mono text-xs">
+                                      {{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Revenue', label: label}), year, label, totalRooms) }}
+                                    </span>
+                                  </td>
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
+                                    <span class="font-mono text-xs text-violet-700">
+                                      {{ calculateFnbTotal(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Revenue'}), year, getColumnLabelsForYearLocal(year), totalRooms) }}
+                                    </span>
+                                  </td>
+                                </template>
+                                <template v-else>
+                                  <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'restaurant-total-row-cell-' + restaurant.name + '-' + suffix + '-' + year + '-' + label" class="px-2 py-2 text-right border border-violet-200 font-mono text-xs">0.00</td>
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">0.00</td>
+                                </template>
                               </template>
                               <template v-else>
-                                <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">0.00</td>
+                                <template v-if="suffix === 'Cover'">
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
+                                    <span class="font-mono text-xs text-violet-700">
+                                      {{ calculateFnbTotal(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Cover'}), year, getColumnLabelsForYearLocal(year), totalRooms) }}
+                                    </span>
+                                  </td>
+                                </template>
+                                <template v-else-if="suffix === 'Food Revenue'">
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
+                                    <span class="font-mono text-xs text-violet-700">
+                                      {{ calculateFnbTotal(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Food Revenue'}), year, getColumnLabelsForYearLocal(year), totalRooms) }}
+                                    </span>
+                                  </td>
+                                </template>
+                                <template v-else-if="suffix === 'Beverage Revenue'">
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
+                                    <span class="font-mono text-xs text-violet-700">
+                                      {{ calculateFnbTotal(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Beverage Revenue'}), year, getColumnLabelsForYearLocal(year), totalRooms) }}
+                                    </span>
+                                  </td>
+                                </template>
+                                <template v-else-if="suffix === 'Revenue'">
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
+                                    <span class="font-mono text-xs text-violet-700">
+                                      {{ calculateFnbTotal(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Revenue'}), year, getColumnLabelsForYearLocal(year), totalRooms) }}
+                                    </span>
+                                  </td>
+                                </template>
+                                <template v-else>
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">0.00</td>
+                                </template>
                               </template>
                             </template>
                           </tr>
