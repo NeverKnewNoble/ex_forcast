@@ -27,6 +27,7 @@ function parseRowKey(rowKeyString) {
   return null;
 }
 
+
 // Helper function to calculate Monthly Cover without recursion
 function calculateMonthlyCoverDirectly(fnbData, restaurantName, section, year, label) {
   // Construct the Daily Cover row key
@@ -63,6 +64,7 @@ function calculateMonthlyCoverDirectly(fnbData, restaurantName, section, year, l
   }
   return 0;
 }
+
 
 export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
   // If this is the "Number of rooms" row, return the total rooms value
@@ -268,10 +270,37 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
   // Auto-calculate Total Cover: sum of Breakfast, Lunch, and Dinner Monthly Covers
   if (rowType === 'Total Cover') {
     if (rowKeyObj) {
-      const breakfastMonthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, 'Breakfast Revenue', year, label);
       const lunchMonthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, 'Lunch Revenue', year, label);
       const dinnerMonthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, 'Dinner Revenue', year, label);
-      const totalCover = breakfastMonthlyCover + lunchMonthlyCover + dinnerMonthlyCover;
+      
+      // Get Breakfast Covers value - handle default breakfast outlet properly
+      let breakfastCovers = 0;
+      const defaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+      if (defaultBreakfastOutlet === rowKeyObj.restaurant) {
+        // For default breakfast outlet, calculate Breakfast Covers (equals Number of guests)
+        if (typeof getDaysInMonth === 'function' && totalRooms) {
+          const days = getDaysInMonth(year, label);
+          const roomsAvailable = days * totalRooms;
+          
+          // Get double occupancy value
+          const doubleOccupancyByYear = JSON.parse(localStorage.getItem('doubleOccupancyByYear') || '{}');
+          const doubleOccupancyValue = doubleOccupancyByYear[year];
+          let doubleOccupancy = 0;
+          if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null) {
+            doubleOccupancy = parseFloat(doubleOccupancyValue);
+          }
+          
+          // Calculate breakfast covers (equals number of guests for default outlet)
+          breakfastCovers = doubleOccupancy * roomsAvailable;
+        }
+      } else {
+        // For non-default breakfast outlets, get from fnbData
+        const breakfastCoversRowKey = createRowKey(rowKeyObj.restaurant, 'Breakfast Revenue', 'Breakfast Covers', label);
+        const breakfastCoversRaw = fnbData?.[breakfastCoversRowKey]?.[year]?.[label];
+        breakfastCovers = parseFloat(breakfastCoversRaw?.toString().replace(/,/g, '')) || 0;
+      }
+      
+      const totalCover = lunchMonthlyCover + dinnerMonthlyCover + breakfastCovers;
       return totalCover.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
   }
@@ -358,22 +387,124 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
     }
   }
   
+  // Auto-calculate Breakfast Covers: if default breakfast outlet, use Number of guests value
+  if (rowType === 'Breakfast Covers') {
+    if (rowKeyObj) {
+      // Check if this restaurant is the default breakfast outlet
+      const defaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+      if (defaultBreakfastOutlet === rowKeyObj.restaurant) {
+        // For default breakfast outlet, use Number of guests value
+        // Get Number of guests value
+        let numberOfGuests = 0;
+        if (typeof getDaysInMonth === 'function' && totalRooms) {
+          const days = getDaysInMonth(year, label);
+          const roomsAvailable = days * totalRooms;
+          
+          // Get double occupancy value
+          const doubleOccupancyByYear = JSON.parse(localStorage.getItem('doubleOccupancyByYear') || '{}');
+          const doubleOccupancyValue = doubleOccupancyByYear[year];
+          let doubleOccupancy = 0;
+          if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null) {
+            doubleOccupancy = parseFloat(doubleOccupancyValue);
+          }
+          
+          // Calculate number of guests
+          numberOfGuests = doubleOccupancy * roomsAvailable;
+        }
+        return numberOfGuests.toFixed(2);
+      } else {
+        // For non-default breakfast outlets, use user input value
+        const breakfastCoversRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, rowKeyObj.type, label);
+        const breakfastCoversRaw = fnbData?.[breakfastCoversRowKey]?.[year]?.[label];
+        const breakfastCovers = parseFloat(breakfastCoversRaw?.toString().replace(/,/g, '')) || 0;
+        return breakfastCovers.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+    }
+  }
+
+  // Auto-calculate Breakfast Revenue: if default breakfast outlet, use Breakfast Covers × Average check breakfast
+  if (rowType === 'Breakfast Revenue') {
+    if (rowKeyObj) {
+      // Check if this restaurant is the default breakfast outlet
+      const defaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+      if (defaultBreakfastOutlet === rowKeyObj.restaurant) {
+        // For default breakfast outlet, calculate: Breakfast Covers × Average check breakfast
+        // Get Breakfast Covers value (which equals Number of guests for default outlet)
+        let breakfastCovers = 0;
+        if (typeof getDaysInMonth === 'function' && totalRooms) {
+          const days = getDaysInMonth(year, label);
+          const roomsAvailable = days * totalRooms;
+          
+          // Get double occupancy value
+          const doubleOccupancyByYear = JSON.parse(localStorage.getItem('doubleOccupancyByYear') || '{}');
+          const doubleOccupancyValue = doubleOccupancyByYear[year];
+          let doubleOccupancy = 0;
+          if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null) {
+            doubleOccupancy = parseFloat(doubleOccupancyValue);
+          }
+          
+          // Calculate breakfast covers (equals number of guests for default outlet)
+          breakfastCovers = doubleOccupancy * roomsAvailable;
+        }
+        
+        // Calculate Average check breakfast directly: Breakfast Allocation × Exchange Rate
+        const breakfastByYear = JSON.parse(localStorage.getItem('breakfastByYear') || '{}');
+        const breakfastAllocation = parseFloat(breakfastByYear[year]) || 0;
+        
+        const exchangeRateByYear = JSON.parse(localStorage.getItem('exchangeRateByYear') || '{}');
+        const exchangeRate = parseFloat(exchangeRateByYear[year]) || 1;
+        
+        const averageCheckBreakfast = breakfastAllocation * exchangeRate;
+        
+        // Calculate Breakfast Revenue = Breakfast Covers × Average check breakfast
+        const breakfastRevenue = breakfastCovers * averageCheckBreakfast;
+        return breakfastRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      } else {
+        // For non-default breakfast outlets, use user input value
+        const breakfastRevenueRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, rowKeyObj.type, label);
+        const breakfastRevenueRaw = fnbData?.[breakfastRevenueRowKey]?.[year]?.[label];
+        const breakfastRevenue = parseFloat(breakfastRevenueRaw?.toString().replace(/,/g, '')) || 0;
+        return breakfastRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+    }
+  }
+  
+  // Auto-calculate Average check breakfast: if default breakfast outlet, use Breakfast Allocation × Exchange Rate
+  if (rowType === 'Average check breakfast') {
+    if (rowKeyObj) {
+      // Check if this restaurant is the default breakfast outlet
+      const defaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+      if (defaultBreakfastOutlet === rowKeyObj.restaurant) {
+        // For default breakfast outlet, calculate: Breakfast Allocation (USD) × Exchange Rate
+        // Get Breakfast Allocation (USD) for the year
+        const breakfastByYear = JSON.parse(localStorage.getItem('breakfastByYear') || '{}');
+        const breakfastAllocation = parseFloat(breakfastByYear[year]) || 0;
+        
+        // Get Exchange Rate for the year
+        const exchangeRateByYear = JSON.parse(localStorage.getItem('exchangeRateByYear') || '{}');
+        const exchangeRate = parseFloat(exchangeRateByYear[year]) || 1;
+        
+        // Calculate Average check breakfast
+        const averageCheckBreakfast = breakfastAllocation * exchangeRate;
+        return averageCheckBreakfast.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      
+      // For non-default breakfast outlets, use user input value
+      const userRaw = fnbData?.[rowKeyObj.restaurant]?.[rowKeyObj.section]?.[rowType]?.[year]?.[label];
+      if (userRaw !== undefined && userRaw !== null && userRaw !== "") {
+        return userRaw.toString();
+      }
+      
+      // Default fallback
+      return "0.00";
+    }
+  }
+  
   // For restaurant data, look up the specific row in fnbData
   const raw = fnbData?.[row]?.[year]?.[label];
   let num = parseFloat(raw?.toString().replace(/,/g, ''));
   if (isNaN(num)) num = 0;
   
-  // Log any restaurant cell that has a non-zero value
-  // if (row.includes('-') && num > 0) {
-  //   console.log('Restaurant cell with non-zero value:', {
-  //     row,
-  //     year,
-  //     label,
-  //     rawValue: raw,
-  //     parsedValue: num,
-  //     formattedValue: num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  //   });
-  // }
   
   return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
