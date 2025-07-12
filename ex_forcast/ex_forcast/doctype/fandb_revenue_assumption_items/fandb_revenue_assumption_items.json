@@ -7,8 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "dining_cover",
-  "cover_detail",
   "cover_category",
+  "cover_detail",
   "amount"
  ],
  "fields": [
@@ -21,17 +21,17 @@
   },
   {
    "fieldname": "cover_detail",
-   "fieldtype": "Link",
+   "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Cover Detail",
-   "options": "Cover Details"
+   "options": "\nDaily Cover\nBreakfast Covers\nAverage check breakfast\nAverage check food\nAverage check beverage\nMonthly Cover\nBreakfast Revenue\nLunch Revenue\nDinner Revenue\nLunch food revenue\nLunch beverage revenue\nDinner food revenue\nDinner beverage revenue"
   },
   {
-   "fetch_from": "cover_detail.cover_category",
    "fieldname": "cover_category",
-   "fieldtype": "Data",
+   "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Cover Category"
+   "label": "Cover Category",
+   "options": "\nBreakfast Revenue\nLunch Revenue\nDinner Revenue"
   },
   {
    "fieldname": "amount",
@@ -43,7 +43,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-08 12:32:28.250672",
+ "modified": "2025-07-11 18:53:14.776982",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "FandB Revenue Assumption Items",

@@ -30,8 +30,12 @@ function parseRowKey(rowKeyString) {
 
 // Helper function to calculate Monthly Cover without recursion
 function calculateMonthlyCoverDirectly(fnbData, restaurantName, section, year, label) {
-  // Construct the Daily Cover row key
-  const dailyCoverRowKey = createRowKey(restaurantName, section, 'Daily Cover', label);
+  // Construct the Daily Cover row key (without label)
+  const dailyCoverRowKey = JSON.stringify({
+    restaurant: restaurantName,
+    section: section,
+    type: 'Daily Cover'
+  });
   
   // Get the Daily Cover value
   const dailyCoverRaw = fnbData?.[dailyCoverRowKey]?.[year]?.[label];
@@ -152,7 +156,11 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
       const monthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, rowKeyObj.section, year, label);
       
       // Get Average check food value
-      const avgCheckFoodRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check food', label);
+      const avgCheckFoodRowKey = JSON.stringify({
+        restaurant: rowKeyObj.restaurant,
+        section: rowKeyObj.section,
+        type: 'Average check food'
+      });
       const avgCheckFoodRaw = fnbData?.[avgCheckFoodRowKey]?.[year]?.[label];
       
       if (avgCheckFoodRaw !== undefined && avgCheckFoodRaw !== null && avgCheckFoodRaw !== "") {
@@ -172,7 +180,11 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
       const monthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, rowKeyObj.section, year, label);
       
       // Get Average check beverage value
-      const avgCheckBeverageRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check beverage', label);
+      const avgCheckBeverageRowKey = JSON.stringify({
+        restaurant: rowKeyObj.restaurant,
+        section: rowKeyObj.section,
+        type: 'Average check beverage'
+      });
       const avgCheckBeverageRaw = fnbData?.[avgCheckBeverageRowKey]?.[year]?.[label];
       
       if (avgCheckBeverageRaw !== undefined && avgCheckBeverageRaw !== null && avgCheckBeverageRaw !== "") {
@@ -192,7 +204,11 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
       const monthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, rowKeyObj.section, year, label);
       
       // Get Average check food value
-      const avgCheckFoodRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check food', label);
+      const avgCheckFoodRowKey = JSON.stringify({
+        restaurant: rowKeyObj.restaurant,
+        section: rowKeyObj.section,
+        type: 'Average check food'
+      });
       const avgCheckFoodRaw = fnbData?.[avgCheckFoodRowKey]?.[year]?.[label];
       
       if (avgCheckFoodRaw !== undefined && avgCheckFoodRaw !== null && avgCheckFoodRaw !== "") {
@@ -212,7 +228,11 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
       const monthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, rowKeyObj.section, year, label);
       
       // Get Average check beverage value
-      const avgCheckBeverageRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check beverage', label);
+      const avgCheckBeverageRowKey = JSON.stringify({
+        restaurant: rowKeyObj.restaurant,
+        section: rowKeyObj.section,
+        type: 'Average check beverage'
+      });
       const avgCheckBeverageRaw = fnbData?.[avgCheckBeverageRowKey]?.[year]?.[label];
       
       if (avgCheckBeverageRaw !== undefined && avgCheckBeverageRaw !== null && avgCheckBeverageRaw !== "") {
@@ -228,13 +248,21 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
     if (rowKeyObj) {
       // Calculate Lunch food revenue directly to avoid recursion
       const monthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, rowKeyObj.section, year, label);
-      const avgCheckFoodRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check food', label);
+      const avgCheckFoodRowKey = JSON.stringify({
+        restaurant: rowKeyObj.restaurant,
+        section: rowKeyObj.section,
+        type: 'Average check food'
+      });
       const avgCheckFoodRaw = fnbData?.[avgCheckFoodRowKey]?.[year]?.[label];
       const avgCheckFood = parseFloat(avgCheckFoodRaw?.toString().replace(/,/g, '')) || 0;
       const lunchFoodRevenue = monthlyCover * avgCheckFood;
       
       // Calculate Lunch beverage revenue directly to avoid recursion
-      const avgCheckBeverageRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check beverage', label);
+      const avgCheckBeverageRowKey = JSON.stringify({
+        restaurant: rowKeyObj.restaurant,
+        section: rowKeyObj.section,
+        type: 'Average check beverage'
+      });
       const avgCheckBeverageRaw = fnbData?.[avgCheckBeverageRowKey]?.[year]?.[label];
       const avgCheckBeverage = parseFloat(avgCheckBeverageRaw?.toString().replace(/,/g, '')) || 0;
       const lunchBeverageRevenue = monthlyCover * avgCheckBeverage;
@@ -250,13 +278,21 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
     if (rowKeyObj) {
       // Calculate Dinner food revenue directly to avoid recursion
       const monthlyCover = calculateMonthlyCoverDirectly(fnbData, rowKeyObj.restaurant, rowKeyObj.section, year, label);
-      const avgCheckFoodRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check food', label);
+      const avgCheckFoodRowKey = JSON.stringify({
+        restaurant: rowKeyObj.restaurant,
+        section: rowKeyObj.section,
+        type: 'Average check food'
+      });
       const avgCheckFoodRaw = fnbData?.[avgCheckFoodRowKey]?.[year]?.[label];
       const avgCheckFood = parseFloat(avgCheckFoodRaw?.toString().replace(/,/g, '')) || 0;
       const dinnerFoodRevenue = monthlyCover * avgCheckFood;
       
       // Calculate Dinner beverage revenue directly to avoid recursion
-      const avgCheckBeverageRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, 'Average check beverage', label);
+      const avgCheckBeverageRowKey = JSON.stringify({
+        restaurant: rowKeyObj.restaurant,
+        section: rowKeyObj.section,
+        type: 'Average check beverage'
+      });
       const avgCheckBeverageRaw = fnbData?.[avgCheckBeverageRowKey]?.[year]?.[label];
       const avgCheckBeverage = parseFloat(avgCheckBeverageRaw?.toString().replace(/,/g, '')) || 0;
       const dinnerBeverageRevenue = monthlyCover * avgCheckBeverage;
@@ -295,7 +331,11 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
         }
       } else {
         // For non-default breakfast outlets, get from fnbData
-        const breakfastCoversRowKey = createRowKey(rowKeyObj.restaurant, 'Breakfast Revenue', 'Breakfast Covers', label);
+        const breakfastCoversRowKey = JSON.stringify({
+          restaurant: rowKeyObj.restaurant,
+          section: 'Breakfast Revenue',
+          type: 'Breakfast Covers'
+        });
         const breakfastCoversRaw = fnbData?.[breakfastCoversRowKey]?.[year]?.[label];
         breakfastCovers = parseFloat(breakfastCoversRaw?.toString().replace(/,/g, '')) || 0;
       }
@@ -414,7 +454,11 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
         return numberOfGuests.toFixed(2);
       } else {
         // For non-default breakfast outlets, use user input value
-        const breakfastCoversRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, rowKeyObj.type, label);
+        const breakfastCoversRowKey = JSON.stringify({
+          restaurant: rowKeyObj.restaurant,
+          section: rowKeyObj.section,
+          type: rowKeyObj.type
+        });
         const breakfastCoversRaw = fnbData?.[breakfastCoversRowKey]?.[year]?.[label];
         const breakfastCovers = parseFloat(breakfastCoversRaw?.toString().replace(/,/g, '')) || 0;
         return breakfastCovers.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -461,7 +505,11 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
         return breakfastRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       } else {
         // For non-default breakfast outlets, use user input value
-        const breakfastRevenueRowKey = createRowKey(rowKeyObj.restaurant, rowKeyObj.section, rowKeyObj.type, label);
+        const breakfastRevenueRowKey = JSON.stringify({
+          restaurant: rowKeyObj.restaurant,
+          section: rowKeyObj.section,
+          type: rowKeyObj.type
+        });
         const breakfastRevenueRaw = fnbData?.[breakfastRevenueRowKey]?.[year]?.[label];
         const breakfastRevenue = parseFloat(breakfastRevenueRaw?.toString().replace(/,/g, '')) || 0;
         return breakfastRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -501,12 +549,29 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
   }
   
   // For restaurant data, look up the specific row in fnbData
-  const raw = fnbData?.[row]?.[year]?.[label];
-  let num = parseFloat(raw?.toString().replace(/,/g, ''));
-  if (isNaN(num)) num = 0;
-  
-  
-  return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (rowKeyObj) {
+    // For structured row keys, remove the label from the key for lookup
+    const rowKey = JSON.stringify({
+      restaurant: rowKeyObj.restaurant,
+      section: rowKeyObj.section,
+      type: rowKeyObj.type
+    });
+    
+    // console.log('Looking up data for:', { rowKey, year, label, fnbDataKeys: Object.keys(fnbData) });
+    
+    const raw = fnbData?.[rowKey]?.[year]?.[label];
+    // console.log('Raw value found:', raw);
+    
+    let num = parseFloat(raw?.toString().replace(/,/g, ''));
+    if (isNaN(num)) num = 0;
+    return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  } else {
+    // For simple row names (legacy format), look up directly
+    const raw = fnbData?.[row]?.[year]?.[label];
+    let num = parseFloat(raw?.toString().replace(/,/g, ''));
+    if (isNaN(num)) num = 0;
+    return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
 }
 
 export function setFnbCellValue(fnbData, row, year, label, value) {
@@ -515,10 +580,28 @@ export function setFnbCellValue(fnbData, row, year, label, value) {
     console.warn('setFnbCellValue: fnbData is not an object');
     return;
   }
-  if (!fnbData[row]) fnbData[row] = {};
-  if (!fnbData[row][year]) fnbData[row][year] = {};
-  fnbData[row][year][label] = value;
-  // console.log('setFnbCellValue completed. Data structure:', fnbData[row][year]);
+  
+  // Check if this is a structured row key (JSON string)
+  let rowKey = row;
+  try {
+    const rowKeyObj = JSON.parse(row);
+    if (rowKeyObj && rowKeyObj.restaurant && rowKeyObj.section && rowKeyObj.type) {
+      // This is a structured row key, remove the label from the key for storage
+      rowKey = JSON.stringify({
+        restaurant: rowKeyObj.restaurant,
+        section: rowKeyObj.section,
+        type: rowKeyObj.type
+      });
+    }
+  } catch (error) {
+    // Not a JSON string, use as-is
+    rowKey = row;
+  }
+  
+  if (!fnbData[rowKey]) fnbData[rowKey] = {};
+  if (!fnbData[rowKey][year]) fnbData[rowKey][year] = {};
+  fnbData[rowKey][year][label] = value;
+  // console.log('setFnbCellValue completed. Data structure:', fnbData[rowKey][year]);
 }
 
 // --- Shared Utility for Formatting and Cleaning (copied from expense_estimate_utils.js) ---
@@ -717,7 +800,9 @@ export function calculateFnbTotal(fnbData, row, year, labels, totalRooms = null)
   
   let sum = 0;
   for (const label of labels) {
-    const val = parseFloat(getFnbCellValue(fnbData, row, year, label, totalRooms));
+    const cellValue = getFnbCellValue(fnbData, row, year, label, totalRooms);
+    // Remove commas and parse the value properly
+    const val = parseFloat(cellValue.toString().replace(/,/g, ''));
     if (!isNaN(val)) sum += val;
   }
   return sum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });

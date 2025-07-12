@@ -1,11 +1,12 @@
 export async function createRestaurant({ cover_name }) {
   try {
+    // Create form data
+    const formData = new FormData();
+    formData.append('cover_name', cover_name);
+    
     const response = await fetch('/api/method/ex_forcast.api.create_restaurant.create_restaurant', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ cover_name }),
+      body: formData
     });
     const data = await response.json();
     if (data.message && data.message.status === 'success') {

@@ -426,12 +426,12 @@
                                         ? 'bg-violet-50 cursor-not-allowed' 
                                         : 'hover:bg-violet-50 editable-cell'
                                     ]"
-                                    @input="!isRestaurantRowAutoCalculated(restaurant.name, section.section, row) ? handleFnbCellInput({ row: JSON.stringify({restaurant: restaurant.name, section: section.section, type: row, label: label}), year, label, event: $event, fnbData: fnbData, changedCells, isSaved }) : null"
-                                    @focus="!isRestaurantRowAutoCalculated(restaurant.name, section.section, row) ? handleFnbCellFocus({ row: JSON.stringify({restaurant: restaurant.name, section: section.section, type: row, label: label}), year, label, event: $event }) : null"
-                                    @blur="!isRestaurantRowAutoCalculated(restaurant.name, section.section, row) ? handleFnbCellEdit({ row: JSON.stringify({restaurant: restaurant.name, section: section.section, type: row, label: label}), year, label, event: $event, fnbData: fnbData, changedCells, isSaved }) : null"
+                                    @input="!isRestaurantRowAutoCalculated(restaurant.name, section.section, row) ? handleFnbCellInputWrapper({ row: JSON.stringify({restaurant: restaurant.name, section: section.section, type: row}), year, label, event: $event }) : null"
+                                    @focus="!isRestaurantRowAutoCalculated(restaurant.name, section.section, row) ? handleFnbCellFocus({ row: JSON.stringify({restaurant: restaurant.name, section: section.section, type: row}), year, label, event: $event }) : null"
+                                    @blur="!isRestaurantRowAutoCalculated(restaurant.name, section.section, row) ? handleFnbCellEditWrapper({ row: JSON.stringify({restaurant: restaurant.name, section: section.section, type: row}), year, label, event: $event }) : null"
                                     @keypress="!isRestaurantRowAutoCalculated(restaurant.name, section.section, row) ? allowOnlyNumbers($event) : null"
                                   >
-                                    <span class="font-mono text-xs">{{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: section.section, type: row, label: label}), year, label, totalRooms) }}</span>
+                                    <span class="font-mono text-xs">{{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: section.section, type: row}), year, label, totalRooms) }}</span>
                                   </td>
                                   <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">{{ calculateFnbTotal(fnbData, JSON.stringify({restaurant: restaurant.name, section: section.section, type: row}), year, getColumnLabelsForYearLocal(year), totalRooms) }}</td>
                                 </template>
@@ -451,7 +451,7 @@
                                 <template v-if="suffix === 'Cover'">
                                   <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'restaurant-total-row-cell-' + restaurant.name + '-' + suffix + '-' + year + '-' + label" class="px-2 py-2 text-right border border-violet-200 font-mono text-xs">
                                     <span class="font-mono text-xs">
-                                      {{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Cover', label: label}), year, label, totalRooms) }}
+                                      {{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Cover'}), year, label, totalRooms) }}
                                     </span>
                                   </td>
                                   <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
@@ -463,7 +463,7 @@
                                 <template v-else-if="suffix === 'Food Revenue'">
                                   <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'restaurant-total-row-cell-' + restaurant.name + '-' + suffix + '-' + year + '-' + label" class="px-2 py-2 text-right border border-violet-200 font-mono text-xs">
                                     <span class="font-mono text-xs">
-                                      {{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Food Revenue', label: label}), year, label, totalRooms) }}
+                                      {{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Food Revenue'}), year, label, totalRooms) }}
                                     </span>
                                   </td>
                                   <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
@@ -475,7 +475,7 @@
                                 <template v-else-if="suffix === 'Beverage Revenue'">
                                   <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'restaurant-total-row-cell-' + restaurant.name + '-' + suffix + '-' + year + '-' + label" class="px-2 py-2 text-right border border-violet-200 font-mono text-xs">
                                     <span class="font-mono text-xs">
-                                      {{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Beverage Revenue', label: label}), year, label, totalRooms) }}
+                                      {{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Beverage Revenue'}), year, label, totalRooms) }}
                                     </span>
                                   </td>
                                   <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
@@ -487,7 +487,7 @@
                                 <template v-else-if="suffix === 'Revenue'">
                                   <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'restaurant-total-row-cell-' + restaurant.name + '-' + suffix + '-' + year + '-' + label" class="px-2 py-2 text-right border border-violet-200 font-mono text-xs">
                                     <span class="font-mono text-xs">
-                                      {{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Revenue', label: label}), year, label, totalRooms) }}
+                                      {{ getFnbCellValue(fnbData, JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Revenue'}), year, label, totalRooms) }}
                                     </span>
                                   </td>
                                   <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 font-mono text-xs text-violet-700">
@@ -963,7 +963,9 @@
     handleFnbCellInput,
     handleFnbCellEdit,
     handleFnbCellFocus,
-    calculateFnbTotal
+    calculateFnbTotal,
+    loadFnbRevenueDataForFrontend,
+    saveFnbChanges
   } from "@/components/utility/f&b_revenue_assumpt/index.js";
   import { getMarketSegmentList } from "@/components/utility/room_revenue_assumpt./data_service.js";
   import { MARKET_SEGMENTS } from "@/components/utility/room_revenue_assumpt./market_segments.js";
@@ -1029,6 +1031,7 @@
     "Revenue Per Available Room"
   ]
   const fnbData = reactive({}); // { [rowLabel]: { [year]: { [month]: value, ... } } }
+  const originalFnbData = ref({}); // Store original F&B data for comparison
   
   // Debug: Log fnbData initialization
   // console.log('fnbData initialized:', fnbData.value, typeof fnbData.value);
@@ -1076,6 +1079,30 @@
   
   // Check for changes periodically
   setInterval(checkHospitalityExperience, 1000);
+  
+  // Watch for changedCells to update saved state
+  watch(changedCells, (newChanges) => {
+    if (newChanges.length > 0 && isSaved.value) {
+      isSaved.value = false;
+    } else if (newChanges.length === 0 && !isSaved.value) {
+      // Only mark as saved if there are no changes and the data matches original
+      const hasDataChanges = JSON.stringify(fnbData) !== JSON.stringify(originalFnbData.value);
+      if (!hasDataChanges) {
+        isSaved.value = true;
+      }
+    }
+  }, { deep: true });
+  
+  // Watch for F&B data changes to track saved state (less aggressive)
+  watch(fnbData, (newData, oldData) => {
+    // Only check if we have original data to compare against
+    if (Object.keys(originalFnbData.value).length > 0) {
+      const hasChanges = JSON.stringify(newData) !== JSON.stringify(originalFnbData.value);
+      if (hasChanges && isSaved.value) {
+        isSaved.value = false;
+      }
+    }
+  }, { deep: true });
   
   // Check for Room Revenue total changes periodically
   setInterval(() => {
@@ -1192,6 +1219,18 @@
       isSaved.value = true;
       restaurantList.value = await getRestaurants();
       
+      // Load F&B revenue data
+      try {
+        const fnbRevenueData = await loadFnbRevenueDataForFrontend();
+        Object.assign(fnbData, fnbRevenueData);
+        originalFnbData.value = cloneDeep(fnbRevenueData); // Store original
+      } catch (error) {
+        console.error('Error loading F&B revenue data:', error);
+        // Initialize empty fnbData if loading fails
+        Object.assign(fnbData, {});
+        originalFnbData.value = {};
+      }
+      
       // Load total rooms from localStorage
       const savedRooms = localStorage.getItem('totalRooms');
       if (savedRooms) {
@@ -1246,7 +1285,7 @@
   
   // Wrapper function for saveChanges
   const saveChangesWrapper = async () => {
-    await saveChanges(changedCells, isSaving, saveError, expenseData, originalExpenseData, isSaved, loadExpenseData);
+    await saveFnbChanges(changedCells, isSaving, saveError, fnbData, originalFnbData, isSaved, loadFnbRevenueDataForFrontend);
   };
   
   
@@ -1298,6 +1337,17 @@
       expenseData.value = await loadExpenseData();
       originalExpenseData.value = cloneDeep(expenseData.value);
       expenses.value = extractAllExpenses(expenseData.value);
+      
+      // Reload F&B revenue data
+      try {
+        const fnbRevenueData = await loadFnbRevenueDataForFrontend();
+        Object.assign(fnbData, fnbRevenueData);
+        originalFnbData.value = cloneDeep(fnbRevenueData); // Update original
+      } catch (error) {
+        console.error('Error loading F&B revenue data:', error);
+        Object.assign(fnbData, {});
+        originalFnbData.value = {};
+      }
       
       // Reset any unsaved changes
       changedCells.value = [];
@@ -1645,8 +1695,78 @@
 
   // Wrapper function to handle cell input with proper reactive reference
   function handleFnbCellInputWrapper(params) {
-    // console.log('Wrapper called with fnbData:', fnbData, typeof fnbData);
-    return handleFnbCellInput({ ...params, fnbData });
+    // console.log('handleFnbCellInputWrapper called with:', params);
+    const result = handleFnbCellInput({ ...params, fnbData });
+    
+    // Manually track the change to ensure saved state is updated
+    if (params.event && params.event.target) {
+      const value = params.event.target.innerText.replace(/[^\d.]/g, '');
+      const numValue = parseFloat(value) || 0;
+      const newValue = numValue.toFixed(2);
+      
+      // console.log('Cell input change detected:', { row: params.row, year: params.year, label: params.label, newValue });
+      
+      // Add to changedCells if not already present
+      const existingChange = changedCells.value.find(c => 
+        c.row === params.row && c.year === params.year && c.label === params.label
+      );
+      
+      if (!existingChange) {
+        changedCells.value.push({ 
+          row: params.row, 
+          year: params.year, 
+          label: params.label, 
+          newValue 
+        });
+        // console.log('Added new change to changedCells, total changes:', changedCells.value.length);
+      } else {
+        existingChange.newValue = newValue;
+        // console.log('Updated existing change in changedCells');
+      }
+      
+      // Mark as unsaved
+      if (isSaved.value) {
+        isSaved.value = false;
+        console.log('Marked as unsaved');
+      }
+    }
+    
+    return result;
+  }
+  
+  // Wrapper function to handle cell edit with proper reactive reference
+  function handleFnbCellEditWrapper(params) {
+    const result = handleFnbCellEdit({ ...params, fnbData });
+    
+    // Manually track the change to ensure saved state is updated
+    if (params.event && params.event.target) {
+      const value = params.event.target.innerText.replace(/[^\d.]/g, '');
+      const numValue = parseFloat(value) || 0;
+      const newValue = numValue.toFixed(2);
+      
+      // Add to changedCells if not already present
+      const existingChange = changedCells.value.find(c => 
+        c.row === params.row && c.year === params.year && c.label === params.label
+      );
+      
+      if (!existingChange) {
+        changedCells.value.push({ 
+          row: params.row, 
+          year: params.year, 
+          label: params.label, 
+          newValue 
+        });
+      } else {
+        existingChange.newValue = newValue;
+      }
+      
+      // Mark as unsaved
+      if (isSaved.value) {
+        isSaved.value = false;
+      }
+    }
+    
+    return result;
   }
 
   // Function to calculate total covers across all restaurants
@@ -1655,7 +1775,7 @@
     for (const restaurant of restaurantList.value) {
       const restaurantTotalCover = getFnbCellValue(
         fnbData, 
-        JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Cover', label: label}), 
+        JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Cover'}), 
         year, 
         label, 
         totalRooms?.value || totalRooms
@@ -1673,7 +1793,7 @@
     for (const restaurant of restaurantList.value) {
       const restaurantTotalFoodRevenue = getFnbCellValue(
         fnbData, 
-        JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Food Revenue', label: label}), 
+        JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Food Revenue'}), 
         year, 
         label, 
         totalRooms?.value || totalRooms
@@ -1689,7 +1809,7 @@
     for (const restaurant of restaurantList.value) {
       const restaurantTotalBeverageRevenue = getFnbCellValue(
         fnbData, 
-        JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Beverage Revenue', label: label}), 
+        JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Beverage Revenue'}), 
         year, 
         label, 
         totalRooms?.value || totalRooms
@@ -1705,7 +1825,7 @@
     for (const restaurant of restaurantList.value) {
       const restaurantTotalRevenue = getFnbCellValue(
         fnbData, 
-        JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Revenue', label: label}), 
+        JSON.stringify({restaurant: restaurant.name, section: 'Total', type: 'Total Revenue'}), 
         year, 
         label, 
         totalRooms?.value || totalRooms
