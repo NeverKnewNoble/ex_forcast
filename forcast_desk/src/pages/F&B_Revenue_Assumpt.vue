@@ -272,13 +272,20 @@
                   </div>
               </div>
               <!-- Move Create Restaurant button here -->
-              <div class="mb-4">
+              <div class="mb-4 flex gap-2">
                   <button
                     @click="showCreateRestaurantModal = true"
                   class="flex items-center gap-2 px-4 py-1 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg font-medium"
                   >
                     <PlusCircle class="w-4 h-4" />
                     Create Restaurant
+                  </button>
+                  <button
+                    @click="showResetRestaurantsModal = true"
+                    class="flex items-center gap-2 px-4 py-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-200 shadow-md hover:shadow-lg font-medium"
+                  >
+                    <RefreshCw class="w-4 h-4" />
+                    Reset to Default
                   </button>
                 </div>
                 <!-- Modern Table Container -->
@@ -399,8 +406,18 @@
                         <!-- Restaurant rows -->
                         <template v-for="restaurant in restaurantList" :key="restaurant.name">
                           <tr>
-                            <td class="bg-violet-50 text-violet-900 text-lg font-bold border-b border-violet-200 py-2 px-2 pl-4 text-balance" :colspan="1 + visibleYears.length * (getColumnLabelsForYearLocal(visibleYears[0])?.length + 1)">
-                              {{ restaurant.cover_name || restaurant.name }}
+                            <td class="bg-violet-50 text-violet-900 text-lg font-bold border-b border-violet-200 py-2 px-2 pl-4 text-balance flex items-center justify-between" :colspan="1 + visibleYears.length * (getColumnLabelsForYearLocal(visibleYears[0])?.length + 1)">
+                              <span>{{ restaurant.cover_name || restaurant.name }}</span>
+                              <button
+                                @click="showDeleteRestaurantModal = true; restaurantToDelete = restaurant"
+                                class="flex items-center gap-1 px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs font-medium transition-all duration-200 hover:shadow-md"
+                                title="Delete restaurant"
+                              >
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                                Delete
+                              </button>
                             </td>
                           </tr>
                           <template v-for="section in defaultRestaurantRows" :key="section.section">
@@ -909,6 +926,101 @@
         </div>
       </div>
     </transition>
+  
+    <!-- Delete Restaurant Modal -->
+    <transition name="fade">
+      <div
+        v-if="showDeleteRestaurantModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      >
+        <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-lg p-0 overflow-hidden">
+          <!-- Modal Header -->
+          <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-red-600 to-red-700">
+            <Delete class="w-6 h-6 text-white" />
+            <h2 class="text-xl font-bold text-white">Delete Restaurant</h2>
+          </div>
+  
+          <!-- Modal Body -->
+          <div class="p-8 pt-6">
+            <div v-if="restaurantToDelete" class="space-y-4">
+              <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <AlertTriangle class="w-6 h-6 text-red-600" />
+                <div>
+                  <p class="text-red-800 font-medium">Are you sure you want to delete this restaurant?</p>
+                  <p class="text-red-700 text-sm mt-1">{{ restaurantToDelete.cover_name || restaurantToDelete.name }}</p>
+                </div>
+              </div>
+              
+              <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p class="text-yellow-800 text-sm">
+                  <strong>Warning:</strong> This action cannot be undone. All F&B data associated with this restaurant will be permanently removed.
+                </p>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Modal Footer -->
+          <div class="flex justify-end gap-3 px-8 py-4 bg-gray-50 border-t border-violet-100">
+            <button
+              @click="cancelDeleteRestaurant"
+              class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2"
+            >
+              <X class="w-4 h-4" />
+              Cancel
+            </button>
+            <button
+              v-if="restaurantToDelete"
+              @click="confirmDeleteRestaurant"
+              class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 flex items-center gap-2"
+            >
+              <Delete class="w-4 h-4" />
+              Delete Restaurant
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
+  
+    <!-- Reset Restaurants Modal -->
+    <transition name="fade">
+      <div
+        v-if="showResetRestaurantsModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      >
+        <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-lg p-0 overflow-hidden">
+          <!-- Modal Header -->
+          <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
+            <Settings class="w-6 h-6 text-white" />
+            <h2 class="text-xl font-bold text-white">Reset Restaurants</h2>
+          </div>
+  
+          <!-- Modal Body -->
+          <div class="p-8 pt-6">
+            <p class="text-gray-600 mb-4">
+              Are you sure you want to reset the restaurant list to the original state? This action cannot be undone.
+            </p>
+          </div>
+  
+          <!-- Modal Footer -->
+          <div class="flex justify-end gap-3 px-8 py-4 bg-gray-50 border-t border-violet-100">
+            <button
+              @click="cancelResetRestaurants"
+              class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2"
+            >
+              <X class="w-4 h-4" />
+              Cancel
+            </button>
+            <button
+              @click="confirmResetRestaurants"
+              class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2"
+            >
+              <Check class="w-4 h-4" />
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </template>
   
   
@@ -937,6 +1049,7 @@
     Users,
     CircleAlert,
     ArrowLeft,
+    Delete,
   } from 'lucide-vue-next';
   import alertService from "@/components/ui/alertService.js";
   import {
@@ -1018,6 +1131,13 @@
   const defaultBreakfastOutlet = ref("");
   const tempDefaultBreakfastOutlet = ref("");
   
+  // Delete Restaurant Modal State
+  const showDeleteRestaurantModal = ref(false);
+  const restaurantToDelete = ref(null);
+  
+  // Reset Restaurants Modal State
+  const showResetRestaurantsModal = ref(false);
+  
   const fnbRows = [
     "Number of rooms",
     "Days of the Month",
@@ -1038,6 +1158,7 @@
   // const fnbChangedCells = ref([]); // {row, year, label, newValue}
   // const fnbIsSaved = ref(true);
   const restaurantList = ref([]);
+  const originalRestaurantList = ref([]); // Store original restaurant list for reset functionality
   const defaultRestaurantRows = getDefaultRestaurantRows();
   const marketSegmentData = ref({});
   
@@ -1218,6 +1339,7 @@
       toYear.value = localStorage.getItem('fnbRevenueToYear') || "";
       isSaved.value = true;
       restaurantList.value = await getRestaurants();
+      originalRestaurantList.value = [...restaurantList.value]; // Store original list for reset functionality
       
       // Load F&B revenue data
       try {
@@ -1349,6 +1471,10 @@
         originalFnbData.value = {};
       }
       
+      // Reload restaurant list
+      restaurantList.value = await getRestaurants();
+      originalRestaurantList.value = [...restaurantList.value]; // Update original list
+      
       // Reset any unsaved changes
       changedCells.value = [];
       isSaved.value = true;
@@ -1373,7 +1499,8 @@
       alertService.success("Restaurant created successfully!");
       showCreateRestaurantModal.value = false;
       newRestaurantName.value = "";
-      // Optionally refresh restaurant list here
+      // Refresh restaurant list to include the new restaurant
+      restaurantList.value = await getRestaurants();
     } else {
       createRestaurantError.value = result.error || "Failed to create restaurant.";
     }
@@ -1844,6 +1971,98 @@
     if (totalCovers === 0) return '0.00';
     const avg = totalFnbRevenue / totalCovers;
     return avg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function deleteRestaurant(restaurant) {
+    // Remove restaurant from the list
+    restaurantList.value = restaurantList.value.filter(r => r.name !== restaurant.name);
+    
+    // Clear any F&B data associated with this restaurant
+    const restaurantDataKeys = Object.keys(fnbData).filter(key => {
+      try {
+        const rowKeyObj = JSON.parse(key);
+        return rowKeyObj && rowKeyObj.restaurant === restaurant.name;
+      } catch (e) {
+        return false;
+      }
+    });
+    
+    restaurantDataKeys.forEach(key => {
+      delete fnbData[key];
+    });
+    
+    // Clear default breakfast outlet if it was this restaurant
+    if (defaultBreakfastOutlet.value === restaurant.name) {
+      defaultBreakfastOutlet.value = "";
+      localStorage.removeItem('defaultBreakfastOutlet');
+    }
+    
+    // Mark as unsaved
+    isSaved.value = false;
+    
+    alertService.success(`Restaurant "${restaurant.cover_name || restaurant.name}" deleted successfully!`);
+  }
+
+  async function resetToDefaultRestaurants() {
+    try {
+      // Reload restaurants from the server (this gets the original list)
+      const originalRestaurants = await getRestaurants();
+      
+      // Update the restaurant list
+      restaurantList.value = [...originalRestaurants];
+      originalRestaurantList.value = [...originalRestaurants];
+      
+      // Clear any F&B data for restaurants that no longer exist
+      const currentRestaurantNames = originalRestaurants.map(r => r.name);
+      const restaurantDataKeys = Object.keys(fnbData).filter(key => {
+        try {
+          const rowKeyObj = JSON.parse(key);
+          return rowKeyObj && rowKeyObj.restaurant && !currentRestaurantNames.includes(rowKeyObj.restaurant);
+        } catch (e) {
+          return false;
+        }
+      });
+      
+      restaurantDataKeys.forEach(key => {
+        delete fnbData[key];
+      });
+      
+      // Clear default breakfast outlet if it no longer exists
+      if (defaultBreakfastOutlet.value && !currentRestaurantNames.includes(defaultBreakfastOutlet.value)) {
+        defaultBreakfastOutlet.value = "";
+        localStorage.removeItem('defaultBreakfastOutlet');
+      }
+      
+      // Mark as unsaved
+      isSaved.value = false;
+      
+      alertService.success('Restaurant list reset to original successfully!');
+    } catch (error) {
+      console.error('Error resetting restaurants:', error);
+      alertService.error('Failed to reset restaurant list. Please try again.');
+    }
+  }
+
+  function cancelDeleteRestaurant() {
+    showDeleteRestaurantModal.value = false;
+    restaurantToDelete.value = null;
+  }
+
+  function confirmDeleteRestaurant() {
+    if (restaurantToDelete.value) {
+      deleteRestaurant(restaurantToDelete.value);
+      showDeleteRestaurantModal.value = false;
+      restaurantToDelete.value = null;
+    }
+  }
+
+  function cancelResetRestaurants() {
+    showResetRestaurantsModal.value = false;
+  }
+
+  function confirmResetRestaurants() {
+    resetToDefaultRestaurants();
+    showResetRestaurantsModal.value = false;
   }
   </script>
   
