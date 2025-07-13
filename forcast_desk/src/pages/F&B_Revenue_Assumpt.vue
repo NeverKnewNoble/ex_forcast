@@ -380,7 +380,7 @@
                                   {{ getAverageSpentPerFnbCustomer(year, 'Total') }}
                                 </span>
                                 <span class="font-mono text-xs text-violet-700" v-else>
-                                  {{ calculateFnbTotal(fnbData, row, year, getColumnLabelsForYearLocal(year), totalRooms) }}
+                                  {{ calculateDetailsRowTotal(row, year, getColumnLabelsForYearLocal(year)) }}
                                 </span>
                               </td>
                             </template>
@@ -390,7 +390,7 @@
                                   {{ getAverageSpentPerFnbCustomer(year, 'Total') }}
                                 </span>
                                 <span class="font-mono text-xs text-violet-700" v-else>
-                                  {{ calculateFnbTotal(fnbData, row, year, getColumnLabelsForYearLocal(year), totalRooms) }}
+                                  {{ calculateDetailsRowTotal(row, year, getColumnLabelsForYearLocal(year)) }}
                                 </span>
                               </td>
                             </template>
@@ -1576,6 +1576,64 @@
 
   // Patch getFnbCellValue for 'Number of Rooms Sold (excl.)' row
   function getFnbCellValue(fnbData, row, year, label, totalRooms) {
+    if (row === "Number of rooms") {
+      // Return the total rooms value
+      const roomsValue = totalRooms?.value || totalRooms || 0;
+      return roomsValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+    
+    if (row === "Days of the Month") {
+      // Calculate days for the month/quarter
+      if (typeof getDaysInMonth === 'function') {
+        let days = 0;
+        if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
+          // Quarterly mode - sum up days for all 3 months in the quarter
+          const quarterMonths = {
+            "Jan-Mar": ["Jan", "Feb", "Mar"],
+            "Apr-Jun": ["Apr", "May", "Jun"],
+            "Jul-Sep": ["Jul", "Aug", "Sep"],
+            "Oct-Dec": ["Oct", "Nov", "Dec"]
+          };
+          const months = quarterMonths[label];
+          for (const month of months) {
+            days += getDaysInMonth(year, month);
+          }
+        } else {
+          // Monthly mode - get days for single month
+          days = getDaysInMonth(year, label);
+        }
+        return days.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      }
+      return "0";
+    }
+    
+    if (row === "Number of rooms available") {
+      // Calculate: Days × Total Rooms
+      if (typeof getDaysInMonth === 'function') {
+        let days = 0;
+        if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
+          // Quarterly mode - sum up days for all 3 months in the quarter
+          const quarterMonths = {
+            "Jan-Mar": ["Jan", "Feb", "Mar"],
+            "Apr-Jun": ["Apr", "May", "Jun"],
+            "Jul-Sep": ["Jul", "Aug", "Sep"],
+            "Oct-Dec": ["Oct", "Nov", "Dec"]
+          };
+          const months = quarterMonths[label];
+          for (const month of months) {
+            days += getDaysInMonth(year, month);
+          }
+        } else {
+          // Monthly mode - get days for single month
+          days = getDaysInMonth(year, label);
+        }
+        const roomsValue = totalRooms?.value || totalRooms || 0;
+        const roomsAvailable = days * roomsValue;
+        return roomsAvailable.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      }
+      return "0";
+    }
+    
     if (row === "Number of Rooms Sold (excl.)") {
       // Prefer user override if present
       const userRaw = fnbData?.[row]?.[year]?.[label];
@@ -1585,13 +1643,35 @@
         return num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
       }
       // Otherwise, fallback to market segment value
-      const val = getTotalOccupiedRoomFromMarketSegmentation(year, label);
+      let val = 0;
+      if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
+        // Quarterly mode - sum up room nights from all 3 months in the quarter
+        const quarterMonths = {
+          "Jan-Mar": ["Jan", "Feb", "Mar"],
+          "Apr-Jun": ["Apr", "May", "Jun"],
+          "Jul-Sep": ["Jul", "Aug", "Sep"],
+          "Oct-Dec": ["Oct", "Nov", "Dec"]
+        };
+        const months = quarterMonths[label];
+        
+        for (const month of months) {
+          const monthVal = getTotalOccupiedRoomFromMarketSegmentation(year, month);
+          if (monthVal && monthVal > 0) {
+            val += monthVal;
+          }
+        }
+      } else {
+        // Monthly mode - get value for single month
+        val = getTotalOccupiedRoomFromMarketSegmentation(year, label);
+      }
+      
       if (val && val > 0) {
         return val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
       }
       // fallback to 0
       return "0";
     }
+    
     if (row === "Occupancy (excl.) %") {
       // Check if there's occupancy data available from Market Segmentation table
       // First, check if we have any room nights data for this year/month
@@ -1614,8 +1694,25 @@
       
       // If we have market segment data, calculate occupancy using the same logic as Market Segmentation table
       if (hasMarketSegmentData && typeof getDaysInMonth === 'function' && totalRooms) {
-        const days = getDaysInMonth(year, label);
-        const available = days * totalRooms;
+        let days = 0;
+        if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
+          // Quarterly mode - sum up days for all 3 months in the quarter
+          const quarterMonths = {
+            "Jan-Mar": ["Jan", "Feb", "Mar"],
+            "Apr-Jun": ["Apr", "May", "Jun"],
+            "Jul-Sep": ["Jul", "Aug", "Sep"],
+            "Oct-Dec": ["Oct", "Nov", "Dec"]
+          };
+          const months = quarterMonths[label];
+          for (const month of months) {
+            days += getDaysInMonth(year, month);
+          }
+        } else {
+          // Monthly mode - get days for single month
+          days = getDaysInMonth(year, label);
+        }
+        const roomsValue = totalRooms?.value || totalRooms || 0;
+        const available = days * roomsValue;
         if (available > 0) {
           const percent = (occupied / available) * 100;
           return percent.toFixed(2) + '%';
@@ -1631,8 +1728,25 @@
       // Final fallback: calculate from available data
       let available = 0;
       if (typeof getDaysInMonth === 'function' && totalRooms) {
-        const days = getDaysInMonth(year, label);
-        available = days * totalRooms;
+        let days = 0;
+        if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
+          // Quarterly mode - sum up days for all 3 months in the quarter
+          const quarterMonths = {
+            "Jan-Mar": ["Jan", "Feb", "Mar"],
+            "Apr-Jun": ["Apr", "May", "Jun"],
+            "Jul-Sep": ["Jul", "Aug", "Sep"],
+            "Oct-Dec": ["Oct", "Nov", "Dec"]
+          };
+          const months = quarterMonths[label];
+          for (const month of months) {
+            days += getDaysInMonth(year, month);
+          }
+        } else {
+          // Monthly mode - get days for single month
+          days = getDaysInMonth(year, label);
+        }
+        const roomsValue = totalRooms?.value || totalRooms || 0;
+        available = days * roomsValue;
       }
       let percent = 0;
       if (available > 0) {
@@ -1640,6 +1754,7 @@
       }
       return percent.toFixed(2) + '%';
     }
+    
     if (row === "Double occupancy") {
       // Use the double occupancy value from the modal settings
       const doubleOccupancyValue = doubleOccupancyByYear.value[year];
@@ -1654,6 +1769,7 @@
       // Default fallback
       return "0.00";
     }
+    
     if (row === "Number of guests") {
       // Calculate: Double occupancy × Number of rooms available
       // Get double occupancy value
@@ -1672,14 +1788,32 @@
       // Get number of rooms available
       let roomsAvailable = 0;
       if (typeof getDaysInMonth === 'function' && totalRooms) {
-        const days = getDaysInMonth(year, label);
-        roomsAvailable = days * totalRooms;
+        let days = 0;
+        if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
+          // Quarterly mode - sum up days for all 3 months in the quarter
+          const quarterMonths = {
+            "Jan-Mar": ["Jan", "Feb", "Mar"],
+            "Apr-Jun": ["Apr", "May", "Jun"],
+            "Jul-Sep": ["Jul", "Aug", "Sep"],
+            "Oct-Dec": ["Oct", "Nov", "Dec"]
+          };
+          const months = quarterMonths[label];
+          for (const month of months) {
+            days += getDaysInMonth(year, month);
+          }
+        } else {
+          // Monthly mode - get days for single month
+          days = getDaysInMonth(year, label);
+        }
+        const roomsValue = totalRooms?.value || totalRooms || 0;
+        roomsAvailable = days * roomsValue;
       }
       
       // Calculate number of guests
       const numberOfGuests = doubleOccupancy * roomsAvailable;
       return numberOfGuests.toFixed(2);
     }
+    
     if (row === "Average Room Rate") {
       // Use the exact same calculation as the Market Segmentation table's ADR row
       // This replicates the getADRTotal function from MarketSegmentationTables.vue
@@ -1691,9 +1825,36 @@
         for (const seg of MARKET_SEGMENTS) {
           if (seg.segment_category === "OTHER ROOMS REVENUE") continue;
           
-          // Get room rate and room nights for this segment
-          const roomRate = parseFloat(marketSegmentData.value?.[year]?.[seg.market_segment]?.[label]?.room_rate || 0);
-          const roomNights = Number(marketSegmentData.value?.[year]?.[seg.market_segment]?.[label]?.room_nights || 0);
+          let roomRate = 0;
+          let roomNights = 0;
+          
+          if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
+            // Quarterly mode - aggregate data from all 3 months in the quarter
+            const quarterMonths = {
+              "Jan-Mar": ["Jan", "Feb", "Mar"],
+              "Apr-Jun": ["Apr", "May", "Jun"],
+              "Jul-Sep": ["Jul", "Aug", "Sep"],
+              "Oct-Dec": ["Oct", "Nov", "Dec"]
+            };
+            const months = quarterMonths[label];
+            
+            // Sum up room rates and room nights for all months in the quarter
+            for (const month of months) {
+              const monthRoomRate = parseFloat(marketSegmentData.value?.[year]?.[seg.market_segment]?.[month]?.room_rate || 0);
+              const monthRoomNights = Number(marketSegmentData.value?.[year]?.[seg.market_segment]?.[month]?.room_nights || 0);
+              
+              // For room rate, we'll use the average (since it's typically consistent)
+              roomRate += monthRoomRate;
+              roomNights += monthRoomNights;
+            }
+            
+            // Average the room rate across the quarter
+            roomRate = roomRate / 3;
+          } else {
+            // Monthly mode - get data for single month
+            roomRate = parseFloat(marketSegmentData.value?.[year]?.[seg.market_segment]?.[label]?.room_rate || 0);
+            roomNights = Number(marketSegmentData.value?.[year]?.[seg.market_segment]?.[label]?.room_nights || 0);
+          }
           
           if (roomRate > 0 && roomNights > 0) {
             // Calculate ADR for this segment using the same formula as Market Segmentation table
@@ -1725,6 +1886,7 @@
       // Default fallback
       return "0.00";
     }
+    
     if (row === "Revenue Per Available Room") {
       // Calculate: Occupancy (excl.) % × Average Room Rate
       
@@ -1747,6 +1909,7 @@
       const revpar = occupancyPercent * averageRoomRate;
       return revpar.toFixed(2);
     }
+    
     // fallback to original logic for other rows
     // Add debug for Total Cover row
     try {
@@ -1971,6 +2134,229 @@
     if (totalCovers === 0) return '0.00';
     const avg = totalFnbRevenue / totalCovers;
     return avg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // Custom total calculation for Details section rows
+  function calculateDetailsRowTotal(row, year, labels) {
+    // Special handling for different row types
+    if (row === "Number of rooms") {
+      // Total rooms is the same for all periods
+      return totalRooms.value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+    
+    if (row === "Days of the Month") {
+      // Sum up all days for the year
+      let totalDays = 0;
+      for (const label of labels) {
+        if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
+          // Quarterly mode
+          const quarterMonths = {
+            "Jan-Mar": ["Jan", "Feb", "Mar"],
+            "Apr-Jun": ["Apr", "May", "Jun"],
+            "Jul-Sep": ["Jul", "Aug", "Sep"],
+            "Oct-Dec": ["Oct", "Nov", "Dec"]
+          };
+          const months = quarterMonths[label];
+          for (const month of months) {
+            totalDays += getDaysInMonth(year, month);
+          }
+        } else {
+          // Monthly mode
+          totalDays += getDaysInMonth(year, label);
+        }
+      }
+      return totalDays.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+    
+    if (row === "Number of rooms available") {
+      // Sum up all rooms available for the year
+      let totalRoomsAvailable = 0;
+      for (const label of labels) {
+        let days = 0;
+        if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
+          // Quarterly mode
+          const quarterMonths = {
+            "Jan-Mar": ["Jan", "Feb", "Mar"],
+            "Apr-Jun": ["Apr", "May", "Jun"],
+            "Jul-Sep": ["Jul", "Aug", "Sep"],
+            "Oct-Dec": ["Oct", "Nov", "Dec"]
+          };
+          const months = quarterMonths[label];
+          for (const month of months) {
+            days += getDaysInMonth(year, month);
+          }
+        } else {
+          // Monthly mode
+          days = getDaysInMonth(year, label);
+        }
+        totalRoomsAvailable += days * totalRooms.value;
+      }
+      return totalRoomsAvailable.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+    
+    if (row === "Number of Rooms Sold (excl.)") {
+      // Sum up all rooms sold for the year
+      let totalRoomsSold = 0;
+      for (const label of labels) {
+        const roomsSold = getFnbCellValue(fnbData, row, year, label, totalRooms);
+        totalRoomsSold += parseFloat((roomsSold || '0').toString().replace(/,/g, '')) || 0;
+      }
+      return totalRoomsSold.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+    
+    if (row === "Occupancy (excl.) %") {
+      // Calculate weighted average occupancy for the year
+      let totalOccupied = 0;
+      let totalAvailable = 0;
+      
+      for (const label of labels) {
+        const occupancyValue = getFnbCellValue(fnbData, row, year, label, totalRooms);
+        const occupancyPercent = parseFloat((occupancyValue || '0%').toString().replace('%', '')) || 0;
+        
+        // Get rooms available for this period
+        let days = 0;
+        if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
+          const quarterMonths = {
+            "Jan-Mar": ["Jan", "Feb", "Mar"],
+            "Apr-Jun": ["Apr", "May", "Jun"],
+            "Jul-Sep": ["Jul", "Aug", "Sep"],
+            "Oct-Dec": ["Oct", "Nov", "Dec"]
+          };
+          const months = quarterMonths[label];
+          for (const month of months) {
+            days += getDaysInMonth(year, month);
+          }
+        } else {
+          days = getDaysInMonth(year, label);
+        }
+        const roomsAvailable = days * totalRooms.value;
+        
+        totalOccupied += (occupancyPercent / 100) * roomsAvailable;
+        totalAvailable += roomsAvailable;
+      }
+      
+      if (totalAvailable > 0) {
+        const avgOccupancy = (totalOccupied / totalAvailable) * 100;
+        return avgOccupancy.toFixed(2) + '%';
+      }
+      return '0.00%';
+    }
+    
+    if (row === "Double occupancy") {
+      // For double occupancy, return the value for the year (should be consistent)
+      const doubleOccupancyValue = doubleOccupancyByYear.value[year];
+      if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null) {
+        return doubleOccupancyValue.toFixed(2);
+      }
+      // Fallback: calculate average if no year value
+      let total = 0;
+      let count = 0;
+      for (const label of labels) {
+        const value = getFnbCellValue(fnbData, row, year, label, totalRooms);
+        const numValue = parseFloat((value || '0').toString().replace(/,/g, '')) || 0;
+        total += numValue;
+        count++;
+      }
+      return count > 0 ? (total / count).toFixed(2) : '0.00';
+    }
+    
+    if (row === "Number of guests") {
+      // Sum up all guests for the year
+      let totalGuests = 0;
+      for (const label of labels) {
+        const guests = getFnbCellValue(fnbData, row, year, label, totalRooms);
+        totalGuests += parseFloat((guests || '0').toString().replace(/,/g, '')) || 0;
+      }
+      return totalGuests.toFixed(2);
+    }
+    
+    if (row === "Average Room Rate") {
+      // Calculate weighted average room rate for the year
+      let totalRevenue = 0;
+      let totalOccupied = 0;
+      
+      for (const label of labels) {
+        const roomRate = getFnbCellValue(fnbData, row, year, label, totalRooms);
+        const rateValue = parseFloat((roomRate || '0').toString().replace(/,/g, '')) || 0;
+        
+        // Get rooms sold for this period
+        const roomsSold = getFnbCellValue(fnbData, "Number of Rooms Sold (excl.)", year, label, totalRooms);
+        const roomsSoldValue = parseFloat((roomsSold || '0').toString().replace(/,/g, '')) || 0;
+        
+        totalRevenue += rateValue * roomsSoldValue;
+        totalOccupied += roomsSoldValue;
+      }
+      
+      if (totalOccupied > 0) {
+        const avgRate = totalRevenue / totalOccupied;
+        return avgRate.toFixed(2);
+      }
+      return '0.00';
+    }
+    
+    if (row === "Revenue Per Available Room") {
+      // Calculate weighted average RevPAR for the year
+      let totalRevenue = 0;
+      let totalAvailable = 0;
+      
+      for (const label of labels) {
+        const revpar = getFnbCellValue(fnbData, row, year, label, totalRooms);
+        const revparValue = parseFloat((revpar || '0').toString().replace(/,/g, '')) || 0;
+        
+        // Get rooms available for this period
+        let days = 0;
+        if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
+          const quarterMonths = {
+            "Jan-Mar": ["Jan", "Feb", "Mar"],
+            "Apr-Jun": ["Apr", "May", "Jun"],
+            "Jul-Sep": ["Jul", "Aug", "Sep"],
+            "Oct-Dec": ["Oct", "Nov", "Dec"]
+          };
+          const months = quarterMonths[label];
+          for (const month of months) {
+            days += getDaysInMonth(year, month);
+          }
+        } else {
+          days = getDaysInMonth(year, label);
+        }
+        const roomsAvailable = days * totalRooms.value;
+        
+        totalRevenue += revparValue * roomsAvailable;
+        totalAvailable += roomsAvailable;
+      }
+      
+      if (totalAvailable > 0) {
+        const avgRevpar = totalRevenue / totalAvailable;
+        return avgRevpar.toFixed(2);
+      }
+      return '0.00';
+    }
+    
+    if (row === "Average Spent Per F&B Customer") {
+      // Calculate weighted average for the year
+      let totalRevenue = 0;
+      let totalCovers = 0;
+      
+      for (const label of labels) {
+        const avgSpent = getAverageSpentPerFnbCustomer(year, label);
+        const avgSpentValue = parseFloat((avgSpent || '0').toString().replace(/,/g, '')) || 0;
+        
+        const covers = calculateTotalCovers(year, label);
+        const coversValue = parseFloat((covers || '0').toString().replace(/,/g, '')) || 0;
+        
+        totalRevenue += avgSpentValue * coversValue;
+        totalCovers += coversValue;
+      }
+      
+      if (totalCovers > 0) {
+        const avgSpent = totalRevenue / totalCovers;
+        return avgSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      return '0.00';
+    }
+    
+    // Default: use the original calculateFnbTotal function
+    return calculateFnbTotal(fnbData, row, year, labels, totalRooms);
   }
 
   function deleteRestaurant(restaurant) {

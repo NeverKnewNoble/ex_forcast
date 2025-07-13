@@ -1,0 +1,245 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Local Promotion",
+  "modified": "2025-07-01 13:02:42.436884",
+  "module": "Ex Forcast",
+  "name": "Local Promotion",
+  "segment_category": "DISCOUNT"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "OTA Promotion / OTA Package",
+  "modified": "2025-07-01 13:03:10.247703",
+  "module": "Ex Forcast",
+  "name": "OTA Promotion / OTA Package",
+  "segment_category": "DISCOUNT"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Loyalty",
+  "modified": "2025-07-01 13:04:12.856814",
+  "module": "Ex Forcast",
+  "name": "Loyalty",
+  "segment_category": "DISCOUNT"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Staff Rate Discount / Management Discretion Discount",
+  "modified": "2025-07-01 13:05:13.425819",
+  "module": "Ex Forcast",
+  "name": "Staff Rate Discount / Management Discretion Discount",
+  "segment_category": "QUALIFIED"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Members Discount - Government Mandated",
+  "modified": "2025-07-01 13:05:46.309089",
+  "module": "Ex Forcast",
+  "name": "Members Discount - Government Mandated",
+  "segment_category": "QUALIFIED"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Negotiated Global",
+  "modified": "2025-07-01 13:06:53.697763",
+  "module": "Ex Forcast",
+  "name": "Negotiated Global",
+  "segment_category": "NEGOTIATED (CORPORATE)"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Negotiated Local",
+  "modified": "2025-07-01 13:07:18.110145",
+  "module": "Ex Forcast",
+  "name": "Negotiated Local",
+  "segment_category": "NEGOTIATED (CORPORATE)"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Government Global / Local",
+  "modified": "2025-07-01 13:08:26.878407",
+  "module": "Ex Forcast",
+  "name": "Government Global / Local",
+  "segment_category": "NEGOTIATED (CORPORATE)"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "TMC / Consortia",
+  "modified": "2025-07-01 13:08:45.868194",
+  "module": "Ex Forcast",
+  "name": "TMC / Consortia",
+  "segment_category": "NEGOTIATED (CORPORATE)"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Wholesale Dynamic",
+  "modified": "2025-07-01 13:09:16.505916",
+  "module": "Ex Forcast",
+  "name": "Wholesale Dynamic",
+  "segment_category": "WHOLESALE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Wholesale Allotment / Static",
+  "modified": "2025-07-01 13:09:32.949868",
+  "module": "Ex Forcast",
+  "name": "Wholesale Allotment / Static",
+  "segment_category": "WHOLESALE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Transient Tours / Travel",
+  "modified": "2025-07-01 13:09:47.236091",
+  "module": "Ex Forcast",
+  "name": "Transient Tours / Travel",
+  "segment_category": "WHOLESALE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Groups Corporate",
+  "modified": "2025-07-01 13:10:22.582560",
+  "module": "Ex Forcast",
+  "name": "Groups Corporate",
+  "segment_category": "GROUP ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Groups Government",
+  "modified": "2025-07-01 13:11:04.158314",
+  "module": "Ex Forcast",
+  "name": "Groups Government",
+  "segment_category": "GROUP ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Groups Association / Conventions / Events",
+  "modified": "2025-07-01 13:11:35.172088",
+  "module": "Ex Forcast",
+  "name": "Groups Association / Conventions / Events",
+  "segment_category": "GROUP ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Groups Sports",
+  "modified": "2025-07-01 13:11:52.241949",
+  "module": "Ex Forcast",
+  "name": "Groups Sports",
+  "segment_category": "GROUP ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Groups Tours / Wholesalers",
+  "modified": "2025-07-01 13:12:09.038886",
+  "module": "Ex Forcast",
+  "name": "Groups Tours / Wholesalers",
+  "segment_category": "GROUP ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Groups S.M.E.R.F",
+  "modified": "2025-07-01 13:12:25.680343",
+  "module": "Ex Forcast",
+  "name": "Groups S.M.E.R.F",
+  "segment_category": "GROUP ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Long Term Stays",
+  "modified": "2025-07-01 13:13:12.677932",
+  "module": "Ex Forcast",
+  "name": "Long Term Stays",
+  "segment_category": "CONTRACT ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "COMPLIMENTERY ROOMS",
+  "modified": "2025-07-01 13:13:35.126313",
+  "module": "Ex Forcast",
+  "name": "COMPLIMENTERY ROOMS",
+  "segment_category": "OTHER ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "HOUSE USE ROOMS",
+  "modified": "2025-07-01 13:13:55.062952",
+  "module": "Ex Forcast",
+  "name": "HOUSE USE ROOMS",
+  "segment_category": "OTHER ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "NO-SHOW /DAY USE / EXTRA BED / LATE CHECK OUT",
+  "modified": "2025-07-01 13:14:12.392770",
+  "module": "Ex Forcast",
+  "name": "NO-SHOW /DAY USE / EXTRA BED / LATE CHECK OUT",
+  "segment_category": "OTHER ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Crew",
+  "modified": "2025-07-01 13:12:57.018639",
+  "module": "Ex Forcast",
+  "name": "Crew",
+  "segment_category": "CONTRACT ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Hotel Discount",
+  "modified": "2025-07-01 13:03:45.952828",
+  "module": "Ex Forcast",
+  "name": "Hotel Discount",
+  "segment_category": "DISCOUNT"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "OTA Retail",
+  "modified": "2025-07-01 13:01:32.847906",
+  "module": "Ex Forcast",
+  "name": "OTA Retail",
+  "segment_category": "RETAIL"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Direct Retail",
+  "modified": "2025-07-01 13:01:09.596635",
+  "module": "Ex Forcast",
+  "name": "Direct Retail",
+  "segment_category": "RETAIL"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Global Promotion",
+  "modified": "2025-07-01 13:02:14.776498",
+  "module": "Ex Forcast",
+  "name": "Global Promotion",
+  "segment_category": "DISCOUNT"
+ }
+]

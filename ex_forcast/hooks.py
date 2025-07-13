@@ -267,7 +267,6 @@ fixtures = [
             {"doctype": "Room Packages", "filters": [["module" , "in" , ("Ex Forcast" )]]},
             {"doctype": "Segment Category", "filters": [["module" , "in" , ("Ex Forcast" )]]},
             {"doctype": "Room Market Segment", "filters": [["module" , "in" , ("Ex Forcast" )]]},
-            {"doctype": "Cover Details", "filters": [["module" , "in" , ("Ex Forcast" )]]},
 ]
 
 
