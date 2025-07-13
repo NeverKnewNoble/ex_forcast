@@ -1,0 +1,66 @@
+[
+ {
+  "category_name": "QUALIFIED",
+  "docstatus": 0,
+  "doctype": "Segment Category",
+  "modified": "2025-06-30 14:59:23.685823",
+  "module": "Ex Forcast",
+  "name": "QUALIFIED"
+ },
+ {
+  "category_name": "CONTRACT ROOMS REVENUE",
+  "docstatus": 0,
+  "doctype": "Segment Category",
+  "modified": "2025-06-30 15:05:55.178688",
+  "module": "Ex Forcast",
+  "name": "CONTRACT ROOMS REVENUE"
+ },
+ {
+  "category_name": "WHOLESALE",
+  "docstatus": 0,
+  "doctype": "Segment Category",
+  "modified": "2025-06-30 15:03:40.447302",
+  "module": "Ex Forcast",
+  "name": "WHOLESALE"
+ },
+ {
+  "category_name": "OTHER ROOMS REVENUE",
+  "docstatus": 0,
+  "doctype": "Segment Category",
+  "modified": "2025-06-30 15:06:27.850613",
+  "module": "Ex Forcast",
+  "name": "OTHER ROOMS REVENUE"
+ },
+ {
+  "category_name": "RETAIL",
+  "docstatus": 0,
+  "doctype": "Segment Category",
+  "modified": "2025-06-30 15:01:07.759400",
+  "module": "Ex Forcast",
+  "name": "RETAIL"
+ },
+ {
+  "category_name": "NEGOTIATED (CORPORATE)",
+  "docstatus": 0,
+  "doctype": "Segment Category",
+  "modified": "2025-06-30 15:00:16.947292",
+  "module": "Ex Forcast",
+  "name": "NEGOTIATED (CORPORATE)"
+ },
+ {
+  "category_name": "DISCOUNT",
+  "docstatus": 0,
+  "doctype": "Segment Category",
+  "modified": "2025-06-30 14:58:58.185831",
+  "module": "Ex Forcast",
+  "name": "DISCOUNT"
+ },
+ {
+  "category_name": "GROUP ROOMS REVENUE",
+  "docstatus": 0,
+  "doctype": "Segment Category",
+  "modified": "2025-06-30 15:05:17.930734",
+  "module": "Ex Forcast",
+  "name": "GROUP ROOMS REVENUE"
+ }
+]
