@@ -101,7 +101,7 @@ const menuItems = [
   { text: "Expense Assumptions", route: "/expense_estimate", icon: Calculator   },
   { text: "Room Revenue Assumptions", route: "/room_revenue_assumptions", icon: BedDouble },
   { text: "F&B Revenue Assumptions", route: "/f&b_revenue_assumptions", icon: UtensilsCrossed },
-  { text: "Banquet Revenue Forcast", route: "/", icon: HandPlatter},
+  { text: "Banquet Revenue Forcast", route: "/banquet_revenue", icon: HandPlatter},
   { text: "Profit & Loss Statement", route: "/", icon: ChartNoAxesCombined  },
 ]
 

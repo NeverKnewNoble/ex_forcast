@@ -3,7 +3,7 @@
     <div class="mb-4">
       <div class="flex items-center gap-2 mb-3">
         <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
-          <BedDouble class="w-3 h-3 text-white" />
+          <Table class="w-3 h-3 text-white" />
         </div>
         <h2 class="text-lg font-bold text-gray-800">Market Segmentation Overview</h2>
       </div>
@@ -937,7 +937,7 @@
 
 <script setup>
 import { ref, watch, onMounted, nextTick } from 'vue';
-import { BedDouble, DollarSign, Calculator, ChevronDown, ChevronRight, Plus, X, Trash2, Edit3 } from 'lucide-vue-next';
+import { BedDouble, Table, DollarSign, Calculator, ChevronDown, ChevronRight, Plus, X, Trash2, Edit3 } from 'lucide-vue-next';
 import { AverageDailyRateCalculation } from '@/components/utility/room_revenue_assumpt./market_segments.js';
 import { getDaysInMonth, calculateTotalRoomCount } from '@/components/utility/room_revenue_assumpt./room_revenue_utils.js';
 import { 
