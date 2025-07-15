@@ -34,7 +34,7 @@ export async function saveFnbChanges(changedCells, isSaving, saveError, fnbData,
     for (const change of changedCells.value) {
       try {
         const rowKeyObj = JSON.parse(change.row);
-        console.log('Parsed rowKeyObj:', rowKeyObj);
+        // console.log('Parsed rowKeyObj:', rowKeyObj);
         
         // Skip calculated totals and invalid data
         if (rowKeyObj.type && (
@@ -77,7 +77,7 @@ export async function saveFnbChanges(changedCells, isSaving, saveError, fnbData,
       // Mark as saved
       isSaved.value = true;
       
-      alertService.success(`Successfully saved ${changes.length} changes`);
+      alertService.success(`Successfully saved changes`);
     } else {
       const errorMsg = typeof result.message?.message === 'string' ? result.message.message : 'Save failed.';
       throw new Error(errorMsg);

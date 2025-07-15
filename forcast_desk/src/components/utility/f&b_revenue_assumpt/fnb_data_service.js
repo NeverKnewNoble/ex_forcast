@@ -39,7 +39,7 @@ export async function loadFnbRevenueData() {
  */
 export async function saveFnbRevenueChanges(changes) {
   try {
-    console.log('Sending F&B revenue changes to server:', changes);
+    // console.log('Sending F&B revenue changes to server:', changes);
     
     // Create form data
     const formData = new FormData();
@@ -57,7 +57,7 @@ export async function saveFnbRevenueChanges(changes) {
     }
     
     const result = await response.json();
-    console.log('Server response:', result);
+    // console.log('Server response:', result);
     
     if (result.message?.status === 'error') {
       throw new Error(result.message.message);

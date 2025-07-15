@@ -61,7 +61,7 @@ export function getDaysInMonth(year, month) {
   
   const monthIndex = monthMap[month]
   if (monthIndex === undefined) {
-    console.warn(`Invalid month: ${month}`)
+    // console.warn(`Invalid month: ${month}`)
     return 0
   }
   

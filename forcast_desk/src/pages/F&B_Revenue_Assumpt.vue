@@ -9,7 +9,7 @@
           <!-- Left Sidebar - Filters and Controls -->
           <div :class="['bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 min-h-screen flex flex-col shadow-sm transition-all duration-300', sidebarCollapsed ? 'w-14 p-2' : 'w-80 p-6']">
             <!-- Collapse/Expand Button -->
-            <button @click="sidebarCollapsed = !sidebarCollapsed" class="mb-6 flex items-center gap-2 px-3 py-2 bg-violet-100 hover:bg-violet-200 rounded-lg transition-all duration-200 hover:shadow-md">
+            <button @click="sidebarCollapsed = !sidebarCollapsed" class="mb-4 flex items-center gap-2 px-3 py-2 bg-violet-100 hover:bg-violet-200 rounded-lg transition-all duration-200 hover:shadow-md">
               <ChevronLeft v-if="!sidebarCollapsed" class="w-4 h-4 text-violet-700" />
               <ChevronRight v-else class="w-4 h-4 text-violet-700" />
               <span v-if="!sidebarCollapsed" class="text-violet-700 text-sm font-medium">Collapse</span>
@@ -18,15 +18,15 @@
                 <div v-show="!sidebarCollapsed">
                   <!-- Header Section -->
                   <div class="mb-6">
-                    <div class="flex items-center gap-2 mb-3">
+                    <div class="flex items-center gap-3 mb-2">
                       <div class="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <UtensilsCrossed class="w-7 h-7 text-white" />
+                        <UtensilsCrossed class="w-7 h-7 mx-2 text-white" />
                       </div>
                       <div>
-                        <h1 class="text-xl font-bold text-gray-900 leading-tight">F&B Revenue Assumptions</h1>
+                        <h1 class="text-2xl font-bold text-gray-900">F&B Revenue Assumptions</h1>
                       </div>
                     </div>
-                    <p class="text-sm text-gray-600">Configure revenue projections and assumptions for your food & beverage operations</p>
+                    <p class="text-sm text-gray-500">Configure revenue projections and assumptions for your food & beverage operations</p>
                   </div>
   
   
@@ -266,9 +266,9 @@
               <div class="mb-4 flex items-center gap-2">
                   <div class="flex items-center gap-2">
                     <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
-                    <UtensilsCrossed class="w-3 h-3 text-white" />
+                    <Table class="w-3 h-3 text-white" />
                     </div>
-                    <h2 class="text-lg font-bold text-gray-800">F&amp;B Revenue Overview</h2>
+                    <h2 class="text-lg font-bold text-gray-800">F&B Revenue Overview</h2>
                   </div>
               </div>
               <!-- Move Create Restaurant button here -->
@@ -362,7 +362,7 @@
                         >
                           <td class="px-4 py-2 font-medium border-r border-violet-200 flex items-center justify-between">
                             <span>{{ row }}</span>
-                            <span v-if="row === 'Number of rooms' || row === 'Days of the Month' || row === 'Number of rooms available' || row === 'Number of Rooms Sold (excl.)' || row === 'Occupancy (excl.) %' || row === 'Number of guests' || row === 'Average Spent Per F&B Customer' || row === 'Average Room Rate' || row === 'Revenue Per Available Room'" class="text-xs bg-violet-600 text-white px-2 py-0.5 rounded-full">
+                            <span v-if="row === 'Number of rooms' || row === 'Days of the Month' || row === 'Number of rooms available' || row === 'Number of Rooms Sold (excl.)' || row === 'Occupancy (excl.) %' || row === 'Number of guests' || row === 'Average Spent Per F&B Customer' || row === 'Average Room Rate' || row === 'Revenue Per Available Room'" class="px-2 py-0.5 rounded bg-violet-100 text-violet-700 text-[10px] font-semibold border border-violet-200 ">
                               Auto
                             </span>
                           </td>
@@ -429,7 +429,7 @@
                             <tr v-for="row in section.rows" :key="row">
                               <td class="px-4 py-2 text-gray-700 border-b border-gray-50 flex items-center justify-between">
                                 <span class="ml-8">{{ row }}</span>
-                                <span v-if="isRestaurantRowAutoCalculated(restaurant.name, section.section, row)" class="text-xs bg-violet-600 text-white px-2 py-0.5 rounded-full">
+                                <span v-if="isRestaurantRowAutoCalculated(restaurant.name, section.section, row)" class="px-2 py-0.5 rounded bg-violet-100 text-violet-700 text-[10px] font-semibold border border-violet-200 ">
                                   Auto
                                 </span>
                               </td>
@@ -681,7 +681,7 @@
             </button>
             <button
               v-if="visibleYears.length"
-              @click="applyAdvancedSettings"
+              @click="applyAdvancedSettings(advancedModes)"
               class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2"
             >
               <Check class="w-4 h-4" />
@@ -751,7 +751,7 @@
             </button>
             <button
               v-if="visibleYears.length"
-              @click="applyDoubleOccupancySettings"
+              @click="applyDoubleOccupancySettings(doubleOccupancyByYear)"
               class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2"
             >
               <Check class="w-4 h-4" />
@@ -761,45 +761,8 @@
         </div>
       </div>
     </transition>
-  
-  
-    <!-- Unsaved Changes Warning Modal -->
-    <transition name="fade">
-      <div
-        v-if="showUnsavedWarning"
-        class="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
-      >
-        <div class="bg-white rounded-xl p-6 w-[90%] max-w-md shadow-xl border border-red-200">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-              <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-              </svg>
-            </div>
-            <h2 class="text-xl font-semibold text-gray-800">Unsaved Changes</h2>
-          </div>
-          
-          <p class="text-gray-600 mb-6">
-            You have unsaved changes that may be discarded if you leave this page. Are you sure you want to continue?
-          </p>
-          
-          <div class="flex justify-end gap-3">
-            <button
-              @click="cancelNavigation"
-              class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium"
-            >
-              Stay on Page
-            </button>
-            <button
-              @click="confirmNavigation"
-              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all font-medium"
-            >
-              Leave Anyway
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
+    
+
   
     <!-- Create Restaurant Modal -->
     <transition name="fade">
@@ -915,7 +878,7 @@
             </button>
             <button
               v-if="restaurantList.length"
-              @click="applyDefaultBreakfastSettings"
+              @click="applyDefaultBreakfastSettings(defaultBreakfastOutlet)"
               :disabled="!tempDefaultBreakfastOutlet"
               class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -970,7 +933,7 @@
             </button>
             <button
               v-if="restaurantToDelete"
-              @click="confirmDeleteRestaurant"
+              @click="confirmDeleteRestaurant(deleteRestaurant)"
               class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 flex items-center gap-2"
             >
               <Delete class="w-4 h-4" />
@@ -1011,7 +974,7 @@
               Cancel
             </button>
             <button
-              @click="confirmResetRestaurants"
+              @click="confirmResetRestaurants(resetToDefaultRestaurants)"
               class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2"
             >
               <Check class="w-4 h-4" />
@@ -1028,6 +991,10 @@
   
   
   
+
+
+
+  
   <script setup>
   import { ref, onMounted, computed, watch, onUnmounted, reactive } from "vue";
   import Sidebar from "@/components/ui/Sidebar.vue";
@@ -1035,6 +1002,7 @@
     AlertTriangle, 
     UtensilsCrossed, 
     RefreshCw, 
+    Table,
     ChevronLeft, 
     ChevronRight, 
     Calendar,  
@@ -1066,7 +1034,6 @@
     getExpenseFieldOptions
   } from "@/components/utility/expense_assumption/index.js";
   import { cloneDeep } from 'lodash-es';
-  import { saveChanges } from "@/components/utility/expense_assumption/save_changes.js";
   import { 
     createRestaurant, 
     getRestaurants, 
@@ -1078,14 +1045,46 @@
     handleFnbCellFocus,
     calculateFnbTotal,
     loadFnbRevenueDataForFrontend,
-    saveFnbChanges
+    saveFnbChanges,
+    // Modal utilities
+    showAdvanced,
+    showDoubleOccupancyModal,
+    showDefaultBreakfastModal,
+    showCreateRestaurantModal,
+    showDeleteRestaurantModal,
+    showResetRestaurantsModal,
+    showUnsavedWarning,
+    tempAdvancedModes,
+    tempDoubleOccupancyByYear,
+    tempDefaultBreakfastOutlet,
+    newRestaurantName,
+    isCreatingRestaurant,
+    createRestaurantError,
+    restaurantToDelete,
+    applyAdvancedSettings,
+    cancelAdvancedSettings,
+    applyDoubleOccupancySettings,
+    cancelDoubleOccupancySettings,
+    applyDefaultBreakfastSettings,
+    cancelDefaultBreakfastSettings,
+    handleCreateRestaurant as handleCreateRestaurantUtil,
+    cancelDeleteRestaurant,
+    confirmDeleteRestaurant,
+    cancelResetRestaurants,
+    confirmResetRestaurants,
+    cancelNavigation,
+    confirmNavigation,
+    allowOnlyNumbers,
+    handleDoubleOccupancyInput,
+    handleBeforeUnload,
+    setupModalWatchers,
+    cleanupModalListeners
   } from "@/components/utility/f&b_revenue_assumpt/index.js";
   import { getMarketSegmentList } from "@/components/utility/room_revenue_assumpt./data_service.js";
   import { MARKET_SEGMENTS } from "@/components/utility/room_revenue_assumpt./market_segments.js";
   import { getDaysInMonth } from "@/components/utility/room_revenue_assumpt./room_revenue_utils.js";
  
   
-
 
 
   // Move totalRooms declaration here
@@ -1097,9 +1096,7 @@
   const displayMode = ref("monthly");
   const expenses = ref([]);
   const expenseData = ref({});
-  const showAdvanced = ref(false);
   const advancedModes = ref({});
-  const tempAdvancedModes = ref({});
   const expenseOptions = ref([]);
   const hospitalityExperience = ref(
     localStorage.getItem('hospitalityExperience') === null
@@ -1113,31 +1110,12 @@
   const changedCells = ref([]); // {year, label, expense, newValue}
   const isSaving = ref(false);
   const saveError = ref("");
-  const showUnsavedWarning = ref(false);
   // const pendingNavigation = ref(null); // Store the pending navigation action
   const sidebarCollapsed = ref(false);
-  const showCreateRestaurantModal = ref(false);
-  const newRestaurantName = ref("");
-  const isCreatingRestaurant = ref(false);
-  const createRestaurantError = ref("");
-  
   // Double Occupancy Modal State
-  const showDoubleOccupancyModal = ref(false);
   const doubleOccupancyByYear = ref({});
-  const tempDoubleOccupancyByYear = ref({});
-  
   // Default Breakfast Outlet Modal State
-  const showDefaultBreakfastModal = ref(false);
   const defaultBreakfastOutlet = ref("");
-  const tempDefaultBreakfastOutlet = ref("");
-  
-  // Delete Restaurant Modal State
-  const showDeleteRestaurantModal = ref(false);
-  const restaurantToDelete = ref(null);
-  
-  // Reset Restaurants Modal State
-  const showResetRestaurantsModal = ref(false);
-  
   const fnbRows = [
     "Number of rooms",
     "Days of the Month",
@@ -1152,11 +1130,6 @@
   ]
   const fnbData = reactive({}); // { [rowLabel]: { [year]: { [month]: value, ... } } }
   const originalFnbData = ref({}); // Store original F&B data for comparison
-  
-  // Debug: Log fnbData initialization
-  // console.log('fnbData initialized:', fnbData.value, typeof fnbData.value);
-  // const fnbChangedCells = ref([]); // {row, year, label, newValue}
-  // const fnbIsSaved = ref(true);
   const restaurantList = ref([]);
   const originalRestaurantList = ref([]); // Store original restaurant list for reset functionality
   const defaultRestaurantRows = getDefaultRestaurantRows();
@@ -1239,86 +1212,8 @@
     }
   }, 3000);
   
-  // When opening the modal, copy the current settings
-  watch(showAdvanced, (val) => {
-    if (val) {
-      tempAdvancedModes.value = { ...advancedModes.value };
-    }
-  });
-  
-  // When opening the double occupancy modal, copy the current settings
-  watch(showDoubleOccupancyModal, (val) => {
-    if (val) {
-      tempDoubleOccupancyByYear.value = { ...doubleOccupancyByYear.value };
-    }
-  });
-  
-  // When opening the default breakfast outlet modal, copy the current setting
-  watch(showDefaultBreakfastModal, (val) => {
-    if (val) {
-      tempDefaultBreakfastOutlet.value = defaultBreakfastOutlet.value;
-    }
-  });
-  
-  function applyAdvancedSettings() {
-    advancedModes.value = { ...tempAdvancedModes.value };
-    showAdvanced.value = false;
-  }
-  
-  function cancelAdvancedSettings() {
-    showAdvanced.value = false;
-  }
-  
-  function applyDoubleOccupancySettings() {
-    doubleOccupancyByYear.value = { ...tempDoubleOccupancyByYear.value };
-    // Save to localStorage for persistence
-    localStorage.setItem('doubleOccupancyByYear', JSON.stringify(doubleOccupancyByYear.value));
-    showDoubleOccupancyModal.value = false;
-  }
-  
-  function cancelDoubleOccupancySettings() {
-    showDoubleOccupancyModal.value = false;
-  }
-  
-  function applyDefaultBreakfastSettings() {
-    defaultBreakfastOutlet.value = tempDefaultBreakfastOutlet.value;
-    // Save to localStorage for persistence
-    localStorage.setItem('defaultBreakfastOutlet', defaultBreakfastOutlet.value);
-    showDefaultBreakfastModal.value = false;
-    alertService.success('Default breakfast outlet updated successfully!');
-  }
-  
-  function cancelDefaultBreakfastSettings() {
-    showDefaultBreakfastModal.value = false;
-  }
-  
-  // Input validation functions
-  function allowOnlyNumbers(event) {
-    // Allow: backspace, delete, tab, escape, enter, decimal point
-    const allowedKeys = [8, 9, 27, 13, 46, 110, 190]; // backspace, tab, escape, enter, delete, decimal
-    const allowedKeyCodes = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57]; // 0-9
-    
-    if (allowedKeys.includes(event.keyCode) || allowedKeyCodes.includes(event.keyCode)) {
-      return;
-    }
-    
-    // Prevent the input
-    event.preventDefault();
-  }
-  
-  function handleDoubleOccupancyInput(event, year) {
-    // Remove any non-numeric characters except decimal point
-    let value = event.target.value.replace(/[^0-9.]/g, '');
-    
-    // Ensure only one decimal point
-    const parts = value.split('.');
-    if (parts.length > 2) {
-      value = parts[0] + '.' + parts.slice(1).join('');
-    }
-    
-    // Update the value
-    tempDoubleOccupancyByYear.value[year] = value;
-  }
+  // Setup modal watchers
+  setupModalWatchers(advancedModes, doubleOccupancyByYear, defaultBreakfastOutlet);
   
   // On mount, initialize years from localStorage if available
   onMounted(async () => {
@@ -1416,40 +1311,20 @@
   watch(isSaved, (newValue) => {
     if (!newValue) {
       // Add beforeunload event listener when there are unsaved changes
-      window.addEventListener('beforeunload', handleBeforeUnload);
+      window.addEventListener('beforeunload', (event) => handleBeforeUnload(event, isSaved));
     } else {
       // Remove beforeunload event listener when changes are saved
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('beforeunload', (event) => handleBeforeUnload(event, isSaved));
     }
   });
   
-  // Handle beforeunload event to show warning
-  function handleBeforeUnload(event) {
-    if (!isSaved.value) {
-      // Standard browser warning
-      event.preventDefault();
-      event.returnValue = 'You have unsaved changes that may be discarded if not saved. Are you sure you want to leave?';
-      return event.returnValue;
-    }
-  }
+
   
-  // Handle navigation cancellation
-  function cancelNavigation() {
-    showUnsavedWarning.value = false;
-  }
-  
-  // Handle navigation confirmation
-  function confirmNavigation() {
-    showUnsavedWarning.value = false;
-    // Allow the navigation to proceed by removing the event listener temporarily
-    window.removeEventListener('beforeunload', handleBeforeUnload);
-    // Trigger the actual navigation (refresh, close, etc.)
-    window.location.reload();
-  }
+
   
   // Clean up event listeners when component is unmounted
   onUnmounted(() => {
-    window.removeEventListener('beforeunload', handleBeforeUnload);
+    cleanupModalListeners();
   });
   
   // Refresh table functionality
@@ -1487,23 +1362,7 @@
   }
   
   async function handleCreateRestaurant() {
-    if (!newRestaurantName.value.trim()) {
-      createRestaurantError.value = "Restaurant name is required.";
-      return;
-    }
-    isCreatingRestaurant.value = true;
-    createRestaurantError.value = "";
-    const result = await createRestaurant({ cover_name: newRestaurantName.value });
-    isCreatingRestaurant.value = false;
-    if (result.success) {
-      alertService.success("Restaurant created successfully!");
-      showCreateRestaurantModal.value = false;
-      newRestaurantName.value = "";
-      // Refresh restaurant list to include the new restaurant
-      restaurantList.value = await getRestaurants();
-    } else {
-      createRestaurantError.value = result.error || "Failed to create restaurant.";
-    }
+    handleCreateRestaurantUtil(createRestaurant, getRestaurants, restaurantList);
   }
 
   // Collapsed years state
@@ -1928,7 +1787,6 @@
             doubleOccupancy = parseFloat(doubleOccupancyValue);
           }
           const breakfastCovers = doubleOccupancy * roomsAvailable;
-          // console.debug('[getFnbCellValue] Default Breakfast Outlet:', rowKeyObj.restaurant, 'Year:', year, 'Label:', label, 'days:', days, 'totalRooms:', totalRoomsValue, 'roomsAvailable:', roomsAvailable, 'doubleOccupancy:', doubleOccupancy, 'breakfastCovers:', breakfastCovers);
         }
       }
     } catch (e) {
@@ -2017,7 +1875,7 @@
       // Mark as unsaved
       if (isSaved.value) {
         isSaved.value = false;
-        console.log('Marked as unsaved');
+        // console.log('Marked as unsaved');
       }
     }
     
@@ -2429,27 +2287,7 @@
     }
   }
 
-  function cancelDeleteRestaurant() {
-    showDeleteRestaurantModal.value = false;
-    restaurantToDelete.value = null;
-  }
 
-  function confirmDeleteRestaurant() {
-    if (restaurantToDelete.value) {
-      deleteRestaurant(restaurantToDelete.value);
-      showDeleteRestaurantModal.value = false;
-      restaurantToDelete.value = null;
-    }
-  }
-
-  function cancelResetRestaurants() {
-    showResetRestaurantsModal.value = false;
-  }
-
-  function confirmResetRestaurants() {
-    resetToDefaultRestaurants();
-    showResetRestaurantsModal.value = false;
-  }
   </script>
   
   

@@ -31,6 +31,9 @@ export {
   extractAllExpenses
 } from './data_service.js';
 
+// Save changes functionality
+export { saveChanges } from './save_changes.js';
+
 // Table display and interaction
 export {
   collapsedYears,

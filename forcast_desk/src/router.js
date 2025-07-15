@@ -38,6 +38,11 @@ const routes = [
     path: '/f&b_revenue_assumptions',
     component: () => import('@/pages/F&B_Revenue_Assumpt.vue'),
   },
+  {
+    name: 'Banquet_Revenue',
+    path: '/banquet_revenue',
+    component: () => import('@/pages/Banquet_Revenue.vue'),
+  },
 ]
 
 let router = createRouter({
