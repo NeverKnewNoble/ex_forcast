@@ -1,0 +1,44 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:banquet_detail",
+ "creation": "2025-07-15 14:57:13.795448",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "banquet_detail"
+ ],
+ "fields": [
+  {
+   "fieldname": "banquet_detail",
+   "fieldtype": "Data",
+   "label": "Banquet Detail",
+   "unique": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-07-16 00:39:35.700223",
+ "modified_by": "Administrator",
+ "module": "Ex Forcast",
+ "name": "Banquet Details",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

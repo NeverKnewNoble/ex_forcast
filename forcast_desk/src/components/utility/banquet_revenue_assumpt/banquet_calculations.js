@@ -18,24 +18,34 @@ export function calcHallSpaceCharges(row) {
   return toNum(row.events) * toNum(row.avg_hall_space_charges_check);
 }
 
-export function calcGross(row) {
-  return (
-    // Always use the live auto-calculated values for these:
-    calcFood(row) +
-    calcLiquor(row) +
-    calcSoftDrinks(row) +
-    calcHallSpaceCharges(row) +
-    // The rest are manual fields, use as-is:
-    toNum(row.tobacco) +
-    toNum(row.non_fnb) +
-    toNum(row.outside_service_food_catering) +
-    toNum(row.outside_service_beverage_catering) +
-    toNum(row.others)
-  );
+// List of auto-calculated fields
+export const AUTO_CALC_FIELDS = ['food', 'liquor', 'soft_drinks', 'hall_space_charges'];
+// List of summary fields to exclude from gross sum
+export const SUMMARY_FIELDS = ['gross', 'net_amount', 'advance_bal', 'amount_per_event', 'amount_per_pax', 'avg_pax_per_event'];
+
+// Accepts row and a list of all field codes (static + custom)
+export function calcGross(row, allFieldCodes = []) {
+  // Always sum auto-calculated fields
+  let total = 0;
+  for (const code of AUTO_CALC_FIELDS) {
+    switch (code) {
+      case 'food': total += calcFood(row); break;
+      case 'liquor': total += calcLiquor(row); break;
+      case 'soft_drinks': total += calcSoftDrinks(row); break;
+      case 'hall_space_charges': total += calcHallSpaceCharges(row); break;
+    }
+  }
+  // Sum all other manual fields, including custom, except summary/calculated fields and auto-calculated
+  for (const code of allFieldCodes) {
+    if (!AUTO_CALC_FIELDS.includes(code) && !SUMMARY_FIELDS.includes(code)) {
+      total += toNum(row[code]);
+    }
+  }
+  return total;
 }
 
-export function calcNetAmount(row) {
-  return calcGross(row) - toNum(row.advance_bal || 0);
+export function calcNetAmount(row, allFieldCodes = []) {
+  return calcGross(row, allFieldCodes) - toNum(row.advance_bal || 0);
 }
 
 export function calcAmountPerEvent(row) {
