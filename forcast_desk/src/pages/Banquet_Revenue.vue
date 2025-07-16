@@ -195,6 +195,14 @@
                   </div>
                   <h2 class="text-lg font-bold text-gray-800">Banquet Revenue Assumptions Overview</h2>
                 </div>
+                <div class="flex gap-2 mt-2">
+                  <button @click="showAddBanquetDetail = true" class="px-3 py-1.5 bg-violet-600 text-white rounded hover:bg-violet-700 text-sm font-medium shadow transition-all">
+                    Add Banquet Detail
+                  </button>
+                  <button @click="resetToDefault" class="px-3 py-1.5 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm font-medium shadow transition-all">
+                    Reset to Default
+                  </button>
+                </div>
               </div>
   
               <!-- Modern Table Container -->
@@ -259,75 +267,78 @@
                         </tr>
                       </thead>
                       <tbody class="text-gray-700 bg-white text-sm">
-                        <template v-for="(field, idx) in BANQUET_FIELDS" :key="field.code">
+                        <template v-for="(field, idx) in computedBanquetFields" :key="field.code">
                           <tr
                             :class="[
                               'transition-all duration-200 border-b border-gray-100',
                               (['gross','net_amount'].includes(field.code)) ? 'bg-violet-700 text-white font-bold' : 'even:bg-gray-50 hover:bg-violet-50',
                             ]"
                           >
-                            <td class="px-3 py-2 font-medium border-r border-violet-200" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : 'text-gray-600'">
-                              <div class="flex items-center justify-between gap-1 w-full">
-                                <span class="flex items-center gap-1">
-                                  
-                                  {{ field.label }}
-                                </span>
+                            <td class="px-3 py-2 font-medium border-r border-violet-200 flex items-center justify-between" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : 'text-gray-600'">
+                              <span>{{ field.label }}</span>
+                              <div class="flex items-center gap-1">
                                 <span v-if="['food','liquor','soft_drinks','hall_space_charges','gross','net_amount','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)" class="px-2 py-0.5 rounded bg-violet-100 text-violet-700 text-[10px] font-semibold border border-violet-200 align-middle whitespace-nowrap">
                                   Auto
                                 </span>
-                                </div>
-                              </td>
+                                <span v-if="customBanquetFields.some(f => f.code === field.code)" class="px-2 py-0.5 rounded bg-green-100 text-green-700 text-[10px] font-semibold border border-green-200 align-middle whitespace-nowrap">
+                                  Custom
+                                </span>
+                                <button v-if="!['gross','net_amount','advance_bal','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)" @click="deleteBanquetDetail(field)" class="ml-2 text-red-500 hover:text-red-700" title="Delete">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                              </div>
+                            </td>
                             <template v-for="year in visibleYears" :key="'row-' + year + '-' + field.code">
-                                <template v-if="!isYearCollapsed(year)">
-                                  <td
-                                    v-if="['food','liquor','soft_drinks','hall_space_charges','gross','net_amount','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)"
-                                    v-for="label in getColumnLabelsForYearLocal(year)"
-                                    :key="'cell-' + year + '-' + label"
-                                    class="px-2 py-1 text-right border border-violet-200 bg-gray-50 font-semibold select-none"
-                                    :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : ''"
-                                  >
-                                    <span class="font-mono text-xs">
-                                      {{ formatBanquetValue(field.code, getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}
-                                    </span>
-                                  </td>
+                              <template v-if="!isYearCollapsed(year)">
+                                <td
+                                  v-if="['food','liquor','soft_drinks','hall_space_charges','gross','net_amount','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)"
+                                  v-for="label in getColumnLabelsForYearLocal(year)"
+                                  :key="'cell-' + year + '-' + label"
+                                  class="px-2 py-1 text-right border border-violet-200 bg-gray-50 font-semibold select-none"
+                                  :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : ''"
+                                >
+                                  <span class="font-mono text-xs">
+                                    {{ formatBanquetValue(field.code, getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}
+                                  </span>
+                                </td>
                                 <td
                                   v-else
                                   v-for="label in getColumnLabelsForYearLocal(year)"
                                   :key="'cell-editable-' + year + '-' + label"
-                                    contenteditable="true"
-                                    class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
+                                  contenteditable="true"
+                                  class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
                                   :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : ''"
                                   @input="handleBanquetCellInput({ year, label, expense: field.code, event: $event, banquetData })"
                                   @focus="handleBanquetCellFocus({ year, label, expense: field.code, event: $event })"
                                   @blur="handleCellEditWrapper({ year, label, expense: field.code, event: $event })"
                                 >
                                   <span class="font-mono text-xs">{{ formatBanquetValue(field.code, getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
-                                  </td>
+                                </td>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
                                   <span class="font-mono text-xs text-violet-700" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
                                     {{ formatBanquetValue(field.code, calculateTotalForBanquet(banquetData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
-                                    </span>
-                                  </td>
-                                </template>
-                                <template v-else>
-                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
-                                  <span class="font-mono text-xs text-violet-700" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
-                                    {{ formatBanquetValue(field.code, calculateTotalForBanquet(banquetData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
-                                    </span>
-                                  </td>
-                                </template>
+                                  </span>
+                                </td>
                               </template>
-                            </tr>
-                            <tr v-if="field.code === 'avg_hall_space_charges_check'">
-                              <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1), 0)" class="h-10 font-bold text-xl text-violet-700 bg-violet-200 border px-2 py-2 m-0">
-                                Details
-                              </td>
-                            </tr>
-                            <tr v-if="field.code === 'net_amount'">
-                              <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1), 0)" class="h-10 font-bold text-xl text-violet-700 bg-violet-200 border px-2 py-2 m-0">
-                                Statistics 
-                              </td>
-                            </tr>
+                              <template v-else>
+                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
+                                  <span class="font-mono text-xs text-violet-700" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
+                                    {{ formatBanquetValue(field.code, calculateTotalForBanquet(banquetData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
+                                  </span>
+                                </td>
+                              </template>
+                            </template>
+                          </tr>
+                          <tr v-if="field.code === 'avg_hall_space_charges_check'">
+                            <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1), 0)" class="h-10 font-bold text-xl text-violet-700 bg-violet-200 border px-2 py-2 m-0">
+                              Details
+                            </td>
+                          </tr>
+                          <tr v-if="field.code === 'net_amount'">
+                            <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1), 0)" class="h-10 font-bold text-xl text-violet-700 bg-violet-200 border px-2 py-2 m-0">
+                              Statistics 
+                            </td>
+                          </tr>
                         </template>
                       </tbody>
                     </table>
@@ -426,7 +437,33 @@
       </div>
     </transition>
   
-    
+    <!-- Add Banquet Detail Modal -->
+    <transition name="fade">
+      <div v-if="showAddBanquetDetail" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-md p-0 overflow-hidden">
+          <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
+            <Settings class="w-6 h-6 text-white" />
+            <h2 class="text-xl font-bold text-white">Add Banquet Detail</h2>
+          </div>
+          <div class="p-8 pt-6">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Banquet Detail</label>
+              <input v-model="newBanquetDetail" class="w-full px-3 py-2 border rounded focus:ring-violet-500" placeholder="e.g. Decoration" />
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 px-8 py-4 bg-gray-50 border-t border-violet-100">
+            <button @click="closeAddBanquetDetail" class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2">
+              <X class="w-4 h-4" />
+              Cancel
+            </button>
+            <button @click="addBanquetDetail" class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2">
+              <Check class="w-4 h-4" />
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </template>
   
   
@@ -473,7 +510,9 @@
     handleBanquetCellEdit,
     handleBanquetCellInput,
     handleBanquetCellFocus,
-    loadBanquetData,
+    loadBanquetRevenueData, // <-- use new API
+    saveBanquetRevenueChanges, // <-- use new API
+    convertBanquetServerDataToFrontend, // <-- conversion function
     toNum
   } from "@/components/utility/banquet_revenue_assumpt/index.js";
   import {
@@ -501,6 +540,11 @@
   const saveError = ref("");
   const sidebarCollapsed = ref(false);
   const isComponentReady = ref(false); // Add a flag to track if component is ready
+  const showAddBanquetDetail = ref(false);
+  const newBanquetDetail = ref("");
+  const customBanquetFields = ref([]); // Will hold fetched banquet details
+  const removedDefaultFields = ref([]); // Track removed default fields
+
   // Computed properties
   const visibleYears = computed(() => {
     const years = getVisibleYears(fromYear.value, toYear.value);
@@ -545,6 +589,42 @@
   function cancelAdvancedSettings() {
     showAdvanced.value = false;
   }
+
+  function openAddBanquetDetail() {
+    newBanquetDetail.value = "";
+    showAddBanquetDetail.value = true;
+  }
+  function closeAddBanquetDetail() {
+    showAddBanquetDetail.value = false;
+  }
+  async function addBanquetDetail() {
+    if (!newBanquetDetail.value) return;
+    try {
+      const res = await fetch("/api/resource/Banquet Details", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ banquet_detail: newBanquetDetail.value })
+      });
+      if (!res.ok) throw new Error("Failed to create");
+      newBanquetDetail.value = "";
+      showAddBanquetDetail.value = false;
+      await fetchBanquetDetails();
+      alertService.success("Banquet detail added");
+    } catch (err) {
+      alertService.error("Failed to add banquet detail");
+    }
+  }
+
+  async function fetchBanquetDetails() {
+    // Frappe REST API: /api/resource/Banquet Details
+    try {
+      const res = await fetch("/api/resource/Banquet Details?fields=[\"name\",\"banquet_detail\"]&limit_page_length=1000");
+      const data = await res.json();
+      customBanquetFields.value = (data.data || []).map(d => ({ code: d.name, label: d.banquet_detail }));
+    } catch (err) {
+      alertService.error("Failed to load banquet details");
+    }
+  }
   
   // On mount, initialize years from localStorage if available
   onMounted(async () => {
@@ -553,13 +633,15 @@
       fromYear.value = localStorage.getItem('banquetFromYear') || "";
       toYear.value = localStorage.getItem('banquetToYear') || "";
 
-      // Defensive: always assign an object
-      const loaded = await loadBanquetData() || {};
-      Object.assign(banquetData, loaded);
+      // Load from backend API
+      const loaded = await loadBanquetRevenueData() || {};
+      const converted = convertBanquetServerDataToFrontend(loaded);
+      Object.assign(banquetData, converted);
 
       originalBanquetData.value = cloneDeep(banquetData);
       isSaved.value = true;
       isComponentReady.value = true;
+      await fetchBanquetDetails();
     } catch (err) {
       console.error("Error loading data:", err);
     }
@@ -598,9 +680,35 @@
   
   // Wrapper function for saveChanges
   const saveChangesWrapper = async () => {
-    const result = await saveChanges(changedCells, isSaving, saveError, banquetData, originalBanquetData, isSaved, loadBanquetData);
-    if (result) {
+    try {
+      isSaving.value = true;
+      saveError.value = "";
+      // Prepare changes for API
+      const changes = changedCells.value.map(cell => ({
+        year: cell.year,
+        month: cell.label,
+        banquet_detail: cell.expense,
+        amount: cell.newValue
+      }));
+      if (changes.length === 0) {
+        isSaving.value = false;
+        return;
+      }
+      const result = await saveBanquetRevenueChanges(changes);
+      // Reload from backend after save
+      const loaded = await loadBanquetRevenueData() || {};
+      const converted = convertBanquetServerDataToFrontend(loaded);
+      Object.assign(banquetData, converted);
       originalBanquetData.value = cloneDeep(banquetData);
+      changedCells.value = [];
+      isSaved.value = true;
+      alertService.success("Changes saved successfully");
+      isSaving.value = false;
+      return result;
+    } catch (err) {
+      saveError.value = err.message || "Failed to save changes";
+      alertService.error(saveError.value);
+      isSaving.value = false;
     }
   };
   
@@ -637,13 +745,12 @@
   // Refresh table functionality
   async function refreshTable() {
     try {
-      // Remove: banquetData.value = await loadBanquetData();
+      const loaded = await loadBanquetRevenueData() || {};
+      const converted = convertBanquetServerDataToFrontend(loaded);
+      Object.assign(banquetData, converted);
       originalBanquetData.value = cloneDeep(banquetData);
-      // Reset any unsaved changes
       changedCells.value = [];
       isSaved.value = true;
-      
-      console.log("Table data refreshed successfully");
       alertService.success("Page refreshed successfully");
     } catch (error) {
       console.error("Error refreshing table:", error);
@@ -654,7 +761,7 @@
   function getBanquetRowData(banquetData, year, label) {
     // Returns an object with all field values for the given year/label (month/quarter)
     const row = {};
-    for (const f of BANQUET_FIELDS) {
+    for (const f of computedBanquetFields.value) {
       const entries = (banquetData?.[year]?.[label]) || [];
       const found = entries.find(e => e.expense === f.code);
       row[f.code] = found ? Number(found.amount) || 0 : 0;
@@ -674,6 +781,7 @@
   // Computed helper for calculated values
   function getCalculatedValue(fieldCode, year, label) {
     const row = getBanquetRowData(banquetData, year, label);
+    const allFieldCodes = computedBanquetFields.value.map(f => f.code);
     switch (fieldCode) {
       case 'food':
         return calcFood(row);
@@ -684,9 +792,9 @@
       case 'hall_space_charges':
         return calcHallSpaceCharges(row);
       case 'gross':
-        return calcGross(row);
+        return calcGross(row, allFieldCodes);
       case 'net_amount':
-        return calcNetAmount(row);
+        return calcNetAmount(row, allFieldCodes);
       case 'amount_per_event':
         return calcAmountPerEvent(row);
       case 'amount_per_pax':
@@ -699,9 +807,8 @@
   }
 
   function getBanquetCellValue(banquetData, fieldCode, year, label, displayMode = 'monthly') {
-    // Get the row data for this year/label
     const row = getBanquetRowData(banquetData, year, label);
-    // List of auto-calculated fields
+    const allFieldCodes = computedBanquetFields.value.map(f => f.code);
     switch (fieldCode) {
       case 'food':
         return calcFood(row);
@@ -712,9 +819,9 @@
       case 'hall_space_charges':
         return calcHallSpaceCharges(row);
       case 'gross':
-        return calcGross(row);
+        return calcGross(row, allFieldCodes);
       case 'net_amount':
-        return calcNetAmount(row);
+        return calcNetAmount(row, allFieldCodes);
       case 'amount_per_event':
         return calcAmountPerEvent(row);
       case 'amount_per_pax':
@@ -722,10 +829,44 @@
       case 'avg_pax_per_event':
         return calcAvgPaxPerEvent(row);
       default:
-        // For manual fields, use getAmountForBanquet utility
         return getAmountForBanquet(banquetData, fieldCode, year, label, displayMode);
     }
   }
+
+  async function deleteBanquetDetail(field) {
+    // If it's a custom field (from backend)
+    if (customBanquetFields.value.some(f => f.code === field.code)) {
+      if (!confirm('Are you sure you want to delete this custom banquet detail? This action cannot be undone.')) return;
+      try {
+        await fetch(`/api/resource/Banquet Details/${field.code}`, { method: 'DELETE' });
+        await fetchBanquetDetails();
+        alertService.success('Banquet detail deleted');
+      } catch (err) {
+        alertService.error('Failed to delete banquet detail');
+      }
+    } else {
+      // Default field: just filter it out for this session
+      removedDefaultFields.value.push(field.code);
+    }
+  }
+
+  function resetToDefault() {
+    removedDefaultFields.value = [];
+    alertService.success('Default fields have been restored.');
+  }
+
+  const computedBanquetFields = computed(() => {
+    // Insert fetched banquet details above 'others', and filter out removed fields
+    const idx = BANQUET_FIELDS.findIndex(f => f.code === 'others');
+    const filteredDefaults = BANQUET_FIELDS.filter(f => !removedDefaultFields.value.includes(f.code));
+    const filteredCustoms = customBanquetFields.value.filter(f => !removedDefaultFields.value.includes(f.code));
+    if (idx === -1) return [...filteredDefaults, ...filteredCustoms];
+    return [
+      ...filteredDefaults.slice(0, idx),
+      ...filteredCustoms,
+      ...filteredDefaults.slice(idx)
+    ];
+  });
   </script>
   
   
