@@ -22,22 +22,55 @@
 
     <!-- Menu Links -->
 	<div class="mt-2 flex-1 space-y-1">
-		<router-link
-			v-for="item in filteredMenuItems"
-			:key="item.text"
-			:to="item.route"
-			:class="[
-			'flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white',
-			{ 'justify-center': !is_expanded },
-			$route.path === item.route
-				? 'bg-violet-100 border-r-4 border-violet-400 text-violet-500 font-semibold'
-				: ''
-			]"
-		>
-			<component :is="item.icon" class="w-6 h-6" />
-			<span v-if="is_expanded" class="text-sm">{{ item.text }}</span>
-		</router-link>
-	</div>
+		<template v-for="item in filteredMenuItems" :key="item.text">
+    <div v-if="item.children">
+      <button
+        @click="toggleMenuExpand(item.text)"
+        class="flex items-center w-full space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white"
+        :class="[{ 'justify-center': !is_expanded }]"
+      >
+        <component :is="item.icon" class="w-6 h-6" />
+        <span v-if="is_expanded" class="text-sm flex-1 text-left">{{ item.text }}</span>
+        <component
+          v-if="is_expanded"
+          :is="expandedMenus[item.text] ? ChevronUp : ChevronDown"
+          class="w-4 h-4 ml-auto"
+        />
+      </button>
+      <div v-if="expandedMenus[item.text]" class="pl-8">
+        <router-link
+          v-for="child in item.children"
+          :key="child.text"
+          :to="child.route"
+          class="flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white"
+          :class="[
+            { 'justify-center': !is_expanded },
+            $route.path === child.route
+              ? 'bg-violet-100 border-r-4 border-violet-400 text-violet-500 font-semibold'
+              : ''
+          ]"
+        >
+          <component :is="child.icon" class="w-5 h-5" />
+          <span v-if="is_expanded" class="text-sm">{{ child.text }}</span>
+        </router-link>
+      </div>
+    </div>
+    <router-link
+      v-else
+      :to="item.route"
+      :class="[
+        'flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white',
+        { 'justify-center': !is_expanded },
+        $route.path === item.route
+          ? 'bg-violet-100 border-r-4 border-violet-400 text-violet-500 font-semibold'
+          : ''
+      ]"
+    >
+      <component :is="item.icon" class="w-6 h-6" />
+      <span v-if="is_expanded" class="text-sm">{{ item.text }}</span>
+    </router-link>
+  </template>
+</div>
 
     <!-- Footer Greeting -->
     <div class="mt-auto pb-4 px-4">
@@ -79,13 +112,21 @@ import { session } from '@/data/session'
 import { 
   Home, 
   LayoutDashboard, 
-  Calculator , 
-  ChartNoAxesCombined, 
+  Calculator, 
   CircleArrowRight,
   BedDouble, 
   HandPlatter,
   UtensilsCrossed, 
-  CircleArrowLeft  
+  CircleArrowLeft,
+  ChevronDown,
+  ChevronUp,
+  Book,
+  HandCoins,
+  Ellipsis,
+  Plus,
+  Building2,
+  ReceiptText,
+  Sheet,
 } from 'lucide-vue-next'
 
 const is_expanded = ref(localStorage.getItem("is_expanded") === "true")
@@ -102,8 +143,34 @@ const menuItems = [
   { text: "Room Revenue Assumptions", route: "/room_revenue_assumptions", icon: BedDouble },
   { text: "F&B Revenue Assumptions", route: "/f&b_revenue_assumptions", icon: UtensilsCrossed },
   { text: "Banquet Revenue Forcast", route: "/banquet_revenue", icon: HandPlatter},
-  { text: "Profit & Loss Statement", route: "/", icon: ChartNoAxesCombined  },
+  { text: "OOD Data", route: "/ood_data_input", icon: Building2},
+  {
+    text: "Payroll",
+    icon: Sheet,
+    children: [
+      { text: "Payroll Data", route: "/payroll", icon: HandCoins },
+      { text: "Payroll Related", route: "/payroll_related", icon: Ellipsis }
+    ]
+  },
+  { text: "Receipts & Payments", route: "/receipts_and_payments", icon: ReceiptText },
+  {
+    text: "Reports",
+    icon: Plus,
+    children: [
+      { text: "Room P&L", route: "/room_p&l", icon: Book  },
+      { text: "F&B P&L", route: "/f&b_p&l", icon: Book },
+      { text: "OOD P&L", route: "/ood_p&l", icon: Book },
+      { text: "Profit & Loss Statement", route: "/profit_and_loss_statement", icon: Book },
+      { text: "Balance Sheet", route: "/balance_sheet", icon: Book },
+      { text: "Cash Flow", route: "/cash_flow", icon: Book },
+    ]
+  },
 ]
+
+const expandedMenus = ref({})
+const toggleMenuExpand = (text) => {
+  expandedMenus.value[text] = !expandedMenus.value[text]
+}
 
 const hospitalityExperience = ref(
   localStorage.getItem('hospitalityExperience') === null
@@ -116,11 +183,25 @@ watch(hospitalityExperience, (newVal) => {
 })
 
 const filteredMenuItems = computed(() => {
-  return menuItems.filter(item => {
-    if (item.text === "Room Revenue Assumptions" && !hospitalityExperience.value) {
-      return false;
-    }
-    return true;
-  });
+  // Recursively filter children if needed
+  function filterItems(items) {
+    return items
+      .map(item => {
+        if (item.text === "Room Revenue Assumptions" && !hospitalityExperience.value) {
+          return null;
+        }
+        if (item.children) {
+          const filteredChildren = filterItems(item.children)
+          if (filteredChildren.length > 0) {
+            return { ...item, children: filteredChildren }
+          } else {
+            return null
+          }
+        }
+        return item
+      })
+      .filter(Boolean)
+  }
+  return filterItems(menuItems)
 })
 </script>

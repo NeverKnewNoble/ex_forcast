@@ -43,6 +43,11 @@ const routes = [
     path: '/banquet_revenue',
     component: () => import('@/pages/Banquet_Revenue.vue'),
   },
+  {
+    name: 'Profit And Loss Statement',
+    path: '/profit_and_loss_statement',
+    component: () => import('@/pages/Profit&Loss_Statement.vue'),
+  },
 ]
 
 let router = createRouter({

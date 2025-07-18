@@ -19,11 +19,11 @@
                   <div class="mb-8">
               <div class="flex items-center gap-3 mb-2">
                 <div class="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <HandPlatter class="w-7 h-7 mx-2 text-white" />
+                  <ChartNoAxesCombined class="w-7 h-7 mx-2 text-white" />
                 </div>
-                <h1 class="text-2xl font-bold text-gray-900">Banquet Revenue Assumptions</h1>
+                <h1 class="text-2xl font-bold text-gray-900">Profit And Loss Statement</h1>
               </div>
-              <p class="text-sm text-gray-500">Manage and configure your banquet revenue data</p>
+              <p class="text-sm text-gray-500">Manage and configure your profit and loss statement data</p>
             </div>
   
             <!-- Save Status Section -->
@@ -87,13 +87,7 @@
                 </svg>
                 Quick Actions
               </h3>
-              <!-- Notice: Excludes Taxes -->
-              <div v-if="!sidebarCollapsed" class="mb-4">
-                <div class="flex items-center gap-2 p-4 bg-red-100 border border-red-200 rounded text-red-800 text-sm">
-                  <AlertTriangle class="w-6 h-6 text-red-600" />
-                  <span>All figures shown exclude taxes.</span>
-                </div>
-              </div>
+
               
               <div class="flex gap-2 mt-3">
                 <button 
@@ -193,7 +187,7 @@
                   <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
                     <Table class="w-3 h-3 text-white" />
                   </div>
-                  <h2 class="text-lg font-bold text-gray-800">Banquet Revenue Assumptions Overview</h2>
+                  <h2 class="text-lg font-bold text-gray-800">Profit And Loss Statement Overview</h2>
                 </div>
                 <div class="flex gap-2 mt-2">
                   <button @click="showAddBanquetDetail = true" class="px-3 py-1.5 bg-violet-600 text-white rounded hover:bg-violet-700 text-sm font-medium shadow transition-all">
@@ -477,7 +471,7 @@
   import { 
     CircleAlert, 
     AlertTriangle, 
-    HandPlatter, 
+    ChartNoAxesCombined, 
     Table, 
     RefreshCw, 
     FolderOpen, 
