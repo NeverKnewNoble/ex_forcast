@@ -15,59 +15,14 @@ export * from './banquet_fields.js';
 export * from './banquet_format.js';
 export * from './banquet_calculations.js';
 
-// API base for Banquet Revenue
-const BANQUET_API_BASE = '/api/method/ex_forcast.api.call_and_save_banquet_revenue';
-
-/**
- * Fetch Banquet revenue data from the server
- * @returns {Promise<Object>} Banquet revenue data organized by year and month
- */
-export async function loadBanquetRevenueData() {
-  try {
-    const response = await fetch(`${BANQUET_API_BASE}.banquet_revenue_display`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    if (data.error) {
-      throw new Error(data.error);
-    }
-    // Handle case where data might be wrapped in message object
-    const serverData = data.message || data;
-    return serverData;
-  } catch (error) {
-    console.error('Error loading Banquet revenue data:', error);
-    throw error;
-  }
-}
-
-/**
- * Save Banquet revenue changes to the server
- * @param {Array} changes - Array of change objects
- * @returns {Promise<Object>} Save result
- */
-export async function saveBanquetRevenueChanges(changes) {
-  try {
-    const formData = new FormData();
-    formData.append('changes', JSON.stringify(changes));
-    const response = await fetch(`${BANQUET_API_BASE}.upsert_banquet_revenue_items`, {
-      method: 'POST',
-      body: formData
-    });
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
-    }
-    const result = await response.json();
-    if (result.message?.status === 'error') {
-      throw new Error(result.message.message);
-    }
-    return result;
-  } catch (error) {
-    console.error('Error saving Banquet revenue changes:', error);
-    throw error;
-  }
-}
+// Import API functions from data service
+export {
+  loadBanquetRevenueData,
+  saveBanquetRevenueChanges,
+  convertBanquetServerDataToFrontend,
+  testBanquetApi,
+  loadBanquetRevenueDataForFrontend
+} from './banquet_data_service.js';
 
 //! Utility: Load banquet data from the backend
 export async function loadBanquetData() {
@@ -309,23 +264,4 @@ export function getBanquetRowData(banquetData, year, label) {
     row[f.code] = found ? Number(found.amount) || 0 : 0;
   }
   return row;
-}
-
-/**
- * Convert server data (banquet_detail) to frontend format (expense)
- * @param {Object} serverData
- * @returns {Object}
- */
-export function convertBanquetServerDataToFrontend(serverData) {
-  const result = {};
-  for (const year in serverData) {
-    result[year] = {};
-    for (const month in serverData[year]) {
-      result[year][month] = (serverData[year][month] || []).map(item => ({
-        ...item,
-        expense: item.banquet_detail // map banquet_detail to expense
-      }));
-    }
-  }
-  return result;
 }
