@@ -46,7 +46,7 @@ const routes = [
   {
     name: 'Profit And Loss Statement',
     path: '/profit_and_loss_statement',
-    component: () => import('@/pages/Profit&Loss_Statement.vue'),
+    component: () => import('@/pages/reports/Profit&Loss_Statement.vue'),
   },
 ]
 
