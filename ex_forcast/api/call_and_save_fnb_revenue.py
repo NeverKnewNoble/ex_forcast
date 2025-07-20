@@ -3,14 +3,14 @@ from collections import defaultdict
 import json
 
 @frappe.whitelist(allow_guest=True)
-def fnb_revenue_display():
+def fnb_revenue_display(project=None):
     """Fetch F&B revenue data from FandB Revenue Assumptions doctype"""
     try:
         # Define month order for SQL ordering
         month_order = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-        # SQL query to get F&B revenue data
+        # SQL query to get F&B revenue data with project filter
         query = """
             SELECT 
                 parent.year,
@@ -25,12 +25,20 @@ def fnb_revenue_display():
                 `tabFandB Revenue Assumption Items` AS child
             ON 
                 child.parent = parent.name
-            ORDER BY 
-                CAST(parent.year AS UNSIGNED) ASC,
-                FIELD(parent.month, {month_order})
-        """.format(month_order="'" + "', '".join(month_order) + "'")
-
-        raw_results = frappe.db.sql(query, as_dict=True)
+        """
+        
+        # Add project filter if provided
+        if project:
+            query += " WHERE parent.project = %s"
+            query += " ORDER BY CAST(parent.year AS UNSIGNED) ASC, FIELD(parent.month, {month_order})".format(
+                month_order="'" + "', '".join(month_order) + "'"
+            )
+            raw_results = frappe.db.sql(query, (project,), as_dict=True)
+        else:
+            query += " ORDER BY CAST(parent.year AS UNSIGNED) ASC, FIELD(parent.month, {month_order})".format(
+                month_order="'" + "', '".join(month_order) + "'"
+            )
+            raw_results = frappe.db.sql(query, as_dict=True)
         frappe.logger().info(f"Raw SQL results: {raw_results}")
 
         # Nested dict: year -> month -> list of expense rows
@@ -55,7 +63,7 @@ def fnb_revenue_display():
 
 
 @frappe.whitelist()
-def upsert_fnb_revenue_items(changes):
+def upsert_fnb_revenue_items(changes, project=None):
     """
     changes: JSON string or list of dicts, each with:
       - year
@@ -64,6 +72,7 @@ def upsert_fnb_revenue_items(changes):
       - cover_category
       - cover_detail
       - amount
+    project: Project name to filter/create documents for
     """
     try:
         # Debug logging
@@ -98,30 +107,32 @@ def upsert_fnb_revenue_items(changes):
                     frappe.logger().error(f"Restaurant '{restaurant}' does not exist")
                     # Instead of raising an exception, try to create the restaurant
                     try:
-                        frappe.logger().info(f"Attempting to create restaurant '{restaurant}'")
+                        frappe.logger().info(f"Attempting to create restaurant '{restaurant}' for project '{project}'")
                         restaurant_doc = frappe.get_doc({
                             "doctype": "Restaurant",
-                            "cover_name": restaurant
+                            "cover_name": restaurant,
+                            "project": project
                         })
                         restaurant_doc.insert()
                         frappe.db.commit()
-                        frappe.logger().info(f"Successfully created restaurant '{restaurant}'")
+                        frappe.logger().info(f"Successfully created restaurant '{restaurant}' for project '{project}'")
                     except Exception as create_error:
                         frappe.logger().error(f"Failed to create restaurant '{restaurant}': {str(create_error)}")
                         raise Exception(f"Restaurant '{restaurant}' does not exist and could not be created: {str(create_error)}")
 
-                # Find or create parent document
+                # Find or create parent document with project filter
                 parent = frappe.db.get_value(
                     "FandB Revenue Assumptions",
-                    {"year": year, "month": month},
+                    {"year": year, "month": month, "project": project} if project else {"year": year, "month": month},
                     "name"
                 )
                 if not parent:
-                    frappe.logger().info(f"Creating new parent document for year={year}, month={month}")
+                    frappe.logger().info(f"Creating new parent document for year={year}, month={month}, project={project}")
                     parent_doc = frappe.get_doc({
                         "doctype": "FandB Revenue Assumptions",
                         "year": year,
                         "month": month,
+                        "project": project,  # Add project field
                         "expense_items": []
                     })
                     parent_doc.insert()
@@ -184,12 +195,17 @@ def upsert_fnb_revenue_items(changes):
 
 
 @frappe.whitelist()
-def get_restaurants_list():
-    """Fetch list of all restaurants"""
+def get_restaurants_list(project=None):
+    """Fetch list of restaurants filtered by project"""
     try:
+        filters = {}
+        if project:
+            filters["project"] = project
+        
         restaurants = frappe.get_all(
             "Restaurant",
             fields=["name", "cover_name"],
+            filters=filters,
             order_by="name"
         )
         return {"status": "success", "restaurants": restaurants}

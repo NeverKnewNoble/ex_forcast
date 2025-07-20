@@ -55,16 +55,21 @@ export function cancelDefaultBreakfastSettings() {
 }
 
 // Create Restaurant Modal Functions
-export function handleCreateRestaurant(createRestaurant, getRestaurants, restaurantList) {
+export function handleCreateRestaurant(createRestaurant, getRestaurants, restaurantList, project = null) {
   if (!newRestaurantName.value.trim()) {
     createRestaurantError.value = "Restaurant name is required.";
+    return;
+  }
+  
+  if (!project) {
+    createRestaurantError.value = "No project selected. Please select a project first.";
     return;
   }
   
   isCreatingRestaurant.value = true;
   createRestaurantError.value = "";
   
-  createRestaurant({ cover_name: newRestaurantName.value })
+  createRestaurant({ cover_name: newRestaurantName.value, project: project })
     .then(result => {
       isCreatingRestaurant.value = false;
       if (result.success) {
@@ -72,7 +77,7 @@ export function handleCreateRestaurant(createRestaurant, getRestaurants, restaur
         showCreateRestaurantModal.value = false;
         newRestaurantName.value = "";
         // Refresh restaurant list to include the new restaurant
-        return getRestaurants();
+        return getRestaurants(project);
       } else {
         createRestaurantError.value = result.error || "Failed to create restaurant.";
       }

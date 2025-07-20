@@ -148,23 +148,12 @@ const menuItems = [
     text: "Payroll",
     icon: Sheet,
     children: [
-      { text: "Payroll Data", route: "/payroll", icon: HandCoins },
-      { text: "Payroll Related", route: "/payroll_related", icon: Ellipsis }
+      { text: "Payroll Data", route: "/", icon: HandCoins },
+      { text: "Payroll Related", route: "/", icon: Ellipsis }
     ]
   },
-  { text: "Receipts & Payments", route: "/receipts_and_payments", icon: ReceiptText },
-  {
-    text: "Reports",
-    icon: Plus,
-    children: [
-      { text: "Room P&L", route: "/room_p&l", icon: Book  },
-      { text: "F&B P&L", route: "/f&b_p&l", icon: Book },
-      { text: "OOD P&L", route: "/ood_p&l", icon: Book },
-      { text: "Profit & Loss Statement", route: "/profit_and_loss_statement", icon: Book },
-      { text: "Balance Sheet", route: "/balance_sheet", icon: Book },
-      { text: "Cash Flow", route: "/cash_flow", icon: Book },
-    ]
-  },
+  { text: "Receipts & Payments", route: "/", icon: ReceiptText },
+  { text: "Reports", route: "/", icon: Plus },
 ]
 
 const expandedMenus = ref({})

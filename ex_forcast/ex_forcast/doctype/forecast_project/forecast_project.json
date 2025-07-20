@@ -1,34 +1,35 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:banquet_detail",
- "creation": "2025-07-15 14:57:13.795448",
+ "autoname": "field:project_name",
+ "creation": "2025-07-18 19:00:55.696152",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "banquet_detail",
-  "project"
+  "project_name",
+  "project_description"
  ],
  "fields": [
   {
-   "fieldname": "banquet_detail",
+   "fieldname": "project_name",
    "fieldtype": "Data",
-   "label": "Banquet Detail",
+   "in_list_view": 1,
+   "label": "Project Name",
    "unique": 1
   },
   {
-   "fieldname": "project",
-   "fieldtype": "Link",
-   "label": "Project",
-   "options": "Forecast Project"
+   "fieldname": "project_description",
+   "fieldtype": "Long Text",
+   "in_list_view": 1,
+   "label": "Project Description"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-19 21:42:30.550694",
+ "modified": "2025-07-18 19:03:54.577199",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
- "name": "Banquet Details",
+ "name": "Forecast Project",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [

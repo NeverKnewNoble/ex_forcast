@@ -6,7 +6,8 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "cover_name"
+  "cover_name",
+  "project"
  ],
  "fields": [
   {
@@ -14,11 +15,17 @@
    "fieldtype": "Data",
    "label": "Name",
    "unique": 1
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Forecast Project"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-08 12:27:07.536260",
+ "modified": "2025-07-19 21:26:30.646395",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Restaurant",

@@ -261,8 +261,41 @@
   
           <!-- Right Side - Content Area -->
           <div class="flex-1 p-4">
+            <!-- No Project Selected State -->
+            <div v-if="fnbData.status === 'no_project_selected'" class="flex flex-col items-center justify-center h-96">
+              <div class="bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-xl p-8 text-center max-w-md">
+                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CircleAlert class="w-8 h-8 text-amber-600" />
+                </div>
+                <h3 class="text-xl font-semibold text-amber-800 mb-2">No Project Selected</h3>
+                <p class="text-amber-700 mb-4">
+                  Please go to the Dashboard and select a project to view and manage F&B revenue data.
+                </p>
+                <router-link to="/dashboard" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-all duration-200">
+                  <ArrowLeft class="w-4 h-4" />
+                  Go to Dashboard
+                </router-link>
+              </div>
+            </div>
+
+            <!-- No Data State -->
+            <div v-else-if="fnbData.status === 'no_data'" class="flex flex-col items-center justify-center h-96">
+              <div class="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-8 text-center max-w-md">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Table class="w-8 h-8 text-blue-600" />
+                </div>
+                <h3 class="text-xl font-semibold text-blue-800 mb-2">No F&B Revenue Data</h3>
+                <p class="text-blue-700 mb-4">
+                  The project <span class="font-semibold text-blue-600">{{ fnbData.project }}</span> doesn't have any F&B revenue data yet.
+                </p>
+                <p class="text-blue-600 text-sm">
+                  Start by creating restaurants and adding revenue data.
+                </p>
+              </div>
+            </div>
+
             <!-- Table Header with Stats -->
-            <template v-if="visibleYears.length">
+            <template v-else-if="visibleYears.length">
               <div class="mb-4 flex items-center gap-2">
                   <div class="flex items-center gap-2">
                     <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
@@ -275,14 +308,22 @@
               <div class="mb-4 flex gap-2">
                   <button
                     @click="showCreateRestaurantModal = true"
-                  class="flex items-center gap-2 px-4 py-1 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg font-medium"
+                    :disabled="!selectedProject"
+                    class="flex items-center gap-2 px-4 py-1 rounded-lg transition-all duration-200 shadow-md font-medium"
+                    :class="selectedProject 
+                      ? 'bg-gradient-to-r from-violet-600 to-violet-700 text-white hover:from-violet-700 hover:to-violet-800 hover:shadow-lg' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
                   >
                     <PlusCircle class="w-4 h-4" />
                     Create Restaurant
                   </button>
                   <button
                     @click="showResetRestaurantsModal = true"
-                    class="flex items-center gap-2 px-4 py-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-200 shadow-md hover:shadow-lg font-medium"
+                    :disabled="!selectedProject"
+                    class="flex items-center gap-2 px-4 py-1 rounded-lg transition-all duration-200 shadow-md font-medium"
+                    :class="selectedProject 
+                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:from-gray-600 hover:to-gray-700 hover:shadow-lg' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
                   >
                     <RefreshCw class="w-4 h-4" />
                     Reset to Default
@@ -1083,6 +1124,8 @@
   import { getMarketSegmentList } from "@/components/utility/room_revenue_assumpt./data_service.js";
   import { MARKET_SEGMENTS } from "@/components/utility/room_revenue_assumpt./market_segments.js";
   import { getDaysInMonth } from "@/components/utility/room_revenue_assumpt./room_revenue_utils.js";
+  // Import project service
+  import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
  
   
 
@@ -1187,6 +1230,42 @@
     }
   }, { deep: true });
   
+  // Watch for project changes and reload data
+  watch(selectedProject, async (newProject, oldProject) => {
+    // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
+    
+    if (newProject) {
+      try {
+        // console.log('Reloading F&B revenue data for new project:', newProject.project_name);
+        
+        // Reload F&B revenue data for the new project
+        const fnbRevenueData = await loadFnbRevenueDataForFrontend(newProject.project_name);
+        Object.assign(fnbData, fnbRevenueData);
+        originalFnbData.value = cloneDeep(fnbRevenueData);
+        
+        // Reload restaurants for the new project
+        restaurantList.value = await getRestaurants(newProject.project_name);
+        originalRestaurantList.value = [...restaurantList.value];
+        
+        // Reset any unsaved changes
+        changedCells.value = [];
+        isSaved.value = true;
+        
+        // console.log('F&B revenue data reloaded successfully for project:', newProject.project_name);
+        alertService.success(`Switched to project: ${newProject.project_name}`);
+      } catch (error) {
+        console.error('Error reloading F&B revenue data for new project:', error);
+        alertService.error("Failed to load project data. Please try again.");
+      }
+    } else {
+      // Clear data when no project is selected
+      fnbData.value = { status: 'no_project_selected', message: 'No project selected' };
+      originalFnbData.value = { status: 'no_project_selected', message: 'No project selected' };
+      restaurantList.value = [];
+      originalRestaurantList.value = [];
+    }
+  });
+  
   // Watch for F&B data changes to track saved state (less aggressive)
   watch(fnbData, (newData, oldData) => {
     // Only check if we have original data to compare against
@@ -1218,6 +1297,30 @@
   // On mount, initialize years from localStorage if available
   onMounted(async () => {
     try {
+      // Initialize project service first to restore selected project
+      await initializeProjectService();
+      
+      // Wait a moment to ensure project is properly set
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Load F&B revenue data for the current project
+      if (selectedProject.value) {
+        try {
+          const fnbRevenueData = await loadFnbRevenueDataForFrontend(selectedProject.value.project_name);
+          Object.assign(fnbData, fnbRevenueData);
+          originalFnbData.value = cloneDeep(fnbRevenueData); // Store original
+        } catch (error) {
+          console.error('Error loading F&B revenue data:', error);
+          // Initialize empty fnbData if loading fails
+          Object.assign(fnbData, {});
+          originalFnbData.value = {};
+        }
+      } else {
+        // No project selected
+        fnbData.value = { status: 'no_project_selected', message: 'No project selected' };
+        originalFnbData.value = { status: 'no_project_selected', message: 'No project selected' };
+      }
+      
       years.value = await loadYearOptions();
       expenseData.value = await loadExpenseData();
       originalExpenseData.value = cloneDeep(expenseData.value); // Store original
@@ -1233,19 +1336,13 @@
       fromYear.value = localStorage.getItem('fnbRevenueFromYear') || "";
       toYear.value = localStorage.getItem('fnbRevenueToYear') || "";
       isSaved.value = true;
-      restaurantList.value = await getRestaurants();
-      originalRestaurantList.value = [...restaurantList.value]; // Store original list for reset functionality
-      
-      // Load F&B revenue data
-      try {
-        const fnbRevenueData = await loadFnbRevenueDataForFrontend();
-        Object.assign(fnbData, fnbRevenueData);
-        originalFnbData.value = cloneDeep(fnbRevenueData); // Store original
-      } catch (error) {
-        console.error('Error loading F&B revenue data:', error);
-        // Initialize empty fnbData if loading fails
-        Object.assign(fnbData, {});
-        originalFnbData.value = {};
+      // Load restaurants for the current project
+      if (selectedProject.value) {
+        restaurantList.value = await getRestaurants(selectedProject.value.project_name);
+        originalRestaurantList.value = [...restaurantList.value]; // Store original list for reset functionality
+      } else {
+        restaurantList.value = [];
+        originalRestaurantList.value = [];
       }
       
       // Load total rooms from localStorage
@@ -1302,7 +1399,11 @@
   
   // Wrapper function for saveChanges
   const saveChangesWrapper = async () => {
-    await saveFnbChanges(changedCells, isSaving, saveError, fnbData, originalFnbData, isSaved, loadFnbRevenueDataForFrontend);
+    if (selectedProject.value) {
+      await saveFnbChanges(changedCells, isSaving, saveError, fnbData, originalFnbData, isSaved, () => loadFnbRevenueDataForFrontend(selectedProject.value.project_name), selectedProject.value.project_name);
+    } else {
+      alertService.error("No project selected. Please select a project first.");
+    }
   };
   
   
@@ -1335,20 +1436,31 @@
       originalExpenseData.value = cloneDeep(expenseData.value);
       expenses.value = extractAllExpenses(expenseData.value);
       
-      // Reload F&B revenue data
-      try {
-        const fnbRevenueData = await loadFnbRevenueDataForFrontend();
-        Object.assign(fnbData, fnbRevenueData);
-        originalFnbData.value = cloneDeep(fnbRevenueData); // Update original
-      } catch (error) {
-        console.error('Error loading F&B revenue data:', error);
-        Object.assign(fnbData, {});
-        originalFnbData.value = {};
+      // Reload F&B revenue data for current project
+      if (selectedProject.value) {
+        try {
+          const fnbRevenueData = await loadFnbRevenueDataForFrontend(selectedProject.value.project_name);
+          Object.assign(fnbData, fnbRevenueData);
+          originalFnbData.value = cloneDeep(fnbRevenueData); // Update original
+        } catch (error) {
+          console.error('Error loading F&B revenue data:', error);
+          Object.assign(fnbData, {});
+          originalFnbData.value = {};
+        }
+      } else {
+        // No project selected
+        fnbData.value = { status: 'no_project_selected', message: 'No project selected' };
+        originalFnbData.value = { status: 'no_project_selected', message: 'No project selected' };
       }
       
-      // Reload restaurant list
-      restaurantList.value = await getRestaurants();
-      originalRestaurantList.value = [...restaurantList.value]; // Update original list
+      // Reload restaurant list for current project
+      if (selectedProject.value) {
+        restaurantList.value = await getRestaurants(selectedProject.value.project_name);
+        originalRestaurantList.value = [...restaurantList.value]; // Update original list
+      } else {
+        restaurantList.value = [];
+        originalRestaurantList.value = [];
+      }
       
       // Reset any unsaved changes
       changedCells.value = [];
@@ -1362,7 +1474,11 @@
   }
   
   async function handleCreateRestaurant() {
-    handleCreateRestaurantUtil(createRestaurant, getRestaurants, restaurantList);
+    if (selectedProject.value) {
+      handleCreateRestaurantUtil(createRestaurant, getRestaurants, restaurantList, selectedProject.value.project_name);
+    } else {
+      alertService.error("No project selected. Please select a project first.");
+    }
   }
 
   // Collapsed years state
@@ -2249,8 +2365,13 @@
 
   async function resetToDefaultRestaurants() {
     try {
-      // Reload restaurants from the server (this gets the original list)
-      const originalRestaurants = await getRestaurants();
+      if (!selectedProject.value) {
+        alertService.error("No project selected. Please select a project first.");
+        return;
+      }
+      
+      // Reload restaurants from the server for the current project
+      const originalRestaurants = await getRestaurants(selectedProject.value.project_name);
       
       // Update the restaurant list
       restaurantList.value = [...originalRestaurants];

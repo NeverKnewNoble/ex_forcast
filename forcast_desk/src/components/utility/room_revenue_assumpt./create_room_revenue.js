@@ -14,7 +14,16 @@ const roomRevenueResource = createResource({
 })
 
 
+import { selectedProject } from '@/components/utility/dashboard/projectService.js';
+
 export async function createRoomRevenueAssumption({ year, month, room_revenue_assumptions }) {
+    
+    // Get the currently selected project
+    const currentProject = selectedProject.value
+    
+    if (!currentProject) {
+        throw new Error('No project selected. Please select a project first.');
+    }
     
     const room_revenue_assumptions_items = room_revenue_assumptions.map(item => ({
         room_package: item.revenue_name,
@@ -26,6 +35,7 @@ export async function createRoomRevenueAssumption({ year, month, room_revenue_as
     const doc = {
         year,
         month,
+        project: currentProject.project_name,  // Add project field
         room_details: room_revenue_assumptions_items
     }
 

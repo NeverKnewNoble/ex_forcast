@@ -77,7 +77,7 @@ function submit(e: Event) {
 
   // Simulate API call
   setTimeout(() => {
-    console.log("Reset link sent to:", email)
+    // console.log("Reset link sent to:", email)
     sending.value = false
     alert('Password reset link sent!')
   }, 2000)

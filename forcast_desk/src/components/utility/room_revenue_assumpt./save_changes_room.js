@@ -1,5 +1,6 @@
 import alertService from "@/components/ui/alertService.js";
 import { cloneDeep } from 'lodash-es';
+import { saveRoomRevenueChanges } from './data_service.js';
 
 // Helper function to find room details from data
 function findRoomDetails(roomData, roomType, year, month) {
@@ -82,19 +83,26 @@ export async function saveRoomChanges(changedCells, isSaving, saveError, roomDat
       });
     }
 
-    // Here you would make the actual API call to save the changes
-    // For now, we'll simulate the API call
+    // Make the actual API call to save the changes
     console.log('Saving room revenue changes:', updates);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const result = await saveRoomRevenueChanges(updates);
     
-    // Update original data to reflect saved state
-    originalRoomData.value = cloneDeep(roomData);
-    changedCells.length = 0;
-    isSaved.value = true;
-    
-    alertService.success("Room revenue changes saved successfully!");
+    // Handle both direct response and wrapped response structures
+    const responseData = result.data || result;
+    if (responseData && responseData.status === 'success') {
+      console.log('Room revenue changes saved successfully:', responseData);
+      
+      // Update original data to reflect saved state
+      originalRoomData.value = cloneDeep(roomData);
+      changedCells.length = 0;
+      isSaved.value = true;
+      
+      alertService.success("Room revenue changes saved successfully!");
+    } else {
+      console.error('Failed to save room revenue changes:', result);
+      throw new Error(result?.message || 'Failed to save changes');
+    }
     
   } catch (error) {
     console.error('Error saving room revenue changes:', error);

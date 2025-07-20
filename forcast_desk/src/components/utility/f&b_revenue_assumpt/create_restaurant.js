@@ -1,8 +1,11 @@
-export async function createRestaurant({ cover_name }) {
+export async function createRestaurant({ cover_name, project = null }) {
   try {
     // Create form data
     const formData = new FormData();
     formData.append('cover_name', cover_name);
+    if (project) {
+      formData.append('project', project);
+    }
     
     const response = await fetch('/api/method/ex_forcast.api.create_restaurant.create_restaurant', {
       method: 'POST',

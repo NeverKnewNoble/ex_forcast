@@ -2,10 +2,12 @@ import frappe
 import json
 
 @frappe.whitelist(allow_guest=True)
-def create_restaurant(cover_name):
+def create_restaurant(cover_name, project=None):
     try:
         doc = frappe.new_doc("Restaurant")
         doc.cover_name = cover_name
+        if project:
+            doc.project = project
         doc.insert()
         frappe.db.commit()
         return {"status": "success", "docname": doc.name}
@@ -14,9 +16,13 @@ def create_restaurant(cover_name):
         return {"status": "error", "message": str(e)}
 
 @frappe.whitelist(allow_guest=True)
-def get_restaurants():
+def get_restaurants(project=None):
     try:
-        restaurants = frappe.get_all("Restaurant", fields=["name", "cover_name"])
+        filters = {}
+        if project:
+            filters["project"] = project
+        
+        restaurants = frappe.get_all("Restaurant", fields=["name", "cover_name"], filters=filters, order_by="name")
         # Return a list of dicts with name and cover_name
         return restaurants
     except Exception as e:
