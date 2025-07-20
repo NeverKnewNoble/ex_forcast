@@ -1,5 +1,6 @@
 import alertService from "@/components/ui/alertService.js";
 import { cloneDeep } from 'lodash-es';
+import { selectedProject } from '@/components/utility/dashboard/projectService.js';
 
 //! Helper function to find expense details from data
 function findExpenseDetails(expenseData, expense, year, month) {
@@ -53,6 +54,15 @@ function findExpenseDetails(expenseData, expense, year, month) {
 // ! Save changes to the database
 export async function saveChanges(changedCells, isSaving, saveError, expenseData, originalExpenseData, isSaved, loadExpenseData) {
   if (changedCells.value.length === 0) return;
+  
+  // Get the currently selected project
+  const currentProject = selectedProject.value
+  
+  if (!currentProject) {
+    alertService.error("No project selected. Please select a project first.");
+    return;
+  }
+  
   isSaving.value = true;
   saveError.value = "";
   try {
@@ -73,7 +83,10 @@ export async function saveChanges(changedCells, isSaving, saveError, expenseData
     const response = await fetch("/api/method/ex_forcast.api.expense_estimate.upsert_expense_items", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ changes: payload })
+      body: JSON.stringify({ 
+        changes: payload,
+        project: currentProject.project_name
+      })
     });
     const result = await response.json();
     // console.log('result', result);

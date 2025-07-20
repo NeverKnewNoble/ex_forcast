@@ -3,13 +3,13 @@ from collections import defaultdict
 import json
 
 @frappe.whitelist(allow_guest=True)
-def room_revenue_display():
+def room_revenue_display(project=None):
     try:
         # Define month order for SQL ordering
         month_order = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-        # SQL query to get raw expense rows
+        # SQL query to get raw room revenue rows with project filter
         query = """
             SELECT 
                 parent.year,
@@ -23,12 +23,20 @@ def room_revenue_display():
                 `tabRoom Revenue Items` AS child
             ON 
                 child.parent = parent.name
-            ORDER BY 
-                CAST(parent.year AS UNSIGNED) ASC,
-                FIELD(parent.month, {month_order})
-        """.format(month_order="'" + "', '".join(month_order) + "'")
-
-        raw_results = frappe.db.sql(query, as_dict=True)
+        """
+        
+        # Add project filter if provided
+        if project:
+            query += " WHERE parent.project = %s"
+            query += " ORDER BY CAST(parent.year AS UNSIGNED) ASC, FIELD(parent.month, {month_order})".format(
+                month_order="'" + "', '".join(month_order) + "'"
+            )
+            raw_results = frappe.db.sql(query, (project,), as_dict=True)
+        else:
+            query += " ORDER BY CAST(parent.year AS UNSIGNED) ASC, FIELD(parent.month, {month_order})".format(
+                month_order="'" + "', '".join(month_order) + "'"
+            )
+            raw_results = frappe.db.sql(query, as_dict=True)
 
         # Nested dict: year -> month -> list of expense rows
         grouped_data = defaultdict(lambda: defaultdict(list))
@@ -50,14 +58,14 @@ def room_revenue_display():
 
 
 @frappe.whitelist(allow_guest=True)
-def market_segment_display():
+def market_segment_display(project=None):
     """Fetch market segment data from Room Revenue Assumptions doctype"""
     try:
         # Define month order for SQL ordering
         month_order = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-        # SQL query to get market segment data with market segment names
+        # SQL query to get market segment data with market segment names and project filter
         query = """
             SELECT 
                 parent.year,
@@ -75,12 +83,20 @@ def market_segment_display():
                 `tabRoom Market Segment` AS segment
             ON
                 child.market_segment = segment.name
-            ORDER BY 
-                CAST(parent.year AS UNSIGNED) ASC,
-                FIELD(parent.month, {month_order})
-        """.format(month_order="'" + "', '".join(month_order) + "'")
-
-        raw_results = frappe.db.sql(query, as_dict=True)
+        """
+        
+        # Add project filter if provided
+        if project:
+            query += " WHERE parent.project = %s"
+            query += " ORDER BY CAST(parent.year AS UNSIGNED) ASC, FIELD(parent.month, {month_order})".format(
+                month_order="'" + "', '".join(month_order) + "'"
+            )
+            raw_results = frappe.db.sql(query, (project,), as_dict=True)
+        else:
+            query += " ORDER BY CAST(parent.year AS UNSIGNED) ASC, FIELD(parent.month, {month_order})".format(
+                month_order="'" + "', '".join(month_order) + "'"
+            )
+            raw_results = frappe.db.sql(query, as_dict=True)
 
         # Nested dict: year -> market_segment -> month -> data
         grouped_data = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
@@ -105,13 +121,10 @@ def market_segment_display():
         return {"error": str(err)}
 
 
-@frappe.whitelist()
-def test_api():
-    """Simple test endpoint to verify API is working"""
-    return {"status": "success", "message": "API is working"}
+
 
 @frappe.whitelist()
-def upsert_room_revenue_items(changes):
+def upsert_room_revenue_items(changes, project=None):
     """
     changes: JSON string or list of dicts, each with:
       For room revenue data:
@@ -124,6 +137,7 @@ def upsert_room_revenue_items(changes):
         - roomType (package name)
         - field: 'room_count'
         - newValue (number_of_rooms)
+    project: Project name to filter/create documents for
     """
     try:
         # Debug logging
@@ -162,10 +176,10 @@ def upsert_room_revenue_items(changes):
                 frappe.logger().warning(f"Skipping invalid change: {change}")
                 continue
 
-            # Find or create parent document
+            # Find or create parent document with project filter
             parent = frappe.db.get_value(
                 "Room Revenue Assumptions",
-                {"year": year, "month": month},
+                {"year": year, "month": month, "project": project} if project else {"year": year, "month": month},
                 "name"
             )
             if not parent:
@@ -173,6 +187,7 @@ def upsert_room_revenue_items(changes):
                     "doctype": "Room Revenue Assumptions",
                     "year": year,
                     "month": month,
+                    "project": project,  # Add project field
                     "room_details": []
                 })
                 parent_doc.insert()
@@ -257,7 +272,7 @@ def upsert_room_revenue_items(changes):
 
 
 @frappe.whitelist()
-def upsert_market_segment_items(changes):
+def upsert_market_segment_items(changes, project=None):
     """
     changes: JSON string or list of dicts, each with:
       - year
@@ -265,6 +280,7 @@ def upsert_market_segment_items(changes):
       - market_segment
       - field: 'room_nights' or 'room_rate'
       - value
+    project: Project name to filter/create documents for
     """
     try:
         # Debug logging
@@ -300,10 +316,10 @@ def upsert_market_segment_items(changes):
                 frappe.logger().warning(f"Market segment '{market_segment_name}' not found, skipping change")
                 continue
 
-            # Find or create parent document
+            # Find or create parent document with project filter
             parent = frappe.db.get_value(
                 "Room Revenue Assumptions",
-                {"year": year, "month": month},
+                {"year": year, "month": month, "project": project} if project else {"year": year, "month": month},
                 "name"
             )
             if not parent:
@@ -311,6 +327,7 @@ def upsert_market_segment_items(changes):
                     "doctype": "Room Revenue Assumptions",
                     "year": year,
                     "month": month,
+                    "project": project,  # Add project field
                     "market_segment": []
                 })
                 parent_doc.insert()

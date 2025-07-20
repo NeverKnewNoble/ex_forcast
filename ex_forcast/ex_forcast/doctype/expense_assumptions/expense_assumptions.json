@@ -6,6 +6,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "project",
   "expense_information_section",
   "year",
   "column_break_rtve",
@@ -46,11 +47,17 @@
    "fieldtype": "Table",
    "label": "Expense Items",
    "options": "Expense Items"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project ",
+   "options": "Forecast Project"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-13 23:33:34.498758",
+ "modified": "2025-07-18 19:19:33.612807",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Expense Assumptions",

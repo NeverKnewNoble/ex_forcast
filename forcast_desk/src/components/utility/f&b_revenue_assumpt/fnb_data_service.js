@@ -6,12 +6,19 @@ const API_BASE = '/api/method/ex_forcast.api.call_and_save_fnb_revenue';
 
 /**
  * Fetch F&B revenue data from the server
+ * @param {string} project - Project name to filter data
  * @returns {Promise<Object>} F&B revenue data organized by year and month
  */
-export async function loadFnbRevenueData() {
+export async function loadFnbRevenueData(project = null) {
   try {
-    // console.log('Loading F&B revenue data from server...');
-    const response = await fetch(`${API_BASE}.fnb_revenue_display`);
+    // console.log('Loading F&B revenue data from server for project:', project);
+    
+    let url = `${API_BASE}.fnb_revenue_display`;
+    if (project) {
+      url += `?project=${encodeURIComponent(project)}`;
+    }
+    
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -35,15 +42,19 @@ export async function loadFnbRevenueData() {
 /**
  * Save F&B revenue changes to the server
  * @param {Array} changes - Array of change objects
+ * @param {string} project - Project name to filter data
  * @returns {Promise<Object>} Save result
  */
-export async function saveFnbRevenueChanges(changes) {
+export async function saveFnbRevenueChanges(changes, project = null) {
   try {
-    // console.log('Sending F&B revenue changes to server:', changes);
+    // console.log('Sending F&B revenue changes to server for project:', project, 'changes:', changes);
     
     // Create form data
     const formData = new FormData();
     formData.append('changes', JSON.stringify(changes));
+    if (project) {
+      formData.append('project', project);
+    }
     
     const response = await fetch(`${API_BASE}.upsert_fnb_revenue_items`, {
       method: 'POST',
@@ -72,11 +83,17 @@ export async function saveFnbRevenueChanges(changes) {
 
 /**
  * Get list of restaurants from the server
+ * @param {string} project - Project name to filter restaurants
  * @returns {Promise<Array>} Array of restaurant objects
  */
-export async function getRestaurantsList() {
+export async function getRestaurantsList(project = null) {
   try {
-    const response = await fetch(`${API_BASE}.get_restaurants_list`);
+    let url = `${API_BASE}.get_restaurants_list`;
+    if (project) {
+      url += `?project=${encodeURIComponent(project)}`;
+    }
+    
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -258,12 +275,13 @@ export function convertFrontendDataToServerFormat(frontendData) {
 
 /**
  * Load and convert F&B revenue data for frontend use
+ * @param {string} project - Project name to filter data
  * @returns {Promise<Object>} Frontend format data
  */
-export async function loadFnbRevenueDataForFrontend() {
+export async function loadFnbRevenueDataForFrontend(project = null) {
   try {
-    // console.log('Loading F&B revenue data for frontend...');
-    const serverData = await loadFnbRevenueData();
+    // console.log('Loading F&B revenue data for frontend for project:', project);
+    const serverData = await loadFnbRevenueData(project);
     
     if (!serverData || Object.keys(serverData).length === 0) {
       console.log('No F&B revenue data found, returning empty object');
@@ -289,12 +307,13 @@ export async function loadFnbRevenueDataForFrontend() {
 /**
  * Save F&B revenue data from frontend format
  * @param {Object} frontendData - Frontend format data
+ * @param {string} project - Project name to filter data
  * @returns {Promise<Object>} Save result
  */
-export async function saveFnbRevenueDataFromFrontend(frontendData) {
+export async function saveFnbRevenueDataFromFrontend(frontendData, project = null) {
   try {
     const changes = convertFrontendDataToServerFormat(frontendData);
-    return await saveFnbRevenueChanges(changes);
+    return await saveFnbRevenueChanges(changes, project);
   } catch (error) {
     console.error('Error saving F&B revenue data from frontend:', error);
     throw error;

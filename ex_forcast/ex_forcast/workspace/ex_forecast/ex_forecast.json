@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"148SCOK8kl\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Ex Forecast</span>\",\"col\":12}},{\"id\":\"SZKUdC-JYr\",\"type\":\"paragraph\",\"data\":{\"text\":\"Welcome To Ex&nbsp;Forecast,&nbsp;Your personalized forecasting insights delivered straight to your dashboard\",\"col\":12}},{\"id\":\"OaRg0G0hxI\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Portal</b></span>\",\"col\":12}},{\"id\":\"fx37FpUt7f\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Forecast Portal\",\"col\":3}},{\"id\":\"5RLkklEXhF\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Masters</b></span>\",\"col\":12}},{\"id\":\"K0k0BAZhZU\",\"type\":\"card\",\"data\":{\"card_name\":\"Operations\",\"col\":4}}]",
+ "content": "[{\"id\":\"148SCOK8kl\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Ex Forecast</span>\",\"col\":12}},{\"id\":\"SZKUdC-JYr\",\"type\":\"paragraph\",\"data\":{\"text\":\"Welcome To Ex&nbsp;Forecast,&nbsp;Your personalized forecasting insights delivered straight to your dashboard\",\"col\":12}},{\"id\":\"OaRg0G0hxI\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Portal</b></span>\",\"col\":12}},{\"id\":\"fx37FpUt7f\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Forecast Portal\",\"col\":3}}]",
  "creation": "2025-06-29 22:42:25.674404",
  "custom_blocks": [],
  "docstatus": 0,
@@ -12,48 +12,8 @@
  "indicator_color": "",
  "is_hidden": 0,
  "label": "Ex Forecast",
- "links": [
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Operations",
-   "link_count": 3,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Room Packages",
-   "link_count": 0,
-   "link_to": "Room Packages",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Expense Assumptions",
-   "link_count": 0,
-   "link_to": "Expense Assumptions",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Room Revenue Assumptions",
-   "link_count": 0,
-   "link_to": "Room Revenue Assumptions",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  }
- ],
- "modified": "2025-06-30 11:21:46.016319",
+ "links": [],
+ "modified": "2025-07-18 18:48:40.022526",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Ex Forecast",

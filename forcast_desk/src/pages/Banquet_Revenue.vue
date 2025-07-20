@@ -186,8 +186,25 @@
 
           <!-- Right Side - Table Area -->
           <div class="flex-1 p-4">
+            <!-- No Project Selected State -->
+            <template v-if="!selectedProject">
+              <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
+                <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
+                  <CircleAlert class="w-8 h-8 text-violet-500" />
+                </div>
+                <h3 class="text-lg text-violet-700 font-semibold mb-2">No Project Selected</h3>
+                <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
+                  Please select a project from the dashboard to view and manage banquet revenue assumptions.
+                </p>
+                <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
+                  <ArrowLeft class="w-3 h-3" />
+                  <span>Use the project selector in the dashboard to get started</span>
+                </div>
+              </div>
+            </template>
+            
             <!-- Table Header with Stats -->
-            <template v-if="visibleYears.length && isComponentReady">
+            <template v-else-if="visibleYears.length && isComponentReady">
               <div class="mb-4">
                 <div class="flex items-center gap-2">
                   <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
@@ -196,7 +213,16 @@
                   <h2 class="text-lg font-bold text-gray-800">Banquet Revenue Assumptions Overview</h2>
                 </div>
                 <div class="flex gap-2 mt-2">
-                  <button @click="showAddBanquetDetail = true" class="px-3 py-1.5 bg-violet-600 text-white rounded hover:bg-violet-700 text-sm font-medium shadow transition-all">
+                  <button 
+                    @click="showAddBanquetDetail = true" 
+                    :disabled="!selectedProject"
+                    :class="[
+                      'px-3 py-1.5 text-sm font-medium shadow rounded-md transition-all',
+                      selectedProject 
+                        ? 'bg-violet-600 text-white hover:bg-violet-700' 
+                        : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    ]"
+                  >
                     Add Banquet Detail
                   </button>
                   <button @click="resetToDefault" class="px-3 py-1.5 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm font-medium shadow transition-all">
@@ -348,7 +374,7 @@
             </template>
   
             <!-- Enhanced No Years Selected State -->
-            <template v-else>
+            <template v-else-if="selectedProject">
               <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
                 <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
                   <CircleAlert class="w-8 h-8 text-violet-500" />
@@ -364,6 +390,23 @@
                 <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
                   <ArrowLeft class="w-3 h-3" />
                   <span>Use the filters on the left to get started</span>
+                </div>
+              </div>
+            </template>
+            
+            <!-- Fallback for when project is selected but no years -->
+            <template v-else>
+              <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
+                <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
+                  <CircleAlert class="w-8 h-8 text-violet-500" />
+                </div>
+                <h3 class="text-lg text-violet-700 font-semibold mb-2">No Project Selected</h3>
+                <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
+                  Please select a project from the dashboard to view and manage banquet revenue assumptions.
+                </p>
+                <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
+                  <ArrowLeft class="w-3 h-3" />
+                  <span>Use the project selector in the dashboard to get started</span>
                 </div>
               </div>
             </template>
@@ -446,7 +489,13 @@
             <h2 class="text-xl font-bold text-white">Add Banquet Detail</h2>
           </div>
           <div class="p-8 pt-6">
-            <div class="mb-4">
+            <!-- No Project Selected Message -->
+            <div v-if="!selectedProject" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
+              <AlertTriangle class="w-6 h-6 text-yellow-600" />
+              <span class="text-yellow-800 font-medium">Please select a project first to add banquet details.</span>
+            </div>
+            
+            <div v-else class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">Banquet Detail</label>
               <input v-model="newBanquetDetail" class="w-full px-3 py-2 border rounded focus:ring-violet-500" placeholder="e.g. Decoration" />
             </div>
@@ -456,7 +505,16 @@
               <X class="w-4 h-4" />
               Cancel
             </button>
-            <button @click="addBanquetDetail" class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2">
+            <button 
+              @click="addBanquetDetail" 
+              :disabled="!selectedProject || !newBanquetDetail"
+              :class="[
+                'px-4 py-2 rounded-md flex items-center gap-2',
+                selectedProject && newBanquetDetail
+                  ? 'bg-violet-600 text-white hover:bg-violet-700'
+                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+              ]"
+            >
               <Check class="w-4 h-4" />
               Add
             </button>
@@ -522,6 +580,9 @@
   } from "@/components/utility/expense_assumption/index.js";
   import { cloneDeep } from 'lodash-es';
   
+  // Import project service
+  import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
+  
   
   // Reactive state
   const years = ref([]);
@@ -569,7 +630,7 @@
 
   // Watch for changes in banquetData to ensure calculated fields update
   watch(banquetData, (newData, oldData) => {
-    console.log('banquetData changed:', newData);
+    // console.log('banquetData changed:', newData);
   }, { deep: true, immediate: true });
   
   
@@ -598,11 +659,18 @@
   }
   async function addBanquetDetail() {
     if (!newBanquetDetail.value) return;
+    if (!selectedProject.value) {
+      alertService.error("Please select a project first");
+      return;
+    }
     try {
       const res = await fetch("/api/resource/Banquet Details", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ banquet_detail: newBanquetDetail.value })
+        body: JSON.stringify({ 
+          banquet_detail: newBanquetDetail.value,
+          project: selectedProject.value.project_name
+        })
       });
       if (!res.ok) throw new Error("Failed to create");
       newBanquetDetail.value = "";
@@ -617,7 +685,12 @@
   async function fetchBanquetDetails() {
     // Frappe REST API: /api/resource/Banquet Details
     try {
-      const res = await fetch("/api/resource/Banquet Details?fields=[\"name\",\"banquet_detail\"]&limit_page_length=1000");
+      if (!selectedProject.value) {
+        customBanquetFields.value = [];
+        return;
+      }
+      
+      const res = await fetch(`/api/resource/Banquet Details?fields=["name","banquet_detail"]&filters=[["project","=","${selectedProject.value.project_name}"]]&limit_page_length=1000`);
       const data = await res.json();
       customBanquetFields.value = (data.data || []).map(d => ({ code: d.name, label: d.banquet_detail }));
     } catch (err) {
@@ -628,14 +701,25 @@
   // On mount, initialize years from localStorage if available
   onMounted(async () => {
     try {
+      // Initialize project service first to restore selected project
+      await initializeProjectService();
+      
+      // Wait a moment to ensure project is properly set
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       years.value = await loadYearOptions();
       fromYear.value = localStorage.getItem('banquetFromYear') || "";
       toYear.value = localStorage.getItem('banquetToYear') || "";
 
-      // Load from backend API
-      const loaded = await loadBanquetRevenueData() || {};
-      const converted = convertBanquetServerDataToFrontend(loaded);
-      Object.assign(banquetData, converted);
+      // Load from backend API for the current project
+      if (selectedProject.value) {
+        const loaded = await loadBanquetRevenueData(selectedProject.value.project_name) || {};
+        const converted = convertBanquetServerDataToFrontend(loaded);
+        Object.assign(banquetData, converted);
+      } else {
+        // No project selected
+        banquetData.value = { status: 'no_project_selected', message: 'No project selected' };
+      }
 
       originalBanquetData.value = cloneDeep(banquetData);
       isSaved.value = true;
@@ -653,6 +737,47 @@
   watch(toYear, (newValue) => {
     localStorage.setItem('banquetToYear', newValue);
   });
+  
+  // Watch for project changes and reload data
+  watch(selectedProject, async (newProject, oldProject) => {
+    // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
+    
+    if (newProject) {
+      try {
+        // console.log('Reloading Banquet revenue data for new project:', newProject.project_name);
+        
+        // Reload Banquet revenue data for the new project
+        const loaded = await loadBanquetRevenueData(newProject.project_name) || {};
+        const converted = convertBanquetServerDataToFrontend(loaded);
+        Object.assign(banquetData, converted);
+        originalBanquetData.value = cloneDeep(banquetData);
+        
+        // Reset any unsaved changes
+        changedCells.value = [];
+        isSaved.value = true;
+        saveError.value = "";
+        
+        // Reload banquet details for the new project
+        await fetchBanquetDetails();
+        
+        // console.log('Banquet revenue data reloaded successfully for project:', newProject.project_name);
+        alertService.success(`Switched to project: ${newProject.project_name}`);
+      } catch (error) {
+        console.error('Error reloading Banquet revenue data for new project:', error);
+        alertService.error("Failed to load project data. Please try again.");
+      }
+    } else {
+      // Clear data when no project is selected
+      banquetData.value = { status: 'no_project_selected', message: 'No project selected' };
+      originalBanquetData.value = cloneDeep(banquetData);
+      changedCells.value = [];
+      isSaved.value = true;
+      saveError.value = "";
+      
+      // Clear banquet details when no project is selected
+      customBanquetFields.value = [];
+    }
+  }, { deep: true });
   
   function clearYearSelection() {
     fromYear.value = "";
@@ -693,9 +818,9 @@
         isSaving.value = false;
         return;
       }
-      const result = await saveBanquetRevenueChanges(changes);
+      const result = await saveBanquetRevenueChanges(changes, selectedProject.value?.project_name);
       // Reload from backend after save
-      const loaded = await loadBanquetRevenueData() || {};
+      const loaded = await loadBanquetRevenueData(selectedProject.value?.project_name) || {};
       const converted = convertBanquetServerDataToFrontend(loaded);
       Object.assign(banquetData, converted);
       originalBanquetData.value = cloneDeep(banquetData);
@@ -744,7 +869,7 @@
   // Refresh table functionality
   async function refreshTable() {
     try {
-      const loaded = await loadBanquetRevenueData() || {};
+      const loaded = await loadBanquetRevenueData(selectedProject.value?.project_name) || {};
       const converted = convertBanquetServerDataToFrontend(loaded);
       Object.assign(banquetData, converted);
       originalBanquetData.value = cloneDeep(banquetData);
@@ -767,12 +892,12 @@
     }
     // Debug logging for pax and avg_food_check
     if (toNum(row.pax) > 0 || toNum(row.avg_food_check) > 0) {
-      console.log(`getBanquetRowData for ${year}/${label}:`, {
-        pax: toNum(row.pax),
-        avg_food_check: toNum(row.avg_food_check),
-        calculated_food: toNum(row.pax) * toNum(row.avg_food_check),
-        all_data: row
-      });
+      // console.log(`getBanquetRowData for ${year}/${label}:`, {
+      //   pax: toNum(row.pax),
+      //   avg_food_check: toNum(row.avg_food_check),
+      //   calculated_food: toNum(row.pax) * toNum(row.avg_food_check),
+      //   all_data: row
+      // });
     }
     return row;
   }

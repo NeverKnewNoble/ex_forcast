@@ -4,13 +4,13 @@ from collections import defaultdict
 import json
 
 @frappe.whitelist(allow_guest=True)
-def estimate_display():
+def estimate_display(project=None):
     try:
         # Define month order for SQL ordering
         month_order = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-        # SQL query to get raw expense rows
+        # SQL query to get raw expense rows with project filter
         query = """
             SELECT 
                 parent.year,
@@ -27,12 +27,20 @@ def estimate_display():
                 `tabExpense Items` AS child
             ON 
                 child.parent = parent.name
-            ORDER BY 
-                CAST(parent.year AS UNSIGNED) ASC,
-                FIELD(parent.month, {month_order})
-        """.format(month_order="'" + "', '".join(month_order) + "'")
-
-        raw_results = frappe.db.sql(query, as_dict=True)
+        """
+        
+        # Add project filter if provided
+        if project:
+            query += " WHERE parent.project = %s"
+            query += " ORDER BY CAST(parent.year AS UNSIGNED) ASC, FIELD(parent.month, {month_order})".format(
+                month_order="'" + "', '".join(month_order) + "'"
+            )
+            raw_results = frappe.db.sql(query, (project,), as_dict=True)
+        else:
+            query += " ORDER BY CAST(parent.year AS UNSIGNED) ASC, FIELD(parent.month, {month_order})".format(
+                month_order="'" + "', '".join(month_order) + "'"
+            )
+            raw_results = frappe.db.sql(query, as_dict=True)
 
         # Nested dict: year -> month -> list of expense rows
         grouped_data = defaultdict(lambda: defaultdict(list))
@@ -59,7 +67,7 @@ def estimate_display():
 
 
 @frappe.whitelist(allow_guest=True)
-def upsert_expense_items(changes):
+def upsert_expense_items(changes, project=None):
     """
     changes: JSON string or list of dicts, each with:
       - year
@@ -68,6 +76,7 @@ def upsert_expense_items(changes):
       - code
       - amount
       - (optionally: category/hospitality_category, cost_type)
+    project: Project name to filter/create documents for
     """
     try:
         if isinstance(changes, str):
@@ -83,10 +92,10 @@ def upsert_expense_items(changes):
             hospitality_category = change.get("hospitality_category")
             cost_type = change.get("cost_type")
 
-            # Find or create parent document
+            # Find or create parent document with project filter
             parent = frappe.db.get_value(
                 "Expense Assumptions",
-                {"year": year, "month": month},
+                {"year": year, "month": month, "project": project} if project else {"year": year, "month": month},
                 "name"
             )
             if not parent:
@@ -94,6 +103,7 @@ def upsert_expense_items(changes):
                     "doctype": "Expense Assumptions",
                     "year": year,
                     "month": month,
+                    "project": project,  # Add project field
                     "expense_items": []
                 })
                 parent_doc.insert()

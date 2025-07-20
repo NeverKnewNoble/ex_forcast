@@ -11,8 +11,9 @@ import alertService from '@/components/ui/alertService.js';
  * @param {Object} originalFnbData - Original F&B data for comparison
  * @param {Object} isSaved - Reactive reference for saved state
  * @param {Function} loadFnbData - Function to reload F&B data
+ * @param {string} project - Project name to filter data
  */
-export async function saveFnbChanges(changedCells, isSaving, saveError, fnbData, originalFnbData, isSaved, loadFnbData) {
+export async function saveFnbChanges(changedCells, isSaving, saveError, fnbData, originalFnbData, isSaved, loadFnbData, project = null) {
   if (isSaving.value) {
     return; // Already saving
   }
@@ -65,7 +66,7 @@ export async function saveFnbChanges(changedCells, isSaving, saveError, fnbData,
     // console.log('Prepared changes for API:', changes);
 
     // Save only the specific changes to server
-    const result = await saveFnbRevenueChanges(changes);
+    const result = await saveFnbRevenueChanges(changes, project);
     
     if (result.message?.status === 'success') {
       // Update original data to match current data

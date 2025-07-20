@@ -7,6 +7,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "project",
   "expense_information_section",
   "year",
   "column_break_rtve",
@@ -47,11 +48,17 @@
    "fieldtype": "Table",
    "label": "Revenue Items",
    "options": "FandB Revenue Assumption Items"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Forecast Project"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-08 11:41:19.038806",
+ "modified": "2025-07-18 19:17:43.447615",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "FandB Revenue Assumptions",

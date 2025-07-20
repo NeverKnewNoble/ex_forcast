@@ -1,6 +1,11 @@
-export async function getRestaurants() {
+export async function getRestaurants(project = null) {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.create_restaurant.get_restaurants', {
+    let url = '/api/method/ex_forcast.api.create_restaurant.get_restaurants';
+    if (project) {
+      url += `?project=${encodeURIComponent(project)}`;
+    }
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

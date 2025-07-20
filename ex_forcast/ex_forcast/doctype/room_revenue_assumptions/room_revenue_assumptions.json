@@ -6,6 +6,8 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "project",
+  "section_break_tbvi",
   "year",
   "column_break_neuz",
   "month",
@@ -53,11 +55,21 @@
    "fieldtype": "Table",
    "label": "Market segment",
    "options": "Market Segement Table Data"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Forecast Project"
+  },
+  {
+   "fieldname": "section_break_tbvi",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-03 19:33:06.599813",
+ "modified": "2025-07-18 19:14:57.860387",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Room Revenue Assumptions",

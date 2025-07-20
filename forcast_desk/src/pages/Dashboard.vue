@@ -11,10 +11,78 @@
       <div class="relative z-10">
         <div class="flex items-center justify-between mb-8">
           <div>
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 bg-clip-text text-transparent">
-              Welcome back! 👋
-            </h1>
-            <p class="text-gray-600 mt-2 text-lg">Here's what's happening with your forecasts today</p>
+
+          </div>
+          
+          <!-- Project Selector -->
+          <ProjectSelector @project-changed="handleProjectChange" />
+        </div>
+
+        <!-- Animated Project Display -->
+        <div class="mb-8">
+          <div 
+            v-if="selectedProject" 
+            class="relative overflow-hidden rounded-2xl p-8 bg-gradient-to-r from-violet-600 via-purple-600 to-white shadow-xl border "
+          >
+            <!-- Animated background elements -->
+            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse"></div>
+            <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full blur-lg animate-pulse" style="animation-delay: 1s;"></div>
+            
+            <!-- Project display content -->
+            <div class="relative z-10 text-center">
+              <div class="mb-4">
+                <div class="inline-flex items-center gap-3 px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm">
+                  <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <span class="text-white/90 text-sm font-medium">Active Project</span>
+                </div>
+              </div>
+              
+              <h2 
+                class="text-[60px] md:text-[80px] font-bold text-white mb-2 animate-text"
+                :key="selectedProject.project_name"
+              >
+                {{ selectedProject.project_name || "Welcome to Your Forecastor" }}
+              </h2>
+              
+              <p class="text-white/80 text-lg max-w-2xl mx-auto leading-relaxed">
+                Welcome to your project dashboard. Manage forecasts, track expenses, and monitor your financial projections all in one place.
+              </p>
+              
+              <!-- Project stats -->
+              <div class="mt-8 flex justify-center gap-8">
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-white">{{ getCurrentDate() }}</div>
+                  <div class="text-white/70 text-sm">Current Date</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-white">{{ getCurrentTime() }}</div>
+                  <div class="text-white/70 text-sm">Local Time</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- No project selected state -->
+          <div 
+            v-else 
+            class="relative overflow-hidden rounded-2xl p-8 bg-gradient-to-r from-gray-400 via-gray-500 to-gray-600 shadow-2xl border border-white/20"
+          >
+            <div class="relative z-10 text-center">
+              <div class="mb-4">
+                <div class="inline-flex items-center gap-3 px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm">
+                  <div class="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+                  <span class="text-white/90 text-sm font-medium">No Project Selected</span>
+                </div>
+              </div>
+              
+              <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                Select a Project
+              </h2>
+              
+              <p class="text-white/80 text-lg max-w-2xl mx-auto leading-relaxed">
+                Please select a project from the dropdown above to start managing your forecasts and financial data.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -45,67 +113,6 @@
                   <span>{{ card.trend }}</span>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-
-        <!-- Recent Forecasts Section -->
-        <div class="mb-8">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Recent Forecasts</h2>
-            <button class="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center space-x-1 transition-colors duration-200">
-              <span>View All</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </button>
-          </div>
-          
-          <div class="rounded-2xl shadow-xl overflow-hidden bg-white/80 backdrop-blur-xl border border-white/20">
-            <div class="overflow-x-auto">
-              <table class="min-w-full">
-                <thead class="bg-gradient-to-r from-gray-50 to-gray-100/50">
-                  <tr>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Month</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Year</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Total Expenses</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Created By</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100/50">
-                  <tr
-                    v-for="item in recentForecasts"
-                    :key="item.id"
-                    class="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 transition-all duration-300 group"
-                  >
-                    <td class="px-6 py-4">
-                      <div class="flex items-center space-x-3">
-                        <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-                        <span class="font-medium text-gray-800">{{ item.month }}</span>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 text-gray-600">{{ item.year }}</td>
-                    <td class="px-6 py-4">
-                      <span class="font-semibold text-gray-800">GHS {{ item.amount.toLocaleString() }}</span>
-                    </td>
-                    <td class="px-6 py-4">
-                      <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                          {{ item.created_by.charAt(0) }}
-                        </div>
-                        <span class="text-gray-700">{{ item.created_by }}</span>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4">
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="item.statusClass">
-                        {{ item.status }}
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
             </div>
           </div>
         </div>
@@ -148,7 +155,10 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
 import Sidebar from "@/components/ui/Sidebar.vue"
+import ProjectSelector from "@/components/ui/ProjectSelector.vue"
+import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js'
 import { BarChart3, CalendarDays, AlertTriangle, FileText, TrendingUp, TrendingDown, Users, DollarSign } from "lucide-vue-next"
 
 const statCards = [
@@ -198,35 +208,7 @@ const statCards = [
   }
 ]
 
-const recentForecasts = [
-  { 
-    id: 1, 
-    month: "June", 
-    year: "2025", 
-    amount: 1800, 
-    created_by: "Larry",
-    status: "Completed",
-    statusClass: "bg-green-100 text-green-800"
-  },
-  { 
-    id: 2, 
-    month: "May", 
-    year: "2025", 
-    amount: 2200, 
-    created_by: "Larry",
-    status: "In Progress",
-    statusClass: "bg-yellow-100 text-yellow-800"
-  },
-  { 
-    id: 3, 
-    month: "April", 
-    year: "2025", 
-    amount: 1650, 
-    created_by: "Admin",
-    status: "Completed",
-    statusClass: "bg-green-100 text-green-800"
-  }
-]
+
 
 const recentActivity = [
   { id: 1, icon: "📊", title: "New forecast created for June 2025", time: "2 hours ago", bgClass: "bg-blue-500" },
@@ -240,6 +222,57 @@ const upcomingDeadlines = [
   { id: 2, title: "Budget Approval", date: "March 20, 2025", daysLeft: "10 days", bgClass: "bg-yellow-50", textClass: "text-yellow-600" },
   { id: 3, title: "Annual Report", date: "March 25, 2025", daysLeft: "15 days", bgClass: "bg-blue-50", textClass: "text-blue-600" }
 ]
+
+// Reactive state for time display
+const currentTime = ref('')
+const currentDate = ref('')
+let timeInterval = null
+
+// Initialize project service and time display
+onMounted(async () => {
+  await initializeProjectService()
+  updateTime()
+  timeInterval = setInterval(updateTime, 1000)
+})
+
+onUnmounted(() => {
+  if (timeInterval) {
+    clearInterval(timeInterval)
+  }
+})
+
+// Update time and date
+function updateTime() {
+  const now = new Date()
+  currentTime.value = now.toLocaleTimeString('en-US', { 
+    hour12: true, 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    second: '2-digit' 
+  })
+  currentDate.value = now.toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  })
+}
+
+// Get current date and time for display
+function getCurrentDate() {
+  return currentDate.value
+}
+
+function getCurrentTime() {
+  return currentTime.value
+}
+
+// Project change handler
+const handleProjectChange = (project) => {
+  // console.log('Project changed to:', project)
+  // You can add additional logic here when project changes
+  // For example, refresh data based on selected project
+}
 </script>
 
 <style scoped>
@@ -253,6 +286,40 @@ const upcomingDeadlines = [
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Text animation for project name */
+@keyframes textReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-text {
+  animation: textReveal 0.8s ease-out forwards;
+}
+
+/* Pulse animation for status indicators */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .grid > div {

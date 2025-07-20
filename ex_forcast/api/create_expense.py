@@ -2,7 +2,7 @@ import frappe
 import json
 
 @frappe.whitelist(allow_guest=True)
-def create_document(year, month, expenses):
+def create_document(year, month, expenses, project=None):
     try:
         # Parse expenses if sent as JSON string
         if isinstance(expenses, str):
@@ -11,6 +11,7 @@ def create_document(year, month, expenses):
         doc = frappe.new_doc("Expense Assumptions")
         doc.year = year
         doc.month = month
+        doc.project = project  # Add project field
 
         for item in expenses:
             doc.append("expense_items", item)

@@ -2,15 +2,16 @@ import frappe
 import json
 
 @frappe.whitelist(allow_guest=True)
-def create_room_revenue_document(year, month, room_revenue_assumptions):
+def create_room_revenue_document(year, month, room_revenue_assumptions, project=None):
     try:
-        # Parse expenses if sent as JSON string
-        if isinstance(expenses, str):
-            expenses = json.loads(expenses)
+        # Parse room revenue assumptions if sent as JSON string
+        if isinstance(room_revenue_assumptions, str):
+            room_revenue_assumptions = json.loads(room_revenue_assumptions)
 
         doc = frappe.new_doc("Room Revenue Assumptions")
         doc.year = year
         doc.month = month
+        doc.project = project  # Add project field
         doc.room_revenue_assumptions = room_revenue_assumptions
         doc.insert()
         frappe.db.commit()

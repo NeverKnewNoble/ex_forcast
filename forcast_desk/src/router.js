@@ -44,9 +44,9 @@ const routes = [
     component: () => import('@/pages/Banquet_Revenue.vue'),
   },
   {
-    name: 'Profit And Loss Statement',
-    path: '/profit_and_loss_statement',
-    component: () => import('@/pages/reports/Profit&Loss_Statement.vue'),
+    name: 'OOD_Data',
+    path: '/ood_data_input',
+    component: () => import('@/pages/OOD_Data.vue'),
   },
 ]
 

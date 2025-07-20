@@ -137,17 +137,8 @@ export async function saveRoomChanges(changedCells, isSaving, saveError, roomDat
   
   try {
     // Import the API functions and alert service
-    const { saveRoomRevenueChanges, testAPI } = await import('./data_service.js')
+    const { saveRoomRevenueChanges } = await import('./data_service.js')
     const alertService = await import('@/components/ui/alertService.js').then(m => m.default)
-    
-    // Test if API is accessible
-    try {
-      const testResult = await testAPI()
-      console.log('API test result:', testResult)
-    } catch (testError) {
-      console.error('API test failed:', testError)
-      throw new Error('API endpoint is not accessible. Please check your connection.')
-    }
     
     // Transform the data to match API expectations
     const transformedChanges = changedCells.value.map(change => {

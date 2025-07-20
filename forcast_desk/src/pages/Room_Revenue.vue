@@ -240,7 +240,7 @@
           <!-- Right Side - Table Area -->
           <div class="flex-1 p-4">
             <MarketSegmentationTables
-              v-if="marketSegmentation"
+              v-if="marketSegmentation && !roomData.status"
               :visible-years="visibleYears"
               :from-year="fromYear"
               :to-year="toYear"
@@ -262,8 +262,68 @@
               ref="marketSegmentationTablesRef"
             />
             <div v-else>
+              <!-- Status Messages -->
+              <div v-if="roomData.status" class="mb-6">
+                <div v-if="roomData.status === 'no_project_selected'" class="bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-xl p-6 text-center">
+                  <div class="flex flex-col items-center gap-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-500 rounded-full flex items-center justify-center shadow-lg">
+                      <FolderOpen class="w-8 h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 class="text-xl font-bold text-amber-800 mb-2">No Project Selected</h3>
+                      <p class="text-amber-700 mb-4">Please select a project on the dashboard to view room revenue data.</p>
+                      <router-link 
+                        to="/dashboard" 
+                        class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                      >
+                        <ArrowRight class="w-4 h-4" />
+                        Go to Dashboard
+                      </router-link>
+                    </div>
+                  </div>
+                </div>
+                
+                <div v-else-if="roomData.status === 'no_data'" class="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6 text-center">
+                  <div class="flex flex-col items-center gap-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                      <Database class="w-8 h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 class="text-xl font-bold text-blue-800 mb-2">No Room Revenue Data</h3>
+                      <p class="text-blue-700 mb-4">No room revenue data found for project: <strong>{{ roomData.project }}</strong></p>
+                      <button 
+                        @click="showAddRoomRevenueModal = true"
+                        class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                      >
+                        <Plus class="w-4 h-4" />
+                        Add First Room Revenue
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div v-else-if="roomData.status === 'error'" class="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-xl p-6 text-center">
+                  <div class="flex flex-col items-center gap-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-red-400 to-red-500 rounded-full flex items-center justify-center shadow-lg">
+                      <AlertCircle class="w-8 h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 class="text-xl font-bold text-red-800 mb-2">Error Loading Data</h3>
+                      <p class="text-red-700 mb-4">{{ roomData.message }}</p>
+                      <button 
+                        @click="refreshRoomRevenueData"
+                        class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                      >
+                        <RefreshCw class="w-4 h-4" />
+                        Try Again
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Table Header with Stats -->
-              <template v-if="visibleYears.length">
+              <template v-if="visibleYears.length && !roomData.status">
                 <div class="mb-4">
                   <div class="flex items-center gap-2">
                     <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
@@ -737,7 +797,7 @@
 
 
               <!-- No Years Selected -->
-              <template v-else>
+              <template v-else-if="!roomData.status">
                 <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
                   <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
                     <CircleAlert class="w-8 h-8 text-violet-500" />
@@ -1257,7 +1317,7 @@
 <script setup>
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import Sidebar from "@/components/ui/Sidebar.vue";
-import { CircleAlert, BadgeCent, Coffee, Table, AlertTriangle, BedDouble, Plus, PlusCircle, DollarSign, Calculator, Settings, Calendar, X, Check, Save, Loader2, RefreshCw, ChevronDown, ChevronRight, ArrowLeft, ChevronLeft } from 'lucide-vue-next';
+import { CircleAlert, BadgeCent, Coffee, Table, AlertTriangle, BedDouble, Plus, PlusCircle, DollarSign, Calculator, Settings, Calendar, X, Check, Save, Loader2, RefreshCw, ChevronDown, ChevronRight, ArrowLeft, ChevronLeft, FolderOpen, Database, AlertCircle, ArrowRight, Percent } from 'lucide-vue-next';
 import alertService from "@/components/ui/alertService.js";
 
 // Import room revenue utilities
@@ -1306,6 +1366,9 @@ import {
 
 // Import year options utility
 import { loadYearOptions, months } from "@/components/utility/expense_assumption/index.js";
+
+// Import project service
+import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
 
 import { cloneDeep } from 'lodash-es';
 
@@ -1430,11 +1493,19 @@ function cancelAdvancedSettings() {
 // On mount, initialize years from localStorage if available
 onMounted(async () => {
   try {
+    // Initialize project service first to restore selected project
+    await initializeProjectService();
+    
+    // Wait a moment to ensure project is properly set
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     years.value = await loadYearOptions();
+    
+    // Load room revenue data for the current project
     roomData.value = await getRoomRevenueList();    
     originalRoomData.value = cloneDeep(roomData.value); 
     
-    // Load market segment data
+    // Load market segment data for the current project
     const marketSegmentResponse = await getMarketSegmentList();
     marketSegmentData.value = marketSegmentResponse || {};
     originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
@@ -1465,6 +1536,8 @@ onMounted(async () => {
     // Restore Service Charge from localStorage
     const storedServiceCharge = localStorage.getItem('serviceChargeByYear');
     if (storedServiceCharge) serviceChargeByYear.value = JSON.parse(storedServiceCharge);
+    
+    // console.log('Room Revenue page loaded with project:', selectedProject.value?.project_name);
   } catch (err) {
     console.error("Error loading data:", err);
   }
@@ -1477,6 +1550,40 @@ watch(fromYear, (newValue) => {
 watch(toYear, (newValue) => {
   localStorage.setItem('roomRevenueToYear', newValue);
 });
+
+// Watch for project changes and reload data
+watch(selectedProject, async (newProject, oldProject) => {
+        // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
+  
+  if (newProject) {
+    try {
+      // console.log('Reloading data for new project:', newProject.project_name);
+      
+      // Reload room revenue data for the new project
+      roomData.value = await getRoomRevenueList();
+      originalRoomData.value = cloneDeep(roomData.value);
+      
+      // Reload market segment data for the new project
+      const marketSegmentResponse = await getMarketSegmentList();
+      marketSegmentData.value = marketSegmentResponse || {};
+      originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
+      
+      // Reset save status
+      isSaved.value = true;
+      saveError.value = "";
+      
+              // console.log('Data reloaded successfully for project:', newProject.project_name);
+    } catch (error) {
+      console.error('Error reloading data for new project:', error);
+    }
+  } else {
+    // Clear data when no project is selected
+    roomData.value = { status: 'no_project_selected', message: 'No project selected' };
+    marketSegmentData.value = { status: 'no_project_selected', message: 'No project selected' };
+    originalRoomData.value = cloneDeep(roomData.value);
+    originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
+  }
+}, { deep: true });
 
 function clearYearSelection() {
   fromYear.value = "";
@@ -1536,13 +1643,18 @@ const submitAddRoomRevenueWrapper = async () => {
         // Close modal and reset form
         showAddRoomRevenueModal.value = false;
         resetRoomRevenueForm();
+        
+        // Reload data to show the newly created room revenue
+        roomData.value = await getRoomRevenueList();
+        originalRoomData.value = cloneDeep(roomData.value);
+        
         // Show success message
         alertService.success("Room revenue assumption created successfully!");
       }
     } catch (error) {
       console.error('Error creating room revenue assumption:', error);
       // Show error message to user
-      alertService.error("Failed to create Room Revenue Assumption. Please try again.");
+      alertService.error(error.message || "Failed to create Room Revenue Assumption. Please try again.");
     }
   }
 };
@@ -1560,7 +1672,7 @@ const saveChangesWrapper = async () => {
         // Handle both direct response and wrapped response structures
         const responseData = result.data || result;
         if (responseData && responseData.status === 'success') {
-          console.log('Market segment changes saved successfully:', responseData);
+          // console.log('Market segment changes saved successfully:', responseData);
           // Clear changes after successful save
           marketSegmentationTablesRef.value.marketSegmentChanges = [];
           originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
@@ -1618,12 +1730,26 @@ onUnmounted(() => {
   window.removeEventListener('beforeunload', handleBeforeUnload);
 });
 
-function refreshRoomRevenueData() {
-  // Implement the logic to refresh room revenue data
-  // Example: reload data, then show alert
-  // (Replace with actual data reload logic as needed)
-  // await getRoomRevenueList() ...
-  alertService.success('Page refreshed');
+async function refreshRoomRevenueData() {
+  try {
+    // Reload room revenue data
+    roomData.value = await getRoomRevenueList();
+    originalRoomData.value = cloneDeep(roomData.value);
+    
+    // Reload market segment data
+    const marketSegmentResponse = await getMarketSegmentList();
+    marketSegmentData.value = marketSegmentResponse || {};
+    originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
+    
+    // Reset save status
+    isSaved.value = true;
+    saveError.value = "";
+    
+    alertService.success('Data refreshed successfully');
+  } catch (error) {
+    console.error('Error refreshing data:', error);
+    alertService.error('Failed to refresh data');
+  }
 }
 
 function addNewRoomType() {

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>Payroll Data</h1>
+        <h1>Bonus</h1>
     </div>
 </template>
 <script>
