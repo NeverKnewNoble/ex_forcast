@@ -1,4 +1,4 @@
-import alertService from "@/components/ui/alertService.js";
+import alertService from "@/components/ui/ui_utility/alertService.js";
 import { cloneDeep } from 'lodash-es';
 import { selectedProject } from '@/components/utility/dashboard/projectService.js';
 

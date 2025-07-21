@@ -548,7 +548,7 @@
     X, 
     Check, 
   } from 'lucide-vue-next';
-  import alertService from "@/components/ui/alertService.js";
+  import alertService from "@/components/ui/ui_utility/alertService.js";
   import { 
     BANQUET_FIELDS, 
     formatBanquetValue, 

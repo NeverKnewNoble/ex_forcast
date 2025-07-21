@@ -1,5 +1,4 @@
 // Room Revenue Utilities - Core calculations and table display functions
-
 import { ref } from 'vue'
 
 //? Default room types (will be overridden by dynamic packages)

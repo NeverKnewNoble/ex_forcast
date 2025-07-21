@@ -1,5 +1,5 @@
 import { ref, watch } from 'vue';
-import alertService from "@/components/ui/alertService.js";
+import alertService from "@/components/ui/ui_utility/alertService.js";
 
 // Modal state management
 export const showAdvanced = ref(false);

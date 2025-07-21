@@ -1,7 +1,6 @@
 // import { getColumnLabels, getAmountForExpense, loadExpenseData, createExpenseDocument } from "@/components/utility/expense_assumption/index.js";
 import { getColumnLabels, getAmountForExpense} from "@/components/utility/expense_assumption/index.js";
-// import alertService from "@/components/ui/alertService.js";
-// import { cloneDeep } from 'lodash-es';
+
 
 // Calculate total for a category in a specific year
 export function calculateCategoryTotal(expenseData, expenses, year, displayMode, advancedModes) {
