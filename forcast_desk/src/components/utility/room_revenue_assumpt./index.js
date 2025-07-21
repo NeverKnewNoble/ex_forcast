@@ -2,7 +2,9 @@
     
 // Data loading and API services
 export {
-    getRoomPackagesList
+    getRoomPackagesList,
+    createDefaultRoomPackages,
+    deleteRoomPackage
 } from './revenue_packages.js';
 
 
@@ -41,6 +43,8 @@ export {
 // Core Room Revenue Utilities
 export {
     ROOM_TYPES,
+    DEFAULT_ROOM_TYPES,
+    updateRoomTypes,
     collapsedYears,
     toggleCollapse,
     isYearCollapsed,

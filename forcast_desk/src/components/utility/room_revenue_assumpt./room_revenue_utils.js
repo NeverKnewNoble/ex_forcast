@@ -2,8 +2,31 @@
 
 import { ref } from 'vue'
 
-//? Static room types
-export const ROOM_TYPES = ['Standard', 'Superior', 'Deluxe', 'Suite', 'Presidential']
+//? Default room types (will be overridden by dynamic packages)
+export const DEFAULT_ROOM_TYPES = ['Standard', 'Superior', 'Deluxe', 'Suite', 'Presidential']
+
+// Dynamic room types based on available packages
+export let ROOM_TYPES = [...DEFAULT_ROOM_TYPES]
+
+// Function to update room types based on available packages
+export function updateRoomTypes(roomPackages) {
+  if (roomPackages && roomPackages.length > 0) {
+    // Start with default packages in the correct order
+    const orderedRoomTypes = [...DEFAULT_ROOM_TYPES];
+    
+    // Add any custom packages that are not in the default list
+    roomPackages.forEach(pkg => {
+      const packageName = pkg.package_name || pkg.name;
+      if (!DEFAULT_ROOM_TYPES.includes(packageName)) {
+        orderedRoomTypes.push(packageName);
+      }
+    });
+    
+    ROOM_TYPES = orderedRoomTypes;
+  } else {
+    ROOM_TYPES = [...DEFAULT_ROOM_TYPES];
+  }
+}
 
 // ! Table collapse state management
 export const collapsedYears = ref(new Set())

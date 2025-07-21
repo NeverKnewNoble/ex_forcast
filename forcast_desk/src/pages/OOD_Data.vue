@@ -21,7 +21,7 @@
                 <div class="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
                   <Building2 class="w-7 h-7 mx-2 text-white" />
                 </div>
-                <h1 class="text-2xl font-bold text-gray-900">Other Operating Departments Data</h1>
+                <h1 class="text-2xl font-bold text-gray-900">Other Operating Departments Revenue Assumptions</h1>
               </div>
               <p class="text-sm text-gray-500">Manage and configure your other operating departments data</p>
             </div>
@@ -80,13 +80,22 @@
             </div>
 
             <!-- Action Buttons Section -->
-            <div class="">
+            <div class="mb-8">
               <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                 <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
                 Quick Actions
               </h3>
+              <div class="flex gap-2">
+                <button 
+                  @click="refreshTable"
+                  class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white border border-violet-200 text-violet-700 rounded-lg hover:bg-violet-50 transition-all text-sm font-medium"
+                >
+                  <RefreshCw class="w-4 h-4" />
+                  Refresh
+                </button>
+              </div>
             </div>
   
             <!-- Filters Section -->
@@ -155,6 +164,13 @@
                       Advanced
                     </button>
                   </div>
+                  <button
+                    @click="showLaundryDetails = true"
+                    class="w-full flex items-center justify-left gap-2 px-3 py-2.5 bg-white border border-blue-500 text-blue-700 rounded-lg hover:bg-blue-50 transition-all duration-200 text-sm font-medium mt-2"
+                  >
+                    <FolderOpen class="w-4 h-4" />
+                    Laundry Details
+                  </button>
                 </div>
               </div>
             </div>
@@ -169,44 +185,52 @@
 
           <!-- Right Side - Table Area -->
           <div class="flex-1 p-4">
-            <!-- Table Header with Stats -->
-            <template v-if="visibleYears.length && isComponentReady">
-              <div class="mb-4">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
+            <!-- No Project Selected State -->
+            <template v-if="!selectedProject">
+              <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
+                <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
+                  <CircleAlert class="w-8 h-8 text-violet-500" />
+                  </div>
+                <h3 class="text-lg text-violet-700 font-semibold mb-2">No Project Selected</h3>
+                <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
+                  Please select a project from the dashboard to view and manage other operating departments data.
+                </p>
+                <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
+                  <ArrowLeft class="w-3 h-3" />
+                  <span>Use the project selector in the dashboard to get started</span>
+                </div>
+                </div>
+            </template>
+            
+            <!-- Tables when years are selected -->
+            <template v-else-if="visibleYears.length && isComponentReady">
+              <!-- Laundry Table -->
+              <div class="mb-8">
+                <div class="flex items-center gap-2 mb-4">
+                  <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                     <Table class="w-3 h-3 text-white" />
                   </div>
-                  <h2 class="text-lg font-bold text-gray-800">Banquet Revenue Assumptions Overview</h2>
-                </div>
-                <div class="flex gap-2 mt-2">
-                  <button @click="showAddBanquetDetail = true" class="px-3 py-1.5 bg-violet-600 text-white rounded hover:bg-violet-700 text-sm font-medium shadow transition-all">
-                    Add Operating Department
-                  </button>
-                  <button @click="resetToDefault" class="px-3 py-1.5 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm font-medium shadow transition-all">
-                    Reset to Default
-                  </button>
-                </div>
+                  <h2 class="text-lg font-bold text-gray-800">Laundry</h2>
               </div>
   
-              <!-- Modern Table Container -->
-              <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden">
+                <div class="bg-white rounded-lg border border-blue-200 shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
                   <div class="min-w-full w-max">
                     <table class="w-full">
                       <!-- Table Header -->
-                      <thead class="bg-gradient-to-r from-violet-600 to-violet-700 text-white">
+                        <thead class="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
                         <tr>
-                          <th rowspan="2" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
-                            <div class="flex items-center gap-1">
-                              <FolderOpen class="w-3 h-3" />
-                              Banquet Details
-                            </div>
-                          </th>
+                            <th rowspan="2" class="px-3 py-2 text-left border-r font-semibold text-sm w-[300px]">
+                              <div class="flex items-center gap-1">
+                                <FolderOpen class="w-3 h-3" />
+                                Details
+                              </div>
+                            </th>
                           <th
                             v-for="year in visibleYears"
                             :key="'header-' + year"
                             :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
-                            class="px-2 py-2 text-center border-x-2 border-white cursor-pointer select-none hover:bg-violet-700 transition-all duration-200 group text-sm"
+                              class="px-2 py-2 text-center border-x-2 border-white cursor-pointer select-none hover:bg-blue-700 transition-all duration-200 group text-sm"
                             @click="toggleCollapse(year)"
                             title="Click to collapse/expand"
                           >
@@ -223,24 +247,24 @@
                             </div>
                           </th>
                         </tr>
-                        <tr class="bg-violet-500/90 text-xs">
+                          <tr class="bg-blue-500/90 text-xs">
                           <template v-for="year in visibleYears" :key="'months-' + year">
                             <template v-if="!isYearCollapsed(year)">
-                              <th
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="year + '-' + label"
-                                class="px-2 py-1 text-center border border-violet-300 min-w-[100px] font-medium"
-                              >
-                                {{ label }}
-                              </th>
-                              <th class="px-2 py-1 text-center border border-violet-300 min-w-[110px] font-semibold">
-                                <div class="flex items-center justify-center gap-1">
-                                  Forecast
-                                </div>
-                              </th>
-                            </template>
-                            <template v-else>
-                              <th class="px-2 py-1 text-center border border-violet-300 min-w-[110px] font-semibold">
+                                                              <th
+                                  v-for="label in getColumnLabelsForYearLocal(year)"
+                                  :key="year + '-' + label"
+                                  class="px-2 py-1 text-center border border-blue-300 min-w-[100px] font-medium text-xs"
+                                >
+                                  {{ label }}
+                                </th>
+                                                                <th class="px-2 py-1 text-center border border-blue-300 min-w-[110px] font-semibold text-xs">
+                                  <div class="flex items-center justify-center gap-1">
+                                    Forecast
+                                  </div>
+                                </th>
+                              </template>
+                              <template v-else>
+                                <th class="px-2 py-1 text-center border border-blue-300 min-w-[110px] font-semibold text-xs">
                                 <div class="flex items-center justify-center gap-1">
                                   Forecast
                                 </div>
@@ -250,88 +274,243 @@
                         </tr>
                       </thead>
                       <tbody class="text-gray-700 bg-white text-sm">
-                        <template v-for="(field, idx) in computedBanquetFields" :key="field.code">
-                          <tr
-                            :class="[
-                              'transition-all duration-200 border-b border-gray-100',
-                              (['gross','net_amount'].includes(field.code)) ? 'bg-violet-700 text-white font-bold' : 'even:bg-gray-50 hover:bg-violet-50',
-                            ]"
-                          >
-                            <td class="px-3 py-2 font-medium border-r border-violet-200 flex items-center justify-between" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : 'text-gray-600'">
-                              <span>{{ field.label }}</span>
+                          <template v-for="(field, idx) in laundryFields" :key="field.code">
+                            <tr v-if="field.label === 'COST OF LAUNDRY'">
+                              <td :colspan="1 + visibleYears.length * (isYearCollapsed(visibleYears[0]) ? 1 : getColumnLabelsForYearLocal(visibleYears[0]).length + 1)"
+                                  class="bg-blue-100 text-blue-900 font-bold text-left px-3 py-2 border-t-2 border-b-2 border-blue-300 uppercase tracking-wider">
+                                {{ field.label }}
+                              </td>
+                            </tr>
+                            <tr v-else class="transition-all duration-200 border-b border-gray-100 even:bg-gray-50 hover:bg-blue-50">
+                              <td class="px-3 py-2 font-medium border-r text-gray-600 w-[300px]">
+                                {{ field.label }}
+                              </td>
+                              <template v-for="year in visibleYears" :key="'row-' + year + '-' + field.code">
+                                <template v-if="!isYearCollapsed(year)">
+                                                                    <td
+                                    v-for="label in getColumnLabelsForYearLocal(year)"
+                                    :key="'cell-editable-' + year + '-' + label"
+                                    contenteditable="true"
+                                    class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 min-w-[100px]"
+                                    @input="handleOODCellInput({ year, label, field: field.code, event: $event, oodData: laundryData })"
+                                    @focus="handleOODCellFocus({ year, label, field: field.code, event: $event })"
+                                    @blur="handleCellEditWrapper({ year, label, field: field.code, event: $event })"
+                                  >
+                                    <span class="font-mono text-xs">{{ formatOODValue(field.code, getOODCellValue(laundryData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
+                                  </td>
+                                                                    <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50 min-w-[110px]">
+                                    <span class="font-mono text-xs text-blue-700">
+                                      {{ formatOODValue(field.code, calculateTotalForOOD(laundryData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
+                                    </span>
+                                  </td>
+                                </template>
+                                <template v-else>
+                                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50 min-w-[110px]">
+                                    <span class="font-mono text-xs text-blue-700">
+                                      {{ formatOODValue(field.code, calculateTotalForOOD(laundryData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
+                                    </span>
+                                  </td>
+                                </template>
+                            </template>
+                          </tr>
+                          </template>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Health Club Table -->
+              <div class="mb-8">
+                <div class="flex items-center gap-2 mb-4">
+                  <div class="w-6 h-6 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                    <Table class="w-3 h-3 text-white" />
+                  </div>
+                  <h2 class="text-lg font-bold text-gray-800">Health Club</h2>
+                </div>
+                
+                <div class="bg-white rounded-lg border border-green-200 shadow-sm overflow-hidden">
+                  <div class="overflow-x-auto">
+                    <div class="min-w-full w-max">
+                      <table class="w-full">
+                        <!-- Table Header -->
+                        <thead class="bg-gradient-to-r from-green-600 to-green-700 text-white">
+                          <tr>
+                            <th rowspan="2" class="px-3 py-2 text-left border-r font-semibold text-sm w-[300px]">
                               <div class="flex items-center gap-1">
-                                <span v-if="['food','liquor','soft_drinks','hall_space_charges','gross','net_amount','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)" class="px-2 py-0.5 rounded bg-violet-100 text-violet-700 text-[10px] font-semibold border border-violet-200 align-middle whitespace-nowrap">
-                                  Auto
-                                </span>
-                                <span v-if="customBanquetFields.some(f => f.code === field.code)" class="px-2 py-0.5 rounded bg-green-100 text-green-700 text-[10px] font-semibold border border-green-200 align-middle whitespace-nowrap">
-                                  Custom
-                                </span>
-                                <button v-if="!['gross','net_amount','advance_bal','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)" @click="deleteBanquetDetail(field)" class="ml-2 text-red-500 hover:text-red-700" title="Delete">
-                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                                </button>
+                                <FolderOpen class="w-3 h-3" />
+                              Details
                               </div>
-                            </td>
-                            <template v-for="year in visibleYears" :key="'row-' + year + '-' + field.code">
+                            </th>
+                            <th
+                              v-for="year in visibleYears"
+                              :key="'header-' + year"
+                              :colspan="isYearCollapsed(year) ? 2 : (getColumnLabelsForYearLocal(year).length * 2) + 2"
+                              class="px-2 py-2 text-center border-x-2 border-white cursor-pointer select-none hover:bg-green-700 transition-all duration-200 group text-sm"
+                              @click="toggleCollapse(year)"
+                              title="Click to collapse/expand"
+                            >
+                              <div class="flex items-center justify-center gap-1">
+                                <span class="font-semibold">{{ year }}</span>
+                                <ChevronDown 
+                                  v-if="!isYearCollapsed(year)" 
+                                  class="w-3 h-3 transition-transform group-hover:scale-110" 
+                                />
+                                <ChevronRight 
+                                  v-else 
+                                  class="w-3 h-3 transition-transform group-hover:scale-110" 
+                                />
+                              </div>
+                            </th>
+                          </tr>
+                          <tr class="bg-green-500/90 text-xs">
+                            <template v-for="year in visibleYears" :key="'months-' + year">
                               <template v-if="!isYearCollapsed(year)">
-                                <td
-                                  v-if="['food','liquor','soft_drinks','hall_space_charges','gross','net_amount','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)"
-                                  v-for="label in getColumnLabelsForYearLocal(year)"
-                                  :key="'cell-' + year + '-' + label"
-                                  class="px-2 py-1 text-right border border-violet-200 bg-gray-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200 font-semibold select-none"
-                                  :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : ''"
-                                >
-                                  <span class="font-mono text-xs">
-                                    {{ formatBanquetValue(field.code, getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}
-                                  </span>
-                                </td>
-                                <td
-                                  v-else
-                                  v-for="label in getColumnLabelsForYearLocal(year)"
-                                  :key="'cell-editable-' + year + '-' + label"
-                                  contenteditable="true"
-                                  class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
-                                  :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : ''"
-                                  @input="handleBanquetCellInput({ year, label, expense: field.code, event: $event, banquetData })"
-                                  @focus="handleBanquetCellFocus({ year, label, expense: field.code, event: $event })"
-                                  @blur="handleCellEditWrapper({ year, label, expense: field.code, event: $event })"
-                                >
-                                  <span class="font-mono text-xs">{{ formatBanquetValue(field.code, getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
-                                </td>
-                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
-                                  <span class="font-mono text-xs text-violet-700" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
-                                    {{ formatBanquetValue(field.code, calculateTotalForBanquet(banquetData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
-                                  </span>
-                                </td>
+                                <template v-for="label in getColumnLabelsForYearLocal(year)" :key="year + '-' + label">
+                                  <th class="px-2 py-1 text-center border border-green-300 min-w-[100px] font-medium">
+                                    {{ label }}
+                                  </th>
+                                  <th class="px-2 py-1 text-center border border-green-300 min-w-[80px] font-medium">
+                                    %
+                                  </th>
+                                </template>
+                                <th class="px-2 py-1 text-center border border-green-300 min-w-[110px] font-semibold">
+                                  <div class="flex items-center justify-center gap-1">
+                                    Forecast
+                                  </div>
+                                </th>
+                                <th class="px-2 py-1 text-center border border-green-300 min-w-[80px] font-semibold">
+                                  %
+                                </th>
                               </template>
                               <template v-else>
-                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
-                                  <span class="font-mono text-xs text-violet-700" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
-                                    {{ formatBanquetValue(field.code, calculateTotalForBanquet(banquetData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
-                                  </span>
-                                </td>
+                                <th class="px-2 py-1 text-center border border-green-300 min-w-[110px] font-semibold">
+                                  <div class="flex items-center justify-center gap-1">
+                                    Forecast
+                                  </div>
+                                </th>
+                                <th class="px-2 py-1 text-center border border-green-300 min-w-[80px] font-semibold">
+                                  %
+                                </th>
                               </template>
                             </template>
                           </tr>
-                          <tr v-if="field.code === 'avg_hall_space_charges_check'">
-                            <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1), 0)" class="h-10 font-bold text-xl text-violet-700 bg-violet-200 border px-2 py-2 m-0">
-                              Details
+                        </thead>
+                        <tbody class="text-gray-700 bg-white text-sm">
+                          <template v-for="(field, idx) in healthClubFields" :key="field.code">
+                            <tr :class="[
+                              'transition-all duration-200 border-b border-gray-100 hover:bg-green-50',
+                              isTotalField(field.code) 
+                                ? 'bg-gradient-to-r from-green-100 to-green-50 border-green-300 font-semibold' 
+                                : 'even:bg-gray-50'
+                            ]">
+                              <td :class="[
+                                'px-3 py-2 border-r w-[300px]',
+                                isTotalField(field.code)
+                                  ? 'font-bold text-green-800 bg-green-200'
+                                  : 'font-medium text-gray-600'
+                              ]">
+                                {{ field.label }}
                             </td>
-                          </tr>
-                          <tr v-if="field.code === 'net_amount'">
-                            <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1), 0)" class="h-10 font-bold text-xl text-violet-700 bg-violet-200 border px-2 py-2 m-0">
-                              Statistics 
-                            </td>
+                              <template v-for="year in visibleYears" :key="'row-' + year + '-' + field.code">
+                                <template v-if="!isYearCollapsed(year)">
+                                  <template v-for="label in getColumnLabelsForYearLocal(year)" :key="year + '-' + label">
+                                    <td
+                                      contenteditable="true"
+                                      :class="[
+                                        'px-2 py-1 text-right border border-green-200 outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200',
+                                        isTotalField(field.code)
+                                          ? 'bg-green-100 hover:bg-green-200 font-semibold'
+                                          : 'hover:bg-green-50'
+                                      ]"
+                                      @input="handleOODCellInput({ year, label, field: field.code, event: $event, oodData: healthClubData })"
+                                      @focus="handleOODCellFocus({ year, label, field: field.code, event: $event })"
+                                      @blur="handleCellEditWrapper({ year, label, field: field.code, event: $event })"
+                                    >
+                                      <span :class="[
+                                        'font-mono text-xs',
+                                        isTotalField(field.code) ? 'text-green-800 font-semibold' : ''
+                                      ]">{{ formatOODValue(field.code, getOODCellValue(healthClubData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
+                                    </td>
+                                    <td
+                                      contenteditable="true"
+                                      :class="[
+                                        'px-2 py-1 text-right border border-green-200 outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200',
+                                        isTotalField(field.code)
+                                          ? 'bg-green-100 hover:bg-green-200 font-semibold'
+                                          : 'hover:bg-green-50'
+                                      ]"
+                                      @input="handleOODCellInput({ year, label, field: field.code + '_pct', event: $event, oodData: healthClubData })"
+                                      @focus="handleOODCellFocus({ year, label, field: field.code + '_pct', event: $event })"
+                                      @blur="handleCellEditWrapper({ year, label, field: field.code + '_pct', event: $event })"
+                                    >
+                                      <span :class="[
+                                        'font-mono text-xs',
+                                        isTotalField(field.code) ? 'text-green-800 font-semibold' : ''
+                                      ]">{{ formatOODValue(field.code + '_pct', getOODCellValue(healthClubData, field.code + '_pct', year, label, advancedModes[year] || displayMode)) }}</span>
+                                    </td>
+                                  </template>
+                                  <td :class="[
+                                    'px-2 py-1 text-right border border-green-200 font-semibold',
+                                    isTotalField(field.code) ? 'bg-green-200' : 'bg-green-50'
+                                  ]">
+                                    <span :class="[
+                                      'font-mono text-xs',
+                                      isTotalField(field.code) ? 'text-green-900 font-bold' : 'text-green-700'
+                                    ]">
+                                      {{ formatOODValue(field.code, calculateTotalForOOD(healthClubData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
+                                    </span>
+                                  </td>
+                                  <td :class="[
+                                    'px-2 py-1 text-right border border-green-200 font-semibold',
+                                    isTotalField(field.code) ? 'bg-green-200' : 'bg-green-50'
+                                  ]">
+                                    <span :class="[
+                                      'font-mono text-xs',
+                                      isTotalField(field.code) ? 'text-green-900 font-bold' : 'text-green-700'
+                                    ]">
+                                      {{ formatOODValue(field.code + '_pct', calculateTotalForOOD(healthClubData, field.code + '_pct', year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
+                                    </span>
+                                  </td>
+                                </template>
+                                <template v-else>
+                                  <td :class="[
+                                    'px-2 py-1 text-right border border-green-200 font-semibold',
+                                    isTotalField(field.code) ? 'bg-green-200' : 'bg-green-50'
+                                  ]">
+                                    <span :class="[
+                                      'font-mono text-xs',
+                                      isTotalField(field.code) ? 'text-green-900 font-bold' : 'text-green-700'
+                                    ]">
+                                      {{ formatOODValue(field.code, calculateTotalForOOD(healthClubData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
+                                    </span>
+                                  </td>
+                                  <td :class="[
+                                    'px-2 py-1 text-right border border-green-200 font-semibold',
+                                    isTotalField(field.code) ? 'bg-green-200' : 'bg-green-50'
+                                  ]">
+                                    <span :class="[
+                                      'font-mono text-xs',
+                                      isTotalField(field.code) ? 'text-green-900 font-bold' : 'text-green-700'
+                                    ]">
+                                      {{ formatOODValue(field.code + '_pct', calculateTotalForOOD(healthClubData, field.code + '_pct', year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
+                                    </span>
+                                  </td>
+                                </template>
+                              </template>
                           </tr>
                         </template>
                       </tbody>
                     </table>
+                    </div>
                   </div>
                 </div>
               </div>
             </template>
   
             <!-- Enhanced No Years Selected State -->
-            <template v-else>
+            <template v-else-if="selectedProject">
               <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
                 <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
                   <CircleAlert class="w-8 h-8 text-violet-500" />
@@ -340,9 +519,9 @@
                   {{ fromYear && !toYear ? 'Select "To Year"' : !fromYear && toYear ? 'Select "From Year"' : 'No Years Selected' }}
                 </h3>
                 <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
-                  {{ fromYear && !toYear ? 'You have selected a From Year, now please select a To Year to display the expense table.' : 
-                     !fromYear && toYear ? 'You have selected a To Year, now please select a From Year to display the expense table.' :
-                       'Please select both "From Year" and "To Year" in the left panel to display the expense table.' }}
+                  {{ fromYear && !toYear ? 'You have selected a From Year, now please select a To Year to display the tables.' : 
+                     !fromYear && toYear ? 'You have selected a To Year, now please select a From Year to display the tables.' :
+                       'Please select both "From Year" and "To Year" in the left panel to display the tables.' }}
                 </p>
                 <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
                   <ArrowLeft class="w-3 h-3" />
@@ -374,7 +553,7 @@
             <!-- Message when no years selected -->
             <div v-if="!visibleYears.length" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
               <AlertTriangle class="w-6 h-6 text-yellow-600" />
-              <span class="text-yellow-800 font-medium">Please select both \"From Year\" and \"To Year\" to configure advanced settings.</span>
+              <span class="text-yellow-800 font-medium">Please select both "From Year" and "To Year" to configure advanced settings.</span>
             </div>
   
             <div v-if="visibleYears.length" class="space-y-4 max-h-[50vh] overflow-auto pr-2">
@@ -420,33 +599,101 @@
       </div>
     </transition>
   
-    <!-- Add Banquet Detail Modal -->
-    <transition name="fade">
-      <div v-if="showAddBanquetDetail" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-md p-0 overflow-hidden">
-          <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
-            <Settings class="w-6 h-6 text-white" />
-            <h2 class="text-xl font-bold text-white">Add Banquet Detail</h2>
-          </div>
-          <div class="p-8 pt-6">
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Banquet Detail</label>
-              <input v-model="newBanquetDetail" class="w-full px-3 py-2 border rounded focus:ring-violet-500" placeholder="e.g. Decoration" />
-            </div>
-          </div>
-          <div class="flex justify-end gap-3 px-8 py-4 bg-gray-50 border-t border-violet-100">
-            <button @click="closeAddBanquetDetail" class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2">
-              <X class="w-4 h-4" />
-              Cancel
-            </button>
-            <button @click="addBanquetDetail" class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2">
-              <Check class="w-4 h-4" />
-              Add
-            </button>
+  <!-- Laundry Details Modal -->
+  <transition name="fade">
+    <div
+      v-if="showLaundryDetails"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+    >
+      <div class="bg-white rounded-3xl shadow-2xl border border-blue-200 w-[99%] max-w-5xl p-0">
+        <!-- Modal Header -->
+        <div class="flex items-center gap-4 px-12 py-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-3xl">
+          <Settings class="w-7 h-7 text-white" />
+          <h2 class="text-2xl font-bold text-white tracking-wide">Laundry Details</h2>
+        </div>
+        <!-- Modal Body -->
+        <div class="p-10 pt-8 bg-blue-50/30">
+          <div class="overflow-x-auto">
+            <table class="min-w-full w-full border-separate border-spacing-y-2">
+              <thead>
+                <tr>
+                  <th class="text-left text-base font-semibold text-blue-900 pb-2 pl-2">Detail</th>
+                  <th class="text-center text-base font-semibold text-blue-900 pb-2">Number</th>
+                  <th class="text-center text-base font-semibold text-blue-900 pb-2">Percentage</th>
+                  <th class="text-center text-base font-semibold text-blue-900 pb-2">Base</th>
+                  <th class="text-center text-base font-semibold text-blue-900 pb-2">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template v-for="field in laundryFields" :key="'laundry-detail-' + field.code">
+                  <tr v-if="field.label === 'COST OF LAUNDRY'">
+                    <td colspan="5" class="bg-blue-100 text-blue-900 font-bold text-left px-4 py-3 border-t-2 border-b-2 border-blue-300 uppercase tracking-wider rounded-xl">
+                      {{ field.label }}
+                    </td>
+                  </tr>
+                  <tr v-else class="bg-white hover:bg-blue-100 transition-all border border-blue-100 rounded-xl shadow-sm">
+                    <td class="py-3 px-4 font-medium text-blue-800 rounded-l-xl">{{ field.label }}</td>
+                    <td class="py-3 px-2 text-center">
+                      <input
+                        type="number"
+                        v-model="laundryDetailsModalData[field.code + '_number']"
+                        class="px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-400 w-28 text-sm bg-blue-50/50"
+                        placeholder="0"
+                      />
+                    </td>
+                    <td class="py-3 px-2 text-center">
+                      <input
+                        type="number"
+                        v-model="laundryDetailsModalData[field.code + '_percentage']"
+                        class="px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-400 w-28 text-sm bg-blue-50/50"
+                        placeholder="0%"
+                      />
+                    </td>
+                    <td class="py-3 px-2 text-center">
+                      <select
+                        v-model="laundryDetailsModalData[field.code + '_base']"
+                        class="px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-400 w-32 text-sm bg-blue-50/50"
+                      >
+                        <option disabled value="">Select a base</option>
+                        <option value="per_day">per day</option>
+                        <option value="per_week">per week</option>
+                        <option value="per_year">per year</option>
+                      </select>
+                    </td>
+                    <td class="py-3 px-2 text-center rounded-r-xl">
+                      <input
+                        type="number"
+                        v-model="laundryDetailsModalData[field.code + '_amount']"
+                        class="px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-400 w-32 text-sm bg-blue-50/50"
+                        placeholder="0.00"
+                      />
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
           </div>
         </div>
+        <!-- Modal Footer -->
+        <div class="flex justify-end gap-4 px-12 py-6 bg-blue-50 border-t border-blue-100 rounded-b-3xl">
+          <button
+            @click="cancelLaundryDetails"
+            class="px-5 py-2.5 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2 text-base font-medium shadow-sm"
+          >
+            <X class="w-5 h-5" />
+            Cancel
+          </button>
+          <button
+            @click="applyLaundryDetails"
+            class="px-5 py-2.5 rounded-md bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2 text-base font-semibold shadow-md"
+          >
+            <Check class="w-5 h-5" />
+            Apply
+          </button>
+        </div>
       </div>
-    </transition>
+    </div>
+  </transition>
   </template>
   
   
@@ -475,74 +722,77 @@
   } from 'lucide-vue-next';
   import alertService from "@/components/ui/alertService.js";
   import { 
-    BANQUET_FIELDS, 
-    formatBanquetValue, 
-    calcFood, 
-    calcLiquor, 
-    calcSoftDrinks, 
-    calcHallSpaceCharges, 
-    calcGross,
-    calcNetAmount,
-    calcAmountPerEvent,
-    calcAmountPerPax,
-    calcAvgPaxPerEvent,
+  LAUNDRY_FIELDS,
+  HEALTH_CLUB_FIELDS,
+  formatOODValue, 
     getVisibleYears,
     getColumnLabels,
-    getAmountForBanquet,
-    calculateTotalForBanquet,
-    handleBanquetCellEdit,
-    handleBanquetCellInput,
-    handleBanquetCellFocus,
-    loadBanquetRevenueData, 
-    saveBanquetRevenueChanges,
-    convertBanquetServerDataToFrontend, 
-    toNum
-  } from "@/components/utility/banquet_revenue_assumpt/index.js";
-  import {
-    toggleCollapse,
+  getAmountForOOD,
+  calculateTotalForOOD,
+  handleOODCellEdit,
+  handleOODCellInput,
+  handleOODCellFocus,
+  loadOODData, 
+  saveOODChanges,
+  convertOODServerDataToFrontend, 
+  toNum,
+  toggleCollapse as toggleCollapseUtil,
     loadYearOptions,
-    isYearCollapsed
-  } from "@/components/utility/expense_assumption/index.js";
+  isYearCollapsed as isYearCollapsedUtil
+} from "@/components/utility/ood_data/index.js";
   import { cloneDeep } from 'lodash-es';
   
+  // Import project service
+  import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
   
   // Reactive state
   const years = ref([]);
   const fromYear = ref("");
   const toYear = ref("");
   const displayMode = ref("monthly");
-  const banquetData = reactive({});
+  const laundryData = reactive({});
+  const healthClubData = reactive({});
   const showAdvanced = ref(false);
   const advancedModes = ref({});
   const tempAdvancedModes = ref({});
   const isSaved = ref(false);
-  const originalBanquetData = ref({});
-  const changedCells = ref([]); // {year, label, expense, newValue}
+  const originalLaundryData = ref({});
+  const originalHealthClubData = ref({});
+  const changedCells = ref([]); // {year, label, field, newValue}
   const isSaving = ref(false);
   const saveError = ref("");
   const sidebarCollapsed = ref(false);
-  const isComponentReady = ref(false); // Add a flag to track if component is ready
-  const showAddBanquetDetail = ref(false);
-  const newBanquetDetail = ref("");
-  const customBanquetFields = ref([]); // Will hold fetched banquet details
-  const removedDefaultFields = ref([]); // Track removed default fields
+  const isComponentReady = ref(false);
+  const collapsedYears = ref([]);
+  const showLaundryDetails = ref(false);
+  const laundryDetailsModalData = ref({});
 
   // Computed properties
   const visibleYears = computed(() => {
-    const years = getVisibleYears(fromYear.value, toYear.value);
-    return years;
+    return getVisibleYears(fromYear.value, toYear.value);
   });
-  
 
   // Computed property to get column labels for a specific year
   const getColumnLabelsForYearLocal = (year) => {
     return getColumnLabels(advancedModes.value[year] || displayMode.value);
   };
   
+  // Computed properties for table fields
+  const laundryFields = computed(() => {
+    return LAUNDRY_FIELDS.map(field => ({
+      ...field,
+      number: ref(0),
+      percentage: ref(0),
+      base: ref(0)
+    }));
+  });
+
+  const healthClubFields = computed(() => {
+    return HEALTH_CLUB_FIELDS;
+  });
 
   // Watch for changes in visible years to initialize advanced modes
   watch(visibleYears, () => {
-    // console.log('Visible years changed:', visibleYears.value);
     visibleYears.value.forEach(year => {
       if (!advancedModes.value[year]) {
         advancedModes.value[year] = displayMode.value;
@@ -550,11 +800,10 @@
     });
   });
 
-  // Watch for changes in banquetData to ensure calculated fields update
-  watch(banquetData, (newData, oldData) => {
-    // console.log('banquetData changed:', newData);
+  // Watch for changes in data to ensure calculated fields update
+  watch([laundryData, healthClubData], (newData, oldData) => {
+    // console.log('OOD data changed:', newData);
   }, { deep: true, immediate: true });
-  
   
   // When opening the modal, copy the current settings
   watch(showAdvanced, (val) => {
@@ -571,117 +820,141 @@
   function cancelAdvancedSettings() {
     showAdvanced.value = false;
   }
-
-  function openAddBanquetDetail() {
-    newBanquetDetail.value = "";
-    showAddBanquetDetail.value = true;
-  }
-  function closeAddBanquetDetail() {
-    showAddBanquetDetail.value = false;
-  }
-  async function addBanquetDetail() {
-    if (!newBanquetDetail.value) return;
-    try {
-      const res = await fetch("/api/resource/Banquet Details", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ banquet_detail: newBanquetDetail.value })
-      });
-      if (!res.ok) throw new Error("Failed to create");
-      newBanquetDetail.value = "";
-      showAddBanquetDetail.value = false;
-      await fetchBanquetDetails();
-      alertService.success("Banquet detail added");
-    } catch (err) {
-      alertService.error("Failed to add banquet detail");
-    }
-  }
-
-  async function fetchBanquetDetails() {
-    // Frappe REST API: /api/resource/Banquet Details
-    try {
-      const res = await fetch("/api/resource/Banquet Details?fields=[\"name\",\"banquet_detail\"]&limit_page_length=1000");
-      const data = await res.json();
-      customBanquetFields.value = (data.data || []).map(d => ({ code: d.name, label: d.banquet_detail }));
-    } catch (err) {
-      alertService.error("Failed to load banquet details");
-    }
-  }
   
   // On mount, initialize years from localStorage if available
   onMounted(async () => {
     try {
+      // Initialize project service first to restore selected project
+      await initializeProjectService();
+      
+      // Wait a moment to ensure project is properly set
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       years.value = await loadYearOptions();
-      fromYear.value = localStorage.getItem('banquetFromYear') || "";
-      toYear.value = localStorage.getItem('banquetToYear') || "";
+      fromYear.value = localStorage.getItem('oodFromYear') || "";
+      toYear.value = localStorage.getItem('oodToYear') || "";
 
-      // Load from backend API
-      const loaded = await loadBanquetRevenueData() || {};
-      const converted = convertBanquetServerDataToFrontend(loaded);
-      Object.assign(banquetData, converted);
+      // Load from backend API for the current project
+      if (selectedProject.value) {
+        const loaded = await loadOODData(selectedProject.value.project_name) || {};
+        const converted = convertOODServerDataToFrontend(loaded);
+        
+        // Separate laundry and health club data
+        Object.assign(laundryData, converted.laundry || {});
+        Object.assign(healthClubData, converted.health_club || {});
+      } else {
+        // No project selected
+        laundryData.value = { status: 'no_project_selected', message: 'No project selected' };
+        healthClubData.value = { status: 'no_project_selected', message: 'No project selected' };
+      }
 
-      originalBanquetData.value = cloneDeep(banquetData);
+      originalLaundryData.value = cloneDeep(laundryData);
+      originalHealthClubData.value = cloneDeep(healthClubData);
       isSaved.value = true;
       isComponentReady.value = true;
-      await fetchBanquetDetails();
     } catch (err) {
       console.error("Error loading data:", err);
     }
   });
   
-  // Watchers to persist year selection (banquet-specific keys)
+  // Watchers to persist year selection (OOD-specific keys)
   watch(fromYear, (newValue) => {
-    localStorage.setItem('banquetFromYear', newValue);
+    localStorage.setItem('oodFromYear', newValue);
   });
   watch(toYear, (newValue) => {
-    localStorage.setItem('banquetToYear', newValue);
+    localStorage.setItem('oodToYear', newValue);
   });
+
+  // Watch for project changes and reload data
+  watch(selectedProject, async (newProject, oldProject) => {
+    if (newProject) {
+      try {
+        // Reload OOD data for the new project
+        const loaded = await loadOODData(newProject.project_name) || {};
+        const converted = convertOODServerDataToFrontend(loaded);
+        
+        // Separate laundry and health club data
+        Object.assign(laundryData, converted.laundry || {});
+        Object.assign(healthClubData, converted.health_club || {});
+        
+        originalLaundryData.value = cloneDeep(laundryData);
+        originalHealthClubData.value = cloneDeep(healthClubData);
+        
+        // Reset any unsaved changes
+        changedCells.value = [];
+        isSaved.value = true;
+        saveError.value = "";
+        
+        alertService.success(`Switched to project: ${newProject.project_name}`);
+      } catch (error) {
+        console.error('Error reloading OOD data for new project:', error);
+        alertService.error("Failed to load project data. Please try again.");
+      }
+    } else {
+      // Clear data when no project is selected
+      laundryData.value = { status: 'no_project_selected', message: 'No project selected' };
+      healthClubData.value = { status: 'no_project_selected', message: 'No project selected' };
+      originalLaundryData.value = cloneDeep(laundryData);
+      originalHealthClubData.value = cloneDeep(healthClubData);
+      changedCells.value = [];
+      isSaved.value = true;
+      saveError.value = "";
+    }
+  }, { deep: true });
   
   function clearYearSelection() {
     fromYear.value = "";
     toYear.value = "";
-    localStorage.removeItem('banquetFromYear');
-    localStorage.removeItem('banquetToYear');
+    localStorage.removeItem('oodFromYear');
+    localStorage.removeItem('oodToYear');
     isSaved.value = false;
   }
   
-  function handleCellEditWrapper({ year, label, expense, event }) {
-  handleBanquetCellEdit({
+  function handleCellEditWrapper({ year, label, field, event }) {
+    handleOODCellEdit({
     year,
     label,
-    expense,
+      field,
     event,
-    originalBanquetData,
+      originalOODData: originalLaundryData, // This will be updated based on which table is being edited
     changedCells,
-    banquetData,
+      oodData: laundryData, // This will be updated based on which table is being edited
     isSaved,
     isComponentReady
   });
 }
-  
   
   // Wrapper function for saveChanges
   const saveChangesWrapper = async () => {
     try {
       isSaving.value = true;
       saveError.value = "";
+      
       // Prepare changes for API
       const changes = changedCells.value.map(cell => ({
         year: cell.year,
         month: cell.label,
-        banquet_detail: cell.expense,
+        field: cell.field,
         amount: cell.newValue
       }));
+      
       if (changes.length === 0) {
         isSaving.value = false;
         return;
       }
-      const result = await saveBanquetRevenueChanges(changes);
+      
+      const result = await saveOODChanges(changes, selectedProject.value?.project_name);
+      
       // Reload from backend after save
-      const loaded = await loadBanquetRevenueData() || {};
-      const converted = convertBanquetServerDataToFrontend(loaded);
-      Object.assign(banquetData, converted);
-      originalBanquetData.value = cloneDeep(banquetData);
+      const loaded = await loadOODData(selectedProject.value?.project_name) || {};
+      const converted = convertOODServerDataToFrontend(loaded);
+      
+      // Separate laundry and health club data
+      Object.assign(laundryData, converted.laundry || {});
+      Object.assign(healthClubData, converted.health_club || {});
+      
+      originalLaundryData.value = cloneDeep(laundryData);
+      originalHealthClubData.value = cloneDeep(healthClubData);
       changedCells.value = [];
       isSaved.value = true;
       alertService.success("Changes saved successfully");
@@ -694,165 +967,128 @@
     }
   };
   
-  
-  // ! Unsaved Changes Warning Modal
-  // ! Watch for unsaved changes to show warning on page refresh
+  // Unsaved Changes Warning Modal
   watch(isSaved, (newValue) => {
     if (!newValue) {
-      // Add beforeunload event listener when there are unsaved changes
       window.addEventListener('beforeunload', handleBeforeUnload);
     } else {
-      // Remove beforeunload event listener when changes are saved
       window.removeEventListener('beforeunload', handleBeforeUnload);
     }
   });
   
-  // Handle beforeunload event to show warning
   function handleBeforeUnload(event) {
     if (!isSaved.value) {
-      // Standard browser warning
       event.preventDefault();
       event.returnValue = 'You have unsaved changes that may be discarded if not saved. Are you sure you want to leave?';
       return event.returnValue;
     }
   }
   
-  
-  // Clean up event listeners when component is unmounted
   onUnmounted(() => {
     window.removeEventListener('beforeunload', handleBeforeUnload);
   });
   
-  
   // Refresh table functionality
-  // async function refreshTable() {
-  //   try {
-  //     const loaded = await loadBanquetRevenueData() || {};
-  //     const converted = convertBanquetServerDataToFrontend(loaded);
-  //     Object.assign(banquetData, converted);
-  //     originalBanquetData.value = cloneDeep(banquetData);
-  //     changedCells.value = [];
-  //     isSaved.value = true;
-  //     alertService.success("Page refreshed successfully");
-  //   } catch (error) {
-  //     console.error("Error refreshing table:", error);
-  //     alertService.error("Failed to refresh data. Please try again.");
-  //   }
-  // }
-
-  function getBanquetRowData(banquetData, year, label) {
-    // Returns an object with all field values for the given year/label (month/quarter)
-    const row = {};
-    for (const f of computedBanquetFields.value) {
-      const entries = (banquetData?.[year]?.[label]) || [];
-      const found = entries.find(e => e.expense === f.code);
-      row[f.code] = found ? Number(found.amount) || 0 : 0;
-    }
-    // Debug logging for pax and avg_food_check
-    if (toNum(row.pax) > 0 || toNum(row.avg_food_check) > 0) {
-      // console.log(`getBanquetRowData for ${year}/${label}:`, {
-      //   pax: toNum(row.pax),
-      //   avg_food_check: toNum(row.avg_food_check),
-      //   calculated_food: toNum(row.pax) * toNum(row.avg_food_check),
-      //   all_data: row
-      // });
-    }
-    return row;
-  }
-
-  // Computed helper for calculated values
-  function getCalculatedValue(fieldCode, year, label) {
-    const row = getBanquetRowData(banquetData, year, label);
-    const allFieldCodes = computedBanquetFields.value.map(f => f.code);
-    switch (fieldCode) {
-      case 'food':
-        return calcFood(row);
-      case 'liquor':
-        return calcLiquor(row);
-      case 'soft_drinks':
-        return calcSoftDrinks(row);
-      case 'hall_space_charges':
-        return calcHallSpaceCharges(row);
-      case 'gross':
-        return calcGross(row, allFieldCodes);
-      case 'net_amount':
-        return calcNetAmount(row, allFieldCodes);
-      case 'amount_per_event':
-        return calcAmountPerEvent(row);
-      case 'amount_per_pax':
-        return calcAmountPerPax(row);
-      case 'avg_pax_per_event':
-        return calcAvgPaxPerEvent(row);
-      default:
-        return 0;
+  async function refreshTable() {
+    try {
+      const loaded = await loadOODData(selectedProject.value?.project_name) || {};
+      const converted = convertOODServerDataToFrontend(loaded);
+      
+      // Separate laundry and health club data
+      Object.assign(laundryData, converted.laundry || {});
+      Object.assign(healthClubData, converted.health_club || {});
+      
+      originalLaundryData.value = cloneDeep(laundryData);
+      originalHealthClubData.value = cloneDeep(healthClubData);
+      changedCells.value = [];
+      isSaved.value = true;
+      alertService.success("Page refreshed successfully");
+    } catch (error) {
+      console.error("Error refreshing table:", error);
+      alertService.error("Failed to refresh data. Please try again.");
     }
   }
 
-  function getBanquetCellValue(banquetData, fieldCode, year, label, displayMode = 'monthly') {
-    const row = getBanquetRowData(banquetData, year, label);
-    const allFieldCodes = computedBanquetFields.value.map(f => f.code);
-    switch (fieldCode) {
-      case 'food':
-        return calcFood(row);
-      case 'liquor':
-        return calcLiquor(row);
-      case 'soft_drinks':
-        return calcSoftDrinks(row);
-      case 'hall_space_charges':
-        return calcHallSpaceCharges(row);
-      case 'gross':
-        return calcGross(row, allFieldCodes);
-      case 'net_amount':
-        return calcNetAmount(row, allFieldCodes);
-      case 'amount_per_event':
-        return calcAmountPerEvent(row);
-      case 'amount_per_pax':
-        return calcAmountPerPax(row);
-      case 'avg_pax_per_event':
-        return calcAvgPaxPerEvent(row);
-      default:
-        return getAmountForBanquet(banquetData, fieldCode, year, label, displayMode);
-    }
+  function getOODCellValue(oodData, fieldCode, year, label, displayMode = 'monthly') {
+    return getAmountForOOD(oodData, fieldCode, year, label, displayMode);
   }
 
-  async function deleteBanquetDetail(field) {
-    // If it's a custom field (from backend)
-    if (customBanquetFields.value.some(f => f.code === field.code)) {
-      if (!confirm('Are you sure you want to delete this custom banquet detail? This action cannot be undone.')) return;
-      try {
-        await fetch(`/api/resource/Banquet Details/${field.code}`, { method: 'DELETE' });
-        await fetchBanquetDetails();
-        alertService.success('Banquet detail deleted');
-      } catch (err) {
-        alertService.error('Failed to delete banquet detail');
-      }
-    } else {
-      // Default field: just filter it out for this session
-      removedDefaultFields.value.push(field.code);
-    }
+  // Toggle collapse functionality - using imported function
+  function toggleCollapse(year) {
+    toggleCollapseUtil(year, collapsedYears);
   }
 
-  function resetToDefault() {
-    removedDefaultFields.value = [];
-    alertService.success('Default fields have been restored.');
+  // Check if year is collapsed - using imported function
+  function isYearCollapsed(year) {
+    return isYearCollapsedUtil(year, collapsedYears);
   }
 
-  const computedBanquetFields = computed(() => {
-    // Insert fetched banquet details above 'others', and filter out removed fields
-    const idx = BANQUET_FIELDS.findIndex(f => f.code === 'others');
-    const filteredDefaults = BANQUET_FIELDS.filter(f => !removedDefaultFields.value.includes(f.code));
-    const filteredCustoms = customBanquetFields.value.filter(f => !removedDefaultFields.value.includes(f.code));
-    if (idx === -1) return [...filteredDefaults, ...filteredCustoms];
-    return [
-      ...filteredDefaults.slice(0, idx),
-      ...filteredCustoms,
-      ...filteredDefaults.slice(idx)
+  // Handle base change for laundry fields
+  function handleBaseChange(fieldCode, value) {
+    // Store the base value for the field
+    if (!laundryData.static) laundryData.static = {};
+    if (!laundryData.static.base) laundryData.static.base = {};
+    laundryData.static.base[fieldCode] = value;
+    
+    // Mark as unsaved
+    isSaved.value = false;
+  }
+
+  // Get base value for a field
+  function getBaseValue(fieldCode) {
+    return laundryData?.static?.base?.[fieldCode] || '';
+  }
+
+  // Check if a field is a total field in Health Club table
+  function isTotalField(fieldCode) {
+    const totalFields = [
+      'total_club_use_revenue',
+      'total_treatments_other_services', 
+      'total_memberships',
+      'total_health_club_spa',
+      'service_charge',
+      'total_health_club_rev_including_sc'
     ];
+    return totalFields.includes(fieldCode);
+  }
+
+  // Open modal and populate modal data from laundryData
+  function openLaundryDetails() {
+    laundryDetailsModalData.value = {};
+    laundryFields.value.forEach(field => {
+      laundryDetailsModalData.value[field.code + '_number'] = laundryData?.static?.number?.[field.code] || '';
+      laundryDetailsModalData.value[field.code + '_percentage'] = laundryData?.static?.percentage?.[field.code] || '';
+      laundryDetailsModalData.value[field.code + '_base'] = laundryData?.static?.base?.[field.code] || '';
+      laundryDetailsModalData.value[field.code + '_amount'] = laundryData?.static?.amount?.[field.code] || '';
+    });
+    showLaundryDetails.value = true;
+  }
+
+  // Watch for modal open
+  watch(showLaundryDetails, (val) => {
+    if (val) openLaundryDetails();
   });
+
+  function cancelLaundryDetails() {
+    showLaundryDetails.value = false;
+  }
+
+  function applyLaundryDetails() {
+    if (!laundryData.static) laundryData.static = {};
+    if (!laundryData.static.number) laundryData.static.number = {};
+    if (!laundryData.static.percentage) laundryData.static.percentage = {};
+    if (!laundryData.static.base) laundryData.static.base = {};
+    if (!laundryData.static.amount) laundryData.static.amount = {};
+    laundryFields.value.forEach(field => {
+      laundryData.static.number[field.code] = laundryDetailsModalData.value[field.code + '_number'];
+      laundryData.static.percentage[field.code] = laundryDetailsModalData.value[field.code + '_percentage'];
+      laundryData.static.base[field.code] = laundryDetailsModalData.value[field.code + '_base'];
+      laundryData.static.amount[field.code] = laundryDetailsModalData.value[field.code + '_amount'];
+    });
+    isSaved.value = false;
+    showLaundryDetails.value = false;
+  }
   </script>
-  
-  
-  
   
   <style scoped>
   .fade-enter-active, .fade-leave-active {

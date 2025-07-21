@@ -774,7 +774,6 @@
                     class="px-4 py-2 border rounded-md focus:ring-violet-500 focus:border-violet-500 w-24 text-right"
                     placeholder="0.00"
                     @input="handleDoubleOccupancyInput($event, year)"
-                    @keypress="allowOnlyNumbers($event)"
                   />
                 </div>
               </div>
@@ -1733,8 +1732,9 @@
     if (row === "Double occupancy") {
       // Use the double occupancy value from the modal settings
       const doubleOccupancyValue = doubleOccupancyByYear.value[year];
-      if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null) {
-        return doubleOccupancyValue.toFixed(2);
+      const num = parseFloat(doubleOccupancyValue);
+      if (!isNaN(num)) {
+        return num.toFixed(2);
       }
       // Fallback to user input if no modal setting
       const userRaw = fnbData?.[row]?.[year]?.[label];
@@ -2219,8 +2219,9 @@
     if (row === "Double occupancy") {
       // For double occupancy, return the value for the year (should be consistent)
       const doubleOccupancyValue = doubleOccupancyByYear.value[year];
-      if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null) {
-        return doubleOccupancyValue.toFixed(2);
+      const num = parseFloat(doubleOccupancyValue);
+      if (!isNaN(num)) {
+        return num.toFixed(2);
       }
       // Fallback: calculate average if no year value
       let total = 0;

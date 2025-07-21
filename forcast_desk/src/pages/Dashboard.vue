@@ -65,7 +65,7 @@
           <!-- No project selected state -->
           <div 
             v-else 
-            class="relative overflow-hidden rounded-2xl p-8 bg-gradient-to-r from-gray-400 via-gray-500 to-gray-600 shadow-2xl border border-white/20"
+            class="relative overflow-hidden rounded-2xl p-8 bg-gradient-to-r from-gray-500 via-gray-400 to-white shadow-2xl border border-white"
           >
             <div class="relative z-10 text-center">
               <div class="mb-4">
@@ -76,7 +76,7 @@
               </div>
               
               <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
-                Select a Project
+                Welcome to Your Forecastor
               </h2>
               
               <p class="text-white/80 text-lg max-w-2xl mx-auto leading-relaxed">
@@ -91,23 +91,23 @@
           <div
             v-for="(card, index) in statCards"
             :key="card.label"
-            class="group relative overflow-hidden rounded-2xl p-6 bg-white/70 backdrop-blur-xl shadow-lg border border-white/20 hover:shadow-2xl hover:scale-105 transition-all duration-500 ease-out"
+            class="group relative  overflow-hidden rounded-2xl p-6 bg-white/70 backdrop-blur-xl shadow-lg border border-white/20 hover:shadow-2xl hover:scale-105 transition-all duration-500 ease-out"
           >
             <!-- Card background gradient -->
             <div class="absolute inset-0 bg-gradient-to-br from-white/80 to-white/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             
             <!-- Animated border -->
-            <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-violet-500 via-purple-600/30 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             
             <div class="relative z-10">
               <div class="flex items-center justify-between mb-3">
-                <p class="text-gray-600 text-sm font-medium">{{ card.label }}</p>
+                <p class="text-gray-600 group-hover:text-white text-sm font-medium transition-colors duration-300">{{ card.label }}</p>
                 <div class="p-2 rounded-lg" :class="card.bgClass">
                   <component :is="card.icon" class="w-5 h-5" :class="card.iconClass" />
                 </div>
               </div>
               <div class="flex items-end justify-between">
-                <p :class="card.accentClass + ' text-3xl font-bold'">{{ card.value }}</p>
+                <p :class="card.accentClass + ' text-3xl font-bold group-hover:text-white transition-colors duration-300'">{{ card.value }}</p>
                 <div class="flex items-center space-x-1 text-sm" :class="card.trendClass">
                   <component :is="card.trendIcon" class="w-4 h-4" />
                   <span>{{ card.trend }}</span>

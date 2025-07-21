@@ -171,6 +171,15 @@
                           Advanced
                         </button>
                       </div>
+                      <div v-if="!marketSegmentation" class="mt-3">
+                        <button 
+                          @click="openRoomTypeCountModal" 
+                          class="w-full flex items-center justify-left gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
+                        >
+                          <Calculator class="w-4 h-4" />
+                          Room Type Count
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -345,7 +354,6 @@
                           <thead class="bg-gradient-to-r from-violet-50 to-violet-100 text-violet-800 sticky top-0">
                             <tr>
                               <th class="px-4 py-3 text-left font-semibold border-r border-violet-200"><BedDouble class="w-4 h-4 inline mr-1" /> Room Type</th>
-                              <th class="px-4 py-3 text-left font-semibold border-r border-violet-200">No. of Rooms</th>
                               <template v-for="year in visibleYears" :key="'available-header-' + year">
                                 <th
                                   :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
@@ -363,9 +371,6 @@
                             </tr>
                             <tr class="bg-violet-100 text-sm">
                               <th class="px-4 py-2 border-r border-violet-200"></th>
-                              <th class="px-4 py-2 border-r border-violet-200 font-bold">
-                                {{ calculateTotalRoomCount(roomPackages, roomData) }}
-                              </th>
                               <template v-for="year in visibleYears" :key="'available-months-' + year">
                                 <template v-if="!isYearCollapsed(year)">
                                   <th
@@ -389,15 +394,15 @@
                               :key="'available-' + roomType"
                               class="even:bg-violet-50 hover:bg-violet-100 transition"
                             >
-                              <td class="px-4 py-3 font-medium border-r border-violet-200">{{ roomType }}</td>
-                              <td 
-                                class="px-4 py-3 font-medium border-r border-violet-200 text-gray-600"
-                                contenteditable="true"
-                                @input="handleRoomCellInput({ roomType, field: 'room_count', event: $event })"
-                                @focus="handleRoomCellFocus({ roomType, field: 'room_count', event: $event })"
-                                @blur="handleRoomCountEditWrapper({ roomType, event: $event })"
-                              >
-                                {{ getNumberOfRoomsForType(roomPackages, roomType, roomData) }}
+                              <td class="px-4 py-3 font-medium border-r border-violet-200 flex items-center justify-between">
+                                <span>{{ roomType }}</span>
+                                <button
+                                  @click="removeRoomPackage(roomType)"
+                                  class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  title="Remove package"
+                                >
+                                  <X class="w-3 h-3" />
+                                </button>
                               </td>
                               <template v-for="year in visibleYears" :key="'available-row-' + year + '-' + roomType">
                                 <template v-if="!isYearCollapsed(year)">
@@ -432,9 +437,6 @@
                           <tfoot class="bg-violet-100 border-t-2 border-violet-300">
                             <tr class="font-bold text-violet-900">
                               <td class="px-4 py-3 border-r border-violet-200">Total</td>
-                              <td class="px-4 py-3 border-r border-violet-200 font-bold">
-                                {{ calculateTotalRoomCount(roomPackages, roomData) }}
-                              </td>
                               <template v-for="year in visibleYears" :key="'available-total-' + year">
                                 <template v-if="!isYearCollapsed(year)">
                                   <td
@@ -513,7 +515,16 @@
                               :key="'occupied-' + roomType"
                               class="even:bg-blue-50 hover:bg-blue-100 transition"
                             >
-                              <td class="px-4 py-3 font-medium border-r border-blue-200">{{ roomType }}</td>
+                              <td class="px-4 py-3 font-medium border-r border-blue-200 flex items-center justify-between">
+                                <span>{{ roomType }}</span>
+                                <button
+                                  @click="removeRoomPackage(roomType)"
+                                  class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  title="Remove package"
+                                >
+                                  <X class="w-3 h-3" />
+                                </button>
+                              </td>
                               <template v-for="year in visibleYears" :key="'occupied-row-' + year + '-' + roomType">
                                 <template v-if="!isYearCollapsed(year)">
                                   <td
@@ -625,7 +636,16 @@
                               :key="'rate-' + roomType"
                               class="even:bg-green-50 hover:bg-green-100 transition"
                             >
-                              <td class="px-4 py-3 font-medium border-r border-green-200">{{ roomType }}</td>
+                              <td class="px-4 py-3 font-medium border-r border-green-200 flex items-center justify-between">
+                                <span>{{ roomType }}</span>
+                                <button
+                                  @click="removeRoomPackage(roomType)"
+                                  class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  title="Remove package"
+                                >
+                                  <X class="w-3 h-3" />
+                                </button>
+                              </td>
                               <template v-for="year in visibleYears" :key="'rate-row-' + year + '-' + roomType">
                                 <template v-if="!isYearCollapsed(year)">
                                   <td
@@ -737,7 +757,16 @@
                               :key="'revenue-' + roomType"
                               class="even:bg-orange-50 hover:bg-orange-100 transition"
                             >
-                              <td class="px-4 py-3 font-medium border-r border-orange-200">{{ roomType }}</td>
+                              <td class="px-4 py-3 font-medium border-r border-orange-200 flex items-center justify-between">
+                                <span>{{ roomType }}</span>
+                                <button
+                                  @click="removeRoomPackage(roomType)"
+                                  class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  title="Remove package"
+                                >
+                                  <X class="w-3 h-3" />
+                                </button>
+                              </td>
                               <template v-for="year in visibleYears" :key="'revenue-row-' + year + '-' + roomType">
                                 <template v-if="!isYearCollapsed(year)">
                                   <td
@@ -1307,6 +1336,87 @@
       </div>
     </div>
   </transition>
+
+  <!-- Room Type Count Modal -->
+  <transition name="fade">
+    <div
+      v-if="showRoomTypeCountModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+    >
+      <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-2xl p-0 overflow-hidden">
+        <!-- Modal Header -->
+        <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
+          <Calculator class="w-6 h-6 text-white" />
+          <h2 class="text-xl font-bold text-white">Room Type Count Management</h2>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-8 pt-6">
+          <div class="mb-4">
+            <p class="text-gray-600 text-sm">Set the number of rooms for each room type. These values will be used in revenue calculations.</p>
+          </div>
+          
+          <div class="space-y-4 max-h-[60vh] overflow-auto pr-2">
+            <div
+              v-for="roomType in ROOM_TYPES"
+              :key="'room-count-' + roomType"
+              class="flex justify-between items-center border-b pb-4"
+            >
+              <span class="font-medium text-gray-700 flex items-center gap-2">
+                <BedDouble class="w-4 h-4 text-violet-600" />
+                {{ roomType }}
+              </span>
+              <div class="flex items-center gap-2">
+                <input
+                  v-model="roomTypeCounts[roomType]"
+                  type="number"
+                  min="0"
+                  class="px-4 py-2 border rounded-lg focus:ring-violet-500 focus:border-violet-500 w-32 text-left"
+                  placeholder="0"
+                />
+                <span class="text-gray-500 text-sm">rooms</span>
+                <button
+                  @click="removeRoomPackage(roomType)"
+                  class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                  title="Remove package"
+                >
+                  <X class="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div class="mt-6 p-4 bg-violet-50 rounded-lg border border-violet-200">
+            <div class="flex justify-between items-center">
+              <span class="font-medium text-violet-800">Total Rooms:</span>
+              <span class="font-bold text-violet-900 text-lg">
+                {{ Object.values(roomTypeCounts).reduce((sum, count) => sum + (parseInt(count) || 0), 0) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex justify-end gap-3 px-8 py-4 bg-gray-50 border-t border-violet-100">
+          <button
+            @click="cancelRoomTypeCountModal"
+            class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2"
+          >
+            <X class="w-4 h-4" />
+            Cancel
+          </button>
+          <button
+            @click="saveRoomTypeCounts"
+            class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2"
+          >
+            <Check class="w-4 h-4" />
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </transition>
 </template>
   
   
@@ -1324,6 +1434,8 @@ import alertService from "@/components/ui/alertService.js";
 import {
   // Core room revenue utilities
   ROOM_TYPES,
+  DEFAULT_ROOM_TYPES,
+  updateRoomTypes,
   getVisibleYears,
   getColumnLabels,
   toggleCollapse,
@@ -1351,6 +1463,8 @@ import {
   // Data services
   getRoomRevenueList,
   getRoomPackagesList,
+  createDefaultRoomPackages,
+  deleteRoomPackage,
   createRoomRevenueAssumption,
   getMarketSegmentList,
   saveMarketSegmentChanges,
@@ -1440,6 +1554,10 @@ const exchangeRateByYear = ref({});
 const showServiceChargeModal = ref(false);
 const serviceChargeByYear = ref({});
 
+// Add reactive state for room type count modal
+const showRoomTypeCountModal = ref(false);
+const roomTypeCounts = ref({});
+
 // Computed properties
 const visibleYears = computed(() => {
   return getVisibleYears(fromYear.value, toYear.value);
@@ -1511,12 +1629,18 @@ onMounted(async () => {
     originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
     
     // ** Room Packages List ** //
-    const response = await getRoomPackagesList();
+    const response = await getRoomPackagesList(selectedProject.value?.project_name);
     roomPackages.value = response.data.data.room_packages || [];
     roomPackagesOptions.value = roomPackages.value.map(room_package => ({
-      label: room_package.name,
-      value: room_package.name
+      label: room_package.package_name,
+      value: room_package.package_name
     }));
+    
+    // Ensure default packages exist for the current project
+    await ensureDefaultPackages();
+    
+    // Update ROOM_TYPES based on available packages
+    updateRoomTypes(roomPackages.value);
     
     // Restore years from localStorage
     fromYear.value = localStorage.getItem('roomRevenueFromYear') || "";
@@ -1537,6 +1661,12 @@ onMounted(async () => {
     const storedServiceCharge = localStorage.getItem('serviceChargeByYear');
     if (storedServiceCharge) serviceChargeByYear.value = JSON.parse(storedServiceCharge);
     
+    // Initialize room type counts
+    roomTypeCounts.value = {};
+    ROOM_TYPES.forEach(roomType => {
+      roomTypeCounts.value[roomType] = getNumberOfRoomsForType(roomPackages.value, roomType, roomData.value);
+    });
+    
     // console.log('Room Revenue page loaded with project:', selectedProject.value?.project_name);
   } catch (err) {
     console.error("Error loading data:", err);
@@ -1552,30 +1682,12 @@ watch(toYear, (newValue) => {
 });
 
 // Watch for project changes and reload data
-watch(selectedProject, async (newProject, oldProject) => {
-        // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
+watch(selectedProject, (newProject, oldProject) => {
+  // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
   
   if (newProject) {
-    try {
-      // console.log('Reloading data for new project:', newProject.project_name);
-      
-      // Reload room revenue data for the new project
-      roomData.value = await getRoomRevenueList();
-      originalRoomData.value = cloneDeep(roomData.value);
-      
-      // Reload market segment data for the new project
-      const marketSegmentResponse = await getMarketSegmentList();
-      marketSegmentData.value = marketSegmentResponse || {};
-      originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
-      
-      // Reset save status
-      isSaved.value = true;
-      saveError.value = "";
-      
-              // console.log('Data reloaded successfully for project:', newProject.project_name);
-    } catch (error) {
-      console.error('Error reloading data for new project:', error);
-    }
+    // Call async function to reload data
+    reloadDataForProject(newProject);
   } else {
     // Clear data when no project is selected
     roomData.value = { status: 'no_project_selected', message: 'No project selected' };
@@ -1584,6 +1696,45 @@ watch(selectedProject, async (newProject, oldProject) => {
     originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
   }
 }, { deep: true });
+
+// Async function to reload data for a project
+async function reloadDataForProject(newProject) {
+  try {
+    // console.log('Reloading data for new project:', newProject.project_name);
+    
+    // Reload room revenue data for the new project
+    roomData.value = await getRoomRevenueList();
+    originalRoomData.value = cloneDeep(roomData.value);
+    
+    // Reload market segment data for the new project
+    const marketSegmentResponse = await getMarketSegmentList();
+    marketSegmentData.value = marketSegmentResponse || {};
+    originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
+    
+    // Reload room packages for the new project
+    await refreshRoomPackages();
+    
+    // Ensure default packages exist for the new project
+    await ensureDefaultPackages();
+    
+    // Update ROOM_TYPES based on available packages
+    updateRoomTypes(roomPackages.value);
+    
+    // Reset save status
+    isSaved.value = true;
+    saveError.value = "";
+    
+    // Update room type counts for new project
+    roomTypeCounts.value = {};
+    ROOM_TYPES.forEach(roomType => {
+      roomTypeCounts.value[roomType] = getNumberOfRoomsForType(roomPackages.value, roomType, roomData.value);
+    });
+    
+    // console.log('Data reloaded successfully for project:', newProject.project_name);
+  } catch (error) {
+    console.error('Error reloading data for new project:', error);
+  }
+}
 
 function clearYearSelection() {
   fromYear.value = "";
@@ -1752,7 +1903,7 @@ async function refreshRoomRevenueData() {
   }
 }
 
-function addNewRoomType() {
+async function addNewRoomType() {
   const name = newRoomType.value.trim();
   const roomCount = parseInt(newRoomTypeRoomCount.value, 10);
   if (!name || !roomCount || roomCount < 1) return;
@@ -1762,25 +1913,101 @@ function addNewRoomType() {
   );
   if (!exists) {
     isAddingRoomType.value = true;
-    createRoomPackage({ package_name: name, number_of_rooms: roomCount })
-      .then((result) => {
-        if (result && result.message && result.message.success) {
-          roomPackagesOptions.value.push({ label: name, value: name });
-          newRoomType.value = "";
-          newRoomTypeRoomCount.value = "";
-          alertService.success("Room type created successfully!");
-        } else {
-          alertService.error("Failed to create room type. Try again.");
-        }
-      })
-      .catch(() => {
-        alertService.error("Failed to create room type. Try again.");
-      })
-      .finally(() => {
-        isAddingRoomType.value = false;
+    try {
+      const result = await createRoomPackage({ 
+        package_name: name, 
+        number_of_rooms: roomCount,
+        project_name: selectedProject.value?.project_name 
       });
+      
+      // console.log('Create room package result:', result);
+      
+      // Check for success in different possible response structures
+      if (result && (result.success || result.message?.success)) {
+        newRoomType.value = "";
+        newRoomTypeRoomCount.value = "";
+        alertService.success("Room type created successfully!");
+        // Refresh room packages list
+        await refreshRoomPackages();
+      } else {
+        // console.error('Failed to create room package:', result);
+        alertService.error(result?.error || result?.message?.error || "Failed to create room type. Try again.");
+      }
+    } catch (error) {
+      // console.error('Error creating room package:', error);
+      alertService.error("Failed to create room type. Try again.");
+    } finally {
+      isAddingRoomType.value = false;
+    }
   } else {
     alertService && alertService.error && alertService.error("Room type already exists.");
+  }
+}
+
+// Check if a room type is a default package
+function isDefaultPackage(roomType) {
+  return DEFAULT_ROOM_TYPES.includes(roomType);
+}
+
+// Remove a room package from the project
+async function removeRoomPackage(roomType) {
+  if (!selectedProject.value?.project_name) {
+    alertService.error("No project selected");
+    return;
+  }
+
+  try {
+    const result = await deleteRoomPackage(roomType, selectedProject.value.project_name);
+    // Check for success in different possible response structures
+    if (result && (result.success || result.message?.success)) {
+      alertService.success(`Package ${roomType} removed successfully`);
+      // Show alert first, then reload after a short delay
+      setTimeout(() => {
+        window.location.href = window.location.href;
+      }, 1500); // 1.5 seconds delay
+      return;
+    } else {
+      alertService.error(result?.error || result?.message?.error || "Failed to remove package");
+    }
+  } catch (error) {
+    alertService.error("Failed to remove package");
+  }
+}
+
+// Refresh room packages list
+async function refreshRoomPackages() {
+  try {
+    const response = await getRoomPackagesList(selectedProject.value?.project_name);
+    if (response && response.success) {
+      roomPackages.value = response.data.data.room_packages || [];
+      roomPackagesOptions.value = roomPackages.value.map(room_package => ({
+        label: room_package.package_name,
+        value: room_package.package_name
+      }));
+      
+      // Update ROOM_TYPES based on available packages
+      updateRoomTypes(roomPackages.value);
+    }
+  } catch (error) {
+    console.error('Error refreshing room packages:', error);
+  }
+}
+
+// Ensure default packages exist for the current project
+async function ensureDefaultPackages() {
+  if (!selectedProject.value?.project_name) {
+    return;
+  }
+
+  try {
+    const result = await createDefaultRoomPackages(selectedProject.value.project_name);
+    if (result && result.success) {
+      console.log('Default packages ensured for project:', selectedProject.value.project_name);
+      // Refresh room packages list
+      await refreshRoomPackages();
+    }
+  } catch (error) {
+    console.error('Error ensuring default packages:', error);
   }
 }
 
@@ -1899,6 +2126,59 @@ function handleMarketSegmentDataChanged(newData) {
 function handleMarketSegmentDataLoaded(data) {
   marketSegmentData.value = data;
   originalMarketSegmentData.value = cloneDeep(data);
+}
+
+// Room Type Count Modal Functions
+function openRoomTypeCountModal() {
+  // Initialize roomTypeCounts with current values
+  roomTypeCounts.value = {};
+  ROOM_TYPES.forEach(roomType => {
+    roomTypeCounts.value[roomType] = getNumberOfRoomsForType(roomPackages.value, roomType, roomData.value);
+  });
+  showRoomTypeCountModal.value = true;
+}
+
+function cancelRoomTypeCountModal() {
+  showRoomTypeCountModal.value = false;
+  roomTypeCounts.value = {};
+}
+
+function saveRoomTypeCounts() {
+  // Update room packages with new counts
+  roomPackages.value.forEach(pkg => {
+    if (roomTypeCounts.value[pkg.name] !== undefined) {
+      pkg.number_of_rooms = parseInt(roomTypeCounts.value[pkg.name]) || 0;
+    }
+  });
+
+  // Update roomData to reflect changes
+  if (!roomData.value.room_packages) {
+    roomData.value.room_packages = [];
+  }
+  
+  // Update or add room packages in roomData
+  ROOM_TYPES.forEach(roomType => {
+    const count = parseInt(roomTypeCounts.value[roomType]) || 0;
+    const existingIndex = roomData.value.room_packages.findIndex(pkg => pkg.name === roomType);
+    
+    if (existingIndex >= 0) {
+      roomData.value.room_packages[existingIndex].number_of_rooms = count;
+    } else {
+      roomData.value.room_packages.push({
+        name: roomType,
+        number_of_rooms: count
+      });
+    }
+  });
+
+  // Mark as unsaved
+  isSaved.value = false;
+  
+  // Close modal
+  showRoomTypeCountModal.value = false;
+  
+  // Show success message
+  alertService.success("Room type counts updated successfully!");
 }
 </script>
   
