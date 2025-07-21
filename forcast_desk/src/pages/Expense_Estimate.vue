@@ -719,7 +719,7 @@
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import Sidebar from "@/components/ui/Sidebar.vue";
 import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign } from 'lucide-vue-next';
-import alertService from "@/components/ui/alertService.js";
+import alertService from "@/components/ui/ui_utility/alertService.js";
 
 import {
   // Core expense calculations

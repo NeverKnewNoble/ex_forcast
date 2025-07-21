@@ -1,4 +1,4 @@
-import alertService from "@/components/ui/alertService.js";
+import alertService from "@/components/ui/ui_utility/alertService.js";
 import { cloneDeep } from 'lodash-es';
 import { saveRoomRevenueChanges } from './data_service.js';
 

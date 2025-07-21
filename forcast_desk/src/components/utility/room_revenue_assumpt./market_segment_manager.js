@@ -9,7 +9,7 @@ import {
   deleteRoomMarketSegment,
   getDefaultRoomMarketSegments
 } from './data_service.js';
-import alertService from '@/components/ui/alertService.js';
+import alertService from '@/components/ui/ui_utility/alertService.js';
 
 // Reactive state for categories and segments
 export const marketSegmentCategories = ref([]);

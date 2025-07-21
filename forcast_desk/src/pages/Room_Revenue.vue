@@ -1428,7 +1428,7 @@
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import Sidebar from "@/components/ui/Sidebar.vue";
 import { CircleAlert, BadgeCent, Coffee, Table, AlertTriangle, BedDouble, Plus, PlusCircle, DollarSign, Calculator, Settings, Calendar, X, Check, Save, Loader2, RefreshCw, ChevronDown, ChevronRight, ArrowLeft, ChevronLeft, FolderOpen, Database, AlertCircle, ArrowRight, Percent } from 'lucide-vue-next';
-import alertService from "@/components/ui/alertService.js";
+import alertService from "@/components/ui/ui_utility/alertService.js";
 
 // Import room revenue utilities
 import {

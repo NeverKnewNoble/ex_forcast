@@ -138,7 +138,7 @@ export async function saveRoomChanges(changedCells, isSaving, saveError, roomDat
   try {
     // Import the API functions and alert service
     const { saveRoomRevenueChanges } = await import('./data_service.js')
-    const alertService = await import('@/components/ui/alertService.js').then(m => m.default)
+    const alertService = await import('@/components/ui/ui_utility/alertService.js').then(m => m.default)
     
     // Transform the data to match API expectations
     const transformedChanges = changedCells.value.map(change => {
@@ -187,7 +187,7 @@ export async function saveRoomChanges(changedCells, isSaving, saveError, roomDat
     
     // Show error alert
     try {
-      const alertService = await import('@/components/ui/alertService.js').then(m => m.default)
+      const alertService = await import('@/components/ui/ui_utility/alertService.js').then(m => m.default)
       alertService.error(error.message || "Failed to save changes. Please try again.")
     } catch (alertError) {
       console.error('Could not show error alert:', alertError)

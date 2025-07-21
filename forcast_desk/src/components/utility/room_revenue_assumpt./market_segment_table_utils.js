@@ -1,7 +1,7 @@
 // Market Segment Table Utilities - Cell editing and data management
 
 import { saveMarketSegmentChanges as saveMarketSegmentChangesAPI } from './data_service.js';
-import alertService from '@/components/ui/alertService.js';
+import alertService from '@/components/ui/ui_utility/alertService.js';
 
 // Handle market segment cell input events
 export function handleMarketSegmentCellInput({ year, label, segment, field, event, marketSegmentData, isSaved }) {

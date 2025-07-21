@@ -959,7 +959,7 @@ import {
   calculateMarketSegmentTotal
 } from '@/components/utility/room_revenue_assumpt./market_segment_table_utils.js';
 import { getMarketSegmentList } from '@/components/utility/room_revenue_assumpt./data_service.js';
-import alertService from '@/components/ui/alertService.js';
+import alertService from '@/components/ui/ui_utility/alertService.js';
 
 const props = defineProps({
   visibleYears: Array,

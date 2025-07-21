@@ -1,6 +1,6 @@
 // Save changes utility for F&B Revenue data
 import { saveFnbRevenueChanges } from './fnb_data_service.js';
-import alertService from '@/components/ui/alertService.js';
+import alertService from '@/components/ui/ui_utility/alertService.js';
 
 /**
  * Save F&B revenue changes to the server

@@ -1059,7 +1059,7 @@
     ArrowLeft,
     Delete,
   } from 'lucide-vue-next';
-  import alertService from "@/components/ui/alertService.js";
+  import alertService from "@/components/ui/ui_utility/alertService.js";
   import {
     // Core expense calculations
     getVisibleYears,
