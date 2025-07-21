@@ -146,17 +146,18 @@ export function allowOnlyNumbers(event) {
 }
 
 export function handleDoubleOccupancyInput(event, year) {
+  // Accept decimals and store as number
+  let value = event.target.value;
   // Remove any non-numeric characters except decimal point
-  let value = event.target.value.replace(/[^0-9.]/g, '');
-  
+  value = value.replace(/[^0-9.]/g, '');
   // Ensure only one decimal point
   const parts = value.split('.');
   if (parts.length > 2) {
     value = parts[0] + '.' + parts.slice(1).join('');
   }
-  
-  // Update the value
-  tempDoubleOccupancyByYear.value[year] = value;
+  // Store as number if valid, otherwise empty string
+  const num = parseFloat(value);
+  tempDoubleOccupancyByYear.value[year] = !isNaN(num) ? num : '';
 }
 
 // Before unload handler for unsaved changes

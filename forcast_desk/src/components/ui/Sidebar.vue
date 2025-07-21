@@ -23,7 +23,7 @@
     <!-- Menu Links -->
 	<div class="mt-2 flex-1 space-y-1">
 		<template v-for="item in filteredMenuItems" :key="item.text">
-    <div v-if="item.children">
+    <div v-if="item.children" class="relative">
       <button
         @click="toggleMenuExpand(item.text)"
         class="flex items-center w-full space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white"
@@ -37,22 +37,50 @@
           class="w-4 h-4 ml-auto"
         />
       </button>
-      <div v-if="expandedMenus[item.text]" class="pl-8">
+      
+      <!-- Expanded state for full sidebar -->
+      <div v-if="expandedMenus[item.text] && is_expanded" class="pl-8">
         <router-link
           v-for="child in item.children"
           :key="child.text"
           :to="child.route"
           class="flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white"
           :class="[
-            { 'justify-center': !is_expanded },
             $route.path === child.route
               ? 'bg-violet-100 border-r-4 border-violet-400 text-violet-500 font-semibold'
               : ''
           ]"
         >
           <component :is="child.icon" class="w-5 h-5" />
-          <span v-if="is_expanded" class="text-sm">{{ child.text }}</span>
+          <span class="text-sm">{{ child.text }}</span>
         </router-link>
+      </div>
+      
+      <!-- Popup for minimized sidebar -->
+      <div 
+        v-if="expandedMenus[item.text] && !is_expanded" 
+        class="absolute left-full top-0 ml-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-48"
+      >
+        <div class="p-2">
+          <div class="text-xs font-semibold text-gray-500 px-3 py-2 border-b border-gray-100">
+            {{ item.text }}
+          </div>
+          <router-link
+            v-for="child in item.children"
+            :key="child.text"
+            :to="child.route"
+            class="flex items-center space-x-3 px-3 py-2 rounded transition hover:bg-violet-500 hover:text-white text-sm"
+            :class="[
+              $route.path === child.route
+                ? 'bg-violet-100 text-violet-500 font-semibold'
+                : 'text-gray-700'
+            ]"
+            @click="expandedMenus[item.text] = false"
+          >
+            <component :is="child.icon" class="w-4 h-4" />
+            <span>{{ child.text }}</span>
+          </router-link>
+        </div>
       </div>
     </div>
     <router-link
@@ -103,7 +131,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
 import logoURL from '@/assets/images/icon_logo.png'
 import logoURL2 from '@/assets/images/ex_forest_logo.png'
 import { session } from '@/data/session' 
@@ -127,6 +155,7 @@ import {
   Building2,
   ReceiptText,
   Sheet,
+  ChartNoAxesCombined,
 } from 'lucide-vue-next'
 
 const is_expanded = ref(localStorage.getItem("is_expanded") === "true")
@@ -140,16 +169,23 @@ const menuItems = [
   { text: "Home", route: "/", icon: Home },
   { text: "Dashboard", route: "/dashboard", icon: LayoutDashboard  },
   { text: "Expense Assumptions", route: "/expense_estimate", icon: Calculator   },
-  { text: "Room Revenue Assumptions", route: "/room_revenue_assumptions", icon: BedDouble },
-  { text: "F&B Revenue Assumptions", route: "/f&b_revenue_assumptions", icon: UtensilsCrossed },
-  { text: "Banquet Revenue Forcast", route: "/banquet_revenue", icon: HandPlatter},
-  { text: "OOD Data", route: "/ood_data_input", icon: Building2},
+  {
+    text: "Revenue",
+    icon: ChartNoAxesCombined ,
+    children: [
+      { text: "Room Revenue Assumptions", route: "/room_revenue_assumptions", icon: BedDouble },
+      { text: "F&B Revenue Assumptions", route: "/f&b_revenue_assumptions", icon: UtensilsCrossed },
+      { text: "Banquet Revenue Assumptions", route: "/banquet_revenue", icon: HandPlatter},
+      { text: "OOD Revenue Assumptions", route: "/ood_data_input", icon: Building2},
+    ]
+  },
   {
     text: "Payroll",
     icon: Sheet,
     children: [
       { text: "Payroll Data", route: "/", icon: HandCoins },
-      { text: "Payroll Related", route: "/", icon: Ellipsis }
+      { text: "Payroll Related", route: "/", icon: Ellipsis },
+      { text: "Bonus", route: "/", icon: Ellipsis }
     ]
   },
   { text: "Receipts & Payments", route: "/", icon: ReceiptText },
@@ -169,6 +205,25 @@ const hospitalityExperience = ref(
 
 watch(hospitalityExperience, (newVal) => {
   localStorage.setItem('hospitalityExperience', newVal)
+})
+
+// Click outside handler for popup menus
+const handleClickOutside = (event) => {
+  const sidebar = event.target.closest('aside')
+  if (!sidebar) {
+    // Close all expanded menus when clicking outside
+    Object.keys(expandedMenus.value).forEach(key => {
+      expandedMenus.value[key] = false
+    })
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 
 const filteredMenuItems = computed(() => {

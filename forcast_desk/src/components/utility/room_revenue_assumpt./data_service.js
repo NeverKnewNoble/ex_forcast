@@ -97,7 +97,7 @@ export async function getSegmentCategories() {
     }
 
     const data = await response.json();
-    console.log('Segment Categories response:', data);
+    // console.log('Segment Categories response:', data);
     return data;
   } catch (error) {
     console.error('Error fetching segment categories:', error);
@@ -263,7 +263,7 @@ export async function getRoomMarketSegments() {
     }
 
     const data = await response.json();
-    console.log('Room Market Segments response:', data);
+    // console.log('Room Market Segments response:', data);
     return data;
   } catch (error) {
     console.error('Error fetching room market segments:', error);

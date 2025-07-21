@@ -65,7 +65,7 @@ export async function loadCategoriesFromAPI() {
     if (response && response.data && response.data.message && response.data.message.success) {
       const categories = response.data.message.data || [];
       marketSegmentCategories.value = sortCategoriesInOrder(categories.map(cat => cat.category_name));
-      console.log('Loaded categories from API:', marketSegmentCategories.value);
+      // console.log('Loaded categories from API:', marketSegmentCategories.value);
     } else {
       console.error('Failed to load categories from API:', response);
       // Fallback to localStorage
@@ -88,7 +88,7 @@ export async function loadSegmentsFromAPI() {
         market_segment: seg.market_segment,
         segment_category: seg.segment_category
       }));
-      console.log('Loaded segments from API:', marketSegments.value);
+      // console.log('Loaded segments from API:', marketSegments.value);
     } else {
       console.error('Failed to load segments from API:', response);
       // Fallback to localStorage

@@ -21,7 +21,7 @@
       <div class="max-w-6xl mx-auto text-center">
         <div class="animate-fade-in-up">
           <h1 class="text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] font-black  bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 bg-clip-text text-transparent animate-slide-in-left tracking-tight">
-            Ex Forecastor
+            Ex Forecast
           </h1>
           
           <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in-up delay-200">

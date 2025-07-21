@@ -8,6 +8,7 @@
  "field_order": [
   "package_name",
   "number_of_rooms",
+  "project",
   "module"
  ],
  "fields": [
@@ -27,11 +28,17 @@
    "fieldname": "number_of_rooms",
    "fieldtype": "Int",
    "label": "Number Of Rooms"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Forecast Project"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-29 00:09:28.368983",
+ "modified": "2025-07-20 11:39:34.786457",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Room Packages",
