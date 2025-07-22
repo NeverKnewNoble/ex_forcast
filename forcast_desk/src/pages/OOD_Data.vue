@@ -169,7 +169,7 @@
                     class="w-full flex items-center justify-left gap-2 px-3 py-2.5 bg-white border border-blue-500 text-blue-700 rounded-lg hover:bg-blue-50 transition-all duration-200 text-sm font-medium mt-2"
                   >
                     <FolderOpen class="w-4 h-4" />
-                    Laundry Details
+                    Laundry Assumptions
                   </button>
                 </div>
               </div>
@@ -399,7 +399,15 @@
                         </thead>
                         <tbody class="text-gray-700 bg-white text-sm">
                           <template v-for="(field, idx) in healthClubFields" :key="field.code">
-                            <tr :class="[
+                            <!-- Section Divider Rows -->
+                            <tr v-if="['Club Use Revenue', 'Treatments & Other Services', 'Memberships'].includes(field.label)">
+                              <td :colspan="1 + visibleYears.length * (isYearCollapsed(visibleYears[0]) ? 2 : (getColumnLabelsForYearLocal(visibleYears[0]).length * 2) + 2)"
+                                  class="bg-green-100 text-green-900 font-bold text-left px-3 py-2 border-t-2 border-b-2 border-green-300 uppercase tracking-wider">
+                                {{ field.label }}
+                              </td>
+                            </tr>
+                            <!-- Normal Data Rows -->
+                            <tr v-else :class="[
                               'transition-all duration-200 border-b border-gray-100 hover:bg-green-50',
                               isTotalField(field.code) 
                                 ? 'bg-gradient-to-r from-green-100 to-green-50 border-green-300 font-semibold' 
@@ -609,7 +617,7 @@
         <!-- Modal Header -->
         <div class="flex items-center gap-4 px-12 py-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-3xl">
           <Settings class="w-7 h-7 text-white" />
-          <h2 class="text-2xl font-bold text-white tracking-wide">Laundry Details</h2>
+          <h2 class="text-2xl font-bold text-white tracking-wide">Laundry Assumptions</h2>
         </div>
         <!-- Modal Body -->
         <div class="p-10 pt-8 bg-blue-50/30">
@@ -621,7 +629,7 @@
                   <th class="text-center text-base font-semibold text-blue-900 pb-2">Number</th>
                   <th class="text-center text-base font-semibold text-blue-900 pb-2">Percentage</th>
                   <th class="text-center text-base font-semibold text-blue-900 pb-2">Base</th>
-                  <th class="text-center text-base font-semibold text-blue-900 pb-2">Amount</th>
+                  <th class="text-center text-base font-semibold text-blue-900 pb-2">Average Amount</th>
                 </tr>
               </thead>
               <tbody>
@@ -657,7 +665,6 @@
                         <option disabled value="">Select a base</option>
                         <option value="per_day">per day</option>
                         <option value="per_week">per week</option>
-                        <option value="per_year">per year</option>
                       </select>
                     </td>
                     <td class="py-3 px-2 text-center rounded-r-xl">
@@ -727,8 +734,8 @@
   LAUNDRY_FIELDS,
   HEALTH_CLUB_FIELDS,
   formatOODValue, 
-    getVisibleYears,
-    getColumnLabels,
+  getVisibleYears,
+  getColumnLabels,
   getAmountForOOD,
   calculateTotalForOOD,
   handleOODCellEdit,
@@ -739,7 +746,7 @@
   convertOODServerDataToFrontend, 
   toNum,
   toggleCollapse as toggleCollapseUtil,
-    loadYearOptions,
+  loadYearOptions,
   isYearCollapsed as isYearCollapsedUtil
 } from "@/components/utility/ood_data/index.js";
   import { cloneDeep } from 'lodash-es';
@@ -849,13 +856,6 @@
     }
   });
   
-  // Watchers to persist year selection (now handled by Pinia store)
-  // watch(fromYear, (newValue) => {
-  //   localStorage.setItem('oodFromYear', newValue);
-  // });
-  // watch(toYear, (newValue) => {
-  //   localStorage.setItem('oodToYear', newValue);
-  // });
 
   // Watch for project changes and reload data
   watch(selectedProject, async (newProject, oldProject) => {

@@ -1127,7 +1127,7 @@
   import { getDaysInMonth } from "@/components/utility/room_revenue_assumpt./room_revenue_utils.js";
   // Import project service
   import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
- 
+  import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
   
 
 
@@ -1176,6 +1176,12 @@
   const defaultRestaurantRows = getDefaultRestaurantRows();
   const marketSegmentData = ref({});
   
+  // ! Cache for calculations
+  const calculationCache = useCalculationCache();
+
+
+
+
   // Pinia store for year settings
   const yearSettingsStore = useYearSettingsStore();
   const { fromYear, toYear, advancedModes } = storeToRefs(yearSettingsStore);
@@ -1594,6 +1600,9 @@
         }
         const roomsValue = totalRooms?.value || totalRooms || 0;
         const roomsAvailable = days * roomsValue;
+        if (selectedProject.value && selectedProject.value.project_name) {
+          calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Number of rooms available', year, label, roomsAvailable);
+        }
         return roomsAvailable.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
       }
       return "0";
@@ -1605,8 +1614,12 @@
       if (userRaw !== undefined && userRaw !== null && userRaw !== "") {
         let num = parseFloat(userRaw.toString().replace(/,/g, ''));
         if (isNaN(num)) num = 0;
+        if (selectedProject.value && selectedProject.value.project_name) {
+          calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Number of rooms sold (excl.)', year, label, num);
+        }
         return num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
       }
+
       // Otherwise, fallback to market segment value
       let val = 0;
       if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
@@ -1631,6 +1644,9 @@
       }
       
       if (val && val > 0) {
+        if (selectedProject.value && selectedProject.value.project_name) {
+          calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Number of rooms sold (excl.)', year, label, val);
+        }
         return val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
       }
       // fallback to 0
@@ -1680,6 +1696,9 @@
         const available = days * roomsValue;
         if (available > 0) {
           const percent = (occupied / available) * 100;
+          if (selectedProject.value && selectedProject.value.project_name) {
+            calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Occupancy (excl.) %', year, label, percent);
+          }
           return percent.toFixed(2) + '%';
         }
       }
@@ -1716,6 +1735,9 @@
       let percent = 0;
       if (available > 0) {
         percent = (occupied / available) * 100;
+      }
+      if (selectedProject.value && selectedProject.value.project_name) {
+        calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Occupancy (excl.) %', year, label, percent);
       }
       return percent.toFixed(2) + '%';
     }
@@ -1777,6 +1799,9 @@
       
       // Calculate number of guests
       const numberOfGuests = doubleOccupancy * roomsAvailable;
+      if (selectedProject.value && selectedProject.value.project_name) {
+        calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Number of guests', year, label, numberOfGuests);
+      }
       return numberOfGuests.toFixed(2);
     }
     
@@ -1840,6 +1865,9 @@
       // If we have market segment data with occupied rooms, calculate weighted average ADR
       if (totalOccupied > 0) {
         const adr = totalRevenue / totalOccupied;
+        if (selectedProject.value && selectedProject.value.project_name) {
+          calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Average Room Rate', year, label, adr);
+        }
         return adr.toFixed(2);
       }
       
@@ -1873,9 +1901,14 @@
       
       // Calculate Revenue Per Available Room
       const revpar = occupancyPercent * averageRoomRate;
+      if (selectedProject.value && selectedProject.value.project_name) {
+        calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Revenue Per Available Room', year, label, revpar);
+      }
       return revpar.toFixed(2);
     }
     
+
+
     // fallback to original logic for other rows
     // Add debug for Total Cover row
     try {
@@ -2035,10 +2068,19 @@
         label, 
         totalRooms?.value || totalRooms
       );
-      // console.debug('[TotalCovers] Restaurant:', restaurant.name, 'Total Cover:', restaurantTotalCover, 'Year:', year, 'Label:', label);
       total += parseFloat((restaurantTotalCover || '0').toString().replace(/,/g, '')) || 0;
     }
-    // console.debug('[TotalCovers] Final Total:', total, 'Year:', year, 'Label:', label);
+    // Cache the total covers for this year/label
+    if (selectedProject.value && selectedProject.value.project_name) {
+      calculationCache.setValue(
+        selectedProject.value.project_name,
+        'F&B Revenue Assumptions',
+        'Total Covers',
+        year,
+        label,
+        total
+      );
+    }
     return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
@@ -2054,6 +2096,17 @@
         totalRooms?.value || totalRooms
       );
       total += parseFloat((restaurantTotalFoodRevenue || '0').toString().replace(/,/g, '')) || 0;
+    }
+    // Cache the total food revenue for this year/label
+    if (selectedProject.value && selectedProject.value.project_name) {
+      calculationCache.setValue(
+        selectedProject.value.project_name,
+        'F&B Revenue Assumptions',
+        'Total Food Revenue',
+        year,
+        label,
+        total
+      );
     }
     return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
@@ -2071,6 +2124,17 @@
       );
       total += parseFloat((restaurantTotalBeverageRevenue || '0').toString().replace(/,/g, '')) || 0;
     }
+    // Cache the total beverage revenue for this year/label
+    if (selectedProject.value && selectedProject.value.project_name) {
+      calculationCache.setValue(
+        selectedProject.value.project_name,
+        'F&B Revenue Assumptions',
+        'Total Beverage Revenue',
+        year,
+        label,
+        total
+      );
+    }
     return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
@@ -2087,6 +2151,17 @@
       );
       total += parseFloat((restaurantTotalRevenue || '0').toString().replace(/,/g, '')) || 0;
     }
+    // Cache the total F&B revenue for this year/label
+    if (selectedProject.value && selectedProject.value.project_name) {
+      calculationCache.setValue(
+        selectedProject.value.project_name,
+        'F&B Revenue Assumptions',
+        'Total F&B Revenue',
+        year,
+        label,
+        total
+      );
+    }
     return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
@@ -2096,8 +2171,16 @@
     const totalFnbRevenue = parseFloat((calculateTotalFnbRevenue(year, label) || '0').toString().replace(/,/g, '')) || 0;
     // Total Covers
     const totalCovers = parseFloat((calculateTotalCovers(year, label) || '0').toString().replace(/,/g, '')) || 0;
-    if (totalCovers === 0) return '0.00';
+    if (totalCovers === 0) {
+      if (selectedProject.value && selectedProject.value.project_name) {
+        calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Average Spent Per F&B Customer', year, label, 0.00);
+      }
+      return '0.00';
+    }
     const avg = totalFnbRevenue / totalCovers;
+    if (selectedProject.value && selectedProject.value.project_name) {
+      calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Average Spent Per F&B Customer', year, label, avg);
+    }
     return avg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
@@ -2109,6 +2192,7 @@
       return totalRooms.value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     }
     
+
     if (row === "Days of the Month") {
       // Sum up all days for the year
       let totalDays = 0;
@@ -2133,6 +2217,7 @@
       return totalDays.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     }
     
+
     if (row === "Number of rooms available") {
       // Sum up all rooms available for the year
       let totalRoomsAvailable = 0;
@@ -2159,6 +2244,7 @@
       return totalRoomsAvailable.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     }
     
+
     if (row === "Number of Rooms Sold (excl.)") {
       // Sum up all rooms sold for the year
       let totalRoomsSold = 0;
@@ -2169,6 +2255,7 @@
       return totalRoomsSold.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     }
     
+
     if (row === "Occupancy (excl.) %") {
       // Calculate weighted average occupancy for the year
       let totalOccupied = 0;
@@ -2207,6 +2294,7 @@
       return '0.00%';
     }
     
+
     if (row === "Double occupancy") {
       // For double occupancy, return the value for the year (should be consistent)
       const doubleOccupancyValue = doubleOccupancyByYear.value[year];
@@ -2225,17 +2313,30 @@
       }
       return count > 0 ? (total / count).toFixed(2) : '0.00';
     }
+
     
     if (row === "Number of guests") {
-      // Sum up all guests for the year
       let totalGuests = 0;
       for (const label of labels) {
         const guests = getFnbCellValue(fnbData, row, year, label, totalRooms);
-        totalGuests += parseFloat((guests || '0').toString().replace(/,/g, '')) || 0;
+        const numGuests = parseFloat((guests || '0').toString().replace(/,/g, '')) || 0;
+        totalGuests += numGuests;
+        // Cache for each label (month/quarter)
+        if (selectedProject.value && selectedProject.value.project_name) {
+          calculationCache.setValue(
+            selectedProject.value.project_name,
+            'F&B Revenue Assumptions',
+            'Number of guests',
+            year,
+            label,
+            numGuests
+          );
+        }
       }
       return totalGuests.toFixed(2);
     }
     
+
     if (row === "Average Room Rate") {
       // Calculate weighted average room rate for the year
       let totalRevenue = 0;
@@ -2260,6 +2361,7 @@
       return '0.00';
     }
     
+
     if (row === "Revenue Per Available Room") {
       // Calculate weighted average RevPAR for the year
       let totalRevenue = 0;
@@ -2298,6 +2400,7 @@
       return '0.00';
     }
     
+
     if (row === "Average Spent Per F&B Customer") {
       // Calculate weighted average for the year
       let totalRevenue = 0;
@@ -2324,6 +2427,7 @@
     // Default: use the original calculateFnbTotal function
     return calculateFnbTotal(fnbData, row, year, labels, totalRooms);
   }
+
 
   function deleteRestaurant(restaurant) {
     // Remove restaurant from the list
@@ -2355,6 +2459,7 @@
     alertService.success(`Restaurant "${restaurant.cover_name || restaurant.name}" deleted successfully!`);
   }
 
+  
   async function resetToDefaultRestaurants() {
     try {
       if (!selectedProject.value) {
