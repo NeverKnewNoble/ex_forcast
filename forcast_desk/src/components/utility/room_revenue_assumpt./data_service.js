@@ -171,8 +171,6 @@ export async function saveRoomRevenueChanges(changes) {
       throw new Error('No project selected. Please select a project first.');
     }
     
-    console.log('Sending room revenue changes to API for project:', currentProject.project_name, changes)
-    
     // Try URLSearchParams approach for Frappe API
     const params = new URLSearchParams()
     params.append('changes', JSON.stringify(changes))
@@ -186,9 +184,6 @@ export async function saveRoomRevenueChanges(changes) {
       body: params,
     });
 
-    console.log('Room revenue API Response status:', response.status)
-    console.log('Room revenue API Response headers:', response.headers)
-
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Room revenue API Error Response:', errorText)
@@ -196,7 +191,6 @@ export async function saveRoomRevenueChanges(changes) {
     }
 
     const data = await response.json();
-    console.log('Room revenue API Response data:', data)
     return data;
   } catch (error) {
     console.error('Error saving room revenue changes:', error);
@@ -386,8 +380,6 @@ export async function saveMarketSegmentChanges(changes) {
       throw new Error('No project selected. Please select a project first.');
     }
     
-    console.log('Sending market segment changes to API for project:', currentProject.project_name, changes)
-    
     // Try URLSearchParams approach for Frappe API
     const params = new URLSearchParams()
     params.append('changes', JSON.stringify(changes))
@@ -408,7 +400,6 @@ export async function saveMarketSegmentChanges(changes) {
     }
 
     const data = await response.json();
-    console.log('Market segment save response:', data);
     return data;
   } catch (error) {
     console.error('Error saving market segment changes:', error);

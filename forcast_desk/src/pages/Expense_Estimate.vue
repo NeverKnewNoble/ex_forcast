@@ -717,6 +717,8 @@
 
 <script setup>
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
+import { storeToRefs } from 'pinia';
+import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
 import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign } from 'lucide-vue-next';
 import alertService from "@/components/ui/ui_utility/alertService.js";
@@ -774,13 +776,10 @@ import { selectedProject, initializeProjectService } from '@/components/utility/
 
 // Reactive state
 const years = ref([]);
-const fromYear = ref("");
-const toYear = ref("");
 const displayMode = ref("monthly");
 const expenses = ref([]);
 const expenseData = ref({});
 const showAdvanced = ref(false);
-const advancedModes = ref({});
 const tempAdvancedModes = ref({});
 const expenseOptions = ref([]);
 const hospitalityExperience = ref(
@@ -799,11 +798,15 @@ const showUnsavedWarning = ref(false);
 const pendingNavigation = ref(null); // Store the pending navigation action
 const sidebarCollapsed = ref(false);
 
+// Pinia store for year settings
+const yearSettingsStore = useYearSettingsStore();
+const { fromYear, toYear, advancedModes } = storeToRefs(yearSettingsStore);
+const { setFromYear, setToYear, setAdvancedModes, clearYearSettings } = yearSettingsStore;
+
 // Computed properties
 const visibleYears = computed(() => {
-  const years = getVisibleYears(fromYear.value, toYear.value);
-  // console.log('Visible years:', years, 'from:', fromYear.value, 'to:', toYear.value);
-  return years;
+  const yearsArr = getVisibleYears(fromYear.value, toYear.value);
+  return yearsArr;
 });
 
 
@@ -845,10 +848,10 @@ const getColumnLabelsForYearLocal = (year) => {
 
 // Watch for changes in visible years to initialize advanced modes
 watch(visibleYears, () => {
-  // console.log('Visible years changed:', visibleYears.value);
   visibleYears.value.forEach(year => {
     if (!advancedModes.value[year]) {
-      advancedModes.value[year] = displayMode.value;
+      // Use Pinia action to set mode for new years
+      yearSettingsStore.setAdvancedMode(year, displayMode.value);
     }
   });
 });
@@ -909,7 +912,7 @@ watch(showAdvanced, (val) => {
 });
 
 function applyAdvancedSettings() {
-  advancedModes.value = { ...tempAdvancedModes.value };
+  setAdvancedModes({ ...tempAdvancedModes.value });
   showAdvanced.value = false;
 }
 
@@ -920,51 +923,36 @@ function cancelAdvancedSettings() {
 // On mount, initialize years from localStorage if available
 onMounted(async () => {
   try {
-    // Initialize project service first to restore selected project
     await initializeProjectService();
-    
     years.value = await loadYearOptions();
     expenseData.value = await loadExpenseData();
-    // console.log('Loaded expense data structure:', expenseData.value); // Debug log
-    
-    // Only process expense data if it's not a status message
     if (!expenseData.value.status) {
-      originalExpenseData.value = cloneDeep(expenseData.value); // Store original
+      originalExpenseData.value = cloneDeep(expenseData.value);
       expenses.value = extractAllExpenses(expenseData.value);
     } else {
       originalExpenseData.value = expenseData.value;
       expenses.value = [];
     }
-    
     expenseOptions.value = (await getExpenseList())?.map(name => ({ label: name, value: name })) || [];
-    
-    // Use the options API for modal dropdowns (shows all available options)
     const fieldOptions = await getExpenseFieldOptions();
     categoryOptions.value = fieldOptions.hospitality_category.map(category => ({ label: category, value: category }));
     costTypeOptions.value = fieldOptions.cost_type.map(costType => ({ label: costType, value: costType }));
-    
-    // Restore years from localStorage
-    fromYear.value = localStorage.getItem('expenseEstimateFromYear') || "";
-    toYear.value = localStorage.getItem('expenseEstimateToYear') || "";
     isSaved.value = true;
   } catch (err) {
     console.error("Error loading data:", err);
   }
 });
 
-// Watchers to persist year selection
-watch(fromYear, (newValue) => {
-  localStorage.setItem('expenseEstimateFromYear', newValue);
-});
-watch(toYear, (newValue) => {
-  localStorage.setItem('expenseEstimateToYear', newValue);
-});
+// Watchers to persist year selection (now handled by Pinia store)
+// watch(fromYear, (newValue) => {
+//   localStorage.setItem('expenseEstimateFromYear', newValue);
+// });
+// watch(toYear, (newValue) => {
+//   localStorage.setItem('expenseEstimateToYear', newValue);
+// });
 
 function clearYearSelection() {
-  fromYear.value = "";
-  toYear.value = "";
-  localStorage.removeItem('expenseEstimateFromYear');
-  localStorage.removeItem('expenseEstimateToYear');
+  clearYearSettings();
   isSaved.value = false;
 }
 

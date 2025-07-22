@@ -1037,6 +1037,8 @@
   
   <script setup>
   import { ref, onMounted, computed, watch, onUnmounted, reactive } from "vue";
+  import { storeToRefs } from 'pinia';
+  import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
   import Sidebar from "@/components/ui/Sidebar.vue";
   import {  
     AlertTriangle, 
@@ -1133,12 +1135,9 @@
   const totalRooms = ref(0); // Replace 100 with your actual value or make it reactive
   // Reactive state
   const years = ref([]);
-  const fromYear = ref("");
-  const toYear = ref("");
   const displayMode = ref("monthly");
   const expenses = ref([]);
   const expenseData = ref({});
-  const advancedModes = ref({});
   const expenseOptions = ref([]);
   const hospitalityExperience = ref(
     localStorage.getItem('hospitalityExperience') === null
@@ -1177,10 +1176,14 @@
   const defaultRestaurantRows = getDefaultRestaurantRows();
   const marketSegmentData = ref({});
   
+  // Pinia store for year settings
+  const yearSettingsStore = useYearSettingsStore();
+  const { fromYear, toYear, advancedModes } = storeToRefs(yearSettingsStore);
+  const { setFromYear, setToYear, setAdvancedModes, clearYearSettings } = yearSettingsStore;
+  
   // Computed properties
   const visibleYears = computed(() => {
-    const years = getVisibleYears(fromYear.value, toYear.value);
-    return years;
+    return getVisibleYears(fromYear.value, toYear.value);
   });
   
   // Check if total rooms is synced with Room Revenue page
@@ -1194,7 +1197,7 @@
   watch(visibleYears, () => {
     visibleYears.value.forEach(year => {
       if (!advancedModes.value[year]) {
-        advancedModes.value[year] = displayMode.value;
+        yearSettingsStore.setAdvancedMode(year, displayMode.value);
       }
     });
   });
@@ -1331,9 +1334,7 @@
       categoryOptions.value = fieldOptions.hospitality_category.map(category => ({ label: category, value: category }));
       costTypeOptions.value = fieldOptions.cost_type.map(costType => ({ label: costType, value: costType }));
       
-      // Restore years from localStorage
-      fromYear.value = localStorage.getItem('fnbRevenueFromYear') || "";
-      toYear.value = localStorage.getItem('fnbRevenueToYear') || "";
+
       isSaved.value = true;
       // Load restaurants for the current project
       if (selectedProject.value) {
@@ -1372,13 +1373,6 @@
     }
   });
   
-  // Watchers to persist year selection
-  watch(fromYear, (newValue) => {
-    localStorage.setItem('fnbRevenueFromYear', newValue);
-  });
-  watch(toYear, (newValue) => {
-    localStorage.setItem('fnbRevenueToYear', newValue);
-  });
   
   // Watch for total rooms changes to persist to localStorage
   watch(totalRooms, (newValue) => {
@@ -1387,10 +1381,7 @@
   });
   
   function clearYearSelection() {
-    fromYear.value = "";
-    toYear.value = "";
-    localStorage.removeItem('fnbRevenueFromYear');
-    localStorage.removeItem('fnbRevenueToYear');
+    clearYearSettings();
     isSaved.value = false;
   }
   
