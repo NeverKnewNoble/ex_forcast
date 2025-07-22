@@ -531,6 +531,8 @@
   
   <script setup>
   import { ref, onMounted, computed, watch, onUnmounted, reactive } from "vue";
+  import { storeToRefs } from 'pinia';
+  import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
   import Sidebar from "@/components/ui/Sidebar.vue";
   import { 
     CircleAlert, 
@@ -586,12 +588,9 @@
   
   // Reactive state
   const years = ref([]);
-  const fromYear = ref("");
-  const toYear = ref("");
   const displayMode = ref("monthly");
   const banquetData = reactive({});
   const showAdvanced = ref(false);
-  const advancedModes = ref({});
   const tempAdvancedModes = ref({});
   const isSaved = ref(false);
   const originalBanquetData = ref({});
@@ -605,10 +604,15 @@
   const customBanquetFields = ref([]); // Will hold fetched banquet details
   const removedDefaultFields = ref([]); // Track removed default fields
 
+  // Pinia store for year settings
+  const yearSettingsStore = useYearSettingsStore();
+  const { fromYear, toYear, advancedModes } = storeToRefs(yearSettingsStore);
+  const { setFromYear, setToYear, setAdvancedModes, clearYearSettings } = yearSettingsStore;
+
   // Computed properties
   const visibleYears = computed(() => {
-    const years = getVisibleYears(fromYear.value, toYear.value);
-    return years;
+    const yearsArr = getVisibleYears(fromYear.value, toYear.value);
+    return yearsArr;
   });
   
 
@@ -620,10 +624,9 @@
 
   // Watch for changes in visible years to initialize advanced modes
   watch(visibleYears, () => {
-    // console.log('Visible years changed:', visibleYears.value);
     visibleYears.value.forEach(year => {
       if (!advancedModes.value[year]) {
-        advancedModes.value[year] = displayMode.value;
+        yearSettingsStore.setAdvancedMode(year, displayMode.value);
       }
     });
   });
@@ -642,7 +645,7 @@
   });
   
   function applyAdvancedSettings() {
-    advancedModes.value = { ...tempAdvancedModes.value };
+    setAdvancedModes({ ...tempAdvancedModes.value });
     showAdvanced.value = false;
   }
   
@@ -698,29 +701,19 @@
     }
   }
   
-  // On mount, initialize years from localStorage if available
+  // On mount, initialize years
   onMounted(async () => {
     try {
-      // Initialize project service first to restore selected project
       await initializeProjectService();
-      
-      // Wait a moment to ensure project is properly set
       await new Promise(resolve => setTimeout(resolve, 100));
-      
       years.value = await loadYearOptions();
-      fromYear.value = localStorage.getItem('banquetFromYear') || "";
-      toYear.value = localStorage.getItem('banquetToYear') || "";
-
-      // Load from backend API for the current project
       if (selectedProject.value) {
         const loaded = await loadBanquetRevenueData(selectedProject.value.project_name) || {};
         const converted = convertBanquetServerDataToFrontend(loaded);
         Object.assign(banquetData, converted);
       } else {
-        // No project selected
         banquetData.value = { status: 'no_project_selected', message: 'No project selected' };
       }
-
       originalBanquetData.value = cloneDeep(banquetData);
       isSaved.value = true;
       isComponentReady.value = true;
@@ -730,13 +723,9 @@
     }
   });
   
-  // Watchers to persist year selection (banquet-specific keys)
-  watch(fromYear, (newValue) => {
-    localStorage.setItem('banquetFromYear', newValue);
-  });
-  watch(toYear, (newValue) => {
-    localStorage.setItem('banquetToYear', newValue);
-  });
+  // Watchers to persist year selection (now handled by Pinia store)
+  // watch(fromYear, ...)
+  // watch(toYear, ...)
   
   // Watch for project changes and reload data
   watch(selectedProject, async (newProject, oldProject) => {
@@ -780,10 +769,7 @@
   }, { deep: true });
   
   function clearYearSelection() {
-    fromYear.value = "";
-    toYear.value = "";
-    localStorage.removeItem('banquetFromYear');
-    localStorage.removeItem('banquetToYear');
+    clearYearSettings();
     isSaved.value = false;
   }
   

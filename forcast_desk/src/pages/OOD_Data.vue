@@ -703,6 +703,8 @@
   
   <script setup>
   import { ref, onMounted, computed, watch, onUnmounted, reactive } from "vue";
+  import { storeToRefs } from 'pinia';
+  import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
   import Sidebar from "@/components/ui/Sidebar.vue";
   import { 
     CircleAlert, 
@@ -747,13 +749,10 @@
   
   // Reactive state
   const years = ref([]);
-  const fromYear = ref("");
-  const toYear = ref("");
   const displayMode = ref("monthly");
   const laundryData = reactive({});
   const healthClubData = reactive({});
   const showAdvanced = ref(false);
-  const advancedModes = ref({});
   const tempAdvancedModes = ref({});
   const isSaved = ref(false);
   const originalLaundryData = ref({});
@@ -766,6 +765,11 @@
   const collapsedYears = ref([]);
   const showLaundryDetails = ref(false);
   const laundryDetailsModalData = ref({});
+
+  // Pinia store for year settings
+  const yearSettingsStore = useYearSettingsStore();
+  const { fromYear, toYear, advancedModes } = storeToRefs(yearSettingsStore);
+  const { setFromYear, setToYear, setAdvancedModes, clearYearSettings } = yearSettingsStore;
 
   // Computed properties
   const visibleYears = computed(() => {
@@ -795,7 +799,7 @@
   watch(visibleYears, () => {
     visibleYears.value.forEach(year => {
       if (!advancedModes.value[year]) {
-        advancedModes.value[year] = displayMode.value;
+        yearSettingsStore.setAdvancedMode(year, displayMode.value);
       }
     });
   });
@@ -813,7 +817,7 @@
   });
   
   function applyAdvancedSettings() {
-    advancedModes.value = { ...tempAdvancedModes.value };
+    setAdvancedModes({ ...tempAdvancedModes.value });
     showAdvanced.value = false;
   }
   
@@ -821,33 +825,21 @@
     showAdvanced.value = false;
   }
   
-  // On mount, initialize years from localStorage if available
+  // On mount, initialize years
   onMounted(async () => {
     try {
-      // Initialize project service first to restore selected project
       await initializeProjectService();
-      
-      // Wait a moment to ensure project is properly set
       await new Promise(resolve => setTimeout(resolve, 100));
-      
       years.value = await loadYearOptions();
-      fromYear.value = localStorage.getItem('oodFromYear') || "";
-      toYear.value = localStorage.getItem('oodToYear') || "";
-
-      // Load from backend API for the current project
       if (selectedProject.value) {
         const loaded = await loadOODData(selectedProject.value.project_name) || {};
         const converted = convertOODServerDataToFrontend(loaded);
-        
-        // Separate laundry and health club data
         Object.assign(laundryData, converted.laundry || {});
         Object.assign(healthClubData, converted.health_club || {});
       } else {
-        // No project selected
         laundryData.value = { status: 'no_project_selected', message: 'No project selected' };
         healthClubData.value = { status: 'no_project_selected', message: 'No project selected' };
       }
-
       originalLaundryData.value = cloneDeep(laundryData);
       originalHealthClubData.value = cloneDeep(healthClubData);
       isSaved.value = true;
@@ -857,13 +849,13 @@
     }
   });
   
-  // Watchers to persist year selection (OOD-specific keys)
-  watch(fromYear, (newValue) => {
-    localStorage.setItem('oodFromYear', newValue);
-  });
-  watch(toYear, (newValue) => {
-    localStorage.setItem('oodToYear', newValue);
-  });
+  // Watchers to persist year selection (now handled by Pinia store)
+  // watch(fromYear, (newValue) => {
+  //   localStorage.setItem('oodFromYear', newValue);
+  // });
+  // watch(toYear, (newValue) => {
+  //   localStorage.setItem('oodToYear', newValue);
+  // });
 
   // Watch for project changes and reload data
   watch(selectedProject, async (newProject, oldProject) => {
@@ -903,10 +895,7 @@
   }, { deep: true });
   
   function clearYearSelection() {
-    fromYear.value = "";
-    toYear.value = "";
-    localStorage.removeItem('oodFromYear');
-    localStorage.removeItem('oodToYear');
+    clearYearSettings();
     isSaved.value = false;
   }
   

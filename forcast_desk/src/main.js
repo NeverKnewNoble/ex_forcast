@@ -13,6 +13,8 @@ import {
   resourcesPlugin,
 } from 'frappe-ui'
 
+import { createPinia } from 'pinia';
+
 
 let app = createApp(App)
 
@@ -20,6 +22,7 @@ setConfig('resourceFetcher', frappeRequest)
 
 app.use(router)
 app.use(resourcesPlugin)
+app.use(createPinia());
 
 
 app.component('Button', Button)

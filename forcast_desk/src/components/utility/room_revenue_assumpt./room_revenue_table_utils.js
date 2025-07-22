@@ -173,8 +173,6 @@ export async function saveRoomChanges(changedCells, isSaving, saveError, roomDat
       changedCells.value.length = 0
       isSaved.value = true
       
-      console.log('Changes saved successfully:', apiResult.summary)
-      
       // Show success alert
       alertService.success("Saved successfully")
     } else {

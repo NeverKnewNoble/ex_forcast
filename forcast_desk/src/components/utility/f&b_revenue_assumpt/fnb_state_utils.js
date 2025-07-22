@@ -21,9 +21,7 @@ export async function initializeData(years, expenseData, originalExpenseData, ex
     categoryOptions.value = fieldOptions.hospitality_category.map(category => ({ label: category, value: category }));
     costTypeOptions.value = fieldOptions.cost_type.map(costType => ({ label: costType, value: costType }));
     
-    // Restore years from localStorage
-    fromYear.value = localStorage.getItem('expenseEstimateFromYear') || "";
-    toYear.value = localStorage.getItem('expenseEstimateToYear') || "";
+
     isSaved.value = true;
     restaurantList.value = await getRestaurants();
     
@@ -37,35 +35,6 @@ export async function initializeData(years, expenseData, originalExpenseData, ex
   }
 }
 
-// Setup watchers for localStorage persistence
-export function setupWatchers(fromYear, toYear, totalRooms, watch) {
-  // Watchers to persist year selection
-  const unwatchFromYear = watch(fromYear, (newValue) => {
-    if (newValue !== undefined) {
-      localStorage.setItem('expenseEstimateFromYear', newValue);
-    }
-  });
-  
-  const unwatchToYear = watch(toYear, (newValue) => {
-    if (newValue !== undefined) {
-      localStorage.setItem('expenseEstimateToYear', newValue);
-    }
-  });
-  
-  // Watch for total rooms changes to persist to localStorage
-  const unwatchTotalRooms = watch(totalRooms, (newValue) => {
-    if (newValue !== undefined) {
-      localStorage.setItem('totalRooms', newValue.toString());
-      // Total rooms changes don't trigger unsaved state
-    }
-  });
-
-  return {
-    unwatchFromYear,
-    unwatchToYear,
-    unwatchTotalRooms
-  };
-}
 
 // Setup advanced settings watcher
 export function setupAdvancedSettingsWatcher(showAdvanced, advancedModes, tempAdvancedModes, watch) {

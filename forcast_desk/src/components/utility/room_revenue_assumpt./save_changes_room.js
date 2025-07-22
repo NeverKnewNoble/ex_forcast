@@ -84,14 +84,12 @@ export async function saveRoomChanges(changedCells, isSaving, saveError, roomDat
     }
 
     // Make the actual API call to save the changes
-    console.log('Saving room revenue changes:', updates);
     
     const result = await saveRoomRevenueChanges(updates);
     
     // Handle both direct response and wrapped response structures
     const responseData = result.data || result;
     if (responseData && responseData.status === 'success') {
-      console.log('Room revenue changes saved successfully:', responseData);
       
       // Update original data to reflect saved state
       originalRoomData.value = cloneDeep(roomData);
