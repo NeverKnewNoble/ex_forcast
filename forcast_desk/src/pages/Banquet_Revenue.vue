@@ -581,9 +581,9 @@
     isYearCollapsed
   } from "@/components/utility/expense_assumption/index.js";
   import { cloneDeep } from 'lodash-es';
-  
   // Import project service
   import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
+  import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
   
   
   // Reactive state
@@ -604,17 +604,19 @@
   const customBanquetFields = ref([]); // Will hold fetched banquet details
   const removedDefaultFields = ref([]); // Track removed default fields
 
+  // ! Cache for calculations
+  const calculationCache = useCalculationCache();  
   // Pinia store for year settings
   const yearSettingsStore = useYearSettingsStore();
   const { fromYear, toYear, advancedModes } = storeToRefs(yearSettingsStore);
   const { setFromYear, setToYear, setAdvancedModes, clearYearSettings } = yearSettingsStore;
-
   // Computed properties
   const visibleYears = computed(() => {
     const yearsArr = getVisibleYears(fromYear.value, toYear.value);
     return yearsArr;
   });
   
+
 
   // Computed property to get column labels for a specific year
   const getColumnLabelsForYearLocal = (year) => {
@@ -892,25 +894,31 @@
   function getCalculatedValue(fieldCode, year, label) {
     const row = getBanquetRowData(banquetData, year, label);
     const allFieldCodes = computedBanquetFields.value.map(f => f.code);
+    const context = {
+      projectName: selectedProject.value?.project_name,
+      calculationCache,
+      year,
+      label
+    };
     switch (fieldCode) {
       case 'food':
-        return calcFood(row);
+        return calcFood(row, context);
       case 'liquor':
-        return calcLiquor(row);
+        return calcLiquor(row, context);
       case 'soft_drinks':
-        return calcSoftDrinks(row);
+        return calcSoftDrinks(row, context);
       case 'hall_space_charges':
-        return calcHallSpaceCharges(row);
+        return calcHallSpaceCharges(row, context);
       case 'gross':
-        return calcGross(row, allFieldCodes);
+        return calcGross(row, allFieldCodes, context);
       case 'net_amount':
-        return calcNetAmount(row, allFieldCodes);
+        return calcNetAmount(row, allFieldCodes, context);
       case 'amount_per_event':
-        return calcAmountPerEvent(row);
+        return calcAmountPerEvent(row, context);
       case 'amount_per_pax':
-        return calcAmountPerPax(row);
+        return calcAmountPerPax(row, context);
       case 'avg_pax_per_event':
-        return calcAvgPaxPerEvent(row);
+        return calcAvgPaxPerEvent(row, context);
       default:
         return 0;
     }
@@ -919,28 +927,40 @@
   function getBanquetCellValue(banquetData, fieldCode, year, label, displayMode = 'monthly') {
     const row = getBanquetRowData(banquetData, year, label);
     const allFieldCodes = computedBanquetFields.value.map(f => f.code);
+    const context = {
+      projectName: selectedProject.value?.project_name,
+      calculationCache,
+      year,
+      label
+    };
+    let value;
     switch (fieldCode) {
       case 'food':
-        return calcFood(row);
+        value = calcFood(row); break;
       case 'liquor':
-        return calcLiquor(row);
+        value = calcLiquor(row); break;
       case 'soft_drinks':
-        return calcSoftDrinks(row);
+        value = calcSoftDrinks(row); break;
       case 'hall_space_charges':
-        return calcHallSpaceCharges(row);
+        value = calcHallSpaceCharges(row); break;
       case 'gross':
-        return calcGross(row, allFieldCodes);
+        value = calcGross(row, allFieldCodes);
+        if (context.projectName && context.calculationCache && context.year && context.label) {
+          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Gross', context.year, context.label, value);
+        }
+        break;
       case 'net_amount':
-        return calcNetAmount(row, allFieldCodes);
+        value = calcNetAmount(row, allFieldCodes); break;
       case 'amount_per_event':
-        return calcAmountPerEvent(row);
+        value = calcAmountPerEvent(row); break;
       case 'amount_per_pax':
-        return calcAmountPerPax(row);
+        value = calcAmountPerPax(row); break;
       case 'avg_pax_per_event':
-        return calcAvgPaxPerEvent(row);
+        value = calcAvgPaxPerEvent(row); break;
       default:
-        return getAmountForBanquet(banquetData, fieldCode, year, label, displayMode);
+        value = getAmountForBanquet(banquetData, fieldCode, year, label, displayMode);
     }
+    return value;
   }
 
   async function deleteBanquetDetail(field) {
