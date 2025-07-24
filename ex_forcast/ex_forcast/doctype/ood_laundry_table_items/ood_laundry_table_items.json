@@ -1,0 +1,47 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-07-24 11:04:35.660553",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section",
+  "detail",
+  "amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "section",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Section",
+   "options": "\nIn House Guest Laundry Revenue\nIn House Dry Cleaning Revenue\nOutside Guest Laundry\nGuest Laundry Cost\nRevenue\nCOST OF LAUNDRY"
+  },
+  {
+   "fieldname": "detail",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Detail",
+   "options": "\nNumber\nPercentage\nBase\nAverage Amount\nOther Revenue\nOther Laundry Costs"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-07-24 11:17:28.003671",
+ "modified_by": "Administrator",
+ "module": "Ex Forcast",
+ "name": "OOD Laundry Table Items",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

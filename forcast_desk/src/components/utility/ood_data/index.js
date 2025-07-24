@@ -60,6 +60,7 @@ export function getAmountForOOD(oodData, fieldCode, year, label, displayMode = '
   if (!oodData || !oodData[year] || !oodData[year][label]) return 0;
   
   const entries = oodData[year][label];
+  if (!Array.isArray(entries)) return 0;
   const found = entries.find(e => e.field === fieldCode);
   return found ? Number(found.amount) || 0 : 0;
 }
@@ -82,8 +83,8 @@ export function handleOODCellInput({ year, label, field, event, oodData }) {
   const numValue = value === '' ? 0 : Number(value.replace(/[^\d.-]/g, ''));
   
   if (!oodData[year]) oodData[year] = {};
-  if (!oodData[year][label]) oodData[year][label] = [];
-  
+  if (!Array.isArray(oodData[year][label])) oodData[year][label] = [];
+
   const existingIndex = oodData[year][label].findIndex(e => e.field === field);
   
   if (existingIndex >= 0) {

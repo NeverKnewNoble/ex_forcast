@@ -89,3 +89,94 @@ export function calculateGuestLaundryCost(laundryAssumptions, year, label, calcu
     return 0;
 }
 
+/**
+ * Calculate TOTAL CLUB USE REVENUE: Sauna + Gym + Swimming Pool
+ */
+export function calculateTotalClubUseRevenue(healthClubData, year, label) {
+  return (
+    Number(healthClubData[year]?.[label]?.find(e => e.field === 'sauna')?.amount || 0) +
+    Number(healthClubData[year]?.[label]?.find(e => e.field === 'gym')?.amount || 0) +
+    Number(healthClubData[year]?.[label]?.find(e => e.field === 'swimming_pool')?.amount || 0)
+  );
+}
+
+/**
+ * Calculate TOTAL TREATMENTS & OTHER SERVICES: Fitness Lessons (group) + Health / Wellness Services + Massage + Personal Training & Swimming Lessons + Spa Treatment + Salon Treatment + Merchandise + Clothing
+ */
+export function calculateTotalTreatmentsOtherServices(healthClubData, year, label) {
+  const fields = [
+    'fitness_lessons_group',
+    'health_wellness_services',
+    'massage',
+    'personal_training_swimming_lessons',
+    'spa_treatment',
+    'salon_treatment',
+    'merchandise',
+    'clothing',
+  ];
+  return fields.reduce((sum, field) => sum + Number(healthClubData[year]?.[label]?.find(e => e.field === field)?.amount || 0), 0);
+}
+
+/**
+ * Calculate TOTAL MEMBERSHIPS: Pool/SPA + Gym Membership + Pool / Gym + Spa / Gym + Gym / Pool / Spa + Pool Only
+ */
+export function calculateTotalMemberships(healthClubData, year, label) {
+  const fields = [
+    'pool_spa',
+    'gym_membership',
+    'pool_gym',
+    'spa_gym',
+    'gym_pool_spa',
+    'pool_only',
+  ];
+  return fields.reduce((sum, field) => sum + Number(healthClubData[year]?.[label]?.find(e => e.field === field)?.amount || 0), 0);
+}
+
+/**
+ * Calculate TOTAL HEALTH CLUB & SPA: TOTAL CLUB USE REVENUE + TOTAL TREATMENTS & OTHER SERVICES + TOTAL MEMBERSHIPS
+ */
+export function calculateTotalHealthClubSpa(healthClubData, year, label) {
+  return (
+    calculateTotalClubUseRevenue(healthClubData, year, label) +
+    calculateTotalTreatmentsOtherServices(healthClubData, year, label) +
+    calculateTotalMemberships(healthClubData, year, label)
+  );
+}
+
+/**
+ * Calculate TOTAL HEALTH CLUB REV INCLUDING SC: TOTAL HEALTH CLUB & SPA + SERVICE CHARGE
+ */
+export function calculateTotalHealthClubRevIncludingSC(healthClubData, year, label) {
+  return (
+    calculateTotalHealthClubSpa(healthClubData, year, label) +
+    Number(healthClubData[year]?.[label]?.find(e => e.field === 'service_charge')?.amount || 0)
+  );
+}
+
+/**
+ * Calculate percentage for TOTAL CLUB USE REVENUE row: TOTAL CLUB USE REVENUE / TOTAL HEALTH CLUB & SPA
+ */
+export function calculateTotalClubUseRevenuePct(healthClubData, year, label) {
+  const total = calculateTotalHealthClubSpa(healthClubData, year, label);
+  if (!total) return 0;
+  return (calculateTotalClubUseRevenue(healthClubData, year, label) / total) * 100;
+}
+
+/**
+ * Calculate percentage for TOTAL TREATMENTS & OTHER SERVICES row: TOTAL TREATMENTS & OTHER SERVICES / TOTAL HEALTH CLUB & SPA
+ */
+export function calculateTotalTreatmentsOtherServicesPct(healthClubData, year, label) {
+  const total = calculateTotalHealthClubSpa(healthClubData, year, label);
+  if (!total) return 0;
+  return (calculateTotalTreatmentsOtherServices(healthClubData, year, label) / total) * 100;
+}
+
+/**
+ * Calculate percentage for TOTAL MEMBERSHIPS row: TOTAL MEMBERSHIPS / TOTAL HEALTH CLUB & SPA
+ */
+export function calculateTotalMembershipsPct(healthClubData, year, label) {
+  const total = calculateTotalHealthClubSpa(healthClubData, year, label);
+  if (!total) return 0;
+  return (calculateTotalMemberships(healthClubData, year, label) / total) * 100;
+}
+
