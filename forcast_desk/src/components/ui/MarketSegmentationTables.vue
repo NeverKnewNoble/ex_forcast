@@ -960,6 +960,8 @@ import {
 } from '@/components/utility/room_revenue_assumpt./market_segment_table_utils.js';
 import { getMarketSegmentList } from '@/components/utility/room_revenue_assumpt./data_service.js';
 import alertService from '@/components/ui/ui_utility/alertService.js';
+import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+import { selectedProject } from '@/components/utility/dashboard/projectService.js';
 
 const props = defineProps({
   visibleYears: Array,
@@ -1260,8 +1262,22 @@ function handleRoomRateCellEditWrapper({ year, label, segment, event }) {
   updateMarketSegmentData({ year, label, segment, field: 'room_rate', value });
 }
 
+
+// ************ CALCULATIONS *****************
+// Pinia calculation cache
+const calculationCache = useCalculationCache();
+
+// Helper: get project name for cache
+function getProjectName() {
+  return selectedProject.value?.project_name || 'default';
+}
+const PAGE_KEY = 'Market Segmentation';
+
 // --- Total Occupied Room helpers ---
 function getTotalOccupiedRoom(year, label) {
+  const project = getProjectName();
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Total Occupied Room', year, label);
+  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   let total = 0;
   for (const segment of marketSegments.value) {
     if (segment.segment_category === "OTHER ROOMS REVENUE") continue;
@@ -1270,10 +1286,14 @@ function getTotalOccupiedRoom(year, label) {
     );
     total += value;
   }
+  calculationCache.setValue(project, PAGE_KEY, 'Total Occupied Room', year, label, total);
   return total;
 }
 
 function getTotalOccupiedRoomYear(year) {
+  const project = getProjectName();
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Total Occupied Room Year', year, 'ALL');
+  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   let total = 0;
   for (const segment of marketSegments.value) {
     if (segment.segment_category === "OTHER ROOMS REVENUE") continue;
@@ -1282,49 +1302,71 @@ function getTotalOccupiedRoomYear(year) {
       total += Number(segmentData?.[label]?.room_nights || 0);
     }
   }
+  calculationCache.setValue(project, PAGE_KEY, 'Total Occupied Room Year', year, 'ALL', total);
   return total;
 }
 
 // --- Total Available Rooms helpers ---
 function getTotalAvailableRooms(year, label) {
+  const project = getProjectName();
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Total Available Rooms', year, label);
+  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   const days = getDaysInMonth(year, label);
   const totalRooms = props.totalNumberOfRooms || 0;
-  return days * totalRooms;
+  const val = days * totalRooms;
+  calculationCache.setValue(project, PAGE_KEY, 'Total Available Rooms', year, label, val);
+  return val;
 }
 
 function getTotalAvailableRoomsYear(year) {
+  const project = getProjectName();
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Total Available Rooms Year', year, 'ALL');
+  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   let total = 0;
   for (const label of props.getColumnLabelsForYearLocal(year)) {
     total += getTotalAvailableRooms(year, label);
   }
+  calculationCache.setValue(project, PAGE_KEY, 'Total Available Rooms Year', year, 'ALL', total);
   return total;
 }
 
 // --- Occupancy Percentage helpers ---
 function getOccupancyPercentage(year, label) {
+  const project = getProjectName();
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Occupancy (%)', year, label);
+  if (cacheVal && cacheVal > 0) return cacheVal.toFixed(2) + '%';
   const occupied = getTotalOccupiedRoom(year, label);
   const available = getTotalAvailableRooms(year, label);
-  if (!available || available === 0) return '0.00%';
-  return ((occupied / available) * 100).toFixed(2) + '%';
+  let percent = 0;
+  if (available > 0) percent = (occupied / available) * 100;
+  calculationCache.setValue(project, PAGE_KEY, 'Occupancy (%)', year, label, percent);
+  return percent.toFixed(2) + '%';
 }
 
 function getOccupancyPercentageYear(year) {
+  const project = getProjectName();
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Occupancy (%) Year', year, 'ALL');
+  if (cacheVal && cacheVal > 0) return cacheVal.toFixed(2) + '%';
   const occupied = getTotalOccupiedRoomYear(year);
   const available = getTotalAvailableRoomsYear(year);
-  if (!available || available === 0) return '0.00%';
-  return ((occupied / available) * 100).toFixed(2) + '%';
+  let percent = 0;
+  if (available > 0) percent = (occupied / available) * 100;
+  calculationCache.setValue(project, PAGE_KEY, 'Occupancy (%) Year', year, 'ALL', percent);
+  return percent.toFixed(2) + '%';
 }
 
 // --- ADR Calculation Helper ---
 function getADRValue(segment, year, label) {
-  // Get room_rate from marketSegmentData
+  const project = getProjectName();
+  const cacheKey = `ADR:${segment.market_segment}`;
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, label);
+  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const room_rate = parseFloat(props.marketSegmentData?.[year]?.[segment.market_segment]?.[label]?.room_rate || 0);
-  // Get VAT, Breakfast, Exchange Rate for the year
-  const VAT = parseFloat(props.vatByYear?.[year] || 1); // Default to 1 if not set
+  const VAT = parseFloat(props.vatByYear?.[year] || 1);
   const Breakfast_Rate = parseFloat(props.breakfastByYear?.[year] || 0);
-  const exchange_rate = parseFloat(props.exchangeRateByYear?.[year] || 1); // Default to 1 if not set
-  // Calculate ADR
+  const exchange_rate = parseFloat(props.exchangeRateByYear?.[year] || 1);
   const adr = AverageDailyRateCalculation(room_rate, VAT, Breakfast_Rate, exchange_rate);
+  calculationCache.setValue(project, PAGE_KEY, cacheKey, year, label, adr);
   return adr.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
@@ -1351,6 +1393,9 @@ function getCalculatedRoomRevenueTotal(segment, year) {
 
 // Add helper methods in <script setup>:
 function getTotalRoomRevenue(year, label) {
+  const project = getProjectName();
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Total Room Revenue', year, label);
+  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   let total = 0;
   for (const segment of marketSegments.value) {
     if (segment.segment_category === 'OTHER ROOMS REVENUE') continue;
@@ -1358,10 +1403,14 @@ function getTotalRoomRevenue(year, label) {
     const roomNights = Number(props.marketSegmentData?.[year]?.[segment.market_segment]?.[label]?.room_nights || 0);
     total += adr * roomNights;
   }
+  calculationCache.setValue(project, PAGE_KEY, 'Total Room Revenue', year, label, total);
   return total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function getTotalRoomRevenueYear(year) {
+  const project = getProjectName();
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Total Room Revenue Year', year, 'ALL');
+  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   let total = 0;
   for (const segment of marketSegments.value) {
     if (segment.segment_category === 'OTHER ROOMS REVENUE') continue;
@@ -1371,21 +1420,27 @@ function getTotalRoomRevenueYear(year) {
       total += adr * roomNights;
     }
   }
+  calculationCache.setValue(project, PAGE_KEY, 'Total Room Revenue Year', year, 'ALL', total);
   return total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 // --- Service Charge Functions ---
 function getServiceChargeValue(year, label) {
-  // Get service charge from props (yearly value) - show full amount for each month
+  const project = getProjectName();
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Service Charge', year, label);
+  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const yearlyServiceCharge = Number(props.serviceChargeByYear?.[year] || 0);
   if (yearlyServiceCharge === 0) return '0.00';
-  
+  calculationCache.setValue(project, PAGE_KEY, 'Service Charge', year, label, yearlyServiceCharge);
   return yearlyServiceCharge.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function getServiceChargeTotal(year) {
-  // Return the yearly service charge value
+  const project = getProjectName();
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Service Charge Year', year, 'ALL');
+  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const yearlyServiceCharge = Number(props.serviceChargeByYear?.[year] || 0);
+  calculationCache.setValue(project, PAGE_KEY, 'Service Charge Year', year, 'ALL', yearlyServiceCharge);
   return yearlyServiceCharge.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
@@ -1422,24 +1477,26 @@ function getADRTotalYear(year) {
 
 // --- REVPAR Calculation Helpers ---
 function getREVPARTotal(year, label) {
-  // Get ADR for the month
+  const project = getProjectName();
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'REVPAR', year, label);
+  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const adr = parseFloat(getADRTotal(year, label).replace(/,/g, ''));
-  // Get occupancy percentage (remove % and convert to decimal)
   const occupancyStr = getOccupancyPercentage(year, label);
   const occupancy = parseFloat(occupancyStr.replace('%', '')) / 100;
-  // Calculate REVPAR = ADR * Occupancy
   const revpar = adr * occupancy;
+  calculationCache.setValue(project, PAGE_KEY, 'REVPAR', year, label, revpar);
   return revpar.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function getREVPARTotalYear(year) {
-  // Get ADR for the year
+  const project = getProjectName();
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'REVPAR Year', year, 'ALL');
+  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const adr = parseFloat(getADRTotalYear(year).replace(/,/g, ''));
-  // Get occupancy percentage for the year (remove % and convert to decimal)
   const occupancyStr = getOccupancyPercentageYear(year);
   const occupancy = parseFloat(occupancyStr.replace('%', '')) / 100;
-  // Calculate REVPAR = ADR * Occupancy
   const revpar = adr * occupancy;
+  calculationCache.setValue(project, PAGE_KEY, 'REVPAR Year', year, 'ALL', revpar);
   return revpar.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 

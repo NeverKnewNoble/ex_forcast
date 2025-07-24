@@ -14,6 +14,7 @@ import {
 } from 'frappe-ui'
 
 import { createPinia } from 'pinia';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 
 
 let app = createApp(App)
@@ -22,7 +23,10 @@ setConfig('resourceFetcher', frappeRequest)
 
 app.use(router)
 app.use(resourcesPlugin)
-app.use(createPinia());
+
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
+app.use(pinia);
 
 
 app.component('Button', Button)
