@@ -1013,7 +1013,7 @@
   
   
   <script setup>
-  import { ref, onMounted, computed, watch, onUnmounted, reactive } from "vue";
+  import { ref, onMounted, computed, watch, onUnmounted, reactive, nextTick } from "vue";
   import { storeToRefs } from 'pinia';
   import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
   import Sidebar from "@/components/ui/Sidebar.vue";
@@ -1041,19 +1041,18 @@
   getVisibleYears,
   getColumnLabels,
   getAmountForOOD,
-  calculateTotalForOOD,
   handleOODCellEdit,
   handleOODCellInput,
   handleOODCellFocus,
   loadOODData, 
   saveOODChanges,
   convertOODServerDataToFrontend, 
-  // toNum,
+    toNum,
   toggleCollapse as toggleCollapseUtil,
   loadYearOptions,
   isYearCollapsed as isYearCollapsedUtil,
   calculateLaundryRevenue,
-  // calculateInHouseRevenue,
+    calculateInHouseRevenue,
   calculateOutsideGuestLaundryRevenue,
   calculateGuestLaundryCost,
   calculateTotalClubUseRevenue,
@@ -1170,17 +1169,20 @@
       await new Promise(resolve => setTimeout(resolve, 100));
       years.value = await loadYearOptions();
       if (selectedProject.value) {
-        const loaded = await loadOODData(selectedProject.value.project_name) || {};
-        const converted = convertOODServerDataToFrontend(loaded);
-        Object.assign(laundryData, converted.laundry || {});
-        Object.assign(healthClubData, converted.health_club || {});
+        const [laundryResult, healthClubResult] = await Promise.all([
+          loadLaundryTableData(selectedProject.value.project_name),
+          loadHealthClubTableData(selectedProject.value.project_name)
+        ]);
+        Object.assign(laundryData, normalizeLaundryData(laundryResult || {}));
+        populateLaundryAssumptionsFromData(laundryData);
+        isSaved.value = true;
+        Object.assign(healthClubData, normalizeHealthClubData(healthClubResult || {}));
       } else {
         laundryData.value = { status: 'no_project_selected', message: 'No project selected' };
         healthClubData.value = { status: 'no_project_selected', message: 'No project selected' };
       }
       originalLaundryData.value = cloneDeep(laundryData);
       originalHealthClubData.value = cloneDeep(healthClubData);
-      isSaved.value = true;
       isComponentReady.value = true;
     } catch (err) {
       console.error("Error loading data:", err);
@@ -1192,29 +1194,24 @@
   watch(selectedProject, async (newProject, oldProject) => {
     if (newProject) {
       try {
-        // Reload OOD data for the new project
-        const loaded = await loadOODData(newProject.project_name) || {};
-        const converted = convertOODServerDataToFrontend(loaded);
-        
-        // Separate laundry and health club data
-        Object.assign(laundryData, converted.laundry || {});
-        Object.assign(healthClubData, converted.health_club || {});
-        
+        const [laundryResult, healthClubResult] = await Promise.all([
+          loadLaundryTableData(newProject.project_name),
+          loadHealthClubTableData(newProject.project_name)
+        ]);
+        Object.assign(laundryData, normalizeLaundryData(laundryResult || {}));
+        populateLaundryAssumptionsFromData(laundryData);
+        isSaved.value = true;
+        Object.assign(healthClubData, normalizeHealthClubData(healthClubResult || {}));
         originalLaundryData.value = cloneDeep(laundryData);
         originalHealthClubData.value = cloneDeep(healthClubData);
-        
-        // Reset any unsaved changes
         changedCells.value = [];
-        isSaved.value = true;
         saveError.value = "";
-        
         alertService.success(`Switched to project: ${newProject.project_name}`);
       } catch (error) {
         console.error('Error reloading OOD data for new project:', error);
         alertService.error("Failed to load project data. Please try again.");
       }
     } else {
-      // Clear data when no project is selected
       laundryData.value = { status: 'no_project_selected', message: 'No project selected' };
       healthClubData.value = { status: 'no_project_selected', message: 'No project selected' };
       originalLaundryData.value = cloneDeep(laundryData);
@@ -1251,7 +1248,7 @@
       saveError.value = "";
       
       // Log changedCells to see if health club changes are tracked
-      console.log('[OOD Save] changedCells:', JSON.parse(JSON.stringify(changedCells.value)));
+      // console.log('[OOD Save] changedCells:', JSON.parse(JSON.stringify(changedCells.value)));
 
       // Group changed cells by year and month
       const changesByYearMonth = {};
@@ -1295,7 +1292,7 @@
           // Gather health club table data
           const health_club_table = [];
           if (healthClubData[year] && healthClubData[year][month]) {
-            console.log('[OOD Save] healthClubData for', year, month, ':', JSON.parse(JSON.stringify(healthClubData[year][month])));
+            // console.log('[OOD Save] healthClubData for', year, month, ':', JSON.parse(JSON.stringify(healthClubData[year][month])));
             for (const row of healthClubData[year][month]) {
               if (row.section && row.detail && row.amount !== undefined && row.amount !== "") {
                 health_club_table.push({
@@ -1314,7 +1311,7 @@
           }
           // Save health club table if there are changes
           if (health_club_table.length > 0) {
-            console.log('[OOD Save] Health Club Table Payload:', { year, month, health_club_table });
+            // console.log('[OOD Save] Health Club Table Payload:', { year, month, health_club_table });
             savePromises.push(
               saveHealthClubTableData(year, month, health_club_table, selectedProject.value?.project_name)
             );
@@ -1326,18 +1323,18 @@
         return;
       }
       await Promise.all(savePromises);
-      // Reload both tables
+      // After saving, reload and normalize both tables
       const [laundryResult, healthClubResult] = await Promise.all([
         loadLaundryTableData(selectedProject.value?.project_name),
         loadHealthClubTableData(selectedProject.value?.project_name)
       ]);
-      // Assign loaded data
-      Object.assign(laundryData, laundryResult || {});
-      Object.assign(healthClubData, healthClubResult || {});
+      Object.assign(laundryData, normalizeLaundryData(laundryResult || {}));
+      populateLaundryAssumptionsFromData(laundryData);
+      isSaved.value = true;
+      Object.assign(healthClubData, normalizeHealthClubData(healthClubResult || {}));
       originalLaundryData.value = cloneDeep(laundryData);
       originalHealthClubData.value = cloneDeep(healthClubData);
       changedCells.value = [];
-      isSaved.value = true;
       alertService.success("Changes saved successfully");
       isSaving.value = false;
       return;
@@ -1372,17 +1369,17 @@
   // Refresh table functionality
   async function refreshTable() {
     try {
-      const loaded = await loadOODData(selectedProject.value?.project_name) || {};
-      const converted = convertOODServerDataToFrontend(loaded);
-      
-      // Separate laundry and health club data
-      Object.assign(laundryData, converted.laundry || {});
-      Object.assign(healthClubData, converted.health_club || {});
-      
+      const [laundryResult, healthClubResult] = await Promise.all([
+        loadLaundryTableData(selectedProject.value?.project_name),
+        loadHealthClubTableData(selectedProject.value?.project_name)
+      ]);
+      Object.assign(laundryData, normalizeLaundryData(laundryResult || {}));
+      populateLaundryAssumptionsFromData(laundryData);
+      isSaved.value = true;
+      Object.assign(healthClubData, normalizeHealthClubData(healthClubResult || {}));
       originalLaundryData.value = cloneDeep(laundryData);
       originalHealthClubData.value = cloneDeep(healthClubData);
       changedCells.value = [];
-      isSaved.value = true;
       alertService.success("Page refreshed successfully");
     } catch (error) {
       console.error("Error refreshing table:", error);
@@ -1406,7 +1403,7 @@
         year,
         label
       );
-      console.log('[Cache Lookup] project:', projectName, 'page:', pageId, 'row:', rowCode, 'year:', year, 'label:', label, '=>', numberOfGuests);
+      // console.log('[Cache Lookup] project:', projectName, 'page:', pageId, 'row:', rowCode, 'year:', year, 'label:', label, '=>', numberOfGuests);
       return calculateLaundryRevenue(
         laundryData.static,
         fieldCode,
@@ -1533,7 +1530,7 @@
 
   // Watch for changes in laundryAssumptions to mark as unsaved
   watch(laundryAssumptions, () => {
-    if (isSaved.value) {
+    if (!isPopulatingLaundryAssumptions && isSaved.value) {
     isSaved.value = false;
   }
   }, { deep: true });
@@ -1563,6 +1560,104 @@
       healthClubData[year][label].push({ field, section, detail, amount });
     }
   }
+
+  // Helper to find code for section/detail
+  function findHealthClubCode(section, detail) {
+    const match = HEALTH_CLUB_FIELDS.find(f => f.section === section && f.label === detail);
+    return match ? match.code : undefined;
+  }
+
+  // Normalize health club data after loading
+  function normalizeHealthClubData(raw) {
+    const normalized = {};
+    for (const year in raw) {
+      normalized[year] = {};
+      for (const month in raw[year]) {
+        const arr = (raw[year][month]?.health_club_table || []).map(row => ({
+          ...row,
+          field: findHealthClubCode(row.section, row.detail)
+        }));
+        normalized[year][month] = arr;
+      }
+    }
+    return normalized;
+  }
+
+  // Helper to find code for section/detail in laundry fields
+  function findLaundryCode(section, detail) {
+    const match = LAUNDRY_FIELDS.find(f => f.label === section && f.detail === detail);
+    // If LAUNDRY_FIELDS does not have 'detail', fallback to label only
+    if (!match) {
+      const fallback = LAUNDRY_FIELDS.find(f => f.label === section);
+      return fallback ? fallback.code : undefined;
+    }
+    return match.code;
+  }
+
+  // Normalize laundry data after loading
+  function normalizeLaundryData(raw) {
+    const normalized = {};
+    for (const year in raw) {
+      normalized[year] = {};
+      for (const month in raw[year]) {
+        const arr = (raw[year][month]?.laundry_table || []).map(row => ({
+          ...row,
+          field: findLaundryCode(row.section, row.detail)
+        }));
+        normalized[year][month] = arr;
+      }
+    }
+    return normalized;
+  }
+
+  // Map normalized laundryData to laundryAssumptions
+  function populateLaundryAssumptionsFromData(laundryData) {
+    isPopulatingLaundryAssumptions = true;
+    // Clear existing
+    Object.keys(laundryAssumptions).forEach(key => {
+      laundryAssumptions[key] = {};
+    });
+    for (const year in laundryData) {
+      for (const month in laundryData[year]) {
+        for (const row of laundryData[year][month]) {
+          // Map by field
+          switch (row.field) {
+            case 'in_house_guest_laundry':
+              if (row.detail === 'Percentage') {
+                if (!laundryAssumptions.in_house_guest_laundry_percentage[year]) laundryAssumptions.in_house_guest_laundry_percentage[year] = {};
+                laundryAssumptions.in_house_guest_laundry_percentage[year][month] = row.amount;
+              } else if (row.detail === 'Base') {
+                if (!laundryAssumptions.in_house_guest_laundry_base[year]) laundryAssumptions.in_house_guest_laundry_base[year] = {};
+                laundryAssumptions.in_house_guest_laundry_base[year][month] = row.base;
+              } else if (row.detail === 'Average Amount') {
+                if (!laundryAssumptions.in_house_guest_laundry_amount[year]) laundryAssumptions.in_house_guest_laundry_amount[year] = {};
+                laundryAssumptions.in_house_guest_laundry_amount[year][month] = row.amount;
+              }
+              break;
+            case 'in_house_dry_cleaning':
+              if (row.detail === 'Percentage') {
+                if (!laundryAssumptions.in_house_dry_cleaning_percentage[year]) laundryAssumptions.in_house_dry_cleaning_percentage[year] = {};
+                laundryAssumptions.in_house_dry_cleaning_percentage[year][month] = row.amount;
+              } else if (row.detail === 'Base') {
+                if (!laundryAssumptions.in_house_dry_cleaning_base[year]) laundryAssumptions.in_house_dry_cleaning_base[year] = {};
+                laundryAssumptions.in_house_dry_cleaning_base[year][month] = row.base;
+              } else if (row.detail === 'Average Amount') {
+                if (!laundryAssumptions.in_house_dry_cleaning_amount[year]) laundryAssumptions.in_house_dry_cleaning_amount[year] = {};
+                laundryAssumptions.in_house_dry_cleaning_amount[year][month] = row.amount;
+              }
+              break;
+            // Add similar mapping for other fields as needed
+          }
+        }
+      }
+    }
+    nextTick(() => {
+      isPopulatingLaundryAssumptions = false;
+    });
+  }
+
+  // Add at the top of <script setup>
+  let isPopulatingLaundryAssumptions = false;
 
   </script>
   
