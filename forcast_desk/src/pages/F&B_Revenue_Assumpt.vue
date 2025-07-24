@@ -1374,6 +1374,15 @@
       if (savedDefaultBreakfastOutlet) {
         defaultBreakfastOutlet.value = savedDefaultBreakfastOutlet;
       }
+
+      // ************Prefill calculation cache for Number of guests for all visible years/labels***********************
+      if (selectedProject.value && visibleYears.value.length) {
+        visibleYears.value.forEach(year => {
+          getColumnLabelsForYearLocal(year).forEach(label => {
+            getFnbCellValue(fnbData, 'Number of guests', year, label, totalRooms);
+          });
+        });
+      }
     } catch (err) {
       console.error("Error loading data:", err);
     }

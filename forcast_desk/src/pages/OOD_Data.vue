@@ -164,13 +164,6 @@
                       Advanced
                     </button>
                   </div>
-                  <button
-                    @click="showLaundryDetails = true"
-                    class="w-full flex items-center justify-left gap-2 px-3 py-2.5 bg-white border border-blue-500 text-blue-700 rounded-lg hover:bg-blue-50 transition-all duration-200 text-sm font-medium mt-2"
-                  >
-                    <FolderOpen class="w-4 h-4" />
-                    Laundry Assumptions
-                  </button>
                 </div>
               </div>
             </div>
@@ -202,122 +195,372 @@
                 </div>
             </template>
             
+            
             <!-- Tables when years are selected -->
             <template v-else-if="visibleYears.length && isComponentReady">
-              <!-- Laundry Table -->
-              <div class="mb-8">
+              <!-- Laundry Assumptions Matrix Table -->
+              <div class="mb-10">
                 <div class="flex items-center gap-2 mb-4">
                   <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                    <Table class="w-3 h-3 text-white" />
+                    <Table class="w-4 h-4 text-white" />
                   </div>
                   <h2 class="text-lg font-bold text-gray-800">Laundry</h2>
               </div>
-  
-                <div class="bg-white rounded-lg border border-blue-200 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                  <div class="min-w-full w-max">
-                    <table class="w-full">
-                      <!-- Table Header -->
-                        <thead class="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-                        <tr>
-                            <th rowspan="2" class="px-3 py-2 text-left border-r font-semibold text-sm w-[300px]">
+                <div class="bg-white rounded-lg border border-blue-200 shadow-sm overflow-x-auto">
+                  <table class="min-w-full w-max text-sm border border-blue-300">
+                    <thead class="bg-blue-50">
+                      <tr>
+                        <th rowspan="2" class="px-3 py-2 text-left font-semibold text-white  bg-blue-700 w-[300px] border border-blue-300">
                               <div class="flex items-center gap-1">
                                 <FolderOpen class="w-3 h-3" />
-                                Details
+                                Assumption Details
                               </div>
                             </th>
-                          <th
-                            v-for="year in visibleYears"
-                            :key="'header-' + year"
-                            :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
-                              class="px-2 py-2 text-center border-x-2 border-white cursor-pointer select-none hover:bg-blue-700 transition-all duration-200 group text-sm"
+                        <th v-for="year in visibleYears" :key="'header-' + year"
+                          :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length"
+                          class="px-2 py-2 text-center font-semibold text-white bg-blue-700 border border-blue-300 cursor-pointer select-none group"
                             @click="toggleCollapse(year)"
                             title="Click to collapse/expand"
                           >
                             <div class="flex items-center justify-center gap-1">
                               <span class="font-semibold">{{ year }}</span>
-                              <ChevronDown 
-                                v-if="!isYearCollapsed(year)" 
-                                class="w-3 h-3 transition-transform group-hover:scale-110" 
-                              />
-                              <ChevronRight 
-                                v-else 
-                                class="w-3 h-3 transition-transform group-hover:scale-110" 
-                              />
+                            <ChevronDown v-if="!isYearCollapsed(year)" class="w-3 h-3 transition-transform group-hover:scale-110" />
+                            <ChevronRight v-else class="w-3 h-3 transition-transform group-hover:scale-110" />
                             </div>
                           </th>
                         </tr>
-                          <tr class="bg-blue-500/90 text-xs">
+                      <tr>
                           <template v-for="year in visibleYears" :key="'months-' + year">
                             <template v-if="!isYearCollapsed(year)">
-                                                              <th
-                                  v-for="label in getColumnLabelsForYearLocal(year)"
-                                  :key="year + '-' + label"
-                                  class="px-2 py-1 text-center border border-blue-300 min-w-[100px] font-medium text-xs"
-                                >
-                                  {{ label }}
-                                </th>
-                                                                <th class="px-2 py-1 text-center border border-blue-300 min-w-[110px] font-semibold text-xs">
-                                  <div class="flex items-center justify-center gap-1">
-                                    Forecast
-                                  </div>
-                                </th>
+                            <th v-for="label in getColumnLabelsForYearLocal(year)" :key="year + '-' + label" class="px-2 py-1 text-center font-medium text-xs border border-white min-w-[100px] bg-blue-500 text-white">{{ label }}</th>
                               </template>
                               <template v-else>
-                                <th class="px-2 py-1 text-center border border-blue-300 min-w-[110px] font-semibold text-xs">
-                                <div class="flex items-center justify-center gap-1">
-                                  Forecast
-                                </div>
-                              </th>
+                            <th class="px-2 py-1 text-center font-medium text-xs border border-blue-300 min-w-[110px]">Forecast</th>
                             </template>
                           </template>
                         </tr>
                       </thead>
-                      <tbody class="text-gray-700 bg-white text-sm">
-                          <template v-for="(field, idx) in laundryFields" :key="field.code">
-                            <tr v-if="field.label === 'COST OF LAUNDRY'">
-                              <td :colspan="1 + visibleYears.length * (isYearCollapsed(visibleYears[0]) ? 1 : getColumnLabelsForYearLocal(visibleYears[0]).length + 1)"
-                                  class="bg-blue-100 text-blue-900 font-bold text-left px-3 py-2 border-t-2 border-b-2 border-blue-300 uppercase tracking-wider">
-                                {{ field.label }}
+                    <tbody>
+                      <!-- Section: In House Guest Laundry Revenue -->
+                      <tr class="bg-blue-100">
+                        <td colspan="100" class="font-semibold text-blue-900 px-4 py-2 border border-blue-300">In House Guest Laundry Revenue</td>
+                      </tr>
+                      <!-- Percentage Row (Guest Laundry) -->
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border border-blue-300">Percentage</td>
+                        <template v-for="year in visibleYears" :key="'perc-guest-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'perc-guest-' + year + '-' + label" class="border border-blue-300">
+                              <input type="number"
+                                :value="laundryAssumptions.in_house_guest_laundry_percentage[year]?.[label] || ''"
+                                @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.in_house_guest_laundry_percentage[year]) laundryAssumptions.in_house_guest_laundry_percentage[year] = {}; laundryAssumptions.in_house_guest_laundry_percentage[year][label] = val; }"
+                                placeholder="0%"
+                                class="borderless-input w-full" />
                               </td>
+                          </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
                             </tr>
-                            <tr v-else class="transition-all duration-200 border-b border-gray-100 even:bg-gray-50 hover:bg-blue-50">
-                              <td class="px-3 py-2 font-medium border-r text-gray-600 w-[300px]">
-                                {{ field.label }}
+                      <!-- Base Row (Guest Laundry) -->
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border border-blue-300">Base</td>
+                        <template v-for="year in visibleYears" :key="'base-guest-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'base-guest-' + year + '-' + label" class="border border-blue-300">
+                              <select
+                                :value="laundryAssumptions.in_house_guest_laundry_base[year]?.[label] || ''"
+                                @change="e => { if (!laundryAssumptions.in_house_guest_laundry_base[year]) laundryAssumptions.in_house_guest_laundry_base[year] = {}; laundryAssumptions.in_house_guest_laundry_base[year][label] = e.target.value; }"
+                                class="borderless-input w-full">
+                                <option disabled value="">Select base</option>
+                                <option value="per_month">per month</option>
+                                <option value="per_week">per week</option>
+                              </select>
                               </td>
-                              <template v-for="year in visibleYears" :key="'row-' + year + '-' + field.code">
+                          </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
+                      <!-- Average Amount Row (Guest Laundry) -->
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border border-blue-300">Average Amount</td>
+                        <template v-for="year in visibleYears" :key="'amt-guest-' + year">
                                 <template v-if="!isYearCollapsed(year)">
-                                                                    <td
-                                    v-for="label in getColumnLabelsForYearLocal(year)"
-                                    :key="'cell-editable-' + year + '-' + label"
-                                    contenteditable="true"
-                                    class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 min-w-[100px]"
-                                    @input="handleOODCellInput({ year, label, field: field.code, event: $event, oodData: laundryData })"
-                                    @focus="handleOODCellFocus({ year, label, field: field.code, event: $event })"
-                                    @blur="handleCellEditWrapper({ year, label, field: field.code, event: $event })"
-                                  >
-                                    <span class="font-mono text-xs">{{ formatOODValue(field.code, getOODCellValue(laundryData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'amt-guest-' + year + '-' + label" class="border border-blue-300">
+                              <input type="number"
+                                :value="laundryAssumptions.in_house_guest_laundry_amount[year]?.[label] || ''"
+                                @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.in_house_guest_laundry_amount[year]) laundryAssumptions.in_house_guest_laundry_amount[year] = {}; laundryAssumptions.in_house_guest_laundry_amount[year][label] = val; }"
+                                placeholder="0"
+                                class="borderless-input w-full" />
                                   </td>
-                                                                    <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50 min-w-[110px]">
-                                    <span class="font-mono text-xs text-blue-700">
-                                      {{ formatOODValue(field.code, calculateTotalForOOD(laundryData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
+                          </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
+                      <!-- Section: In House Dry Cleaning Revenue -->
+                      <tr class="bg-blue-100">
+                        <td colspan="100" class="font-semibold text-blue-900 px-4 py-2 border border-blue-300">In House Dry Cleaning Revenue</td>
+                      </tr>
+                      <!-- Percentage Row (Dry Cleaning) -->
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border border-blue-300">Percentage</td>
+                        <template v-for="year in visibleYears" :key="'perc-dry-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'perc-dry-' + year + '-' + label" class="border border-blue-300">
+                              <input type="number"
+                                :value="laundryAssumptions.in_house_dry_cleaning_percentage[year]?.[label] || ''"
+                                @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.in_house_dry_cleaning_percentage[year]) laundryAssumptions.in_house_dry_cleaning_percentage[year] = {}; laundryAssumptions.in_house_dry_cleaning_percentage[year][label] = val; }"
+                                placeholder="0%"
+                                class="borderless-input w-full" />
+                            </td>
+                          </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
+                      <!-- Base Row (Dry Cleaning) -->
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border border-blue-300">Base</td>
+                        <template v-for="year in visibleYears" :key="'base-dry-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'base-dry-' + year + '-' + label" class="border border-blue-300">
+                              <select
+                                :value="laundryAssumptions.in_house_dry_cleaning_base[year]?.[label] || ''"
+                                @change="e => { if (!laundryAssumptions.in_house_dry_cleaning_base[year]) laundryAssumptions.in_house_dry_cleaning_base[year] = {}; laundryAssumptions.in_house_dry_cleaning_base[year][label] = e.target.value; }"
+                                class="borderless-input w-full">
+                                <option disabled value="">Select base</option>
+                                <option value="per_month">per month</option>
+                                <option value="per_week">per week</option>
+                              </select>
+                            </td>
+                          </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
+                      <!-- Average Amount Row (Dry Cleaning) -->
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border border-blue-300">Average Amount</td>
+                        <template v-for="year in visibleYears" :key="'amt-dry-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'amt-dry-' + year + '-' + label" class="border border-blue-300">
+                              <input type="number"
+                                :value="laundryAssumptions.in_house_dry_cleaning_amount[year]?.[label] || ''"
+                                @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.in_house_dry_cleaning_amount[year]) laundryAssumptions.in_house_dry_cleaning_amount[year] = {}; laundryAssumptions.in_house_dry_cleaning_amount[year][label] = val; }"
+                                placeholder="0"
+                                class="borderless-input w-full" />
+                            </td>
+                          </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
+                      <!-- Section: Outside Guest Laundry -->
+                      <tr class="bg-blue-100">
+                        <td colspan="100" class="font-semibold text-blue-900 px-4 py-2 border border-blue-300">Outside Guest Laundry</td>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border border-blue-300">Number</td>
+                        <template v-for="year in visibleYears" :key="'num-outside-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'num-outside-' + year + '-' + label" class="border border-blue-300">
+                              <input type="number"
+                                :value="laundryAssumptions.outside_guest_laundry_number[year]?.[label] || ''"
+                                @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.outside_guest_laundry_number[year]) laundryAssumptions.outside_guest_laundry_number[year] = {}; laundryAssumptions.outside_guest_laundry_number[year][label] = val; }"
+                                placeholder="0"
+                                class="borderless-input w-full" />
+                            </td>
+                          </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border border-blue-300">Base</td>
+                        <template v-for="year in visibleYears" :key="'base-outside-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'base-outside-' + year + '-' + label" class="border border-blue-300">
+                              <select
+                                :value="laundryAssumptions.outside_guest_laundry_base[year]?.[label] || ''"
+                                @change="e => { if (!laundryAssumptions.outside_guest_laundry_base[year]) laundryAssumptions.outside_guest_laundry_base[year] = {}; laundryAssumptions.outside_guest_laundry_base[year][label] = e.target.value; }"
+                                class="borderless-input w-full">
+                                <option disabled value="">Select base</option>
+                                <option value="per_month">per month</option>
+                                <option value="per_week">per week</option>
+                              </select>
+                            </td>
+                          </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border border-blue-300">Average Amount</td>
+                        <template v-for="year in visibleYears" :key="'amt-outside-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'amt-outside-' + year + '-' + label" class="border border-blue-300">
+                              <input type="number"
+                                :value="laundryAssumptions.outside_guest_laundry_amount[year]?.[label] || ''"
+                                @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.outside_guest_laundry_amount[year]) laundryAssumptions.outside_guest_laundry_amount[year] = {}; laundryAssumptions.outside_guest_laundry_amount[year][label] = val; }"
+                                placeholder="0"
+                                class="borderless-input w-full" />
+                            </td>
+                          </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
+                      <tr class="bg-blue-100">
+                        <td colspan="100" class="font-semibold text-blue-900 px-4 py-2 border border-blue-300">Guest Laundry Cost</td>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border border-blue-300">Percentage</td>
+                        <template v-for="year in visibleYears" :key="'perc-cost-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'perc-cost-' + year + '-' + label" class="border border-blue-300">
+                              <input type="number"
+                                :value="laundryAssumptions.guest_laundry_cost_percentage[year]?.[label] || ''"
+                                @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.guest_laundry_cost_percentage[year]) laundryAssumptions.guest_laundry_cost_percentage[year] = {}; laundryAssumptions.guest_laundry_cost_percentage[year][label] = val; if (val > 0) { if (!laundryAssumptions.guest_laundry_cost_amount[year]) laundryAssumptions.guest_laundry_cost_amount[year] = {}; laundryAssumptions.guest_laundry_cost_amount[year][label] = ''; } }"
+                                :disabled="Number(laundryAssumptions.guest_laundry_cost_amount[year]?.[label] || 0) > 0"
+                                placeholder="0%"
+                                :class="['borderless-input w-full', Number(laundryAssumptions.guest_laundry_cost_amount[year]?.[label] || 0) > 0 ? 'bg-gray-100 cursor-not-allowed' : '']" />
+                            </td>
+                          </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border border-blue-300">Average Amount</td>
+                        <template v-for="year in visibleYears" :key="'amt-cost-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'amt-cost-' + year + '-' + label" class="border border-blue-300">
+                              <input type="number"
+                                :value="laundryAssumptions.guest_laundry_cost_amount[year]?.[label] || ''"
+                                @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.guest_laundry_cost_amount[year]) laundryAssumptions.guest_laundry_cost_amount[year] = {}; laundryAssumptions.guest_laundry_cost_amount[year][label] = val; if (val > 0) { if (!laundryAssumptions.guest_laundry_cost_percentage[year]) laundryAssumptions.guest_laundry_cost_percentage[year] = {}; laundryAssumptions.guest_laundry_cost_percentage[year][label] = ''; } }"
+                                :disabled="Number(laundryAssumptions.guest_laundry_cost_percentage[year]?.[label] || 0) > 0"
+                                placeholder="0"
+                                :class="['borderless-input w-full', Number(laundryAssumptions.guest_laundry_cost_percentage[year]?.[label] || 0) > 0 ? 'bg-gray-100 cursor-not-allowed' : '']" />
+                            </td>
+                          </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
+                      <tr class="bg-blue-100">
+                        <td colspan="100" class="font-semibold bg-blue-700 text-white px-4 py-2 border border-blue-300">Revenue</td>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border flex justify-between items-end">
+                          <span>In House</span>
+                          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            Auto
                                     </span>
+                        </td>
+                        <template v-for="year in visibleYears" :key="'rev-inhouse-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'rev-inhouse-' + year + '-' + label"
+                              class="px-2 py-1 text-right text-blue-700 font-mono bg-blue-50 min-w-[110px] border border-blue-300">
+                              {{ formatOODValue('revenue_in_house', calculateInHouseRevenueReactive(year, label)) }}
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50 min-w-[110px]">
-                                    <span class="font-mono text-xs text-blue-700">
-                                      {{ formatOODValue(field.code, calculateTotalForOOD(laundryData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700  flex justify-between items-end">
+                          <span>Outside</span>
+                          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            Auto
                                     </span>
+                        </td>
+                        <template v-for="year in visibleYears" :key="'rev-outside-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'rev-outside-' + year + '-' + label"
+                              class="px-2 py-1 text-right text-blue-700 font-mono bg-blue-50 min-w-[110px] border border-blue-300">
+                              {{ formatOODValue('revenue_outside', calculateOutsideGuestLaundryRevenue(laundryAssumptions, year, label)) }}
                                   </td>
+                                </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                            </template>
+                          </tr>
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border border-blue-300">Other Revenue</td>
+                        <template v-for="year in visibleYears" :key="'rev-other-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'rev-other-' + year + '-' + label"
+                              class="px-2 py-1 text-right font-mono text-blue-700 bg-blue-50 min-w-[110px] border border-blue-300"
+                                    contenteditable="true"
+                              @input="e => handleContentEditableInput(e, laundryAssumptions.revenue_other, year, label)"
+                              @paste="handleContentEditablePaste"
+                            >
+                              {{ formatOODValue('revenue_other', laundryAssumptions.revenue_other?.[year]?.[label] || '') }}
+                                  </td>
+                          </template>
+                                <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
+                      <tr class="bg-blue-100">
+                        <td colspan="100" class="font-semibold bg-blue-700 text-white px-4 py-2 border border-blue-300">COST OF LAUNDRY</td>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 flex justify-between items-end">
+                          <span>Guest Laundry Cost</span>
+                          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            Auto
+                          </span>
+                        </td>
+                        <template v-for="year in visibleYears" :key="'cost-guest-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'cost-guest-' + year + '-' + label"
+                              class="px-2 py-1 text-right text-blue-700 font-mono bg-blue-50 min-w-[110px] border border-blue-300">
+                              {{ formatOODValue('guest_laundry_cost', calculateGuestLaundryCostReactive(year, label)) }}
+                                  </td>
+                                </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
                                 </template>
                             </template>
                           </tr>
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 border border-blue-300">Other Laundry Costs</td>
+                        <template v-for="year in visibleYears" :key="'cost-other-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'cost-other-' + year + '-' + label"
+                              class="px-2 py-1 text-right font-mono text-blue-700 bg-blue-50 min-w-[110px] border border-blue-300"
+                              contenteditable="true"
+                              @input="e => handleContentEditableInput(e, laundryAssumptions.other_laundry_costs, year, label)"
+                              @paste="handleContentEditablePaste"
+                            >
+                              {{ formatOODValue('other_laundry_costs', laundryAssumptions.other_laundry_costs?.[year]?.[label] || '') }}
+                            </td>
                           </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
                         </tbody>
                       </table>
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -325,7 +568,7 @@
               <div class="mb-8">
                 <div class="flex items-center gap-2 mb-4">
                   <div class="w-6 h-6 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                    <Table class="w-3 h-3 text-white" />
+                    <Table class="w-4 h-4 text-white" />
                   </div>
                   <h2 class="text-lg font-bold text-gray-800">Health Club</h2>
                 </div>
@@ -333,11 +576,11 @@
                 <div class="bg-white rounded-lg border border-green-200 shadow-sm overflow-hidden">
                   <div class="overflow-x-auto">
                     <div class="min-w-full w-max">
-                      <table class="w-full">
+                      <table class="w-full border border-green-300">
                         <!-- Table Header -->
                         <thead class="bg-gradient-to-r from-green-600 to-green-700 text-white">
                           <tr>
-                            <th rowspan="2" class="px-3 py-2 text-left border-r font-semibold text-sm w-[300px]">
+                            <th rowspan="2" class="px-3 py-2 text-left border-r font-semibold text-sm w-[300px] border border-green-300">
                               <div class="flex items-center gap-1">
                                 <FolderOpen class="w-3 h-3" />
                               Details
@@ -402,7 +645,7 @@
                             <!-- Section Divider Rows -->
                             <tr v-if="['Club Use Revenue', 'Treatments & Other Services', 'Memberships'].includes(field.label)">
                               <td :colspan="1 + visibleYears.length * (isYearCollapsed(visibleYears[0]) ? 2 : (getColumnLabelsForYearLocal(visibleYears[0]).length * 2) + 2)"
-                                  class="bg-green-100 text-green-900 font-bold text-left px-3 py-2 border-t-2 border-b-2 border-green-300 uppercase tracking-wider">
+                                  class="bg-green-100 text-green-900 font-bold text-left px-3 py-2 border-t-2 border-b-2  uppercase tracking-wider border border-green-300">
                                 {{ field.label }}
                               </td>
                             </tr>
@@ -606,101 +849,6 @@
         </div>
       </div>
     </transition>
-  
-  <!-- Laundry Details Modal -->
-  <transition name="fade">
-    <div
-      v-if="showLaundryDetails"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-    >
-      <div class="bg-white rounded-3xl shadow-2xl border border-blue-200 w-[99%] max-w-5xl p-0">
-        <!-- Modal Header -->
-        <div class="flex items-center gap-4 px-12 py-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-3xl">
-          <Settings class="w-7 h-7 text-white" />
-          <h2 class="text-2xl font-bold text-white tracking-wide">Laundry Assumptions</h2>
-        </div>
-        <!-- Modal Body -->
-        <div class="p-10 pt-8 bg-blue-50/30">
-          <div class="overflow-x-auto">
-            <table class="min-w-full w-full border-separate border-spacing-y-2">
-              <thead>
-                <tr>
-                  <th class="text-left text-base font-semibold text-blue-900 pb-2 pl-2">Detail</th>
-                  <th class="text-center text-base font-semibold text-blue-900 pb-2">Number</th>
-                  <th class="text-center text-base font-semibold text-blue-900 pb-2">Percentage</th>
-                  <th class="text-center text-base font-semibold text-blue-900 pb-2">Base</th>
-                  <th class="text-center text-base font-semibold text-blue-900 pb-2">Average Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                <template v-for="field in laundryFields" :key="'laundry-detail-' + field.code">
-                  <tr v-if="field.label === 'COST OF LAUNDRY'">
-                    <td colspan="5" class="bg-blue-100 text-blue-900 font-bold text-left px-4 py-3 border-t-2 border-b-2 border-blue-300 uppercase tracking-wider rounded-xl">
-                      {{ field.label }}
-                    </td>
-                  </tr>
-                  <tr v-else class="bg-white hover:bg-blue-100 transition-all border border-blue-100 rounded-xl shadow-sm">
-                    <td class="py-3 px-4 font-medium text-blue-800 rounded-l-xl">{{ field.label }}</td>
-                    <td class="py-3 px-2 text-center">
-                      <input
-                        type="number"
-                        v-model="laundryDetailsModalData[field.code + '_number']"
-                        class="px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-400 w-28 text-sm bg-blue-50/50"
-                        placeholder="0"
-                      />
-                    </td>
-                    <td class="py-3 px-2 text-center">
-                      <input
-                        type="number"
-                        v-model="laundryDetailsModalData[field.code + '_percentage']"
-                        class="px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-400 w-28 text-sm bg-blue-50/50"
-                        placeholder="0%"
-                      />
-                    </td>
-                    <td class="py-3 px-2 text-center">
-                      <select
-                        v-model="laundryDetailsModalData[field.code + '_base']"
-                        class="px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-400 w-32 text-sm bg-blue-50/50"
-                      >
-                        <option disabled value="">Select a base</option>
-                        <option value="per_day">per day</option>
-                        <option value="per_week">per week</option>
-                      </select>
-                    </td>
-                    <td class="py-3 px-2 text-center rounded-r-xl">
-                      <input
-                        type="number"
-                        v-model="laundryDetailsModalData[field.code + '_amount']"
-                        class="px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-400 w-32 text-sm bg-blue-50/50"
-                        placeholder="0.00"
-                      />
-                    </td>
-                  </tr>
-                </template>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <!-- Modal Footer -->
-        <div class="flex justify-end gap-4 px-12 py-6 bg-blue-50 border-t border-blue-100 rounded-b-3xl">
-          <button
-            @click="cancelLaundryDetails"
-            class="px-5 py-2.5 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2 text-base font-medium shadow-sm"
-          >
-            <X class="w-5 h-5" />
-            Cancel
-          </button>
-          <button
-            @click="applyLaundryDetails"
-            class="px-5 py-2.5 rounded-md bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2 text-base font-semibold shadow-md"
-          >
-            <Check class="w-5 h-5" />
-            Apply
-          </button>
-        </div>
-      </div>
-    </div>
-  </transition>
   </template>
   
   
@@ -744,12 +892,17 @@
   loadOODData, 
   saveOODChanges,
   convertOODServerDataToFrontend, 
-  toNum,
+  // toNum,
   toggleCollapse as toggleCollapseUtil,
   loadYearOptions,
-  isYearCollapsed as isYearCollapsedUtil
+  isYearCollapsed as isYearCollapsedUtil,
+  calculateLaundryRevenue,
+  // calculateInHouseRevenue,
+  calculateOutsideGuestLaundryRevenue,
+  calculateGuestLaundryCost
 } from "@/components/utility/ood_data/index.js";
   import { cloneDeep } from 'lodash-es';
+  import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
   
   // Import project service
   import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
@@ -770,8 +923,26 @@
   const sidebarCollapsed = ref(false);
   const isComponentReady = ref(false);
   const collapsedYears = ref([]);
-  const showLaundryDetails = ref(false);
-  const laundryDetailsModalData = ref({});
+  const calculationCache = useCalculationCache();
+  // Matrix/grid state for laundry assumptions per year/month
+  const laundryAssumptions = reactive({
+    // For each assumption, store year -> label -> value
+    in_house_guest_laundry_percentage: {},
+    in_house_guest_laundry_base: {},
+    in_house_guest_laundry_amount: {},
+    in_house_dry_cleaning_percentage: {},
+    in_house_dry_cleaning_base: {},
+    in_house_dry_cleaning_amount: {},
+    outside_guest_laundry_number: {},
+    outside_guest_laundry_base: {},
+    outside_guest_laundry_amount: {},
+    guest_laundry_cost_percentage: {},
+    guest_laundry_cost_amount: {},
+    revenue_in_house: {},
+    revenue_outside: {},
+    revenue_other: {},
+    other_laundry_costs: {},
+  });
 
   // Pinia store for year settings
   const yearSettingsStore = useYearSettingsStore();
@@ -788,15 +959,7 @@
     return getColumnLabels(advancedModes.value[year] || displayMode.value);
   };
   
-  // Computed properties for table fields
-  const laundryFields = computed(() => {
-    return LAUNDRY_FIELDS.map(field => ({
-      ...field,
-      number: ref(0),
-      percentage: ref(0),
-      base: ref(0)
-    }));
-  });
+
 
   const healthClubFields = computed(() => {
     return HEALTH_CLUB_FIELDS;
@@ -999,6 +1162,31 @@
   }
 
   function getOODCellValue(oodData, fieldCode, year, label, displayMode = 'monthly') {
+    // Auto-calc for laundry revenue rows
+    if (
+      fieldCode === 'in_house_guest_laundry' ||
+      fieldCode === 'in_house_dry_cleaning'
+    ) {
+      const projectName = selectedProject.value?.project_name;
+      const pageId = 'F&B Revenue Assumptions';
+      const rowCode = 'Number of guests';
+      const numberOfGuests = calculationCache.getValue(
+        projectName,
+        pageId,
+        rowCode,
+        year,
+        label
+      );
+      console.log('[Cache Lookup] project:', projectName, 'page:', pageId, 'row:', rowCode, 'year:', year, 'label:', label, '=>', numberOfGuests);
+      return calculateLaundryRevenue(
+        laundryData.static,
+        fieldCode,
+        year,
+        label,
+        numberOfGuests
+      );
+    }
+    // Default for other fields
     return getAmountForOOD(oodData, fieldCode, year, label, displayMode);
   }
 
@@ -1012,21 +1200,21 @@
     return isYearCollapsedUtil(year, collapsedYears);
   }
 
-  // Handle base change for laundry fields
-  function handleBaseChange(fieldCode, value) {
-    // Store the base value for the field
-    if (!laundryData.static) laundryData.static = {};
-    if (!laundryData.static.base) laundryData.static.base = {};
-    laundryData.static.base[fieldCode] = value;
+  // // Handle base change for laundry fields
+  // function handleBaseChange(fieldCode, value) {
+  //   // Store the base value for the field
+  //   if (!laundryData.static) laundryData.static = {};
+  //   if (!laundryData.static.base) laundryData.static.base = {};
+  //   laundryData.static.base[fieldCode] = value;
     
-    // Mark as unsaved
-    isSaved.value = false;
-  }
+  //   // Mark as unsaved
+  //   isSaved.value = false;
+  // }
 
-  // Get base value for a field
-  function getBaseValue(fieldCode) {
-    return laundryData?.static?.base?.[fieldCode] || '';
-  }
+  // // Get base value for a field
+  // function getBaseValue(fieldCode) {
+  //   return laundryData?.static?.base?.[fieldCode] || '';
+  // }
 
   // Check if a field is a total field in Health Club table
   function isTotalField(fieldCode) {
@@ -1041,43 +1229,86 @@
     return totalFields.includes(fieldCode);
   }
 
-  // Open modal and populate modal data from laundryData
-  function openLaundryDetails() {
-    laundryDetailsModalData.value = {};
-    laundryFields.value.forEach(field => {
-      laundryDetailsModalData.value[field.code + '_number'] = laundryData?.static?.number?.[field.code] || '';
-      laundryDetailsModalData.value[field.code + '_percentage'] = laundryData?.static?.percentage?.[field.code] || '';
-      laundryDetailsModalData.value[field.code + '_base'] = laundryData?.static?.base?.[field.code] || '';
-      laundryDetailsModalData.value[field.code + '_amount'] = laundryData?.static?.amount?.[field.code] || '';
-    });
-    showLaundryDetails.value = true;
+  // Utility: Only allow numbers and dot in input
+  function sanitizeNumberInput(e) {
+    let val = e.target.value;
+    // Remove all except digits and dot, allow only one dot
+    val = val.replace(/[^\d.]/g, '');
+    const parts = val.split('.');
+    if (parts.length > 2) {
+      val = parts[0] + '.' + parts.slice(1).join('');
+    }
+    // Remove leading zeros unless before dot
+    val = val.replace(/^0+(?!\.)/, '');
+    e.target.value = val;
+    return val;
   }
 
-  // Watch for modal open
-  watch(showLaundryDetails, (val) => {
-    if (val) openLaundryDetails();
-  });
-
-  function cancelLaundryDetails() {
-    showLaundryDetails.value = false;
+  // In the <script setup> section, add a handler for contenteditable numeric enforcement:
+  function handleContentEditableInput(e, obj, year, label) {
+    let val = e.target.innerText.replace(/[^\d.]/g, '');
+    // Only allow one dot
+    const parts = val.split('.');
+    if (parts.length > 2) {
+      val = parts[0] + '.' + parts.slice(1).join('');
+    }
+    // Remove leading zeros unless before dot
+    val = val.replace(/^0+(?!\.)/, '');
+    e.target.innerText = val;
+    if (!obj[year]) obj[year] = {};
+    obj[year][label] = val;
+  }
+  function handleContentEditablePaste(e) {
+    const text = (e.clipboardData || window.clipboardData).getData('text');
+    if (/[^\d.]/.test(text)) {
+      e.preventDefault();
+      // Only paste numbers and dot
+      document.execCommand('insertText', false, text.replace(/[^\d.]/g, ''));
+    }
   }
 
-  function applyLaundryDetails() {
-    if (!laundryData.static) laundryData.static = {};
-    if (!laundryData.static.number) laundryData.static.number = {};
-    if (!laundryData.static.percentage) laundryData.static.percentage = {};
-    if (!laundryData.static.base) laundryData.static.base = {};
-    if (!laundryData.static.amount) laundryData.static.amount = {};
-    laundryFields.value.forEach(field => {
-      laundryData.static.number[field.code] = laundryDetailsModalData.value[field.code + '_number'];
-      laundryData.static.percentage[field.code] = laundryDetailsModalData.value[field.code + '_percentage'];
-      laundryData.static.base[field.code] = laundryDetailsModalData.value[field.code + '_base'];
-      laundryData.static.amount[field.code] = laundryDetailsModalData.value[field.code + '_amount'];
-    });
-    isSaved.value = false;
-    showLaundryDetails.value = false;
-  }
+  // In the <script setup> section, add a computed property for the In House revenue calculation:
+  const calculateInHouseRevenueReactive = (year, label) => {
+    const projectName = selectedProject.value?.project_name;
+    const pageId = 'F&B Revenue Assumptions';
+    const rowCode = 'Number of guests';
+    const numberOfGuests = calculationCache.getValue(projectName, pageId, rowCode, year, label);
+    
+    // Get current values from laundryAssumptions
+    const guestLaundryPct = Number(laundryAssumptions.in_house_guest_laundry_percentage?.[year]?.[label] || 0) / 100;
+    const guestLaundryBase = laundryAssumptions.in_house_guest_laundry_base?.[year]?.[label] || 'per_month';
+    const guestLaundryAmount = Number(laundryAssumptions.in_house_guest_laundry_amount?.[year]?.[label] || 0);
+    
+    const dryCleaningPct = Number(laundryAssumptions.in_house_dry_cleaning_percentage?.[year]?.[label] || 0) / 100;
+    const dryCleaningBase = laundryAssumptions.in_house_dry_cleaning_base?.[year]?.[label] || 'per_month';
+    const dryCleaningAmount = Number(laundryAssumptions.in_house_dry_cleaning_amount?.[year]?.[label] || 0);
+    
+    // Calculate base multipliers
+    const guestLaundryBaseMultiplier = guestLaundryBase === 'per_week' ? 4 : 1;
+    const dryCleaningBaseMultiplier = dryCleaningBase === 'per_week' ? 4 : 1;
+    
+    // Calculate revenues
+    const guestLaundryRevenue = guestLaundryPct * guestLaundryBaseMultiplier * guestLaundryAmount * Number(numberOfGuests || 0);
+    const dryCleaningRevenue = dryCleaningPct * dryCleaningBaseMultiplier * dryCleaningAmount * Number(numberOfGuests || 0);
+    
+    return guestLaundryRevenue + dryCleaningRevenue;
+  };
+
+  // Reactive function for Guest Laundry Cost calculation
+  const calculateGuestLaundryCostReactive = (year, label) => {
+    return calculateGuestLaundryCost(
+      laundryAssumptions, 
+      year, 
+      label, 
+      calculateInHouseRevenueReactive, 
+      (assumptions, y, l) => calculateOutsideGuestLaundryRevenue(assumptions, y, l)
+    );
+  };
+
   </script>
+  
+
+
   
   <style scoped>
   .fade-enter-active, .fade-leave-active {
@@ -1085,6 +1316,12 @@
   }
   .fade-enter-from, .fade-leave-to {
     opacity: 0;
+  }
+  .input {
+    @apply w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-400 text-sm bg-blue-50/50;
+  }
+  .borderless-input {
+    @apply w-full px-3 py-2 bg-blue-50/50 focus:ring-2 focus:ring-blue-400 text-sm outline-none border-0 shadow-none;
   }
   </style>
   

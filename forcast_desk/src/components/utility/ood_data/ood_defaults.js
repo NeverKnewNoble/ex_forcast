@@ -5,7 +5,7 @@ export const LAUNDRY_FIELDS = [
     { code: 'outside_guest_laundry', label: 'Outside Guest Laundry' },
     { code: 'cost_of_sale', label: 'COST OF LAUNDRY' },
     { code: 'guest_laundry_cost', label: 'Guest Laundry Cost' },
-    { code: 'other', label: 'Other' }
+    { code: 'other', label: 'Other Laundry Costs' }
   ];
   
   // Default fields for Health Club table

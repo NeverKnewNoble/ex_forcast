@@ -24,6 +24,7 @@ export const useCalculationCache = defineStore('calculationCache', {
     getRowValues(projectId, pageId, rowCode) {
       return this.cache?.[projectId]?.[pageId]?.[rowCode] ?? {};
     }
-  }
+  },
+  persist: true
 });
  

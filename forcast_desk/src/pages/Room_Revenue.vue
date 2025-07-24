@@ -1494,6 +1494,7 @@ import { createRoomPackage } from '@/components/utility/room_revenue_assumpt./ro
 // Import market segmentation utilities
 import { MARKET_SEGMENT_CATEGORIES, MARKET_SEGMENTS } from "@/components/utility/room_revenue_assumpt./market_segments.js";
 
+
 // Pinia store for year settings
 const yearSettingsStore = useYearSettingsStore();
 const { fromYear, toYear, advancedModes } = storeToRefs(yearSettingsStore);
