@@ -4,8 +4,6 @@ export * from './ood_defaults';
 export * from './ood_calculations';
 
 
-
-
 //! Format value based on field type
 export function formatOODValue(fieldCode, value) {
   if (value === null || value === undefined || value === '') return '0.00';
@@ -103,20 +101,21 @@ export function handleOODCellFocus({ year, label, field, event }) {
 //! Handle cell edit for OOD data
 export function handleOODCellEdit({ year, label, field, event, originalOODData, changedCells, oodData, isSaved, isComponentReady }) {
   if (!isComponentReady.value) return;
-  
-  const newValue = event.target.textContent.trim();
+
+  // Support both input fields and contenteditable
+  const newValue = (typeof event.target.value === 'string') ? event.target.value.trim() : event.target.textContent.trim();
   const originalValue = event.target.dataset.originalValue || '0';
-  
+
   // Convert to numbers for comparison
   const newNum = newValue === '' ? 0 : Number(newValue.replace(/[^\d.-]/g, ''));
   const originalNum = originalValue === '' ? 0 : Number(originalValue.replace(/[^\d.-]/g, ''));
-  
+
   if (newNum !== originalNum) {
     // Check if this change is already tracked
     const existingChangeIndex = changedCells.value.findIndex(
       cell => cell.year === year && cell.label === label && cell.field === field
     );
-    
+
     if (existingChangeIndex >= 0) {
       changedCells.value[existingChangeIndex].newValue = newNum;
     } else {
@@ -127,22 +126,22 @@ export function handleOODCellEdit({ year, label, field, event, originalOODData, 
         newValue: newNum
       });
     }
-    
+
     isSaved.value = false;
   }
 }
 
-//! Load OOD data from backend
+//! Load OOD data from backend (NEW API)
 export async function loadOODData(projectName = null) {
   try {
-    const url = projectName 
-      ? `/api/method/ex_forcast.api.ood_data.load_ood_data?project_name=${encodeURIComponent(projectName)}`
-      : '/api/method/ex_forcast.api.ood_data.load_ood_data';
-    
+    let url = "/api/method/ex_forcast.api.call_and_save_ood_revenue.ood_revenue_display";
+    if (projectName) {
+      url += `?project=${encodeURIComponent(projectName)}`;
+    }
     const response = await fetch(url);
     if (!response.ok) throw new Error('Failed to load OOD data');
-    
     const result = await response.json();
+    // The backend returns { year: { month: { laundry_table: [...], health_club_table: [...] } } }
     return result.message || {};
   } catch (error) {
     console.error('Error loading OOD data:', error);
@@ -150,21 +149,21 @@ export async function loadOODData(projectName = null) {
   }
 }
 
-//! Save OOD data changes to backend
+//! Save OOD data changes to backend (NEW API)
 export async function saveOODChanges(changes, projectName = null) {
   try {
-    const url = projectName 
-      ? `/api/method/ex_forcast.api.ood_data.save_ood_changes?project_name=${encodeURIComponent(projectName)}`
-      : '/api/method/ex_forcast.api.ood_data.save_ood_changes';
-    
+    // changes should be an array of { year, month, laundry_table, health_club_table }
+    const url = "/api/method/ex_forcast.api.call_and_save_ood_revenue.upsert_ood_revenue_items";
+    const formData = new FormData();
+    formData.append('changes', JSON.stringify(changes));
+    if (projectName) {
+      formData.append('project', projectName);
+    }
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ changes })
+      body: formData
     });
-    
     if (!response.ok) throw new Error('Failed to save OOD changes');
-    
     const result = await response.json();
     return result.message;
   } catch (error) {
@@ -224,5 +223,87 @@ export async function loadYearOptions() {
   } catch (error) {
     console.error('Error loading year options:', error);
     return [];
+  }
+} 
+
+// Load only laundry_table data
+export async function loadLaundryTableData(projectName = null) {
+  try {
+    let url = "/api/method/ex_forcast.api.call_and_save_ood_revenue.ood_laundry_table_display";
+    if (projectName) {
+      url += `?project=${encodeURIComponent(projectName)}`;
+    }
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to load laundry table data');
+    const result = await response.json();
+    return result.message || {};
+  } catch (error) {
+    console.error('Error loading laundry table data:', error);
+    return {};
+  }
+}
+
+// Save only laundry_table data for a given year/month
+export async function saveLaundryTableData(year, month, laundryTable, projectName = null) {
+  try {
+    const url = "/api/method/ex_forcast.api.call_and_save_ood_revenue.upsert_ood_laundry_table";
+    const formData = new FormData();
+    formData.append('year', year);
+    formData.append('month', month);
+    formData.append('laundry_table', JSON.stringify(laundryTable));
+    if (projectName) {
+      formData.append('project', projectName);
+    }
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData
+    });
+    if (!response.ok) throw new Error('Failed to save laundry table data');
+    const result = await response.json();
+    return result.message;
+  } catch (error) {
+    console.error('Error saving laundry table data:', error);
+    throw error;
+  }
+}
+
+// Load only health_club_table data
+export async function loadHealthClubTableData(projectName = null) {
+  try {
+    let url = "/api/method/ex_forcast.api.call_and_save_ood_revenue.ood_health_club_table_display";
+    if (projectName) {
+      url += `?project=${encodeURIComponent(projectName)}`;
+    }
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to load health club table data');
+    const result = await response.json();
+    return result.message || {};
+  } catch (error) {
+    console.error('Error loading health club table data:', error);
+    return {};
+  }
+}
+
+// Save only health_club_table data for a given year/month
+export async function saveHealthClubTableData(year, month, healthClubTable, projectName = null) {
+  try {
+    const url = "/api/method/ex_forcast.api.call_and_save_ood_revenue.upsert_ood_health_club_table";
+    const formData = new FormData();
+    formData.append('year', year);
+    formData.append('month', month);
+    formData.append('health_club_table', JSON.stringify(healthClubTable));
+    if (projectName) {
+      formData.append('project', projectName);
+    }
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData
+    });
+    if (!response.ok) throw new Error('Failed to save health club table data');
+    const result = await response.json();
+    return result.message;
+  } catch (error) {
+    console.error('Error saving health club table data:', error);
+    throw error;
   }
 } 
