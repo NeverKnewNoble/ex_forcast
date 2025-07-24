@@ -255,7 +255,8 @@
                                 :value="laundryAssumptions.in_house_guest_laundry_percentage[year]?.[label] || ''"
                                 @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.in_house_guest_laundry_percentage[year]) laundryAssumptions.in_house_guest_laundry_percentage[year] = {}; laundryAssumptions.in_house_guest_laundry_percentage[year][label] = val; }"
                                 placeholder="0%"
-                                class="borderless-input w-full" />
+                                class="borderless-input w-full"
+                                @blur="e => handleCellEditWrapper({ year, label, field: 'in_house_guest_laundry_percentage', event: e })" />
                               </td>
                           </template>
                           <template v-else>
@@ -272,7 +273,8 @@
                               <select
                                 :value="laundryAssumptions.in_house_guest_laundry_base[year]?.[label] || ''"
                                 @change="e => { if (!laundryAssumptions.in_house_guest_laundry_base[year]) laundryAssumptions.in_house_guest_laundry_base[year] = {}; laundryAssumptions.in_house_guest_laundry_base[year][label] = e.target.value; }"
-                                class="borderless-input w-full">
+                                class="borderless-input w-full"
+                                @blur="e => handleCellEditWrapper({ year, label, field: 'in_house_guest_laundry_base', event: e })">
                                 <option disabled value="">Select base</option>
                                 <option value="per_month">per month</option>
                                 <option value="per_week">per week</option>
@@ -294,7 +296,8 @@
                                 :value="laundryAssumptions.in_house_guest_laundry_amount[year]?.[label] || ''"
                                 @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.in_house_guest_laundry_amount[year]) laundryAssumptions.in_house_guest_laundry_amount[year] = {}; laundryAssumptions.in_house_guest_laundry_amount[year][label] = val; }"
                                 placeholder="0"
-                                class="borderless-input w-full" />
+                                class="borderless-input w-full"
+                                @blur="e => handleCellEditWrapper({ year, label, field: 'in_house_guest_laundry_amount', event: e })" />
                                   </td>
                           </template>
                           <template v-else>
@@ -316,7 +319,8 @@
                                 :value="laundryAssumptions.in_house_dry_cleaning_percentage[year]?.[label] || ''"
                                 @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.in_house_dry_cleaning_percentage[year]) laundryAssumptions.in_house_dry_cleaning_percentage[year] = {}; laundryAssumptions.in_house_dry_cleaning_percentage[year][label] = val; }"
                                 placeholder="0%"
-                                class="borderless-input w-full" />
+                                class="borderless-input w-full"
+                                @blur="e => handleCellEditWrapper({ year, label, field: 'in_house_dry_cleaning_percentage', event: e })" />
                             </td>
                           </template>
                           <template v-else>
@@ -333,7 +337,8 @@
                               <select
                                 :value="laundryAssumptions.in_house_dry_cleaning_base[year]?.[label] || ''"
                                 @change="e => { if (!laundryAssumptions.in_house_dry_cleaning_base[year]) laundryAssumptions.in_house_dry_cleaning_base[year] = {}; laundryAssumptions.in_house_dry_cleaning_base[year][label] = e.target.value; }"
-                                class="borderless-input w-full">
+                                class="borderless-input w-full"
+                                @blur="e => handleCellEditWrapper({ year, label, field: 'in_house_dry_cleaning_base', event: e })">
                                 <option disabled value="">Select base</option>
                                 <option value="per_month">per month</option>
                                 <option value="per_week">per week</option>
@@ -355,7 +360,8 @@
                                 :value="laundryAssumptions.in_house_dry_cleaning_amount[year]?.[label] || ''"
                                 @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.in_house_dry_cleaning_amount[year]) laundryAssumptions.in_house_dry_cleaning_amount[year] = {}; laundryAssumptions.in_house_dry_cleaning_amount[year][label] = val; }"
                                 placeholder="0"
-                                class="borderless-input w-full" />
+                                class="borderless-input w-full"
+                                @blur="e => handleCellEditWrapper({ year, label, field: 'in_house_dry_cleaning_amount', event: e })" />
                             </td>
                           </template>
                           <template v-else>
@@ -376,7 +382,8 @@
                                 :value="laundryAssumptions.outside_guest_laundry_number[year]?.[label] || ''"
                                 @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.outside_guest_laundry_number[year]) laundryAssumptions.outside_guest_laundry_number[year] = {}; laundryAssumptions.outside_guest_laundry_number[year][label] = val; }"
                                 placeholder="0"
-                                class="borderless-input w-full" />
+                                class="borderless-input w-full"
+                                @blur="e => handleCellEditWrapper({ year, label, field: 'outside_guest_laundry_number', event: e })" />
                             </td>
                           </template>
                           <template v-else>
@@ -392,7 +399,8 @@
                               <select
                                 :value="laundryAssumptions.outside_guest_laundry_base[year]?.[label] || ''"
                                 @change="e => { if (!laundryAssumptions.outside_guest_laundry_base[year]) laundryAssumptions.outside_guest_laundry_base[year] = {}; laundryAssumptions.outside_guest_laundry_base[year][label] = e.target.value; }"
-                                class="borderless-input w-full">
+                                class="borderless-input w-full"
+                                @blur="e => handleCellEditWrapper({ year, label, field: 'outside_guest_laundry_base', event: e })">
                                 <option disabled value="">Select base</option>
                                 <option value="per_month">per month</option>
                                 <option value="per_week">per week</option>
@@ -413,7 +421,8 @@
                                 :value="laundryAssumptions.outside_guest_laundry_amount[year]?.[label] || ''"
                                 @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.outside_guest_laundry_amount[year]) laundryAssumptions.outside_guest_laundry_amount[year] = {}; laundryAssumptions.outside_guest_laundry_amount[year][label] = val; }"
                                 placeholder="0"
-                                class="borderless-input w-full" />
+                                class="borderless-input w-full"
+                                @blur="e => handleCellEditWrapper({ year, label, field: 'outside_guest_laundry_amount', event: e })" />
                             </td>
                           </template>
                           <template v-else>
@@ -434,7 +443,8 @@
                                 @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.guest_laundry_cost_percentage[year]) laundryAssumptions.guest_laundry_cost_percentage[year] = {}; laundryAssumptions.guest_laundry_cost_percentage[year][label] = val; if (val > 0) { if (!laundryAssumptions.guest_laundry_cost_amount[year]) laundryAssumptions.guest_laundry_cost_amount[year] = {}; laundryAssumptions.guest_laundry_cost_amount[year][label] = ''; } }"
                                 :disabled="Number(laundryAssumptions.guest_laundry_cost_amount[year]?.[label] || 0) > 0"
                                 placeholder="0%"
-                                :class="['borderless-input w-full', Number(laundryAssumptions.guest_laundry_cost_amount[year]?.[label] || 0) > 0 ? 'bg-gray-100 cursor-not-allowed' : '']" />
+                                :class="['borderless-input w-full', Number(laundryAssumptions.guest_laundry_cost_amount[year]?.[label] || 0) > 0 ? 'bg-gray-100 cursor-not-allowed' : '']"
+                                @blur="e => handleCellEditWrapper({ year, label, field: 'guest_laundry_cost_percentage', event: e })" />
                             </td>
                           </template>
                           <template v-else>
@@ -452,7 +462,8 @@
                                 @input="e => { const val = sanitizeNumberInput(e); if (!laundryAssumptions.guest_laundry_cost_amount[year]) laundryAssumptions.guest_laundry_cost_amount[year] = {}; laundryAssumptions.guest_laundry_cost_amount[year][label] = val; if (val > 0) { if (!laundryAssumptions.guest_laundry_cost_percentage[year]) laundryAssumptions.guest_laundry_cost_percentage[year] = {}; laundryAssumptions.guest_laundry_cost_percentage[year][label] = ''; } }"
                                 :disabled="Number(laundryAssumptions.guest_laundry_cost_percentage[year]?.[label] || 0) > 0"
                                 placeholder="0"
-                                :class="['borderless-input w-full', Number(laundryAssumptions.guest_laundry_cost_percentage[year]?.[label] || 0) > 0 ? 'bg-gray-100 cursor-not-allowed' : '']" />
+                                :class="['borderless-input w-full', Number(laundryAssumptions.guest_laundry_cost_percentage[year]?.[label] || 0) > 0 ? 'bg-gray-100 cursor-not-allowed' : '']"
+                                @blur="e => handleCellEditWrapper({ year, label, field: 'guest_laundry_cost_amount', event: e })" />
                             </td>
                           </template>
                           <template v-else>
@@ -510,6 +521,7 @@
                                     contenteditable="true"
                               @input="e => handleContentEditableInput(e, laundryAssumptions.revenue_other, year, label)"
                               @paste="handleContentEditablePaste"
+                              @blur="e => handleCellEditWrapper({ year, label, field: 'revenue_other', event: e })"
                             >
                               {{ formatOODValue('revenue_other', laundryAssumptions.revenue_other?.[year]?.[label] || '') }}
                                   </td>
@@ -550,6 +562,7 @@
                               contenteditable="true"
                               @input="e => handleContentEditableInput(e, laundryAssumptions.other_laundry_costs, year, label)"
                               @paste="handleContentEditablePaste"
+                              @blur="e => handleCellEditWrapper({ year, label, field: 'other_laundry_costs', event: e })"
                             >
                               {{ formatOODValue('other_laundry_costs', laundryAssumptions.other_laundry_costs?.[year]?.[label] || '') }}
                             </td>
@@ -563,6 +576,7 @@
                       </table>
                 </div>
               </div>
+
 
               <!-- Health Club Table -->
               <div class="mb-8">
@@ -768,7 +782,7 @@
                                     <td
                                       contenteditable="true"
                                       class="px-2 py-1 text-right border border-green-200 bg-green-50 font-mono"
-                                      @input="e => { sanitizeNumberInput(e); handleOODCellInput({ year, label, field: field.code, event: e, oodData: healthClubData }); }"
+                                      @input="e => { sanitizeNumberInput(e); handleHealthClubCellInput({ year, label, field: field.code, event: e }); }"
                                       @focus="handleOODCellFocus({ year, label, field: field.code, event: $event })"
                                       @blur="handleCellEditWrapper({ year, label, field: field.code, event: $event })"
                                     >
@@ -783,9 +797,9 @@
                                   <td
                                     contenteditable="true"
                                     class="px-2 py-1 text-right border border-green-200 bg-green-50 font-mono"
-                                    @input="e => { sanitizeNumberInput(e); handleOODCellInput({ year, label: getColumnLabelsForYearLocal(year)[0], field: field.code, event: e, oodData: healthClubData }); }"
-                                    @focus="handleOODCellFocus({ year, label: getColumnLabelsForYearLocal(year)[0], field: field.code, event: $event })"
-                                    @blur="handleCellEditWrapper({ year, label: getColumnLabelsForYearLocal(year)[0], field: field.code, event: $event })"
+                                    @input="e => { sanitizeNumberInput(e); handleHealthClubCellInput({ year, label, field: field.code, event: e }); }"
+                                    @focus="handleOODCellFocus({ year, label, field: field.code, event: $event })"
+                                    @blur="handleCellEditWrapper({ year, label, field: field.code, event: $event })"
                                   >
                                     <span>{{ formatOODValue(field.code, getOODCellValue(healthClubData, field.code, year, getColumnLabelsForYearLocal(year)[0], advancedModes[year] || displayMode)) }}</span>
                                   </td>
@@ -841,21 +855,21 @@
                                 <template v-if="!isYearCollapsed(year)">
                                   <template v-for="label in getColumnLabelsForYearLocal(year)" :key="year + '-' + label">
                                     <td
-                                      contenteditable="true"
-                                      :class="[
-                                        'px-2 py-1 text-right border border-green-200 outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200',
-                                        isTotalField(field.code)
-                                          ? 'bg-green-100 hover:bg-green-200 font-semibold'
-                                          : 'hover:bg-green-50'
-                                      ]"
-                                      @input="e => { sanitizeNumberInput(e); handleOODCellInput({ year, label, field: field.code, event: e, oodData: healthClubData }); }"
-                                      @focus="handleOODCellFocus({ year, label, field: field.code, event: $event })"
-                                      @blur="handleCellEditWrapper({ year, label, field: field.code, event: $event })"
-                                    >
-                                      <span :class="[
-                                        'font-mono text-xs',
-                                        isTotalField(field.code) ? 'text-green-800 font-semibold' : ''
-                                      ]">{{ formatOODValue(field.code, getOODCellValue(healthClubData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
+                                        contenteditable="true"
+                                        :class="[
+                                            'px-2 py-1 text-right border border-green-200 outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200',
+                                            isTotalField(field.code)
+                                            ? 'bg-green-100 hover:bg-green-200 font-semibold'
+                                            : 'hover:bg-green-50'
+                                        ]"
+                                        @input="e => { sanitizeNumberInput(e); handleHealthClubCellInput({ year, label, field: field.code, event: e }); }"
+                                        @focus="handleOODCellFocus({ year, label, field: field.code, event: $event })"
+                                        @blur="handleCellEditWrapper({ year, label, field: field.code, event: $event })"
+                                        >
+                                        <span :class="[
+                                            'font-mono text-xs',
+                                            isTotalField(field.code) ? 'text-green-800 font-semibold' : ''
+                                        ]">{{ formatOODValue(field.code, getOODCellValue(healthClubData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
                                     </td>
                                     <td
                                       :class="[
@@ -899,6 +913,8 @@
                 </div>
               </div>
             </template>
+  
+
   
             <!-- Enhanced No Years Selected State -->
             <template v-else-if="selectedProject">
@@ -1047,7 +1063,11 @@
   calculateTotalHealthClubRevIncludingSC,
   calculateTotalClubUseRevenuePct,
   calculateTotalTreatmentsOtherServicesPct,
-  calculateTotalMembershipsPct
+  calculateTotalMembershipsPct,
+  loadLaundryTableData,
+  saveLaundryTableData,
+  loadHealthClubTableData,
+  saveHealthClubTableData
 } from "@/components/utility/ood_data/index.js";
   import { cloneDeep } from 'lodash-es';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
@@ -1230,36 +1250,97 @@
       isSaving.value = true;
       saveError.value = "";
       
-      // Prepare changes for API
-      const changes = changedCells.value.map(cell => ({
-        year: cell.year,
-        month: cell.label,
-        field: cell.field,
-        amount: cell.newValue
-      }));
-      
-      if (changes.length === 0) {
+      // Log changedCells to see if health club changes are tracked
+      console.log('[OOD Save] changedCells:', JSON.parse(JSON.stringify(changedCells.value)));
+
+      // Group changed cells by year and month
+      const changesByYearMonth = {};
+      for (const cell of changedCells.value) {
+        const { year, label: month } = cell;
+        if (!changesByYearMonth[year]) changesByYearMonth[year] = {};
+        if (!changesByYearMonth[year][month]) changesByYearMonth[year][month] = true;
+      }
+
+      // For each changed year/month, gather and save laundry and health club data
+      const laundryFields = [
+        { section: "In House Guest Laundry Revenue", detail: "Percentage", key: "in_house_guest_laundry_percentage" },
+        { section: "In House Guest Laundry Revenue", detail: "Base", key: "in_house_guest_laundry_base" },
+        { section: "In House Guest Laundry Revenue", detail: "Average Amount", key: "in_house_guest_laundry_amount" },
+        { section: "In House Dry Cleaning Revenue", detail: "Percentage", key: "in_house_dry_cleaning_percentage" },
+        { section: "In House Dry Cleaning Revenue", detail: "Base", key: "in_house_dry_cleaning_base" },
+        { section: "In House Dry Cleaning Revenue", detail: "Average Amount", key: "in_house_dry_cleaning_amount" },
+        { section: "Outside Guest Laundry", detail: "Number", key: "outside_guest_laundry_number" },
+        { section: "Outside Guest Laundry", detail: "Base", key: "outside_guest_laundry_base" },
+        { section: "Outside Guest Laundry", detail: "Average Amount", key: "outside_guest_laundry_amount" },
+        { section: "Guest Laundry Cost", detail: "Percentage", key: "guest_laundry_cost_percentage" },
+        { section: "Guest Laundry Cost", detail: "Amount", key: "guest_laundry_cost_amount" },
+        { section: "Revenue", detail: "Other Revenue", key: "revenue_other" },
+        { section: "COST OF LAUNDRY", detail: "Other Laundry Costs", key: "other_laundry_costs" }
+      ];
+      const savePromises = [];
+      for (const year in changesByYearMonth) {
+        for (const month in changesByYearMonth[year]) {
+          // Gather laundry table data
+          const laundry_table = [];
+          for (const field of laundryFields) {
+            const value = laundryAssumptions[field.key]?.[year]?.[month];
+            if (value !== undefined && value !== "") {
+              laundry_table.push({
+                section: field.section,
+                detail: field.detail,
+                amount: value
+              });
+            }
+          }
+          // Gather health club table data
+          const health_club_table = [];
+          if (healthClubData[year] && healthClubData[year][month]) {
+            console.log('[OOD Save] healthClubData for', year, month, ':', JSON.parse(JSON.stringify(healthClubData[year][month])));
+            for (const row of healthClubData[year][month]) {
+              if (row.section && row.detail && row.amount !== undefined && row.amount !== "") {
+                health_club_table.push({
+                  section: row.section,
+                  detail: row.detail,
+                  amount: row.amount
+                });
+              }
+            }
+          }
+          // Save laundry table if there are changes
+          if (laundry_table.length > 0) {
+            savePromises.push(
+              saveLaundryTableData(year, month, laundry_table, selectedProject.value?.project_name)
+            );
+          }
+          // Save health club table if there are changes
+          if (health_club_table.length > 0) {
+            console.log('[OOD Save] Health Club Table Payload:', { year, month, health_club_table });
+            savePromises.push(
+              saveHealthClubTableData(year, month, health_club_table, selectedProject.value?.project_name)
+            );
+          }
+        }
+      }
+      if (savePromises.length === 0) {
         isSaving.value = false;
         return;
       }
-      
-      const result = await saveOODChanges(changes, selectedProject.value?.project_name);
-      
-      // Reload from backend after save
-      const loaded = await loadOODData(selectedProject.value?.project_name) || {};
-      const converted = convertOODServerDataToFrontend(loaded);
-      
-      // Separate laundry and health club data
-      Object.assign(laundryData, converted.laundry || {});
-      Object.assign(healthClubData, converted.health_club || {});
-      
+      await Promise.all(savePromises);
+      // Reload both tables
+      const [laundryResult, healthClubResult] = await Promise.all([
+        loadLaundryTableData(selectedProject.value?.project_name),
+        loadHealthClubTableData(selectedProject.value?.project_name)
+      ]);
+      // Assign loaded data
+      Object.assign(laundryData, laundryResult || {});
+      Object.assign(healthClubData, healthClubResult || {});
       originalLaundryData.value = cloneDeep(laundryData);
       originalHealthClubData.value = cloneDeep(healthClubData);
       changedCells.value = [];
       isSaved.value = true;
       alertService.success("Changes saved successfully");
       isSaving.value = false;
-      return result;
+      return;
     } catch (err) {
       saveError.value = err.message || "Failed to save changes";
       alertService.error(saveError.value);
@@ -1348,21 +1429,7 @@
     return isYearCollapsedUtil(year, collapsedYears);
   }
 
-  // // Handle base change for laundry fields
-  // function handleBaseChange(fieldCode, value) {
-  //   // Store the base value for the field
-  //   if (!laundryData.static) laundryData.static = {};
-  //   if (!laundryData.static.base) laundryData.static.base = {};
-  //   laundryData.static.base[fieldCode] = value;
-    
-  //   // Mark as unsaved
-  //   isSaved.value = false;
-  // }
 
-  // // Get base value for a field
-  // function getBaseValue(fieldCode) {
-  //   return laundryData?.static?.base?.[fieldCode] || '';
-  // }
 
   // Check if a field is a total field in Health Club table
   function isTotalField(fieldCode) {
@@ -1463,6 +1530,39 @@
       (assumptions, y, l) => calculateOutsideGuestLaundryRevenue(assumptions, y, l)
     );
   };
+
+  // Watch for changes in laundryAssumptions to mark as unsaved
+  watch(laundryAssumptions, () => {
+    if (isSaved.value) {
+    isSaved.value = false;
+  }
+  }, { deep: true });
+
+  // Helper to get section and detail for a health club field code
+  function getHealthClubSectionDetail(fieldCode) {
+    const field = HEALTH_CLUB_FIELDS.find(f => f.code === fieldCode);
+    if (!field) return { section: '', detail: fieldCode };
+    return { section: field.section, detail: field.label };
+  }
+
+  // In the health club table template, update @input handler:
+  // @input="e => { sanitizeNumberInput(e); handleHealthClubCellInput({ year, label, field: field.code, event: e }); }"
+  function handleHealthClubCellInput({ year, label, field, event }) {
+    const value = (typeof event.target.value === 'string') ? event.target.value.trim() : event.target.textContent.trim();
+    const amount = value === '' ? 0 : Number(value.replace(/[^\d.-]/g, ''));
+    if (!healthClubData[year]) healthClubData[year] = {};
+    if (!Array.isArray(healthClubData[year][label])) healthClubData[year][label] = [];
+    const { section, detail } = getHealthClubSectionDetail(field);
+    // Find by field (code) for uniqueness
+    const existingIndex = healthClubData[year][label].findIndex(e => e.field === field);
+    if (existingIndex >= 0) {
+      healthClubData[year][label][existingIndex].amount = amount;
+      healthClubData[year][label][existingIndex].section = section;
+      healthClubData[year][label][existingIndex].detail = detail;
+    } else {
+      healthClubData[year][label].push({ field, section, detail, amount });
+    }
+  }
 
   </script>
   
