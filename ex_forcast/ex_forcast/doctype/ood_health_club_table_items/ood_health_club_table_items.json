@@ -1,0 +1,47 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-07-24 11:23:33.100720",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section",
+  "detail",
+  "amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "section",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Section",
+   "options": "\nClub Use Revenue\nTreatments & Other Services\nMemberships"
+  },
+  {
+   "fieldname": "detail",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Detail",
+   "options": "\nSauna\nGym\nSwimming Pool\nFitness Lessons (group)\nHealth / Wellness Services\nMassage\nPersonal Training & Swimming Lessons\nSpa Treatment\nSalon Treatment\nMerchandise\nClothing\nPool/SPA\nGym\nPool / Gym\nSpa / Gym\nGym / Pool / Spa\nPool"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-07-24 11:32:12.577149",
+ "modified_by": "Administrator",
+ "module": "Ex Forcast",
+ "name": "OOD Health Club Table Items",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

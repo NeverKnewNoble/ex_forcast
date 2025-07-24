@@ -1,0 +1,111 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:OODRA-{#####}",
+ "creation": "2025-07-24 11:02:53.065645",
+ "default_view": "List",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "project",
+  "expense_information_section",
+  "year",
+  "column_break_rtve",
+  "month",
+  "laundry_tab",
+  "laundry_table",
+  "health_club_tab",
+  "health_club_table",
+  "other_ood_tab",
+  "other_ood_details"
+ ],
+ "fields": [
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Forecast Project"
+  },
+  {
+   "fieldname": "expense_information_section",
+   "fieldtype": "Section Break",
+   "label": "Expense Information"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Year",
+   "options": "\n2020\n2021\n2022\n2023\n2024\n2025\n2026\n2027\n2028\n2029\n2030\n2031\n2032\n2033\n2034\n2035\n2036\n2037\n2038\n2039\n2040\n2041\n2042\n2043\n2044\n2045\n2046\n2047\n2048\n2049\n2050\n2051\n2052\n2053\n2054\n2055\n2056\n2057\n2058\n2059\n2060"
+  },
+  {
+   "fieldname": "column_break_rtve",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Month",
+   "options": "\nJan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec"
+  },
+  {
+   "fieldname": "laundry_table",
+   "fieldtype": "Table",
+   "label": "Laundry Table",
+   "options": "OOD Laundry Table Items"
+  },
+  {
+   "fieldname": "health_club_table",
+   "fieldtype": "Table",
+   "label": "Health Club Table",
+   "options": "OOD Health Club Table Items"
+  },
+  {
+   "fieldname": "laundry_tab",
+   "fieldtype": "Tab Break",
+   "label": "Laundry"
+  },
+  {
+   "fieldname": "health_club_tab",
+   "fieldtype": "Tab Break",
+   "label": "Health Club"
+  },
+  {
+   "fieldname": "other_ood_tab",
+   "fieldtype": "Tab Break",
+   "label": "Other OOD"
+  },
+  {
+   "fieldname": "other_ood_details",
+   "fieldtype": "Table",
+   "label": "Other OOD Details",
+   "options": "OOD Other Departments"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-07-24 12:20:36.775346",
+ "modified_by": "Administrator",
+ "module": "Ex Forcast",
+ "name": "OOD Revenue Assumptions",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
