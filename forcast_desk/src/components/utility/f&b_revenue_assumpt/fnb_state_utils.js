@@ -25,10 +25,10 @@ export async function initializeData(years, expenseData, originalExpenseData, ex
     isSaved.value = true;
     restaurantList.value = await getRestaurants();
     
-    // Load total rooms from localStorage only if user has explicitly set it
+    // Load total rooms from localStorage
     const savedRooms = localStorage.getItem('totalRooms');
-    if (savedRooms && savedRooms !== '0') {
-      totalRooms.value = parseInt(savedRooms) || 0;
+    if (savedRooms) {
+      totalRooms.value = parseInt(savedRooms) || 100;
     }
   } catch (err) {
     console.error("Error loading data:", err);

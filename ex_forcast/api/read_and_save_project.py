@@ -2,7 +2,7 @@ import frappe
 from frappe import _
 import json
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_projects():
     """Get all forecast projects"""
     try:
@@ -24,7 +24,7 @@ def get_projects():
             "message": f"Failed to fetch projects: {str(e)}"
         }
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def create_project(project_name, project_description):
     """Create a new forecast project"""
     try:
@@ -76,7 +76,7 @@ def create_project(project_name, project_description):
             "message": f"Failed to create project: {str(e)}"
         }
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_project_by_name(project_name):
     """Get a specific project by name"""
     try:

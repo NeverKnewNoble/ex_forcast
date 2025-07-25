@@ -164,15 +164,6 @@
                           Clear
                         </button>
                         <button 
-                          @click="loadYearSettingsFromStorage" 
-                          class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-all duration-200 text-sm font-medium"
-                        >
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-                          </svg>
-                          Load
-                        </button>
-                        <button 
                           @click="showAdvanced = true" 
                           class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
                         >
@@ -215,12 +206,6 @@
                           class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
                         />
                         <p class="text-xs text-gray-500 mt-1">This value will be used to calculate Total Available Rooms in the market segmentation tables.</p>
-                        <button 
-                          @click="calculateTotalFromRoomPackages"
-                          class="mt-2 px-3 py-1.5 text-xs bg-violet-100 text-violet-700 rounded-lg hover:bg-violet-200 transition-colors"
-                        >
-                          Calculate from Room Packages
-                        </button>
                       </div>
                       <div class="flex flex-col gap-2 mt-4">
                         <button 
@@ -1553,8 +1538,10 @@ const marketSegmentChanges = ref([]); // Track market segment changes
 const originalMarketSegmentData = ref({});
 const marketSegmentationTablesRef = ref(null);
 
-// Add reactive state for total number of rooms - Don't load from localStorage on initialization
-const totalNumberOfRooms = ref(0);
+// Add reactive state for total number of rooms
+const totalNumberOfRooms = ref(
+  localStorage.getItem('totalNumberOfRooms') ? parseInt(localStorage.getItem('totalNumberOfRooms')) : 0
+);
 
 // Add reactive state for VAT tax
 const showVATModal = ref(false);
@@ -1607,9 +1594,7 @@ watch(marketSegmentation, (newValue) => {
 
 // Watch for total number of rooms changes
 watch(totalNumberOfRooms, (newValue) => {
-  if (newValue > 0) {
-    localStorage.setItem('totalNumberOfRooms', newValue.toString());
-  }
+  localStorage.setItem('totalNumberOfRooms', newValue.toString());
 });
 
 // When opening the modal, copy the current settings
@@ -1716,11 +1701,6 @@ async function reloadDataForProject(newProject) {
 function clearYearSelection() {
   clearYearSettings();
   isSaved.value = false;
-}
-
-function loadYearSettingsFromStorage() {
-  yearSettingsStore.loadFromLocalStorage();
-  alertService.success("Year settings loaded from storage");
 }
 
 // Wrapper functions for room revenue cell editing
@@ -2117,13 +2097,6 @@ function openRoomTypeCountModal() {
   showRoomTypeCountModal.value = true;
 }
 
-// Function to calculate total rooms from room packages and update the field
-function calculateTotalFromRoomPackages() {
-  const totalRooms = calculateTotalRoomCount(roomPackages.value, roomData.value);
-  totalNumberOfRooms.value = totalRooms;
-  alertService.success(`Total rooms calculated from room packages: ${totalRooms}`);
-}
-
 function cancelRoomTypeCountModal() {
   showRoomTypeCountModal.value = false;
   roomTypeCounts.value = {};
@@ -2156,10 +2129,6 @@ function saveRoomTypeCounts() {
       });
     }
   });
-
-  // Calculate and update total number of rooms
-  const totalRooms = calculateTotalRoomCount(roomPackages.value, roomData.value);
-  totalNumberOfRooms.value = totalRooms;
 
   // Mark as unsaved
   isSaved.value = false;
