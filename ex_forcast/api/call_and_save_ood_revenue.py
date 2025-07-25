@@ -139,6 +139,7 @@ def ood_revenue_display(project=None):
         frappe.log_error(frappe.get_traceback(), "ood_revenue_display failed")
         return {"error": str(err)}
 
+# call septac: the order by is not working as expected.
 @frappe.whitelist(allow_guest=True)
 def ood_laundry_table_display(project=None):
     """
@@ -154,7 +155,7 @@ def ood_laundry_table_display(project=None):
             "OOD Revenue Assumptions",
             filters=filters,
             fields=["name", "year", "month", "project"],
-            order_by="CAST(year AS UNSIGNED) ASC, FIELD(month, '{}')".format(",".join([f'\'{m}\'' for m in month_order]))
+            order_by = "CAST(year AS UNSIGNED) ASC, FIELD(month, {})".format(",".join([f"'{m}'" for m in month_order]))
         )
         result = {}
         for doc in docs:
@@ -195,7 +196,7 @@ def ood_health_club_table_display(project=None):
             "OOD Revenue Assumptions",
             filters=filters,
             fields=["name", "year", "month", "project"],
-            order_by="CAST(year AS UNSIGNED) ASC, FIELD(month, '{}')".format(",".join([f'\'{m}\'' for m in month_order]))
+            order_by = "CAST(year AS UNSIGNED) ASC, FIELD(month, {})".format(",".join([f"'{m}'" for m in month_order]))
         )
         result = {}
         for doc in docs:

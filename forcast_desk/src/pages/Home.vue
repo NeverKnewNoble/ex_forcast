@@ -55,7 +55,7 @@
       <div class="max-w-6xl mx-auto px-4">
         <div class="text-center mb-16 animate-fade-in-up">
           <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            Why Choose <span class="text-violet-600">Ex Forecastor</span>
+            Why Choose <span class="text-violet-600">Ex Forecast</span>
           </h2>
           <p class="text-xl text-gray-600 max-w-2xl mx-auto">
             Powerful features designed to revolutionize your forecasting experience
@@ -134,7 +134,7 @@
             What Our <span class="text-violet-600">Users Say</span>
           </h2>
           <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-            Join thousands of satisfied users who have transformed their business with Ex Forecastor
+            Join thousands of satisfied users who have transformed their business with Ex Forecast
           </p>
         </div>
         
@@ -150,7 +150,7 @@
               </div>
             </div>
             <p class="text-gray-600 leading-relaxed">
-              "Ex Forecastor has revolutionized how we make business decisions. The AI insights are incredibly accurate and have helped us increase our revenue by 40%."
+              "Ex Forecast has revolutionized how we make business decisions. The AI insights are incredibly accurate and have helped us increase our revenue by 40%."
             </p>
             <div class="flex text-yellow-400 mt-4">
               <Star class="w-5 h-5 fill-current" />
