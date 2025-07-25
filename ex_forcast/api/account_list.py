@@ -33,18 +33,18 @@ def get_accounts():
 def create_account(account_name, account_number, parent_account):
     """
     API endpoint to create a new Account document with the given fields.
-    Sets company to the default company. Does not allow creation if parent_account is a group.
+    Sets company to the default company from Global Defaults. Does not allow creation if parent_account is a group.
     """
     try:
-        # Get default company
-        default_company = frappe.defaults.get_user_default("Company") or frappe.db.get_single_value("Global Defaults", "default_company")
+        # Get default company from Global Defaults
+        default_company = frappe.db.get_single_value("Global Defaults", "default_company")
         if not default_company:
-            return {"success": False, "error": "Default company not found."}
+            return {"success": False, "error": "Default company not found in Global Defaults."}
 
         # Check if parent_account is a group
         parent_doc = frappe.get_doc("Account", parent_account)
-        if parent_doc.is_group:
-            return {"success": False, "error": "Cannot create account under a group account."}
+        if not parent_doc.is_group:
+            return {"success": False, "error": "Cannot create account under a non-group account. Please select a group account as parent."}
 
         # Create the new Account document
         doc = frappe.get_doc({
