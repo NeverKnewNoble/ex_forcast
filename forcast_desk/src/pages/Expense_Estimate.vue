@@ -164,15 +164,6 @@
                     Clear
                   </button>
                   <button 
-                    @click="loadYearSettingsFromStorage" 
-                    class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-all duration-200 text-sm font-medium"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-                    </svg>
-                    Load
-                  </button>
-                  <button 
                     @click="showAdvanced = true" 
                     class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
                   >
@@ -1068,11 +1059,6 @@ onMounted(async () => {
 function clearYearSelection() {
   clearYearSettings();
   isSaved.value = false;
-}
-
-function loadYearSettingsFromStorage() {
-  yearSettingsStore.loadFromLocalStorage();
-  alertService.success("Year settings loaded from storage");
 }
 
 function handleCellEditWrapper({ year, label, expense, event }) {
