@@ -592,9 +592,9 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Select Month</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Select Month/Quarter</label>
               <select v-model="addExpenseForm.month" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white">
-                <option disabled value="">Choose a month</option>
+                <option disabled value="">Choose a month/quarter</option>
                 <option v-for="month in months" :key="'add-month-' + month" :value="month">{{ month }}</option>
               </select>
             </div>
