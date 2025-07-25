@@ -416,8 +416,12 @@
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
                                 :key="'category-total-cell-' + year + '-' + label"
-                                class="px-1 py-1 text-center border border-violet-300 bg-violet-200"
-                              ></td>
+                                class="px-1 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900"
+                              >
+                                <span class="font-mono text-xs">
+                                  {{ calculateCategoryMonthTotal(expenseData, categoryGroup.expenses, year, label, advancedModes[year] || displayMode) }}
+                                </span>
+                              </td>
                               <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
                                 <span class="font-mono text-xs">
                                   {{ calculateCategoryTotal(expenseData, categoryGroup.expenses, year, advancedModes[year] || displayMode) }}
@@ -767,7 +771,8 @@ import {
   cleanAmountValue,
   handleCellEdit,
   handleCellInput,
-  handleCellFocus
+  handleCellFocus,
+  calculateCategoryMonthTotal // <-- add this import
 } from "@/components/utility/expense_assumption/expense_estimate_utils.js";
 import { saveChanges } from "@/components/utility/expense_assumption/save_changes.js";
 import { submitAddExpense } from "@/components/utility/expense_assumption/submit_add_expense.js";
