@@ -41,4 +41,30 @@ def get_expense_field_options():
             }
         }
 
+@frappe.whitelist(allow_guest=True)
+def create_expense_category(category_name):
+    """
+    API endpoint to create a new Expense Category document with the given category name.
+    The 'category' field will be set to the provided category_name.
+    """
+    try:
+        # Create the new Expense Category document
+        doc = frappe.get_doc({
+            "doctype": "Expense Category",
+            "category": category_name
+        })
+        doc.insert(ignore_permissions=True)
+        frappe.db.commit()
+        return {
+            "success": True,
+            "name": doc.name
+        }
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "create_expense_category API failed")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
 # API endpoint: http://127.0.0.1:8000/api/v2/method/ex_forcast.api.expense_options.get_expense_field_options 
+# API endpoint: http://127.0.0.1:8000/api/v2/method/ex_forcast.api.expense_options.create_expense_category?category_name=Test%20Category    

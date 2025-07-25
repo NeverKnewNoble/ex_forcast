@@ -600,6 +600,39 @@
             </div>
           </div>
 
+          <!-- Add Expense Category UI -->
+          <div class="mb-6">
+            <div class="flex items-center gap-3 mb-2">
+              <FolderOpen class="w-5 h-5 text-violet-600" />
+              <span class="text-md font-semibold text-gray-700">Create New Expense Category</span>
+            </div>
+            <div class="flex gap-2 items-center">
+              <input
+                v-model="newCategoryName"
+                type="text"
+                placeholder="Enter new category name"
+                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+                @keyup.enter="createExpenseCategory"
+              />
+              <button
+                :disabled="creatingCategory || !newCategoryName.trim()"
+                @click="createExpenseCategory"
+                class="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-all font-medium flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <Plus class="w-4 h-4" />
+                Add
+              </button>
+            </div>
+            <div v-if="categoryCreateError" class="text-red-500 text-xs mt-1 flex items-center gap-1">
+              <AlertTriangle class="w-3 h-3" />
+              {{ categoryCreateError }}
+            </div>
+            <div v-if="categoryCreateSuccess" class="text-green-600 text-xs mt-1 flex items-center gap-1">
+              <Check class="w-3 h-3" />
+              {{ categoryCreateSuccess }}
+            </div>
+          </div>
+
           <!-- Input Table -->
           <div class="space-y-4">
             <div class="flex items-center gap-3">
@@ -802,6 +835,10 @@ const saveError = ref("");
 const showUnsavedWarning = ref(false);
 const pendingNavigation = ref(null); // Store the pending navigation action
 const sidebarCollapsed = ref(false);
+const newCategoryName = ref("");
+const creatingCategory = ref(false);
+const categoryCreateError = ref("");
+const categoryCreateSuccess = ref("");
 
 // Pinia store for year settings
 const yearSettingsStore = useYearSettingsStore();
@@ -948,13 +985,6 @@ onMounted(async () => {
   }
 });
 
-// Watchers to persist year selection (now handled by Pinia store)
-// watch(fromYear, (newValue) => {
-//   localStorage.setItem('expenseEstimateFromYear', newValue);
-// });
-// watch(toYear, (newValue) => {
-//   localStorage.setItem('expenseEstimateToYear', newValue);
-// });
 
 function clearYearSelection() {
   clearYearSettings();
@@ -1121,6 +1151,35 @@ async function refreshTable() {
   } catch (error) {
     console.error("Error refreshing table:", error);
     alertService.error("Failed to refresh data. Please try again.");
+  }
+}
+
+async function createExpenseCategory() {
+  if (!newCategoryName.value.trim()) return;
+  creatingCategory.value = true;
+  categoryCreateError.value = "";
+  categoryCreateSuccess.value = "";
+  try {
+    const response = await fetch("/api/v2/method/ex_forcast.api.expense_options.create_expense_category", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ category_name: newCategoryName.value.trim() })
+    });
+    const result = await response.json();
+    // console.log('create_expense_category API result:', result);
+    if (result.data && result.data.success) {
+      alertService.success(`Category '${newCategoryName.value.trim()}' created successfully!`);
+      newCategoryName.value = "";
+      // Refresh category options
+      const fieldOptions = await getExpenseFieldOptions();
+      categoryOptions.value = fieldOptions.hospitality_category.map(category => ({ label: category, value: category }));
+    } else {
+      alertService.error((result.data && result.data.error) || result.error || "Failed to create category.");
+    }
+  } catch (err) {
+    alertService.error("Failed to create category.");
+  } finally {
+    creatingCategory.value = false;
   }
 }
 </script>
