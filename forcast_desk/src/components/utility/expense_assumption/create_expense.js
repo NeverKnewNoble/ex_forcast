@@ -39,13 +39,6 @@ export async function createExpenseDocument({ year, month, expenses }) {
     expense_items: expenseItems,
   }
 
-  // console.log('Creating expense document with data:', {
-  //   year,
-  //   month,
-  //   project: currentProject.project_name,
-  //   expenseItems,
-  //   fullDoc: doc
-  // })
 
   try {
     const result = await expenseResource.submit({
