@@ -39,13 +39,13 @@ export async function createExpenseDocument({ year, month, expenses }) {
     expense_items: expenseItems,
   }
 
-  console.log('Creating expense document with data:', {
-    year,
-    month,
-    project: currentProject.project_name,
-    expenseItems,
-    fullDoc: doc
-  })
+  // console.log('Creating expense document with data:', {
+  //   year,
+  //   month,
+  //   project: currentProject.project_name,
+  //   expenseItems,
+  //   fullDoc: doc
+  // })
 
   try {
     const result = await expenseResource.submit({
@@ -53,7 +53,7 @@ export async function createExpenseDocument({ year, month, expenses }) {
       doc
     })
     
-    console.log('Document created successfully:', result)
+    // console.log('Document created successfully:', result)
     return { success: true, name: result.name }
   } catch (error) {
     console.error('Error creating expense document:', error)

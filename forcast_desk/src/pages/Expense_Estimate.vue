@@ -600,36 +600,90 @@
             </div>
           </div>
 
-          <!-- Add Expense Category UI -->
+          <!-- Quick Actions Dropdown Card -->
           <div class="mb-6">
-            <div class="flex items-center gap-3 mb-2">
-              <FolderOpen class="w-5 h-5 text-violet-600" />
-              <span class="text-md font-semibold text-gray-700">Create New Expense Category</span>
-            </div>
-            <div class="flex gap-2 items-center">
-              <input
-                v-model="newCategoryName"
-                type="text"
-                placeholder="Enter new category name"
-                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
-                @keyup.enter="createExpenseCategory"
+            <button
+              @click="showQuickActions = !showQuickActions"
+              class="w-full flex items-center justify-between p-4 bg-gradient-to-r from-violet-50 to-violet-100 border border-violet-200 rounded-lg hover:from-violet-100 hover:to-violet-200 transition-all duration-200"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
+                  <Plus class="w-4 h-4 text-white" />
+                </div>
+                <span class="text-lg font-semibold text-violet-800">Quick Actions</span>
+              </div>
+              <ChevronDown 
+                :class="['w-5 h-5 text-violet-600 transition-transform duration-200', showQuickActions ? 'rotate-180' : '']" 
               />
-              <button
-                :disabled="creatingCategory || !newCategoryName.trim()"
-                @click="createExpenseCategory"
-                class="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-all font-medium flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                <Plus class="w-4 h-4" />
-                Add
-              </button>
-            </div>
-            <div v-if="categoryCreateError" class="text-red-500 text-xs mt-1 flex items-center gap-1">
-              <AlertTriangle class="w-3 h-3" />
-              {{ categoryCreateError }}
-            </div>
-            <div v-if="categoryCreateSuccess" class="text-green-600 text-xs mt-1 flex items-center gap-1">
-              <Check class="w-3 h-3" />
-              {{ categoryCreateSuccess }}
+            </button>
+            
+            <div v-show="showQuickActions" class="mt-3 space-y-4 p-4 bg-white border border-violet-200 rounded-lg shadow-sm">
+              <!-- Add Expense Category UI -->
+              <div>
+                <div class="flex items-center gap-3 mb-2">
+                  <FolderOpen class="w-5 h-5 text-violet-600" />
+                  <span class="text-md font-semibold text-gray-700">Create New Expense Category</span>
+                </div>
+                <div class="flex gap-2 items-center">
+                  <input
+                    v-model="newCategoryName"
+                    type="text"
+                    placeholder="Enter new category name"
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+                    @keyup.enter="createExpenseCategory"
+                  />
+                  <button
+                    :disabled="creatingCategory || !newCategoryName.trim()"
+                    @click="createExpenseCategory"
+                    class="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-all font-medium flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    <Plus class="w-4 h-4" />
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              <!-- Add Account UI -->
+              <div>
+                <div class="flex items-center gap-3 mb-2">
+                  <Receipt class="w-5 h-5 text-violet-600" />
+                  <span class="text-md font-semibold text-gray-700">Create New Account</span>
+                </div>
+                <div class="grid grid-cols-4 gap-3">
+                  <input
+                    v-model="newAccount.account_name"
+                    type="text"
+                    placeholder="Account Name"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+                  />
+                  <input
+                    v-model="newAccount.account_number"
+                    type="text"
+                    placeholder="Account Number"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+                    @keypress="allowOnlyNumbers"
+                    @paste="handlePaste"
+                    @input="validateAccountNumber"
+                  />
+                  <select
+                    v-model="newAccount.parent_account"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+                  >
+                    <option value="">Parent Account</option>
+                    <option v-for="account in groupAccounts" :key="account" :value="account">
+                      {{ account }}
+                    </option>
+                  </select>
+                  <button
+                    :disabled="creatingAccount || !newAccount.account_name.trim() || !newAccount.account_number.trim() || !newAccount.parent_account"
+                    @click="createAccount"
+                    class="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-all font-medium flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    <Plus class="w-4 h-4" />
+                    Create Account
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -837,6 +891,14 @@ const pendingNavigation = ref(null); // Store the pending navigation action
 const sidebarCollapsed = ref(false);
 const newCategoryName = ref("");
 const creatingCategory = ref(false);
+const newAccount = ref({
+  account_name: "",
+  account_number: "",
+  parent_account: ""
+});
+const creatingAccount = ref(false);
+const groupAccounts = ref([]);
+const showQuickActions = ref(false);
 const categoryCreateError = ref("");
 const categoryCreateSuccess = ref("");
 
@@ -979,6 +1041,14 @@ onMounted(async () => {
     const fieldOptions = await getExpenseFieldOptions();
     categoryOptions.value = fieldOptions.hospitality_category.map(category => ({ label: category, value: category }));
     costTypeOptions.value = fieldOptions.cost_type.map(costType => ({ label: costType, value: costType }));
+    
+    // Load group accounts
+    const response = await fetch("/api/v2/method/ex_forcast.api.account_list.get_group_accounts");
+    const result = await response.json();
+    if (result.data && result.data.group_accounts) {
+      groupAccounts.value = result.data.group_accounts;
+    }
+    
     isSaved.value = true;
   } catch (err) {
     console.error("Error loading data:", err);
@@ -1181,6 +1251,55 @@ async function createExpenseCategory() {
   } finally {
     creatingCategory.value = false;
   }
+}
+
+async function createAccount() {
+  if (!newAccount.value.account_name.trim() || !newAccount.value.account_number.trim() || !newAccount.value.parent_account) return;
+  creatingAccount.value = true;
+  try {
+    const response = await fetch("/api/v2/method/ex_forcast.api.account_list.create_account", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        account_name: newAccount.value.account_name.trim(),
+        account_number: newAccount.value.account_number.trim(),
+        parent_account: newAccount.value.parent_account
+      })
+    });
+    const result = await response.json();
+    if (result.data && result.data.success) {
+      alertService.success(`Account '${newAccount.value.account_name.trim()}' created successfully!`);
+      newAccount.value = { account_name: "", account_number: "", parent_account: "" };
+      // Refresh expense options
+      expenseOptions.value = (await getExpenseList())?.map(name => ({ label: name, value: name })) || [];
+    } else {
+      alertService.error((result.data && result.data.error) || result.error || "Failed to create account.");
+    }
+  } catch (err) {
+    alertService.error("Failed to create account.");
+  } finally {
+    creatingAccount.value = false;
+  }
+}
+
+function allowOnlyNumbers(event) {
+  // Allow only numbers (0-9)
+  const charCode = event.which ? event.which : event.keyCode;
+  if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+    event.preventDefault();
+  }
+}
+
+function handlePaste(event) {
+  event.preventDefault();
+  const pastedText = (event.clipboardData || window.clipboardData).getData('text');
+  const numericOnly = pastedText.replace(/[^0-9]/g, '');
+  newAccount.value.account_number += numericOnly;
+}
+
+function validateAccountNumber(event) {
+  // Remove any non-numeric characters
+  newAccount.value.account_number = event.target.value.replace(/[^0-9]/g, '');
 }
 </script>
 
