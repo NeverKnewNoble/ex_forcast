@@ -16,6 +16,17 @@ export function calculateCategoryTotal(expenseData, expenses, year, displayMode,
   return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+// Calculate total for a category in a specific month and year
+export function calculateCategoryMonthTotal(expenseData, expenses, year, label, displayMode) {
+  let total = 0;
+  for (const expense of expenses) {
+    const rawAmount = getAmountForExpense(expenseData, expense, year, label, displayMode);
+    const amt = parseFloat(rawAmount.toString().replace(/,/g, ''));
+    if (!isNaN(amt)) total += amt;
+  }
+  return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 // Format amount input to show commas for better readability
 export function formatAmountInput(index, addExpenseForm, event) {
   if (!addExpenseForm || !addExpenseForm.value || !addExpenseForm.value.rows) {
