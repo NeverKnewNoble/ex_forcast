@@ -2,12 +2,10 @@ import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
 
 export const useYearSettingsStore = defineStore('yearSettings', () => {
-  // State
-  const fromYear = ref(localStorage.getItem('expenseEstimateFromYear') || '');
-  const toYear = ref(localStorage.getItem('expenseEstimateToYear') || '');
-  const advancedModes = ref(
-    JSON.parse(localStorage.getItem('expenseEstimateAdvancedModes') || '{}')
-  );
+  // State - Initialize with empty values for fresh installations
+  const fromYear = ref('');
+  const toYear = ref('');
+  const advancedModes = ref({});
 
   // Actions
   function setFromYear(year) {
