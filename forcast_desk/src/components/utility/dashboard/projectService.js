@@ -130,6 +130,23 @@ export const initializeProjectService = async () => {
   try {
     await fetchProjects()
     
+    // Check if this is a fresh installation (no project selected and no year settings)
+    const hasProject = localStorage.getItem('selectedProject');
+    const hasYearSettings = localStorage.getItem('expenseEstimateFromYear') || localStorage.getItem('expenseEstimateToYear');
+    const isFreshInstall = !hasProject && !hasYearSettings;
+    
+    // If it's a fresh installation, clear any existing localStorage data
+    if (isFreshInstall) {
+      localStorage.removeItem('expenseEstimateFromYear');
+      localStorage.removeItem('expenseEstimateToYear');
+      localStorage.removeItem('expenseEstimateAdvancedModes');
+      localStorage.removeItem('totalNumberOfRooms');
+      localStorage.removeItem('totalRooms');
+      localStorage.removeItem('marketSegmentation');
+      localStorage.removeItem('hospitalityExperience');
+      console.log('Fresh installation detected - cleared localStorage data');
+    }
+    
     // Restore selected project from localStorage
     const storedProject = getStoredSelectedProject()
     if (storedProject) {

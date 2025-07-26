@@ -18,6 +18,17 @@
           <ProjectSelector @project-changed="handleProjectChange" />
         </div>
 
+        <!-- Clear Data Button (for testing) -->
+        <div class="mb-4">
+          <button 
+            @click="clearAllData"
+            class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+          >
+            Clear All Data (Test Fresh Installation)
+          </button>
+        </div>
+        </div>
+
         <!-- Animated Project Display -->
         <div class="mb-8">
           <div 
@@ -272,6 +283,12 @@ const handleProjectChange = (project) => {
   // console.log('Project changed to:', project)
   // You can add additional logic here when project changes
   // For example, refresh data based on selected project
+}
+
+// Clear all localStorage data for testing fresh installation
+const clearAllData = () => {
+  localStorage.clear();
+  alert('All data cleared. Refresh the page to see fresh installation behavior.');
 }
 </script>
 

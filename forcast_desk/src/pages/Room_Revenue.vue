@@ -1539,7 +1539,9 @@ const originalMarketSegmentData = ref({});
 const marketSegmentationTablesRef = ref(null);
 
 // Add reactive state for total number of rooms
-const totalNumberOfRooms = ref(0);
+const totalNumberOfRooms = ref(
+  localStorage.getItem('totalNumberOfRooms') ? parseInt(localStorage.getItem('totalNumberOfRooms')) : 0
+);
 
 // Add reactive state for VAT tax
 const showVATModal = ref(false);
