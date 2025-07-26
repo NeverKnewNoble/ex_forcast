@@ -2,29 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
 
 export const useYearSettingsStore = defineStore('yearSettings', () => {
-  // Check if this is a fresh installation (no project selected and no year settings)
-  const isFreshInstallation = () => {
-    const hasProject = localStorage.getItem('selectedProject');
-    const hasYearSettings = localStorage.getItem('expenseEstimateFromYear') || localStorage.getItem('expenseEstimateToYear');
-    return !hasProject && !hasYearSettings;
-  };
-
-  // Clear localStorage for fresh installations
-  const clearForFreshInstallation = () => {
-    if (isFreshInstallation()) {
-      localStorage.removeItem('expenseEstimateFromYear');
-      localStorage.removeItem('expenseEstimateToYear');
-      localStorage.removeItem('expenseEstimateAdvancedModes');
-      localStorage.removeItem('totalNumberOfRooms');
-      localStorage.removeItem('totalRooms');
-      localStorage.removeItem('marketSegmentation');
-      localStorage.removeItem('hospitalityExperience');
-      return true;
-    }
-    return false;
-  };
-
-  // State - Initialize with values from localStorage if they exist
+  // State
   const fromYear = ref(localStorage.getItem('expenseEstimateFromYear') || '');
   const toYear = ref(localStorage.getItem('expenseEstimateToYear') || '');
   const advancedModes = ref(
@@ -75,7 +53,5 @@ export const useYearSettingsStore = defineStore('yearSettings', () => {
     setAdvancedMode,
     setAdvancedModes,
     clearYearSettings,
-    clearForFreshInstallation,
-    isFreshInstallation,
   };
 }); 

@@ -28,7 +28,7 @@ export async function initializeData(years, expenseData, originalExpenseData, ex
     // Load total rooms from localStorage
     const savedRooms = localStorage.getItem('totalRooms');
     if (savedRooms) {
-      totalRooms.value = parseInt(savedRooms) || 0;
+      totalRooms.value = parseInt(savedRooms) || 100;
     }
   } catch (err) {
     console.error("Error loading data:", err);
