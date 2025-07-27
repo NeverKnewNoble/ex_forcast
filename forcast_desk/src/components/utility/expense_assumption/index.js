@@ -28,6 +28,7 @@ export { createExpenseDocument } from './create_expense.js';
 export {
   loadYearOptions,
   loadExpenseData,
+  loadAllExpensesAndCategories,
   extractAllExpenses
 } from './data_service.js';
 
@@ -41,7 +42,9 @@ export {
   isYearCollapsed,
   getFilteredExpenses,
   getExpensesGroupedByCategory,
+  getAllExpensesGroupedByCategory,
   getExpenseDetails,
+  getExpenseDetailsFromAllExpenses,
   getAmountForExpense,
   calculateTotalForExpense,
   extractFieldOptionsFromData

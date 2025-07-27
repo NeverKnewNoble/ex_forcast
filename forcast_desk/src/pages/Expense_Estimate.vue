@@ -359,7 +359,7 @@
                           <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-600">
                             <div class="flex items-center gap-1">
                               <Hash class="w-2 h-2 text-gray-400" />
-                              {{ getExpenseDetails(expenseData, expense, visibleYears).code }}
+                              {{ getExpenseDetailsLocal(expense).code }}
                             </div>
                           </td>
                           <td class="px-3 py-2 font-medium border-r border-violet-200">
@@ -371,7 +371,7 @@
                           <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-600">
                             <div class="flex items-center gap-1">
                               <Tag class="w-2 h-2 text-gray-400" />
-                              {{ getExpenseDetails(expenseData, expense, visibleYears).costType }}
+                              {{ getExpenseDetailsLocal(expense).costType }}
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'row-' + year + '-' + expense">
@@ -830,6 +830,7 @@ import {
   // Data loading and API services
   loadYearOptions,
   loadExpenseData,
+  loadAllExpensesAndCategories,
   extractAllExpenses,
   
   // Table display and interaction
@@ -837,7 +838,9 @@ import {
   isYearCollapsed,
 
   getExpensesGroupedByCategory,
+  getAllExpensesGroupedByCategory,
   getExpenseDetails,
+  getExpenseDetailsFromAllExpenses,
   getAmountForExpense,
   calculateTotalForExpense,
   
@@ -871,6 +874,7 @@ const years = ref([]);
 const displayMode = ref("monthly");
 const expenses = ref([]);
 const expenseData = ref({});
+const allExpensesData = ref([]); // New: All expenses from Expense Assumptions doctype
 const showAdvanced = ref(false);
 const tempAdvancedModes = ref({});
 const expenseOptions = ref([]);
@@ -920,6 +924,11 @@ const filteredToYears = computed(() => {
 
 
 const groupedExpenses = computed(() => {
+  // Use all expenses data to show all expenses, regardless of year data
+  if (allExpensesData.value.length > 0) {
+    return getAllExpensesGroupedByCategory(allExpensesData.value);
+  }
+  // Fallback to the old method if no all expenses data is available
   return getExpensesGroupedByCategory(expenseData.value, visibleYears.value);
 });
 
@@ -955,6 +964,14 @@ const getColumnLabelsForYearLocal = (year) => {
   return getColumnLabels(advancedModes.value[year] || displayMode.value);
 };
 
+// Function to get expense details using the new approach
+const getExpenseDetailsLocal = (expense) => {
+  if (allExpensesData.value.length > 0) {
+    return getExpenseDetailsFromAllExpenses(allExpensesData.value, expense);
+  }
+  return getExpenseDetails(expenseData.value, expense, visibleYears.value);
+};
+
 // Watch for changes in visible years to initialize advanced modes
 watch(visibleYears, () => {
   visibleYears.value.forEach(year => {
@@ -988,7 +1005,13 @@ watch(selectedProject, async (newProject, oldProject) => {
     try {
       // console.log('Project changed, reloading expense data for:', newProject.project_name);
       
-      // Reload expense data for the new project
+      // Reload all expenses and categories for the new project
+      const allExpensesResult = await loadAllExpensesAndCategories();
+      if (allExpensesResult.status === 'success') {
+        allExpensesData.value = allExpensesResult.expenses;
+      }
+      
+      // Reload expense data for the new project (for cell values)
       expenseData.value = await loadExpenseData();
       
       // Handle the response based on its structure
@@ -1034,6 +1057,14 @@ onMounted(async () => {
   try {
     await initializeProjectService();
     years.value = await loadYearOptions();
+    
+    // Load all expenses and categories from Expense Assumptions doctype
+    const allExpensesResult = await loadAllExpensesAndCategories();
+    if (allExpensesResult.status === 'success') {
+      allExpensesData.value = allExpensesResult.expenses;
+    }
+    
+    // Load expense data for the selected years (for cell values)
     expenseData.value = await loadExpenseData();
     if (!expenseData.value.status) {
       originalExpenseData.value = cloneDeep(expenseData.value);
@@ -1042,6 +1073,7 @@ onMounted(async () => {
       originalExpenseData.value = expenseData.value;
       expenses.value = [];
     }
+    
     expenseOptions.value = (await getExpenseList())?.map(name => ({ label: name, value: name })) || [];
     const fieldOptions = await getExpenseFieldOptions();
     categoryOptions.value = fieldOptions.hospitality_category.map(category => ({ label: category, value: category }));
@@ -1096,6 +1128,12 @@ const cleanAmountValueWrapper = (index) => {
 const submitAddExpenseWrapper = async () => {
   if (addExpenseForm && addExpenseForm.value) {
     await submitAddExpense(addExpenseForm, showAddExpenseModal, resetExpenseForm, isSaved, alertService, async () => {
+      // Reload all expenses and categories
+      const allExpensesResult = await loadAllExpensesAndCategories();
+      if (allExpensesResult.status === 'success') {
+        allExpensesData.value = allExpensesResult.expenses;
+      }
+      
       // Reload expense data to show newly added expenses
       expenseData.value = await loadExpenseData();
       if (!expenseData.value.status) {
@@ -1175,9 +1213,9 @@ function exportTableData() {
     groupedExpenses.value.forEach(categoryGroup => {
       categoryGroup.expenses.forEach(expense => {
         const row = [
-          getExpenseDetails(expenseData.value, expense, visibleYears.value).code,
+          getExpenseDetailsLocal(expense).code,
           expense,
-          getExpenseDetails(expenseData.value, expense, visibleYears.value).costType
+          getExpenseDetailsLocal(expense).costType
         ];
         
         visibleYears.value.forEach(year => {
@@ -1212,7 +1250,13 @@ function exportTableData() {
 // Refresh table functionality
 async function refreshTable() {
   try {
-    // Reload expense data
+    // Reload all expenses and categories
+    const allExpensesResult = await loadAllExpensesAndCategories();
+    if (allExpensesResult.status === 'success') {
+      allExpensesData.value = allExpensesResult.expenses;
+    }
+    
+    // Reload expense data for cell values
     expenseData.value = await loadExpenseData();
     
     // Handle the response based on its structure
