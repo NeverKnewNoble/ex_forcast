@@ -26,6 +26,50 @@ export function getFilteredExpenses(expenseData, visibleYears) {
   return [...filtered].sort()
 }
 
+// New function to group all expenses by category (regardless of year data)
+export function getAllExpensesGroupedByCategory(allExpensesData) {
+  const categoryMap = new Map()
+  
+  // Group expenses by their hospitality_category
+  allExpensesData.forEach(expense => {
+    const category = expense.hospitality_category || 'Other'
+    if (!categoryMap.has(category)) {
+      categoryMap.set(category, [])
+    }
+    categoryMap.get(category).push(expense)
+  })
+  
+  // Convert to array format with category and expenses
+  const groupedExpenses = []
+  const otherExpenses = []
+  
+  for (const [category, expenses] of categoryMap) {
+    const expenseList = expenses.map(exp => exp.expense_name).sort()
+    
+    if (category === 'Other') {
+      otherExpenses.push({
+        category: 'Other',
+        expenses: expenseList
+      })
+    } else {
+      groupedExpenses.push({
+        category,
+        expenses: expenseList
+      })
+    }
+  }
+  
+  // Sort categories alphabetically (excluding "Other")
+  groupedExpenses.sort((a, b) => a.category.localeCompare(b.category))
+  
+  // Add "Other" category at the bottom if it exists
+  if (otherExpenses.length > 0) {
+    groupedExpenses.push(...otherExpenses)
+  }
+  
+  return groupedExpenses
+}
+
 // New functions for redesigned table with categories
 export function getExpensesGroupedByCategory(expenseData, visibleYears) {
   const categoryMap = new Map()
@@ -85,6 +129,19 @@ export function getExpenseDetails(expenseData, expense, visibleYears) {
           hospitalityCategory: entry['hospitality_category'] || ''
         }
       }
+    }
+  }
+  return { code: '', costType: '', hospitalityCategory: '' }
+}
+
+// New function to get expense details from all expenses data
+export function getExpenseDetailsFromAllExpenses(allExpensesData, expense) {
+  const expenseEntry = allExpensesData.find(e => e.expense_name === expense)
+  if (expenseEntry) {
+    return {
+      code: expenseEntry.code || '',
+      costType: expenseEntry.cost_type || '',
+      hospitalityCategory: expenseEntry.hospitality_category || ''
     }
   }
   return { code: '', costType: '', hospitalityCategory: '' }

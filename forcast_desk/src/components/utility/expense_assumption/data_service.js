@@ -54,6 +54,49 @@ export async function loadExpenseData() {
   }
 }
 
+// New function to load all expenses and categories from Expense Assumptions doctype
+export async function loadAllExpensesAndCategories() {
+  try {
+    // Get the currently selected project
+    const currentProject = selectedProject.value
+    
+    if (!currentProject) {
+      return { 
+        status: 'no_project_selected',
+        message: 'No project selected'
+      };
+    }
+
+    // Load all expense assumptions for the project (regardless of year data)
+    const response = await fetch(`/api/v2/method/ex_forcast.api.expense_estimate.get_all_expense_assumptions?project=${encodeURIComponent(currentProject.project_name)}`);
+    const data = await response.json();
+    
+    if (data.data && data.data.expenses) {
+      return {
+        status: 'success',
+        expenses: data.data.expenses,
+        categories: data.data.categories || []
+      };
+    } else {
+      return {
+        status: 'no_data',
+        message: `No expense assumptions found for project: ${currentProject.project_name}`,
+        project: currentProject.project_name,
+        expenses: [],
+        categories: []
+      };
+    }
+  } catch (error) {
+    console.error("Error loading all expenses and categories:", error);
+    return { 
+      status: 'error',
+      message: 'Failed to load expense assumptions',
+      expenses: [],
+      categories: []
+    };
+  }
+}
+
 export function extractAllExpenses(expenseData) {
   const all = new Set();
   for (const year in expenseData) {

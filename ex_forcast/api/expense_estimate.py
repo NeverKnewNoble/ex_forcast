@@ -64,6 +64,64 @@ def estimate_display(project=None):
         return {"error": str(err)}
 
 
+@frappe.whitelist(allow_guest=True)
+def get_all_expense_assumptions(project=None):
+    """
+    Get all unique expenses and categories from Expense Assumptions doctype,
+    regardless of whether they have data for specific years.
+    """
+    try:
+        # SQL query to get all unique expenses and their details
+        query = """
+            SELECT DISTINCT
+                child.expense_name,
+                child.code,
+                child.root_type,
+                child.hospitality_category,
+                child.cost_type
+            FROM 
+                `tabExpense Assumptions` AS parent
+            INNER JOIN 
+                `tabExpense Items` AS child
+            ON 
+                child.parent = parent.name
+        """
+        
+        # Add project filter if provided
+        if project:
+            query += " WHERE parent.project = %s"
+            raw_results = frappe.db.sql(query, (project,), as_dict=True)
+        else:
+            raw_results = frappe.db.sql(query, as_dict=True)
+
+        # Extract unique expenses
+        expenses = []
+        seen_expenses = set()
+        
+        for row in raw_results:
+            expense_name = row['expense_name']
+            if expense_name not in seen_expenses:
+                seen_expenses.add(expense_name)
+                expenses.append({
+                    "expense_name": expense_name,
+                    "code": row['code'] or '',
+                    "root_type": row['root_type'] or '',
+                    "hospitality_category": row['hospitality_category'] or '',
+                    "cost_type": row['cost_type'] or ''
+                })
+
+        # Extract unique categories
+        categories = list(set(row['hospitality_category'] for row in raw_results if row['hospitality_category']))
+        categories.sort()
+
+        return {
+            "expenses": expenses,
+            "categories": categories
+        }
+
+    except Exception as err:
+        frappe.log_error(frappe.get_traceback(), "get_all_expense_assumptions failed")
+        return {"error": str(err)}
 
 
 @frappe.whitelist(allow_guest=True)
