@@ -2098,42 +2098,69 @@ function cancelRoomTypeCountModal() {
   roomTypeCounts.value = {};
 }
 
-function saveRoomTypeCounts() {
-  // Update room packages with new counts
-  roomPackages.value.forEach(pkg => {
-    if (roomTypeCounts.value[pkg.name] !== undefined) {
-      pkg.number_of_rooms = parseInt(roomTypeCounts.value[pkg.name]) || 0;
-    }
-  });
-
-  // Update roomData to reflect changes
-  if (!roomData.value.room_packages) {
-    roomData.value.room_packages = [];
-  }
-  
-  // Update or add room packages in roomData
-  ROOM_TYPES.forEach(roomType => {
-    const count = parseInt(roomTypeCounts.value[roomType]) || 0;
-    const existingIndex = roomData.value.room_packages.findIndex(pkg => pkg.name === roomType);
-    
-    if (existingIndex >= 0) {
-      roomData.value.room_packages[existingIndex].number_of_rooms = count;
-    } else {
-      roomData.value.room_packages.push({
-        name: roomType,
-        number_of_rooms: count
+async function saveRoomTypeCounts() {
+  try {
+    // Prepare changes for API
+    const changes = [];
+    ROOM_TYPES.forEach(roomType => {
+      const count = parseInt(roomTypeCounts.value[roomType]) || 0;
+      changes.push({
+        roomType: roomType,
+        field: 'room_count',
+        newValue: count
       });
-    }
-  });
+    });
 
-  // Mark as unsaved
-  isSaved.value = false;
-  
-  // Close modal
-  showRoomTypeCountModal.value = false;
-  
-  // Show success message
-  alertService.success("Room type counts updated successfully!");
+    // Call API to save room package changes
+    const { saveRoomRevenueChanges } = await import('@/components/utility/room_revenue_assumpt./data_service.js');
+    const result = await saveRoomRevenueChanges(changes);
+    
+    // Handle the response
+    const apiResult = result.data || result;
+    if (apiResult.status === 'success') {
+      // Update local room packages with new counts
+      roomPackages.value.forEach(pkg => {
+        if (roomTypeCounts.value[pkg.package_name] !== undefined) {
+          pkg.number_of_rooms = parseInt(roomTypeCounts.value[pkg.package_name]) || 0;
+        }
+      });
+
+      // Update roomData to reflect changes
+      if (!roomData.value.room_packages) {
+        roomData.value.room_packages = [];
+      }
+      
+      // Update or add room packages in roomData
+      ROOM_TYPES.forEach(roomType => {
+        const count = parseInt(roomTypeCounts.value[roomType]) || 0;
+        const existingIndex = roomData.value.room_packages.findIndex(pkg => pkg.name === roomType);
+        
+        if (existingIndex >= 0) {
+          roomData.value.room_packages[existingIndex].number_of_rooms = count;
+        } else {
+          roomData.value.room_packages.push({
+            name: roomType,
+            number_of_rooms: count
+          });
+        }
+      });
+
+      // Update original data to reflect saved state
+      originalRoomData.value = cloneDeep(roomData.value);
+      isSaved.value = true;
+      
+      // Close modal
+      showRoomTypeCountModal.value = false;
+      
+      // Show success message
+      alertService.success("Room type counts updated and saved successfully!");
+    } else {
+      throw new Error(apiResult.message || 'Failed to save room type counts');
+    }
+  } catch (error) {
+    console.error('Error saving room type counts:', error);
+    alertService.error("Failed to save room type counts. Please try again.");
+  }
 }
 </script>
   

@@ -211,6 +211,7 @@ import {
   clearError,
   initializeProjectService
 } from '@/components/utility/dashboard/projectService.js'
+import alertService from '@/components/ui/ui_utility/alertService.js'
 
 // Component state
 const isDropdownOpen = ref(false)
@@ -282,6 +283,9 @@ const handleCreateProject = async () => {
     const createdProject = await createProject(newProject.name, newProject.description)
     setSelectedProject(createdProject)
     closeCreateModal()
+    
+    // Show success message with information about default room packages
+    alertService.success(`Project "${createdProject.project_name}" created successfully!`)
   } catch (err) {
     // Error is already handled in the service
   }
