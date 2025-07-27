@@ -1923,7 +1923,10 @@
     // console.log('expenseData watcher triggered, fnbData before:', fnbData, typeof fnbData);
     if (!fnbData || typeof fnbData !== 'object') {
       console.log('fnbData is invalid, resetting to empty object');
-      fnbData = {};
+      // Clear all properties from the reactive object
+      for (const key in fnbData) {
+        delete fnbData[key];
+      }
     }
     // console.log('fnbData after:', fnbData, typeof fnbData);
   });
