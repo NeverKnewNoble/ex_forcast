@@ -13,6 +13,11 @@ export const useYearSettingsStore = defineStore('yearSettings', () => {
   function setFromYear(year) {
     fromYear.value = year;
     localStorage.setItem('expenseEstimateFromYear', year);
+    
+    // If toYear is now invalid (before fromYear), clear it
+    if (toYear.value && parseInt(toYear.value) < parseInt(year)) {
+      setToYear('');
+    }
   }
 
   function setToYear(year) {
@@ -39,6 +44,19 @@ export const useYearSettingsStore = defineStore('yearSettings', () => {
     localStorage.removeItem('expenseEstimateAdvancedModes');
   }
 
+  // Function to get filtered years for "To Year" dropdown
+  function getFilteredToYears(allYears) {
+    if (!fromYear.value) {
+      return allYears; // If no fromYear is selected, show all years
+    }
+    
+    const fromYearInt = parseInt(fromYear.value);
+    return allYears.filter(year => {
+      const yearInt = parseInt(year);
+      return yearInt >= fromYearInt; // Only show years >= fromYear
+    });
+  }
+
   // Watchers to keep localStorage in sync if values change elsewhere
   watch(fromYear, (val) => localStorage.setItem('expenseEstimateFromYear', val));
   watch(toYear, (val) => localStorage.setItem('expenseEstimateToYear', val));
@@ -53,5 +71,6 @@ export const useYearSettingsStore = defineStore('yearSettings', () => {
     setAdvancedMode,
     setAdvancedModes,
     clearYearSettings,
+    getFilteredToYears,
   };
 }); 

@@ -146,7 +146,7 @@
                         class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
                       >
                         <option value="">Select Year</option>
-                        <option v-for="year in years" :key="'to-' + year" :value="year">{{ year }}</option>
+                        <option v-for="year in filteredToYears" :key="'to-' + year" :value="year">{{ year }}</option>
                       </select>
                     </div>
                   </div>
@@ -609,11 +609,16 @@
   // Pinia store for year settings
   const yearSettingsStore = useYearSettingsStore();
   const { fromYear, toYear, advancedModes } = storeToRefs(yearSettingsStore);
-  const { setFromYear, setToYear, setAdvancedModes, clearYearSettings } = yearSettingsStore;
+  const { setFromYear, setToYear, setAdvancedModes, clearYearSettings, getFilteredToYears } = yearSettingsStore;
   // Computed properties
   const visibleYears = computed(() => {
     const yearsArr = getVisibleYears(fromYear.value, toYear.value);
     return yearsArr;
+  });
+
+  // Computed property for filtered years in "To Year" dropdown
+  const filteredToYears = computed(() => {
+    return getFilteredToYears(years.value);
   });
   
 
