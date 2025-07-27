@@ -1169,7 +1169,7 @@
     "Average Room Rate",
     "Revenue Per Available Room"
   ]
-  const fnbData = reactive({}); // { [rowLabel]: { [year]: { [month]: value, ... } } }
+  let fnbData = reactive({}); // { [rowLabel]: { [year]: { [month]: value, ... } } }
   const originalFnbData = ref({}); // Store original F&B data for comparison
   const restaurantList = ref([]);
   const originalRestaurantList = ref([]); // Store original restaurant list for reset functionality
@@ -1395,7 +1395,7 @@
         alertService.success("Page refreshed successfully");
       }
     } catch (err) {
-      console.error("Error loading data:", err);
+      // console.error("Error loading data:", err);
     }
   });
   
@@ -1923,10 +1923,7 @@
     // console.log('expenseData watcher triggered, fnbData before:', fnbData, typeof fnbData);
     if (!fnbData || typeof fnbData !== 'object') {
       console.log('fnbData is invalid, resetting to empty object');
-      // Clear all properties from the reactive object
-      for (const key in fnbData) {
-        delete fnbData[key];
-      }
+      fnbData = {};
     }
     // console.log('fnbData after:', fnbData, typeof fnbData);
   });
