@@ -249,7 +249,7 @@
           <!-- Right Side - Table Area -->
           <div class="flex-1 p-4">
             <MarketSegmentationTables
-              v-if="marketSegmentation && !roomData.status"
+              v-if="marketSegmentation"
               :visible-years="visibleYears"
               :from-year="fromYear"
               :to-year="toYear"
@@ -292,25 +292,6 @@
                   </div>
                 </div>
                 
-                <div v-else-if="roomData.status === 'no_data'" class="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6 text-center">
-                  <div class="flex flex-col items-center gap-4">
-                    <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                      <Database class="w-8 h-8 text-white" />
-                    </div>
-                    <div>
-                      <h3 class="text-xl font-bold text-blue-800 mb-2">No Room Revenue Data</h3>
-                      <p class="text-blue-700 mb-4">No room revenue data found for project: <strong>{{ roomData.project }}</strong></p>
-                      <button 
-                        @click="showAddRoomRevenueModal = true"
-                        class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-                      >
-                        <Plus class="w-4 h-4" />
-                        Add First Room Revenue
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
                 <div v-else-if="roomData.status === 'error'" class="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-xl p-6 text-center">
                   <div class="flex flex-col items-center gap-4">
                     <div class="w-16 h-16 bg-gradient-to-br from-red-400 to-red-500 rounded-full flex items-center justify-center shadow-lg">
@@ -332,7 +313,7 @@
               </div>
 
               <!-- Table Header with Stats -->
-              <template v-if="visibleYears.length && !roomData.status">
+              <template v-if="visibleYears.length">
                 <div class="mb-4">
                   <div class="flex items-center gap-2">
                     <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
@@ -346,7 +327,8 @@
                   <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden">
                     <div class="bg-gradient-to-r from-violet-600 to-violet-700 text-white px-6 py-4">
                       <h2 class="text-xl font-bold flex items-center gap-2"><BedDouble class="w-5 h-5" /> Available Beds</h2>
-                      <p class="text-violet-100 text-sm">Number of rooms available</p>
+                      <p class="text-violet-100 text-sm font-semibold">Note: Auto Calculated</p>
+                      <p class="text-violet-100 text-sm">Number of rooms available (No. of days for the month x Room package count)</p>
                     </div>
                     <div class="overflow-x-auto">
                       <div class="min-w-full w-max">
@@ -395,7 +377,10 @@
                               class="even:bg-violet-50 hover:bg-violet-100 transition"
                             >
                               <td class="px-4 py-3 font-medium border-r border-violet-200 flex items-center justify-between">
-                                <span>{{ roomType }}</span>
+                                <div class="flex items-center justify-between w-full">
+                                  <span>{{ roomType }}</span>
+                                  <!-- <span class="px-2 py-1 mx-1 bg-white text-violet-500 border border-violet-500 text-xs font-medium rounded-full">Auto</span> -->
+                                </div>
                                 <button
                                   @click="removeRoomPackage(roomType)"
                                   class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
@@ -409,11 +394,7 @@
                                   <td
                                     v-for="label in getColumnLabelsForYearLocal(year)"
                                     :key="'available-cell-' + year + '-' + label + '-' + roomType"
-                                    contenteditable="true"
-                                    class="px-2 py-2 text-right border border-violet-200 hover:bg-violet-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
-                                    @input="handleRoomCellInput({ year, label, roomType, field: 'number_of_rooms', event: $event })"
-                                    @focus="handleRoomCellFocus({ year, label, roomType, field: 'number_of_rooms', event: $event })"
-                                    @blur="handleRoomCellEditWrapper({ year, label, roomType, field: 'number_of_rooms', event: $event })"
+                                    class="px-2 py-2 text-right border border-violet-200 bg-gray-50"
                                   >
                                     <span class="font-mono text-xs">{{ getAvailableBeds(roomData, roomType, year, label, advancedModes[year] || displayMode, roomPackages) }}</span>
                                   </td>
