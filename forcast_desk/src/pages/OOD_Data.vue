@@ -1189,6 +1189,12 @@
       originalLaundryData.value = cloneDeep(laundryData);
       originalHealthClubData.value = cloneDeep(healthClubData);
       isComponentReady.value = true;
+      
+      // Check if we should show refresh success alert
+      if (localStorage.getItem('showRefreshSuccess') === 'true') {
+        localStorage.removeItem('showRefreshSuccess');
+        alertService.success("Page refreshed successfully");
+      }
     } catch (err) {
       console.error("Error loading data:", err);
     }
@@ -1371,25 +1377,12 @@
     window.removeEventListener('beforeunload', handleBeforeUnload);
   });
   
-  // Refresh table functionality
-  async function refreshTable() {
-    try {
-      const [laundryResult, healthClubResult] = await Promise.all([
-        loadLaundryTableData(selectedProject.value?.project_name),
-        loadHealthClubTableData(selectedProject.value?.project_name)
-      ]);
-      Object.assign(laundryData, normalizeLaundryData(laundryResult || {}));
-      populateLaundryAssumptionsFromData(laundryData);
-      isSaved.value = true;
-      Object.assign(healthClubData, normalizeHealthClubData(healthClubResult || {}));
-      originalLaundryData.value = cloneDeep(laundryData);
-      originalHealthClubData.value = cloneDeep(healthClubData);
-      changedCells.value = [];
-      alertService.success("Page refreshed successfully");
-    } catch (error) {
-      console.error("Error refreshing table:", error);
-      alertService.error("Failed to refresh data. Please try again.");
-    }
+  // Refresh table functionality - reload entire page
+  function refreshTable() {
+    // Set flag to show success alert after reload
+    localStorage.setItem('showRefreshSuccess', 'true');
+    // Reload the entire page
+    window.location.reload();
   }
 
   function getOODCellValue(oodData, fieldCode, year, label, displayMode = 'monthly') {
