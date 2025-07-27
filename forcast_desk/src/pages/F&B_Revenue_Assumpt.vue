@@ -1388,6 +1388,12 @@
           });
         });
       }
+      
+      // Check if we should show refresh success alert
+      if (localStorage.getItem('showRefreshSuccess') === 'true') {
+        localStorage.removeItem('showRefreshSuccess');
+        alertService.success("Page refreshed successfully");
+      }
     } catch (err) {
       console.error("Error loading data:", err);
     }
@@ -1438,49 +1444,12 @@
     cleanupModalListeners();
   });
   
-  // Refresh table functionality
-  async function refreshTable() {
-    try {
-      // Reload expense data
-      expenseData.value = await loadExpenseData();
-      originalExpenseData.value = cloneDeep(expenseData.value);
-      expenses.value = extractAllExpenses(expenseData.value);
-      
-      // Reload F&B revenue data for current project
-      if (selectedProject.value) {
-        try {
-          const fnbRevenueData = await loadFnbRevenueDataForFrontend(selectedProject.value.project_name);
-          Object.assign(fnbData, fnbRevenueData);
-          originalFnbData.value = cloneDeep(fnbRevenueData); // Update original
-        } catch (error) {
-          console.error('Error loading F&B revenue data:', error);
-          Object.assign(fnbData, {});
-          originalFnbData.value = {};
-        }
-      } else {
-        // No project selected
-        fnbData.value = { status: 'no_project_selected', message: 'No project selected' };
-        originalFnbData.value = { status: 'no_project_selected', message: 'No project selected' };
-      }
-      
-      // Reload restaurant list for current project
-      if (selectedProject.value) {
-        restaurantList.value = await getRestaurants(selectedProject.value.project_name);
-        originalRestaurantList.value = [...restaurantList.value]; // Update original list
-      } else {
-        restaurantList.value = [];
-        originalRestaurantList.value = [];
-      }
-      
-      // Reset any unsaved changes
-      changedCells.value = [];
-      isSaved.value = true;
-      
-      alertService.success("Page refreshed successfully");
-    } catch (error) {
-      console.error("Error refreshing data:", error);
-      alertService.error("Failed to refresh data. Please try again.");
-    }
+  // Refresh table functionality - reload entire page
+  function refreshTable() {
+    // Set flag to show success alert after reload
+    localStorage.setItem('showRefreshSuccess', 'true');
+    // Reload the entire page
+    window.location.reload();
   }
   
   async function handleCreateRestaurant() {

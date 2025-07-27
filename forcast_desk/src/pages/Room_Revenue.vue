@@ -1639,6 +1639,12 @@ onMounted(async () => {
     updateRoomTypes(roomPackages.value);
     isSaved.value = true;
     // ... keep VAT, breakfast, exchange, service charge, roomTypeCounts logic ...
+    
+    // Check if we should show refresh success alert
+    if (localStorage.getItem('showRefreshSuccess') === 'true') {
+      localStorage.removeItem('showRefreshSuccess');
+      alertService.success("Page refreshed successfully");
+    }
   } catch (err) {
     console.error("Error loading data:", err);
   }
@@ -1846,25 +1852,10 @@ onUnmounted(() => {
 });
 
 async function refreshRoomRevenueData() {
-  try {
-    // Reload room revenue data
-    roomData.value = await getRoomRevenueList();
-    originalRoomData.value = cloneDeep(roomData.value);
-    
-    // Reload market segment data
-    const marketSegmentResponse = await getMarketSegmentList();
-    marketSegmentData.value = marketSegmentResponse || {};
-    originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
-    
-    // Reset save status
-    isSaved.value = true;
-    saveError.value = "";
-    
-    alertService.success('Data refreshed successfully');
-  } catch (error) {
-    console.error('Error refreshing data:', error);
-    alertService.error('Failed to refresh data');
-  }
+  // Set flag to show success alert after reload
+  localStorage.setItem('showRefreshSuccess', 'true');
+  // Reload the entire page
+  window.location.reload();
 }
 
 async function addNewRoomType() {

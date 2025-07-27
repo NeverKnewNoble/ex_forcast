@@ -1087,6 +1087,12 @@ onMounted(async () => {
     }
     
     isSaved.value = true;
+    
+    // Check if we should show refresh success alert
+    if (localStorage.getItem('showRefreshSuccess') === 'true') {
+      localStorage.removeItem('showRefreshSuccess');
+      alertService.success("Page refreshed successfully");
+    }
   } catch (err) {
     console.error("Error loading data:", err);
   }
@@ -1247,37 +1253,12 @@ function exportTableData() {
 
 
 
-// Refresh table functionality
-async function refreshTable() {
-  try {
-    // Reload all expenses and categories
-    const allExpensesResult = await loadAllExpensesAndCategories();
-    if (allExpensesResult.status === 'success') {
-      allExpensesData.value = allExpensesResult.expenses;
-    }
-    
-    // Reload expense data for cell values
-    expenseData.value = await loadExpenseData();
-    
-    // Handle the response based on its structure
-    if (!expenseData.value.status) {
-      originalExpenseData.value = cloneDeep(expenseData.value);
-      expenses.value = extractAllExpenses(expenseData.value);
-    } else {
-      originalExpenseData.value = expenseData.value;
-      expenses.value = [];
-    }
-    
-    // Reset any unsaved changes
-    changedCells.value = [];
-    isSaved.value = true;
-    
-    // console.log("Table data refreshed successfully");
-    alertService.success("Page refreshed successfully");
-  } catch (error) {
-    console.error("Error refreshing table:", error);
-    alertService.error("Failed to refresh data. Please try again.");
-  }
+// Refresh table functionality - reload entire page
+function refreshTable() {
+  // Set flag to show success alert after reload
+  localStorage.setItem('showRefreshSuccess', 'true');
+  // Reload the entire page
+  window.location.reload();
 }
 
 async function createExpenseCategory() {

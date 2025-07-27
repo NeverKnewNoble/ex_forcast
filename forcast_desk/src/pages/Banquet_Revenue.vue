@@ -725,6 +725,12 @@
       isSaved.value = true;
       isComponentReady.value = true;
       await fetchBanquetDetails();
+      
+      // Check if we should show refresh success alert
+      if (localStorage.getItem('showRefreshSuccess') === 'true') {
+        localStorage.removeItem('showRefreshSuccess');
+        alertService.success("Page refreshed successfully");
+      }
     } catch (err) {
       console.error("Error loading data:", err);
     }
@@ -859,20 +865,12 @@
   });
   
   
-  // Refresh table functionality
-  async function refreshTable() {
-    try {
-      const loaded = await loadBanquetRevenueData(selectedProject.value?.project_name) || {};
-      const converted = convertBanquetServerDataToFrontend(loaded);
-      Object.assign(banquetData, converted);
-      originalBanquetData.value = cloneDeep(banquetData);
-      changedCells.value = [];
-      isSaved.value = true;
-      alertService.success("Page refreshed successfully");
-    } catch (error) {
-      console.error("Error refreshing table:", error);
-      alertService.error("Failed to refresh data. Please try again.");
-    }
+  // Refresh table functionality - reload entire page
+  function refreshTable() {
+    // Set flag to show success alert after reload
+    localStorage.setItem('showRefreshSuccess', 'true');
+    // Reload the entire page
+    window.location.reload();
   }
 
   function getBanquetRowData(banquetData, year, label) {
