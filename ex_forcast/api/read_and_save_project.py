@@ -58,6 +58,26 @@ def create_project(project_name, project_description):
         
         new_project.insert()
         
+        # Create default room packages for the new project
+        default_packages = ["Standard", "Superior", "Deluxe", "Suite", "Presidential"]
+        
+        for package_name in default_packages:
+            # Check if package already exists for this project
+            existing = frappe.db.exists("Room Packages", {
+                "package_name": package_name, 
+                "project": new_project.project_name
+            })
+            
+            if not existing:
+                # Create the package
+                room_package = frappe.get_doc({
+                    "doctype": "Room Packages",
+                    "package_name": package_name,
+                    "number_of_rooms": 0,
+                    "project": new_project.project_name
+                })
+                room_package.insert()
+        
         return {
             "status": "success",
             "data": {

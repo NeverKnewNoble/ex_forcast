@@ -1,28 +1,20 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:package_name",
+ "autoname": "format:{package_name}-{project}",
  "creation": "2025-06-26 11:21:56.721507",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "package_name",
   "number_of_rooms",
-  "project",
-  "module"
+  "project"
  ],
  "fields": [
   {
    "fieldname": "package_name",
    "fieldtype": "Data",
-   "label": "Package Name",
-   "unique": 1
-  },
-  {
-   "fieldname": "module",
-   "fieldtype": "Link",
-   "label": "Module",
-   "options": "Module Def"
+   "label": "Package Name"
   },
   {
    "fieldname": "number_of_rooms",
@@ -38,11 +30,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-20 11:39:34.786457",
+ "modified": "2025-07-27 03:14:46.318664",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Room Packages",
- "naming_rule": "By fieldname",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
@@ -58,6 +50,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
