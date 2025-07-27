@@ -177,7 +177,7 @@
                           class="w-full flex items-center justify-left gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
                         >
                           <Calculator class="w-4 h-4" />
-                          Room Type Count
+                          Room Package Count
                         </button>
                       </div>
                     </div>
@@ -1337,6 +1337,8 @@
     </div>
   </transition>
 
+
+
   <!-- Room Type Count Modal -->
   <transition name="fade">
     <div
@@ -1347,7 +1349,7 @@
         <!-- Modal Header -->
         <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
           <Calculator class="w-6 h-6 text-white" />
-          <h2 class="text-xl font-bold text-white">Room Type Count Management</h2>
+          <h2 class="text-xl font-bold text-white">Room Package Count Management</h2>
         </div>
 
         <!-- Modal Body -->
@@ -1371,6 +1373,8 @@
                   v-model="roomTypeCounts[roomType]"
                   type="number"
                   min="0"
+                  @input="validateRoomCountInput($event, roomType)"
+                  @keypress="allowOnlyNumbers($event)"
                   class="px-4 py-2 border rounded-lg focus:ring-violet-500 focus:border-violet-500 w-32 text-left"
                   placeholder="0"
                 />
@@ -2096,6 +2100,45 @@ function openRoomTypeCountModal() {
 function cancelRoomTypeCountModal() {
   showRoomTypeCountModal.value = false;
   roomTypeCounts.value = {};
+}
+
+// Input validation functions for room count inputs
+function validateRoomCountInput(event, roomType) {
+  const input = event.target;
+  let value = input.value;
+  
+  // Remove any non-numeric characters except for the minus sign at the beginning
+  value = value.replace(/[^0-9]/g, '');
+  
+  // Ensure the value is not negative
+  if (value < 0) {
+    value = 0;
+  }
+  
+  // Update the input value and the reactive data
+  input.value = value;
+  roomTypeCounts.value[roomType] = value;
+}
+
+function allowOnlyNumbers(event) {
+  // Allow: backspace, delete, tab, escape, enter, and navigation keys
+  if ([8, 9, 27, 13, 46, 37, 39].indexOf(event.keyCode) !== -1 ||
+      // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+      (event.keyCode === 65 && event.ctrlKey === true) ||
+      (event.keyCode === 67 && event.ctrlKey === true) ||
+      (event.keyCode === 86 && event.ctrlKey === true) ||
+      (event.keyCode === 88 && event.ctrlKey === true)) {
+    return;
+  }
+  
+  // Allow only numbers
+  if ((event.keyCode >= 48 && event.keyCode <= 57) || // 0-9
+      (event.keyCode >= 96 && event.keyCode <= 105)) { // numpad 0-9
+    return;
+  }
+  
+  // Prevent the default action for all other keys
+  event.preventDefault();
 }
 
 async function saveRoomTypeCounts() {

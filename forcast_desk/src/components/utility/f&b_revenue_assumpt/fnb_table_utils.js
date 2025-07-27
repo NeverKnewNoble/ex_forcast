@@ -661,7 +661,10 @@ export function handleFnbCellInput({ row, year, label, event, fnbData, changedCe
   // Initialize fnbData if it's not valid
   if (!fnbData || typeof fnbData !== 'object') {
     console.log('handleFnbCellInput: fnbData is not valid, initializing as empty object');
-    fnbData = {};
+    // Clear all properties from the reactive object
+    for (const key in fnbData) {
+      delete fnbData[key];
+    }
   }
   
   // Format and validate input
@@ -693,7 +696,10 @@ export function handleFnbCellEdit({ row, year, label, event, fnbData, changedCel
   // Initialize fnbData if it's not valid
   if (!fnbData || typeof fnbData !== 'object') {
     console.log('handleFnbCellEdit: fnbData is not valid, initializing as empty object');
-    fnbData = {};
+    // Clear all properties from the reactive object
+    for (const key in fnbData) {
+      delete fnbData[key];
+    }
   }
   
   // Clean and format value on blur
