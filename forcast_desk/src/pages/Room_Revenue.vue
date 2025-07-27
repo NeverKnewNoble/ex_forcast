@@ -205,7 +205,7 @@
                           placeholder="Enter total number of rooms"
                           class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
                         />
-                        <p class="text-xs text-gray-500 mt-1">This value will be used to calculate Total Available Rooms in the market segmentation tables.</p>
+                        <p class="text-xs text-gray-500 mt-1">This value will be used to calculate in the market segmentation tables.</p>
                       </div>
                       <div class="flex flex-col gap-2 mt-4">
                         <button 
@@ -1107,6 +1107,7 @@
                 type="number"
                 min="0"
                 max="100"
+                @keypress="allowOnlyNumbers($event)"
                 class="px-6 py-2 border rounded-md focus:ring-violet-500 w-32"
                 placeholder="VAT %"
               />
@@ -1169,6 +1170,7 @@
                   type="number"
                   min="0"
                   step="0.01"
+                  @keypress="allowOnlyNumbers($event)"
                   class="px-6 py-2 border rounded-md focus:ring-violet-500 w-32"
                   placeholder="USD"
                 />
@@ -1230,6 +1232,7 @@
                   type="number"
                   min="0"
                   step="0.0001"
+                  @keypress="allowOnlyNumbers($event)"
                   class="px-6 py-2 border rounded-md focus:ring-violet-500 w-32"
                   placeholder="0.00"
                 />
@@ -1290,6 +1293,7 @@
                   type="number"
                   min="0"
                   step="0.01"
+                  @keypress="allowOnlyNumbers($event)"
                   class="px-6 py-2 border rounded-md focus:ring-violet-500 w-32"
                   placeholder="Amount"
                 />
@@ -2103,18 +2107,19 @@ function validateRoomCountInput(event, roomType) {
 
 function allowOnlyNumbers(event) {
   // Allow: backspace, delete, tab, escape, enter, and navigation keys
-  if ([8, 9, 27, 13, 46, 37, 39].indexOf(event.keyCode) !== -1 ||
+  const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+  if (allowedKeys.includes(event.key) ||
       // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-      (event.keyCode === 65 && event.ctrlKey === true) ||
-      (event.keyCode === 67 && event.ctrlKey === true) ||
-      (event.keyCode === 86 && event.ctrlKey === true) ||
-      (event.keyCode === 88 && event.ctrlKey === true)) {
+      (event.key === 'a' && event.ctrlKey === true) ||
+      (event.key === 'c' && event.ctrlKey === true) ||
+      (event.key === 'v' && event.ctrlKey === true) ||
+      (event.key === 'x' && event.ctrlKey === true)) {
     return;
   }
   
-  // Allow only numbers
-  if ((event.keyCode >= 48 && event.keyCode <= 57) || // 0-9
-      (event.keyCode >= 96 && event.keyCode <= 105)) { // numpad 0-9
+  // Allow only numbers and decimal point
+  const allowedChars = /[0-9.,]/;
+  if (allowedChars.test(event.key)) {
     return;
   }
   

@@ -1049,6 +1049,19 @@ watch(() => props.marketSegmentData, (newData) => {
   }
 }, { deep: true });
 
+// Watch for changes in totalNumberOfRooms and clear cache
+watch(() => props.totalNumberOfRooms, (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    // console.log('TotalNumberOfRooms changed from', oldValue, 'to', newValue, '- clearing cache');
+    // Clear the Total Available Rooms cache when totalRooms changes
+    const project = getProjectName();
+    if (calculationCache.cache[project]?.[PAGE_KEY]) {
+      calculationCache.cache[project][PAGE_KEY]['Total Available Rooms'] = {};
+      calculationCache.cache[project][PAGE_KEY]['Total Available Rooms Year'] = {};
+    }
+  }
+});
+
 // --- Category and Segment Management Functions ---
 async function handleAddCategory() {
   categoryError.value = '';
@@ -1309,25 +1322,73 @@ function getTotalOccupiedRoomYear(year) {
 // --- Total Available Rooms helpers ---
 function getTotalAvailableRooms(year, label) {
   const project = getProjectName();
-  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Total Available Rooms', year, label);
-  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-  const days = getDaysInMonth(year, label);
   const totalRooms = props.totalNumberOfRooms || 0;
+  
+  // Debug logging
+  // console.log('Total Available Rooms Debug:', {
+  //   year,
+  //   label,
+  //   totalRooms,
+  //   project
+  // });
+  
+  // If totalRooms is 0, return 0 regardless of cache
+  if (totalRooms === 0) {
+    console.log('TotalRooms is 0, returning 0');
+    return 0;
+  }
+  
+  // Use totalRooms in cache key to avoid conflicts between different totalRooms values
+  const cacheKey = `Total Available Rooms (${totalRooms})`;
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, label);
+  if (cacheVal && cacheVal > 0) {
+    // console.log('Using cached value:', cacheVal);
+    return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+  
+  const days = getDaysInMonth(year, label);
   const val = days * totalRooms;
-  calculationCache.setValue(project, PAGE_KEY, 'Total Available Rooms', year, label, val);
-  return val;
+  
+  console.log('Calculating new value:', {
+    days,
+    totalRooms,
+    val
+  });
+  
+  // Only cache if value is greater than 0
+  if (val > 0) {
+    calculationCache.setValue(project, PAGE_KEY, cacheKey, year, label, val);
+  }
+  
+  return val.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
 function getTotalAvailableRoomsYear(year) {
   const project = getProjectName();
-  const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Total Available Rooms Year', year, 'ALL');
+  const totalRooms = props.totalNumberOfRooms || 0;
+  
+  // If totalRooms is 0, return 0 regardless of cache
+  if (totalRooms === 0) {
+    return 0;
+  }
+  
+  // Use totalRooms in cache key to avoid conflicts between different totalRooms values
+  const cacheKey = `Total Available Rooms Year (${totalRooms})`;
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, 'ALL');
   if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  
   let total = 0;
   for (const label of props.getColumnLabelsForYearLocal(year)) {
-    total += getTotalAvailableRooms(year, label);
+    const days = getDaysInMonth(year, label);
+    total += days * totalRooms;
   }
-  calculationCache.setValue(project, PAGE_KEY, 'Total Available Rooms Year', year, 'ALL', total);
-  return total;
+  
+  // Only cache if value is greater than 0
+  if (total > 0) {
+    calculationCache.setValue(project, PAGE_KEY, cacheKey, year, 'ALL', total);
+  }
+  
+  return total.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
 // --- Occupancy Percentage helpers ---
