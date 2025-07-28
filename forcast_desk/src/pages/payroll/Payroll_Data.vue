@@ -260,10 +260,22 @@
                           <!-- First Year Column -->
                           <th 
                             v-if="visibleYears.length > 0" 
-                            :colspan="25" 
-                            class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm"
+                            :colspan="isYearCollapsed(visibleYears[0]) ? 1 : 25" 
+                            class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm cursor-pointer select-none hover:bg-violet-700 transition-all duration-200 group"
+                            @click="toggleCollapse(visibleYears[0])"
+                            title="Click to collapse/expand"
                           >
-                            {{ visibleYears[0] }}
+                            <div class="flex items-center justify-center gap-1">
+                              <span class="font-semibold">{{ visibleYears[0] }}</span>
+                              <ChevronDown 
+                                v-if="!isYearCollapsed(visibleYears[0])" 
+                                class="w-3 h-3 transition-transform group-hover:scale-110" 
+                              />
+                              <ChevronRight 
+                                v-else 
+                                class="w-3 h-3 transition-transform group-hover:scale-110" 
+                              />
+                            </div>
                           </th>
                           <!-- Annual Percentage Increment Column -->
                           <th 
@@ -277,7 +289,7 @@
                         <tr class="bg-violet-500/90 text-xs">
                           <!-- Monthly Count Sub-column -->
                           <th 
-                            v-if="visibleYears.length > 0" 
+                            v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])" 
                             :colspan="12" 
                             class="px-2 py-1 text-center border border-violet-300 font-medium"
                           >
@@ -285,16 +297,17 @@
                           </th>
                           <!-- Monthly Salary Sub-column -->
                           <th 
-                            v-if="visibleYears.length > 0" 
+                            v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])" 
                             :colspan="12" 
                             class="px-2 py-1 text-center border border-violet-300 font-medium"
                           >
                             Monthly Salary
                           </th>
                           <!-- Total Sub-column -->
-                          <th 
+                          <th
+                            :rowspan="2"
                             v-if="visibleYears.length > 0" 
-                            class="px-2 py-1 text-center border border-violet-300 font-semibold"
+                            class="px-2 py-1 text-center border border-violet-300 font-semibold min-w-[100px]"
                           >
                             Total
                           </th>
@@ -310,6 +323,7 @@
                         <tr class="bg-violet-400/90 text-xs">
                           <!-- Month columns for Monthly Count -->
                           <th 
+                            v-if="!isYearCollapsed(visibleYears[0])"
                             v-for="month in months" 
                             :key="'count-' + month"
                             class="px-2 py-1 text-center border border-violet-300 min-w-[80px] font-medium"
@@ -318,6 +332,7 @@
                           </th>
                           <!-- Month columns for Monthly Salary -->
                           <th 
+                            v-if="!isYearCollapsed(visibleYears[0])"
                             v-for="month in months" 
                             :key="'salary-' + month"
                             class="px-2 py-1 text-center border border-violet-300 min-w-[80px] font-medium"
@@ -325,11 +340,11 @@
                             {{ month }}
                           </th>
                           <!-- Total column -->
-                          <th 
+                          <!-- <th 
                             class="px-2 py-1 text-center border border-violet-300 min-w-[100px] font-semibold"
                           >
                             Total
-                          </th>
+                          </th> -->
                           <!-- Annual Percentage Increment year columns -->
                           <th 
                             v-for="year in visibleYears.slice(1)" 
@@ -345,7 +360,7 @@
                         <template v-for="category in payrollCategories" :key="category">
                           <tr class="bg-violet-100 border-b-2 border-violet-300">
                             <td 
-                              :colspan="4 + (visibleYears.length > 0 ? 25 : 0) + (visibleYears.length > 1 ? visibleYears.length - 1 : 0)" 
+                              :colspan="4 + (visibleYears.length > 0 ? (isYearCollapsed(visibleYears[0]) ? 1 : 25) : 0) + (visibleYears.length > 1 ? visibleYears.length - 1 : 0)" 
                               class="px-3 py-2 font-bold text-violet-800 text-left"
                             >
                               {{ category }}
@@ -367,7 +382,7 @@
                                 <span class="font-mono text-sm">{{ row.count }}</span>
                               </td>
                               <!-- Monthly Count cells -->
-                              <template v-if="visibleYears.length > 0">
+                              <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
                                 <td 
                                   v-for="month in months" 
                                   :key="'count-cell-' + month"
@@ -391,7 +406,9 @@
                                 >
                                   <span class="font-mono text-xs">{{ formatCurrency(getPayrollCellValue(row.id, 'salary', visibleYears[0], month)) }}</span>
                                 </td>
-                                <!-- Total cell -->
+                              </template>
+                              <!-- Total cell (always visible) -->
+                              <template v-if="visibleYears.length > 0">
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
                                   <span class="font-mono text-xs text-violet-700">
                                     {{ formatCurrency(calculatePayrollTotal(row.id, visibleYears[0])) }}
