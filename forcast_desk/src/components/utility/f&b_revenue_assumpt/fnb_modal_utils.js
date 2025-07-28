@@ -43,11 +43,20 @@ export function cancelDoubleOccupancySettings() {
 
 // Default Breakfast Outlet Modal Functions
 export function applyDefaultBreakfastSettings(defaultBreakfastOutlet) {
-  defaultBreakfastOutlet.value = tempDefaultBreakfastOutlet.value;
+  // Ensure defaultBreakfastOutlet is a ref object
+  if (defaultBreakfastOutlet && typeof defaultBreakfastOutlet === 'object' && 'value' in defaultBreakfastOutlet) {
+    defaultBreakfastOutlet.value = tempDefaultBreakfastOutlet.value;
+  }
   // Save to localStorage for persistence
-  localStorage.setItem('defaultBreakfastOutlet', defaultBreakfastOutlet.value);
+  localStorage.setItem('defaultBreakfastOutlet', tempDefaultBreakfastOutlet.value);
   showDefaultBreakfastModal.value = false;
   alertService.success('Default breakfast outlet updated successfully!');
+  
+  // Set flag to show success alert after reload and refresh the page
+  localStorage.setItem('showRefreshSuccess', 'true');
+  setTimeout(() => {
+    window.location.reload();
+  }, 500); // Small delay to ensure the success message is shown
 }
 
 export function cancelDefaultBreakfastSettings() {
@@ -189,7 +198,12 @@ export function setupModalWatchers(advancedModes, doubleOccupancyByYear, default
   // When opening the default breakfast outlet modal, copy the current setting
   watch(showDefaultBreakfastModal, (val) => {
     if (val) {
-      tempDefaultBreakfastOutlet.value = defaultBreakfastOutlet.value;
+      // Ensure defaultBreakfastOutlet is a ref object before accessing .value
+      if (defaultBreakfastOutlet && typeof defaultBreakfastOutlet === 'object' && 'value' in defaultBreakfastOutlet) {
+        tempDefaultBreakfastOutlet.value = defaultBreakfastOutlet.value || "";
+      } else {
+        tempDefaultBreakfastOutlet.value = "";
+      }
     }
   });
 }
