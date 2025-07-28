@@ -1046,6 +1046,15 @@ onMounted(async () => {
 watch(() => props.marketSegmentData, (newData) => {
   if (newData && Object.keys(newData).length > 0) {
     emit('market-segment-changed', newData);
+    
+    // Clear the Total Occupied Room cache when market segment data changes
+    const project = getProjectName();
+    if (calculationCache.cache[project]?.[PAGE_KEY]) {
+      calculationCache.cache[project][PAGE_KEY]['Total Occupied Room'] = {};
+      calculationCache.cache[project][PAGE_KEY]['Total Occupied Room Year'] = {};
+    }
+    
+
   }
 }, { deep: true });
 
@@ -1284,13 +1293,18 @@ const calculationCache = useCalculationCache();
 function getProjectName() {
   return selectedProject.value?.project_name || 'default';
 }
+
+
 const PAGE_KEY = 'Market Segmentation';
 
 // --- Total Occupied Room helpers ---
 function getTotalOccupiedRoom(year, label) {
   const project = getProjectName();
   const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Total Occupied Room', year, label);
-  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  if (cacheVal && cacheVal > 0) {
+    // Cache stores numeric values, so format them
+    return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
   let total = 0;
   for (const segment of marketSegments.value) {
     if (segment.segment_category === "OTHER ROOMS REVENUE") continue;
@@ -1299,14 +1313,22 @@ function getTotalOccupiedRoom(year, label) {
     );
     total += value;
   }
+  
+
+  
+  const formattedTotal = total.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  // Store the numeric value in cache, not the formatted string
   calculationCache.setValue(project, PAGE_KEY, 'Total Occupied Room', year, label, total);
-  return total;
+  return formattedTotal;
 }
 
 function getTotalOccupiedRoomYear(year) {
   const project = getProjectName();
   const cacheVal = calculationCache.getValue(project, PAGE_KEY, 'Total Occupied Room Year', year, 'ALL');
-  if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  if (cacheVal && cacheVal > 0) {
+    // Cache stores numeric values, so format them
+    return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
   let total = 0;
   for (const segment of marketSegments.value) {
     if (segment.segment_category === "OTHER ROOMS REVENUE") continue;
@@ -1315,8 +1337,13 @@ function getTotalOccupiedRoomYear(year) {
       total += Number(segmentData?.[label]?.room_nights || 0);
     }
   }
+  
+
+  
+  const formattedTotal = total.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  // Store the numeric value in cache, not the formatted string
   calculationCache.setValue(project, PAGE_KEY, 'Total Occupied Room Year', year, 'ALL', total);
-  return total;
+  return formattedTotal;
 }
 
 // --- Total Available Rooms helpers ---
@@ -1334,7 +1361,7 @@ function getTotalAvailableRooms(year, label) {
   
   // If totalRooms is 0, return 0 regardless of cache
   if (totalRooms === 0) {
-    console.log('TotalRooms is 0, returning 0');
+  
     return 0;
   }
   
@@ -1349,11 +1376,7 @@ function getTotalAvailableRooms(year, label) {
   const days = getDaysInMonth(year, label);
   const val = days * totalRooms;
   
-  console.log('Calculating new value:', {
-    days,
-    totalRooms,
-    val
-  });
+
   
   // Only cache if value is greater than 0
   if (val > 0) {
