@@ -188,7 +188,7 @@
                 </div>
                 <h3 class="text-lg text-violet-700 font-semibold mb-2">No Project Selected</h3>
                 <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
-                  Please select a project from the dashboard to view and manage banquet revenue assumptions.
+                  Please select a project from the dashboard to view and manage payroll data.
                 </p>
                 <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
                   <ArrowLeft class="w-3 h-3" />
@@ -204,11 +204,11 @@
                   <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
                     <Table class="w-3 h-3 text-white" />
                   </div>
-                  <h2 class="text-lg font-bold text-gray-800">Banquet Revenue Assumptions Overview</h2>
+                  <h2 class="text-lg font-bold text-gray-800">Payroll Data Overview</h2>
                 </div>
                 <div class="flex gap-2 mt-2">
                   <button 
-                    @click="showAddBanquetDetail = true" 
+                    @click="addPayrollRow" 
                     :disabled="!selectedProject"
                     :class="[
                       'px-3 py-1.5 text-sm font-medium shadow rounded-md transition-all',
@@ -217,7 +217,7 @@
                         : 'bg-gray-400 text-gray-200 cursor-not-allowed'
                     ]"
                   >
-                    Add Banquet Detail
+                    Add Payroll Row
                   </button>
                   <button @click="resetToDefault" class="px-3 py-1.5 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm font-medium shadow transition-all">
                     Reset to Default
@@ -233,132 +233,187 @@
                       <!-- Table Header -->
                       <thead class="bg-gradient-to-r from-violet-600 to-violet-700 text-white">
                         <tr>
-                          <th rowspan="2" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
+                          <th rowspan="3" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
                             <div class="flex items-center gap-1">
                               <FolderOpen class="w-3 h-3" />
-                              Banquet Details
+                              Department
                             </div>
                           </th>
-                          <th
-                            v-for="year in visibleYears"
-                            :key="'header-' + year"
-                            :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
-                            class="px-2 py-2 text-center border-x-2 border-white cursor-pointer select-none hover:bg-violet-700 transition-all duration-200 group text-sm"
-                            @click="toggleCollapse(year)"
-                            title="Click to collapse/expand"
-                          >
-                            <div class="flex items-center justify-center gap-1">
-                              <span class="font-semibold">{{ year }}</span>
-                              <ChevronDown 
-                                v-if="!isYearCollapsed(year)" 
-                                class="w-3 h-3 transition-transform group-hover:scale-110" 
-                              />
-                              <ChevronRight 
-                                v-else 
-                                class="w-3 h-3 transition-transform group-hover:scale-110" 
-                              />
+                          <th rowspan="3" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
+                            <div class="flex items-center gap-1">
+                              <FolderOpen class="w-3 h-3" />
+                              Designation
                             </div>
+                          </th>
+                          <th rowspan="3" class="px-3 py-2 text-center align-middle border-r border-violet-400 font-semibold text-sm">
+                            <div class="flex items-center gap-1">
+                              <FolderOpen class="w-3 h-3" />
+                              Salary
+                            </div>
+                          </th>
+                          <th rowspan="3" class="px-3 py-2 text-center align-middle border-r border-violet-400 font-semibold text-sm">
+                            <div class="flex items-center gap-1">
+                              <FolderOpen class="w-3 h-3" />
+                              Count
+                            </div>
+                          </th>
+                          <!-- First Year Column -->
+                          <th 
+                            v-if="visibleYears.length > 0" 
+                            :colspan="25" 
+                            class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm"
+                          >
+                            {{ visibleYears[0] }}
+                          </th>
+                          <!-- Annual Percentage Increment Column -->
+                          <th 
+                            v-if="visibleYears.length > 1" 
+                            :colspan="visibleYears.length - 1" 
+                            class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm"
+                          >
+                            Annual Percentage Increment
                           </th>
                         </tr>
                         <tr class="bg-violet-500/90 text-xs">
-                          <template v-for="year in visibleYears" :key="'months-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <th
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="year + '-' + label"
-                                class="px-2 py-1 text-center border border-violet-300 min-w-[100px] font-medium"
-                              >
-                                {{ label }}
-                              </th>
-                              <th class="px-2 py-1 text-center border border-violet-300 min-w-[110px] font-semibold">
-                                <div class="flex items-center justify-center gap-1">
-                                  Forecast
-                                </div>
-                              </th>
-                            </template>
-                            <template v-else>
-                              <th class="px-2 py-1 text-center border border-violet-300 min-w-[110px] font-semibold">
-                                <div class="flex items-center justify-center gap-1">
-                                  Forecast
-                                </div>
-                              </th>
-                            </template>
-                          </template>
+                          <!-- Monthly Count Sub-column -->
+                          <th 
+                            v-if="visibleYears.length > 0" 
+                            :colspan="12" 
+                            class="px-2 py-1 text-center border border-violet-300 font-medium"
+                          >
+                            Monthly Count
+                          </th>
+                          <!-- Monthly Salary Sub-column -->
+                          <th 
+                            v-if="visibleYears.length > 0" 
+                            :colspan="12" 
+                            class="px-2 py-1 text-center border border-violet-300 font-medium"
+                          >
+                            Monthly Salary
+                          </th>
+                          <!-- Total Sub-column -->
+                          <th 
+                            v-if="visibleYears.length > 0" 
+                            class="px-2 py-1 text-center border border-violet-300 font-semibold"
+                          >
+                            Total
+                          </th>
+                          <!-- Annual Percentage Increment Sub-columns -->
+                          <th 
+                            v-for="year in visibleYears.slice(1)" 
+                            :key="'annual-' + year"
+                            class="px-2 py-1 text-center border border-violet-300 font-medium"
+                          >
+                            {{ year }}
+                          </th>
+                        </tr>
+                        <tr class="bg-violet-400/90 text-xs">
+                          <!-- Month columns for Monthly Count -->
+                          <th 
+                            v-for="month in months" 
+                            :key="'count-' + month"
+                            class="px-2 py-1 text-center border border-violet-300 min-w-[80px] font-medium"
+                          >
+                            {{ month }}
+                          </th>
+                          <!-- Month columns for Monthly Salary -->
+                          <th 
+                            v-for="month in months" 
+                            :key="'salary-' + month"
+                            class="px-2 py-1 text-center border border-violet-300 min-w-[80px] font-medium"
+                          >
+                            {{ month }}
+                          </th>
+                          <!-- Total column -->
+                          <th 
+                            class="px-2 py-1 text-center border border-violet-300 min-w-[100px] font-semibold"
+                          >
+                            Total
+                          </th>
+                          <!-- Annual Percentage Increment year columns -->
+                          <th 
+                            v-for="year in visibleYears.slice(1)" 
+                            :key="'annual-year-' + year"
+                            class="px-2 py-1 text-center border border-violet-300 min-w-[100px] font-medium"
+                          >
+                            {{ year }}
+                          </th>
                         </tr>
                       </thead>
                       <tbody class="text-gray-700 bg-white text-sm">
-                        <template v-for="(field, idx) in computedBanquetFields" :key="field.code">
-                          <tr
-                            :class="[
-                              'transition-all duration-200 border-b border-gray-100',
-                              (['gross','net_amount'].includes(field.code)) ? 'bg-violet-700 text-white font-bold' : 'even:bg-gray-50 hover:bg-violet-50',
-                            ]"
-                          >
-                            <td class="px-3 py-2 font-medium border-r border-violet-200 flex items-center justify-between" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : 'text-gray-600'">
-                              <span>{{ field.label }}</span>
-                              <div class="flex items-center gap-1">
-                                <span v-if="['food','liquor','soft_drinks','hall_space_charges','gross','net_amount','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)" class="px-2 py-0.5 rounded bg-violet-100 text-violet-700 text-[10px] font-semibold border border-violet-200 align-middle whitespace-nowrap">
-                                  Auto
-                                </span>
-                                <span v-if="customBanquetFields.some(f => f.code === field.code)" class="px-2 py-0.5 rounded bg-green-100 text-green-700 text-[10px] font-semibold border border-green-200 align-middle whitespace-nowrap">
-                                  Custom
-                                </span>
-                                <button v-if="!['gross','net_amount','advance_bal','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)" @click="deleteBanquetDetail(field)" class="ml-2 text-red-500 hover:text-red-700" title="Delete">
-                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                                </button>
-                              </div>
+                        <!-- Category Dividers -->
+                        <template v-for="category in payrollCategories" :key="category">
+                          <tr class="bg-violet-100 border-b-2 border-violet-300">
+                            <td 
+                              :colspan="4 + (visibleYears.length > 0 ? 25 : 0) + (visibleYears.length > 1 ? visibleYears.length - 1 : 0)" 
+                              class="px-3 py-2 font-bold text-violet-800 text-left"
+                            >
+                              {{ category }}
                             </td>
-                            <template v-for="year in visibleYears" :key="'row-' + year + '-' + field.code">
-                              <template v-if="!isYearCollapsed(year)">
-                                <td
-                                  v-if="['food','liquor','soft_drinks','hall_space_charges','gross','net_amount','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)"
-                                  v-for="label in getColumnLabelsForYearLocal(year)"
-                                  :key="'cell-' + year + '-' + label"
-                                  class="px-2 py-1 text-right border border-violet-200 bg-gray-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200 font-semibold select-none"
-                                  :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : ''"
-                                >
-                                  <span class="font-mono text-xs">
-                                    {{ formatBanquetValue(field.code, getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}
-                                  </span>
-                                </td>
-                                <td
-                                  v-else
-                                  v-for="label in getColumnLabelsForYearLocal(year)"
-                                  :key="'cell-editable-' + year + '-' + label"
+                          </tr>
+                          <!-- Payroll rows for this category -->
+                          <template v-for="row in getPayrollRowsForCategory(category)" :key="row.id">
+                            <tr class="border-b border-gray-200 hover:bg-violet-50 transition-all duration-200">
+                              <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
+                                {{ row.department }}
+                              </td>
+                              <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
+                                {{ row.designation }}
+                              </td>
+                              <td class="px-3 py-2 text-right border-r border-violet-200">
+                                <span class="font-mono text-sm">{{ formatCurrency(row.salary) }}</span>
+                              </td>
+                              <td class="px-3 py-2 text-right border-r border-violet-200">
+                                <span class="font-mono text-sm">{{ row.count }}</span>
+                              </td>
+                              <!-- Monthly Count cells -->
+                              <template v-if="visibleYears.length > 0">
+                                <td 
+                                  v-for="month in months" 
+                                  :key="'count-cell-' + month"
                                   contenteditable="true"
                                   class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
-                                  :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : ''"
-                                  @input="handleBanquetCellInput({ year, label, expense: field.code, event: $event, banquetData })"
-                                  @focus="handleBanquetCellFocus({ year, label, expense: field.code, event: $event })"
-                                  @blur="handleCellEditWrapper({ year, label, expense: field.code, event: $event })"
+                                  @input="handlePayrollCellInput(row.id, 'count', visibleYears[0], month, $event)"
+                                  @focus="handlePayrollCellFocus(row.id, 'count', visibleYears[0], month, $event)"
+                                  @blur="handlePayrollCellEdit(row.id, 'count', visibleYears[0], month, $event)"
                                 >
-                                  <span class="font-mono text-xs">{{ formatBanquetValue(field.code, getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
+                                  <span class="font-mono text-xs">{{ getPayrollCellValue(row.id, 'count', visibleYears[0], month) }}</span>
                                 </td>
-                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
-                                  <span class="font-mono text-xs text-violet-700" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
-                                    {{ formatBanquetValue(field.code, calculateTotalForBanquet(banquetData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
+                                <!-- Monthly Salary cells -->
+                                <td 
+                                  v-for="month in months" 
+                                  :key="'salary-cell-' + month"
+                                  contenteditable="true"
+                                  class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
+                                  @input="handlePayrollCellInput(row.id, 'salary', visibleYears[0], month, $event)"
+                                  @focus="handlePayrollCellFocus(row.id, 'salary', visibleYears[0], month, $event)"
+                                  @blur="handlePayrollCellEdit(row.id, 'salary', visibleYears[0], month, $event)"
+                                >
+                                  <span class="font-mono text-xs">{{ formatCurrency(getPayrollCellValue(row.id, 'salary', visibleYears[0], month)) }}</span>
+                                </td>
+                                <!-- Total cell -->
+                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
+                                  <span class="font-mono text-xs text-violet-700">
+                                    {{ formatCurrency(calculatePayrollTotal(row.id, visibleYears[0])) }}
                                   </span>
                                 </td>
                               </template>
-                              <template v-else>
-                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
-                                  <span class="font-mono text-xs text-violet-700" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
-                                    {{ formatBanquetValue(field.code, calculateTotalForBanquet(banquetData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
-                                  </span>
+                              <!-- Annual Percentage Increment cells -->
+                              <template v-if="visibleYears.length > 1">
+                                <td 
+                                  v-for="year in visibleYears.slice(1)" 
+                                  :key="'annual-cell-' + year"
+                                  contenteditable="true"
+                                  class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
+                                  @input="handlePayrollCellInput(row.id, 'annual', year, '', $event)"
+                                  @focus="handlePayrollCellFocus(row.id, 'annual', year, '', $event)"
+                                  @blur="handlePayrollCellEdit(row.id, 'annual', year, '', $event)"
+                                >
+                                  <span class="font-mono text-xs">{{ getPayrollCellValue(row.id, 'annual', year, '') }}%</span>
                                 </td>
                               </template>
-                            </template>
-                          </tr>
-                          <tr v-if="field.code === 'avg_hall_space_charges_check'">
-                            <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1), 0)" class="h-10 font-bold text-xl text-violet-700 bg-violet-200 border px-2 py-2 m-0">
-                              Details
-                            </td>
-                          </tr>
-                          <tr v-if="field.code === 'net_amount'">
-                            <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1), 0)" class="h-10 font-bold text-xl text-violet-700 bg-violet-200 border px-2 py-2 m-0">
-                              Statistics 
-                            </td>
-                          </tr>
+                            </tr>
+                          </template>
                         </template>
                       </tbody>
                     </table>
@@ -396,7 +451,7 @@
                 </div>
                 <h3 class="text-lg text-violet-700 font-semibold mb-2">No Project Selected</h3>
                 <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
-                  Please select a project from the dashboard to view and manage banquet revenue assumptions.
+                  Please select a project from the dashboard to view and manage payroll data.
                 </p>
                 <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
                   <ArrowLeft class="w-3 h-3" />
@@ -474,48 +529,7 @@
       </div>
     </transition>
   
-    <!-- Add Banquet Detail Modal -->
-    <transition name="fade">
-      <div v-if="showAddBanquetDetail" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-md p-0 overflow-hidden">
-          <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
-            <Settings class="w-6 h-6 text-white" />
-            <h2 class="text-xl font-bold text-white">Add Banquet Detail</h2>
-          </div>
-          <div class="p-8 pt-6">
-            <!-- No Project Selected Message -->
-            <div v-if="!selectedProject" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
-              <AlertTriangle class="w-6 h-6 text-yellow-600" />
-              <span class="text-yellow-800 font-medium">Please select a project first to add banquet details.</span>
-            </div>
-            
-            <div v-else class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Banquet Detail</label>
-              <input v-model="newBanquetDetail" class="w-full px-3 py-2 border rounded focus:ring-violet-500" placeholder="e.g. Decoration" />
-            </div>
-          </div>
-          <div class="flex justify-end gap-3 px-8 py-4 bg-gray-50 border-t border-violet-100">
-            <button @click="closeAddBanquetDetail" class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2">
-              <X class="w-4 h-4" />
-              Cancel
-            </button>
-            <button 
-              @click="addBanquetDetail" 
-              :disabled="!selectedProject || !newBanquetDetail"
-              :class="[
-                'px-4 py-2 rounded-md flex items-center gap-2',
-                selectedProject && newBanquetDetail
-                  ? 'bg-violet-600 text-white hover:bg-violet-700'
-                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-              ]"
-            >
-              <Check class="w-4 h-4" />
-              Add
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
+
   </template>
   
   
@@ -546,28 +560,8 @@
   } from 'lucide-vue-next';
   import alertService from "@/components/ui/ui_utility/alertService.js";
   import { 
-    BANQUET_FIELDS, 
-    formatBanquetValue, 
-    calcFood, 
-    calcLiquor, 
-    calcSoftDrinks, 
-    calcHallSpaceCharges, 
-    calcGross,
-    calcNetAmount,
-    calcAmountPerEvent,
-    calcAmountPerPax,
-    calcAvgPaxPerEvent,
     getVisibleYears,
-    getColumnLabels,
-    getAmountForBanquet,
-    calculateTotalForBanquet,
-    handleBanquetCellEdit,
-    handleBanquetCellInput,
-    handleBanquetCellFocus,
-    loadBanquetRevenueData, 
-    saveBanquetRevenueChanges,
-    convertBanquetServerDataToFrontend, 
-    toNum
+    getColumnLabels
   } from "@/components/utility/banquet_revenue_assumpt/index.js";
   import {
     toggleCollapse,
@@ -583,20 +577,32 @@
   // Reactive state
   const years = ref([]);
   const displayMode = ref("monthly");
-  const banquetData = reactive({});
+  const payrollData = reactive({});
   const showAdvanced = ref(false);
   const tempAdvancedModes = ref({});
   const isSaved = ref(false);
-  const originalBanquetData = ref({});
-  const changedCells = ref([]); // {year, label, expense, newValue}
+  const originalPayrollData = ref({});
+  const changedCells = ref([]); // {rowId, fieldType, year, month, newValue}
   const isSaving = ref(false);
   const saveError = ref("");
   const sidebarCollapsed = ref(false);
   const isComponentReady = ref(false); // Add a flag to track if component is ready
-  const showAddBanquetDetail = ref(false);
-  const newBanquetDetail = ref("");
-  const customBanquetFields = ref([]); // Will hold fetched banquet details
-  const removedDefaultFields = ref([]); // Track removed default fields
+  const showAddPayrollRow = ref(false);
+  const newPayrollRow = ref({});
+  const payrollRows = ref([]); // Will hold payroll rows
+  const removedDefaultRows = ref([]); // Track removed default rows
+
+  // Payroll specific data
+  const months = ref(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
+  const payrollCategories = ref([
+    'ROOMS',
+    'FOOD & BEVERAGE',
+    'OTHER OPERATING DEPARTMENTS',
+    'ADMINISTRATION & GENERAL',
+    'INFORMATION & TELECOMMUNICATION SYSTEMS',
+    'SALES & MARKETING',
+    'POM'
+  ]);
 
   // ! Cache for calculations
   const calculationCache = useCalculationCache();  
@@ -632,9 +638,9 @@
     });
   });
 
-  // Watch for changes in banquetData to ensure calculated fields update
-  watch(banquetData, (newData, oldData) => {
-    // console.log('banquetData changed:', newData);
+  // Watch for changes in payrollData to ensure calculated fields update
+  watch(payrollData, (newData, oldData) => {
+    // console.log('payrollData changed:', newData);
   }, { deep: true, immediate: true });
   
   
@@ -654,53 +660,44 @@
     showAdvanced.value = false;
   }
 
-  function openAddBanquetDetail() {
-    newBanquetDetail.value = "";
-    showAddBanquetDetail.value = true;
-  }
-  function closeAddBanquetDetail() {
-    showAddBanquetDetail.value = false;
-  }
-  async function addBanquetDetail() {
-    if (!newBanquetDetail.value) return;
+  function addPayrollRow() {
     if (!selectedProject.value) {
       alertService.error("Please select a project first");
       return;
     }
-    try {
-      const res = await fetch("/api/resource/Banquet Details", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          banquet_detail: newBanquetDetail.value,
-          project: selectedProject.value.project_name
-        })
-      });
-      if (!res.ok) throw new Error("Failed to create");
-      newBanquetDetail.value = "";
-      showAddBanquetDetail.value = false;
-      await fetchBanquetDetails();
-      alertService.success("Banquet detail added");
-    } catch (err) {
-      alertService.error("Failed to add banquet detail");
-    }
+    const newRow = {
+      id: Date.now(),
+      department: '',
+      designation: '',
+      salary: 0,
+      count: 0,
+      category: 'ROOMS'
+    };
+    payrollRows.value.push(newRow);
+    alertService.success("Payroll row added");
   }
 
-  async function fetchBanquetDetails() {
-    // Frappe REST API: /api/resource/Banquet Details
-    try {
-      if (!selectedProject.value) {
-        customBanquetFields.value = [];
-        return;
-      }
+//   async function fetchPayrollData() {
+//     try {
+//       if (!selectedProject.value) {
+//         payrollRows.value = [];
+//         return;
+//       }
       
-      const res = await fetch(`/api/resource/Banquet Details?fields=["name","banquet_detail"]&filters=[["project","=","${selectedProject.value.project_name}"]]&limit_page_length=1000`);
-      const data = await res.json();
-      customBanquetFields.value = (data.data || []).map(d => ({ code: d.name, label: d.banquet_detail }));
-    } catch (err) {
-      alertService.error("Failed to load banquet details");
-    }
-  }
+//       const res = await fetch(`/api/resource/Payroll Data?fields=["name","department","designation","salary","count","category"]&filters=[["project","=","${selectedProject.value.project_name}"]]&limit_page_length=1000`);
+//       const data = await res.json();
+//       payrollRows.value = (data.data || []).map(d => ({
+//         id: d.name,
+//         department: d.department,
+//         designation: d.designation,
+//         salary: Number(d.salary) || 0,
+//         count: Number(d.count) || 0,
+//         category: d.category || 'ROOMS'
+//       }));
+//     } catch (err) {
+//       alertService.error("Failed to load payroll data");
+//     }
+//   }
   
   // On mount, initialize years
   onMounted(async () => {
@@ -708,17 +705,14 @@
       await initializeProjectService();
       await new Promise(resolve => setTimeout(resolve, 100));
       years.value = await loadYearOptions();
-      if (selectedProject.value) {
-        const loaded = await loadBanquetRevenueData(selectedProject.value.project_name) || {};
-        const converted = convertBanquetServerDataToFrontend(loaded);
-        Object.assign(banquetData, converted);
-      } else {
-        banquetData.value = { status: 'no_project_selected', message: 'No project selected' };
-      }
-      originalBanquetData.value = cloneDeep(banquetData);
+    //   if (selectedProject.value) {
+    //     await fetchPayrollData();
+    //   } else {
+    //     payrollRows.value = [];
+    //   }
+      originalPayrollData.value = cloneDeep(payrollRows.value);
       isSaved.value = true;
       isComponentReady.value = true;
-      await fetchBanquetDetails();
       
       // Check if we should show refresh success alert
       if (localStorage.getItem('showRefreshSuccess') === 'true') {
@@ -740,38 +734,30 @@
     
     if (newProject) {
       try {
-        // console.log('Reloading Banquet revenue data for new project:', newProject.project_name);
+        // console.log('Reloading Payroll data for new project:', newProject.project_name);
         
-        // Reload Banquet revenue data for the new project
-        const loaded = await loadBanquetRevenueData(newProject.project_name) || {};
-        const converted = convertBanquetServerDataToFrontend(loaded);
-        Object.assign(banquetData, converted);
-        originalBanquetData.value = cloneDeep(banquetData);
+        // Reload Payroll data for the new project
+        // await fetchPayrollData();
+        originalPayrollData.value = cloneDeep(payrollRows.value);
         
         // Reset any unsaved changes
         changedCells.value = [];
         isSaved.value = true;
         saveError.value = "";
         
-        // Reload banquet details for the new project
-        await fetchBanquetDetails();
-        
-        // console.log('Banquet revenue data reloaded successfully for project:', newProject.project_name);
+        // console.log('Payroll data reloaded successfully for project:', newProject.project_name);
         alertService.success(`Switched to project: ${newProject.project_name}`);
       } catch (error) {
-        console.error('Error reloading Banquet revenue data for new project:', error);
+        console.error('Error reloading Payroll data for new project:', error);
         alertService.error("Failed to load project data. Please try again.");
       }
     } else {
       // Clear data when no project is selected
-      banquetData.value = { status: 'no_project_selected', message: 'No project selected' };
-      originalBanquetData.value = cloneDeep(banquetData);
+      payrollRows.value = [];
+      originalPayrollData.value = cloneDeep(payrollRows.value);
       changedCells.value = [];
       isSaved.value = true;
       saveError.value = "";
-      
-      // Clear banquet details when no project is selected
-      customBanquetFields.value = [];
     }
   }, { deep: true });
   
@@ -780,19 +766,34 @@
     isSaved.value = false;
   }
   
-  function handleCellEditWrapper({ year, label, expense, event }) {
-  handleBanquetCellEdit({
-    year,
-    label,
-    expense,
-    event,
-    originalBanquetData,
-    changedCells,
-    banquetData,
-    isSaved,
-    isComponentReady
-  });
-}
+  function handlePayrollCellEdit(rowId, fieldType, year, month, event) {
+    const newValue = parseFloat(event.target.textContent) || 0;
+    const existingChangeIndex = changedCells.value.findIndex(
+      cell => cell.rowId === rowId && cell.fieldType === fieldType && cell.year === year && cell.month === month
+    );
+    
+    if (existingChangeIndex >= 0) {
+      changedCells.value[existingChangeIndex].newValue = newValue;
+    } else {
+      changedCells.value.push({
+        rowId,
+        fieldType,
+        year,
+        month,
+        newValue
+      });
+    }
+    
+    isSaved.value = false;
+  }
+
+  function handlePayrollCellInput(rowId, fieldType, year, month, event) {
+    // Handle input changes
+  }
+
+  function handlePayrollCellFocus(rowId, fieldType, year, month, event) {
+    // Handle focus events
+  }
   
   
   // Wrapper function for saveChanges
@@ -800,23 +801,18 @@
     try {
       isSaving.value = true;
       saveError.value = "";
-      // Prepare changes for API
-      const changes = changedCells.value.map(cell => ({
-        year: cell.year,
-        month: cell.label,
-        banquet_detail: cell.expense,
-        amount: cell.newValue
-      }));
-      if (changes.length === 0) {
+      
+      if (changedCells.value.length === 0) {
         isSaving.value = false;
         return;
       }
-      const result = await saveBanquetRevenueChanges(changes, selectedProject.value?.project_name);
+      
+      // Save payroll data changes
+      const result = await savePayrollChanges(changedCells.value, selectedProject.value?.project_name);
+      
       // Reload from backend after save
-      const loaded = await loadBanquetRevenueData(selectedProject.value?.project_name) || {};
-      const converted = convertBanquetServerDataToFrontend(loaded);
-      Object.assign(banquetData, converted);
-      originalBanquetData.value = cloneDeep(banquetData);
+    //   await fetchPayrollData();
+      originalPayrollData.value = cloneDeep(payrollRows.value);
       changedCells.value = [];
       isSaved.value = true;
       alertService.success("Changes saved successfully");
@@ -828,6 +824,12 @@
       isSaving.value = false;
     }
   };
+
+  async function savePayrollChanges(changes, projectName) {
+    // Implementation for saving payroll changes
+    console.log('Saving payroll changes:', changes);
+    return true;
+  }
   
   
   // ! Unsaved Changes Warning Modal
@@ -867,133 +869,52 @@
     window.location.reload();
   }
 
-  function getBanquetRowData(banquetData, year, label) {
-    // Returns an object with all field values for the given year/label (month/quarter)
-    const row = {};
-    for (const f of computedBanquetFields.value) {
-      const entries = (banquetData?.[year]?.[label]) || [];
-      const found = entries.find(e => e.expense === f.code);
-      row[f.code] = found ? Number(found.amount) || 0 : 0;
+  function getPayrollCellValue(rowId, fieldType, year, month) {
+    // Get the value for a specific payroll cell
+    const row = payrollRows.value.find(r => r.id === rowId);
+    if (!row) return 0;
+    
+    if (fieldType === 'count' || fieldType === 'salary') {
+      // For monthly data, return the value from payrollData
+      return payrollData[year]?.[month]?.[rowId]?.[fieldType] || 0;
+    } else if (fieldType === 'annual') {
+      // For annual percentage increment
+      return payrollData[year]?.[rowId]?.[fieldType] || 0;
     }
-    // Debug logging for pax and avg_food_check
-    if (toNum(row.pax) > 0 || toNum(row.avg_food_check) > 0) {
-      // console.log(`getBanquetRowData for ${year}/${label}:`, {
-      //   pax: toNum(row.pax),
-      //   avg_food_check: toNum(row.avg_food_check),
-      //   calculated_food: toNum(row.pax) * toNum(row.avg_food_check),
-      //   all_data: row
-      // });
-    }
-    return row;
+    return 0;
   }
 
-  // Computed helper for calculated values
-  function getCalculatedValue(fieldCode, year, label) {
-    const row = getBanquetRowData(banquetData, year, label);
-    const allFieldCodes = computedBanquetFields.value.map(f => f.code);
-    const context = {
-      projectName: selectedProject.value?.project_name,
-      calculationCache,
-      year,
-      label
-    };
-    switch (fieldCode) {
-      case 'food':
-        return calcFood(row, context);
-      case 'liquor':
-        return calcLiquor(row, context);
-      case 'soft_drinks':
-        return calcSoftDrinks(row, context);
-      case 'hall_space_charges':
-        return calcHallSpaceCharges(row, context);
-      case 'gross':
-        return calcGross(row, allFieldCodes, context);
-      case 'net_amount':
-        return calcNetAmount(row, allFieldCodes, context);
-      case 'amount_per_event':
-        return calcAmountPerEvent(row, context);
-      case 'amount_per_pax':
-        return calcAmountPerPax(row, context);
-      case 'avg_pax_per_event':
-        return calcAvgPaxPerEvent(row, context);
-      default:
-        return 0;
-    }
+  function calculatePayrollTotal(rowId, year) {
+    // Calculate total for a payroll row in a specific year
+    const row = payrollRows.value.find(r => r.id === rowId);
+    if (!row) return 0;
+    
+    let total = 0;
+    months.value.forEach(month => {
+      const count = getPayrollCellValue(rowId, 'count', year, month);
+      const salary = getPayrollCellValue(rowId, 'salary', year, month);
+      total += count * salary;
+    });
+    return total;
   }
 
-  function getBanquetCellValue(banquetData, fieldCode, year, label, displayMode = 'monthly') {
-    const row = getBanquetRowData(banquetData, year, label);
-    const allFieldCodes = computedBanquetFields.value.map(f => f.code);
-    const context = {
-      projectName: selectedProject.value?.project_name,
-      calculationCache,
-      year,
-      label
-    };
-    let value;
-    switch (fieldCode) {
-      case 'food':
-        value = calcFood(row); break;
-      case 'liquor':
-        value = calcLiquor(row); break;
-      case 'soft_drinks':
-        value = calcSoftDrinks(row); break;
-      case 'hall_space_charges':
-        value = calcHallSpaceCharges(row); break;
-      case 'gross':
-        value = calcGross(row, allFieldCodes);
-        if (context.projectName && context.calculationCache && context.year && context.label) {
-          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Gross', context.year, context.label, value);
-        }
-        break;
-      case 'net_amount':
-        value = calcNetAmount(row, allFieldCodes); break;
-      case 'amount_per_event':
-        value = calcAmountPerEvent(row); break;
-      case 'amount_per_pax':
-        value = calcAmountPerPax(row); break;
-      case 'avg_pax_per_event':
-        value = calcAvgPaxPerEvent(row); break;
-      default:
-        value = getAmountForBanquet(banquetData, fieldCode, year, label, displayMode);
-    }
-    return value;
+  function getPayrollRowsForCategory(category) {
+    return payrollRows.value.filter(row => row.category === category);
   }
 
-  async function deleteBanquetDetail(field) {
-    // If it's a custom field (from backend)
-    if (customBanquetFields.value.some(f => f.code === field.code)) {
-      if (!confirm('Are you sure you want to delete this custom banquet detail? This action cannot be undone.')) return;
-      try {
-        await fetch(`/api/resource/Banquet Details/${field.code}`, { method: 'DELETE' });
-        await fetchBanquetDetails();
-        alertService.success('Banquet detail deleted');
-      } catch (err) {
-        alertService.error('Failed to delete banquet detail');
-      }
-    } else {
-      // Default field: just filter it out for this session
-      removedDefaultFields.value.push(field.code);
-    }
+  function formatCurrency(value) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value);
   }
 
   function resetToDefault() {
-    removedDefaultFields.value = [];
-    alertService.success('Default fields have been restored.');
+    payrollRows.value = [];
+    alertService.success('Payroll data has been reset to default.');
   }
-
-  const computedBanquetFields = computed(() => {
-    // Insert fetched banquet details above 'others', and filter out removed fields
-    const idx = BANQUET_FIELDS.findIndex(f => f.code === 'others');
-    const filteredDefaults = BANQUET_FIELDS.filter(f => !removedDefaultFields.value.includes(f.code));
-    const filteredCustoms = customBanquetFields.value.filter(f => !removedDefaultFields.value.includes(f.code));
-    if (idx === -1) return [...filteredDefaults, ...filteredCustoms];
-    return [
-      ...filteredDefaults.slice(0, idx),
-      ...filteredCustoms,
-      ...filteredDefaults.slice(idx)
-    ];
-  });
   </script>
   
   
