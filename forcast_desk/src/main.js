@@ -16,6 +16,9 @@ import {
 import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 
+// Import project-specific localStorage utilities for debugging
+import { debugLocalStorage, migrateToProjectSpecificKeys, getAllProjectKeys } from '@/components/utility/projectLocalStorage.js'
+
 
 let app = createApp(App)
 
@@ -27,6 +30,11 @@ app.use(resourcesPlugin)
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 app.use(pinia);
+
+// Add global debug functions for testing project-specific localStorage
+window.debugProjectLocalStorage = debugLocalStorage
+window.migrateToProjectSpecificKeys = migrateToProjectSpecificKeys
+window.getAllProjectKeys = getAllProjectKeys
 
 
 app.component('Button', Button)

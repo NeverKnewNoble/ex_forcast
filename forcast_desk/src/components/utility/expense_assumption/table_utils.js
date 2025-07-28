@@ -175,7 +175,14 @@ export function extractFieldOptionsFromData(expenseData) {
 // Get amount for a specific expense, year, and month/quarter
 export function getAmountForExpense(expenseData, expense, year, label, displayMode = "monthly") {
   if (displayMode === "quarterly" && quarterToMonths[label]) {
-    // Sum the three months in the quarter
+    // First, check if the quarterly label itself exists in the data (e.g., "Jan-Mar")
+    const quarterlyEntries = expenseData?.[year]?.[label] || [];
+    const quarterlyFound = quarterlyEntries.find(e => e.expense === expense);
+    if (quarterlyFound) {
+      return parseFloat(quarterlyFound.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    
+    // If quarterly label doesn't exist, try to sum the three months in the quarter
     let total = 0;
     for (const month of quarterToMonths[label]) {
       const entries = expenseData?.[year]?.[month] || [];
@@ -192,8 +199,8 @@ export function getAmountForExpense(expenseData, expense, year, label, displayMo
 }
 
 // Calculate total for a specific expense and year
-export function calculateTotalForExpense(expenseData, expense, year, displayMode, getColumnLabels) {
-  const months = getColumnLabels(displayMode)
+export function calculateTotalForExpense(expenseData, expense, year, displayMode, getColumnLabelsForYear) {
+  const months = getColumnLabelsForYear(year)
   let total = 0
   for (const month of months) {
     const rawAmount = getAmountForExpense(expenseData, expense, year, month, displayMode)

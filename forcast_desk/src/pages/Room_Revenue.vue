@@ -1476,6 +1476,9 @@ import { loadYearOptions, months } from "@/components/utility/expense_assumption
 // Import project service
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
 
+// Import project-specific localStorage utilities
+import { getProjectKey, clearOldLocalStorageKeys } from '@/components/utility/projectLocalStorage.js';
+
 import { cloneDeep } from 'lodash-es';
 
 // Import new room package utility
@@ -1529,9 +1532,7 @@ const originalMarketSegmentData = ref({});
 const marketSegmentationTablesRef = ref(null);
 
 // Add reactive state for total number of rooms
-const totalNumberOfRooms = ref(
-  localStorage.getItem('totalNumberOfRooms') ? parseInt(localStorage.getItem('totalNumberOfRooms')) : 0
-);
+const totalNumberOfRooms = ref(0);
 
 // Add reactive state for VAT tax
 const showVATModal = ref(false);
@@ -1587,9 +1588,23 @@ watch(marketSegmentation, (newValue) => {
   localStorage.setItem('marketSegmentation', newValue);
 });
 
+// Function to load project-specific settings
+function loadProjectSettings() {
+  const project = selectedProject.value;
+  if (!project || !project.project_name) {
+    // Clear settings if no project selected
+    totalNumberOfRooms.value = 0;
+    return;
+  }
+
+  // Load project-specific settings
+  const storedTotalRooms = localStorage.getItem(getProjectKey('totalNumberOfRooms'));
+  totalNumberOfRooms.value = storedTotalRooms ? parseInt(storedTotalRooms) : 0;
+}
+
 // Watch for total number of rooms changes
 watch(totalNumberOfRooms, (newValue) => {
-  localStorage.setItem('totalNumberOfRooms', newValue.toString());
+  localStorage.setItem(getProjectKey('totalNumberOfRooms'), newValue.toString());
 });
 
 // When opening the modal, copy the current settings
@@ -1613,6 +1628,13 @@ onMounted(async () => {
   try {
     await initializeProjectService();
     await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Clear old localStorage keys for migration
+    clearOldLocalStorageKeys();
+    
+    // Load project-specific settings
+    loadProjectSettings();
+    
     years.value = await loadYearOptions();
     roomData.value = await getRoomRevenueList();    
     originalRoomData.value = cloneDeep(roomData.value); 
@@ -1649,6 +1671,8 @@ watch(selectedProject, (newProject, oldProject) => {
   // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
   
   if (newProject) {
+    // Load project-specific settings
+    loadProjectSettings();
     // Call async function to reload data
     reloadDataForProject(newProject);
   } else {
@@ -1657,6 +1681,8 @@ watch(selectedProject, (newProject, oldProject) => {
     marketSegmentData.value = { status: 'no_project_selected', message: 'No project selected' };
     originalRoomData.value = cloneDeep(roomData.value);
     originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
+    // Clear project-specific settings
+    totalNumberOfRooms.value = 0;
   }
 }, { deep: true });
 
@@ -1692,6 +1718,9 @@ async function reloadDataForProject(newProject) {
     ROOM_TYPES.forEach(roomType => {
       roomTypeCounts.value[roomType] = getNumberOfRoomsForType(roomPackages.value, roomType, roomData.value);
     });
+    
+    // Load project-specific settings after data reload
+    loadProjectSettings();
     
     // console.log('Data reloaded successfully for project:', newProject.project_name);
   } catch (error) {

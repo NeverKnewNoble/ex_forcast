@@ -135,14 +135,14 @@
                         </td>
                         <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
                           <span class="font-mono text-xs text-violet-700">
-                            {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'room_nights') }}
+                            {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'room_nights', getColumnLabelsForYearLocal) }}
                           </span>
                         </td>
                       </template>
                       <template v-else>
                         <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
                           <span class="font-mono text-xs text-violet-700">
-                            {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'room_nights') }}
+                            {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'room_nights', getColumnLabelsForYearLocal) }}
                           </span>
                         </td>
                       </template>
@@ -333,14 +333,14 @@
                         </td>
                         <td class="px-2 py-2 text-right border border-green-200 font-semibold bg-green-50">
                           <span class="font-mono text-xs text-green-700">
-                            {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'room_rate') }}
+                            {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'room_rate', getColumnLabelsForYearLocal) }}
                           </span>
                         </td>
                       </template>
                       <template v-else>
                         <td class="px-2 py-2 text-right border border-green-200 font-semibold bg-green-50">
                           <span class="font-mono text-xs text-green-700">
-                            {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'room_rate') }}
+                            {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'room_rate', getColumnLabelsForYearLocal) }}
                           </span>
                         </td>
                       </template>
@@ -442,14 +442,14 @@
                         </td>
                         <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50">
                           <span class="font-mono text-xs text-blue-700">
-                            {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'average_daily_rate') }}
+                            {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'average_daily_rate', getColumnLabelsForYearLocal) }}
                           </span>
                         </td>
                       </template>
                       <template v-else>
                         <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50">
                           <span class="font-mono text-xs text-blue-700">
-                            {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'average_daily_rate') }}
+                            {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'average_daily_rate', getColumnLabelsForYearLocal) }}
                           </span>
                         </td>
                       </template>
@@ -1319,7 +1319,7 @@ function getTotalOccupiedRoom(year, label) {
   const formattedTotal = total.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   // Store the numeric value in cache, not the formatted string
   calculationCache.setValue(project, PAGE_KEY, 'Total Occupied Room', year, label, total);
-  return formattedTotal;
+  return formattedTotal;    
 }
 
 function getTotalOccupiedRoomYear(year) {

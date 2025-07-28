@@ -1,18 +1,36 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
+import { selectedProject } from '@/components/utility/dashboard/projectService.js';
+import { getProjectKey, clearOldLocalStorageKeys, getAllProjectKeys } from '@/components/utility/projectLocalStorage.js';
 
 export const useYearSettingsStore = defineStore('yearSettings', () => {
-  // State
-  const fromYear = ref(localStorage.getItem('expenseEstimateFromYear') || '');
-  const toYear = ref(localStorage.getItem('expenseEstimateToYear') || '');
-  const advancedModes = ref(
-    JSON.parse(localStorage.getItem('expenseEstimateAdvancedModes') || '{}')
-  );
+
+  // State - initialize with empty values, will be updated when project changes
+  const fromYear = ref('');
+  const toYear = ref('');
+  const advancedModes = ref({});
+
+  // Function to load settings for current project
+  function loadProjectSettings() {
+    const project = selectedProject.value;
+    if (!project || !project.project_name) {
+      // Clear settings if no project selected
+      fromYear.value = '';
+      toYear.value = '';
+      advancedModes.value = {};
+      return;
+    }
+
+    // Load project-specific settings
+    fromYear.value = localStorage.getItem(getProjectKey('expenseEstimateFromYear')) || '';
+    toYear.value = localStorage.getItem(getProjectKey('expenseEstimateToYear')) || '';
+    advancedModes.value = JSON.parse(localStorage.getItem(getProjectKey('expenseEstimateAdvancedModes')) || '{}');
+  }
 
   // Actions
   function setFromYear(year) {
     fromYear.value = year;
-    localStorage.setItem('expenseEstimateFromYear', year);
+    localStorage.setItem(getProjectKey('expenseEstimateFromYear'), year);
     
     // If toYear is now invalid (before fromYear), clear it
     if (toYear.value && parseInt(toYear.value) < parseInt(year)) {
@@ -22,26 +40,28 @@ export const useYearSettingsStore = defineStore('yearSettings', () => {
 
   function setToYear(year) {
     toYear.value = year;
-    localStorage.setItem('expenseEstimateToYear', year);
+    localStorage.setItem(getProjectKey('expenseEstimateToYear'), year);
   }
 
   function setAdvancedMode(year, mode) {
     advancedModes.value[year] = mode;
-    localStorage.setItem('expenseEstimateAdvancedModes', JSON.stringify(advancedModes.value));
+    localStorage.setItem(getProjectKey('expenseEstimateAdvancedModes'), JSON.stringify(advancedModes.value));
   }
 
   function setAdvancedModes(modes) {
     advancedModes.value = { ...modes };
-    localStorage.setItem('expenseEstimateAdvancedModes', JSON.stringify(advancedModes.value));
+    localStorage.setItem(getProjectKey('expenseEstimateAdvancedModes'), JSON.stringify(advancedModes.value));
   }
 
   function clearYearSettings() {
     fromYear.value = '';
     toYear.value = '';
     advancedModes.value = {};
-    localStorage.removeItem('expenseEstimateFromYear');
-    localStorage.removeItem('expenseEstimateToYear');
-    localStorage.removeItem('expenseEstimateAdvancedModes');
+    
+    // Clear project-specific localStorage items
+    localStorage.removeItem(getProjectKey('expenseEstimateFromYear'));
+    localStorage.removeItem(getProjectKey('expenseEstimateToYear'));
+    localStorage.removeItem(getProjectKey('expenseEstimateAdvancedModes'));
   }
 
   // Function to get filtered years for "To Year" dropdown
@@ -57,10 +77,18 @@ export const useYearSettingsStore = defineStore('yearSettings', () => {
     });
   }
 
+  // Watch for project changes and reload settings
+  watch(selectedProject, () => {
+    loadProjectSettings();
+  }, { deep: true });
+
+  // Initialize settings for current project
+  loadProjectSettings();
+
   // Watchers to keep localStorage in sync if values change elsewhere
-  watch(fromYear, (val) => localStorage.setItem('expenseEstimateFromYear', val));
-  watch(toYear, (val) => localStorage.setItem('expenseEstimateToYear', val));
-  watch(advancedModes, (val) => localStorage.setItem('expenseEstimateAdvancedModes', JSON.stringify(val)), { deep: true });
+  watch(fromYear, (val) => localStorage.setItem(getProjectKey('expenseEstimateFromYear'), val));
+  watch(toYear, (val) => localStorage.setItem(getProjectKey('expenseEstimateToYear'), val));
+  watch(advancedModes, (val) => localStorage.setItem(getProjectKey('expenseEstimateAdvancedModes'), JSON.stringify(val)), { deep: true });
 
   return {
     fromYear,
@@ -72,5 +100,8 @@ export const useYearSettingsStore = defineStore('yearSettings', () => {
     setAdvancedModes,
     clearYearSettings,
     getFilteredToYears,
+    loadProjectSettings,
+    clearOldLocalStorageKeys,
+    getAllProjectKeys,
   };
 }); 
