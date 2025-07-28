@@ -96,7 +96,18 @@ export function getDaysInMonth(year, month) {
 // ! Get data for a specific room type, year, and month/quarter
 export function getRoomData(roomRevenueData, roomType, year, label, displayMode = "monthly") {
   if (displayMode === "quarterly" && quarterToMonths[label]) {
-    // For quarterly, we need to aggregate data from the three months
+    // First, check if the quarterly label itself exists in the data (e.g., "Jan-Mar")
+    const quarterlyEntries = roomRevenueData?.[year]?.[label] || []
+    const quarterlyFound = quarterlyEntries.find(e => e.room_package === roomType)
+    if (quarterlyFound) {
+      return {
+        number_of_rooms: parseFloat(quarterlyFound.number_of_rooms) || 0,
+        rate: parseFloat(quarterlyFound.rate) || 0,
+        occupied_beds: parseFloat(quarterlyFound.occupied_beds) || 0
+      }
+    }
+    
+    // If quarterly label doesn't exist, try to aggregate data from the three months
     const quarterData = {
       number_of_rooms: 0,
       rate: 0,

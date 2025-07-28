@@ -37,7 +37,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Month",
-   "options": "\nJan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec"
+   "options": "\nJan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec\nJan-Mar\nApr-Jun\nJul-Sep\nOct-Dec"
   },
   {
    "fieldname": "section_break_kykx",
@@ -58,7 +58,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-18 19:17:43.447615",
+ "modified": "2025-07-28 11:13:06.540309",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "FandB Revenue Assumptions",
@@ -78,6 +78,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

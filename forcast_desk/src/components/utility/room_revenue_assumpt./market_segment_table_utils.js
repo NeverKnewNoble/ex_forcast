@@ -112,16 +112,27 @@ export function getMarketSegmentValue(data, segment, year, label, field) {
 }
 
 // Calculate market segment total for a year
-export function calculateMarketSegmentTotal(data, segment, year, field) {
+export function calculateMarketSegmentTotal(data, segment, year, field, getColumnLabelsForYear = null) {
   let total = 0;
-  const months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-  ];
   
-  for (const month of months) {
-    const value = data?.[year]?.[segment.market_segment]?.[month]?.[field] ?? 0;
-    total += parseFloat(value) || 0;
+  // If getColumnLabelsForYear is provided, use it to get the appropriate labels
+  if (getColumnLabelsForYear) {
+    const labels = getColumnLabelsForYear(year);
+    for (const label of labels) {
+      const value = data?.[year]?.[segment.market_segment]?.[label]?.[field] ?? 0;
+      total += parseFloat(value) || 0;
+    }
+  } else {
+    // Fallback to individual months for backward compatibility
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    
+    for (const month of months) {
+      const value = data?.[year]?.[segment.market_segment]?.[month]?.[field] ?? 0;
+      total += parseFloat(value) || 0;
+    }
   }
   
   return total.toLocaleString('en-US', {

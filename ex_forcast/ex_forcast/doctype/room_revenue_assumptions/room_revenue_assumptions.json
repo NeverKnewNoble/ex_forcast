@@ -33,7 +33,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Month",
-   "options": "\nJan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec"
+   "options": "\nJan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec\nJan-Mar\nApr-Jun\nJul-Sep\nOct-Dec"
   },
   {
    "fieldname": "section_break_saeg",
@@ -69,7 +69,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-18 19:14:57.860387",
+ "modified": "2025-07-28 11:12:45.416020",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Room Revenue Assumptions",
@@ -89,6 +89,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

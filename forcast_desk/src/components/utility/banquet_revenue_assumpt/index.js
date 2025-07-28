@@ -60,7 +60,14 @@ export function getColumnLabels(displayMode) {
 //! Utility: Get amount for a specific field, year, and label (month/quarter)
 export function getAmountForBanquet(banquetData, code, year, label, displayMode = 'monthly') {
   if (displayMode === 'quarterly' && ['Jan-Mar','Apr-Jun','Jul-Sep','Oct-Dec'].includes(label)) {
-    // Sum the three months in the quarter
+    // First, check if the quarterly label itself exists in the data (e.g., "Jan-Mar")
+    const quarterlyEntries = banquetData?.[year]?.[label] || [];
+    const quarterlyFound = quarterlyEntries.find(e => e.expense === code);
+    if (quarterlyFound) {
+      return Number(quarterlyFound.amount) || 0;
+    }
+    
+    // If quarterly label doesn't exist, try to sum the three months in the quarter
     const quarterToMonths = {
       'Jan-Mar': ['Jan', 'Feb', 'Mar'],
       'Apr-Jun': ['Apr', 'May', 'Jun'],
@@ -82,8 +89,8 @@ export function getAmountForBanquet(banquetData, code, year, label, displayMode 
 }
 
 //! Utility: Calculate total for a field in a year
-export function calculateTotalForBanquet(banquetData, code, year, displayMode, getColumnLabels) {
-  const months = getColumnLabels(displayMode);
+export function calculateTotalForBanquet(banquetData, code, year, displayMode, getColumnLabelsForYear) {
+  const months = getColumnLabelsForYear(year);
   let total = 0.00;
   for (const month of months) {
     total += getAmountForBanquet(banquetData, code, year, month, displayMode);
