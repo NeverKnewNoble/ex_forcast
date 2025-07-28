@@ -48,6 +48,11 @@ const routes = [
     path: '/ood_data_input',
     component: () => import('@/pages/OOD_Data.vue'),
   },
+  {
+    name: 'Payroll_Data',
+    path: '/payroll_data',
+    component: () => import('@/pages/payroll/Payroll_Data.vue'),
+  },
 ]
 
 let router = createRouter({
