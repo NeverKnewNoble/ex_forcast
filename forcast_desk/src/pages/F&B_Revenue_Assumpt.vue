@@ -1127,6 +1127,8 @@
   import { getDaysInMonth } from "@/components/utility/room_revenue_assumpt./room_revenue_utils.js";
   // Import project service
   import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
+  // Import project-specific localStorage utilities
+  import { getProjectKey } from '@/components/utility/projectLocalStorage.js';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
   
 
@@ -1199,7 +1201,7 @@
   
   // Check if total rooms is synced with Room Revenue page
   const isSyncedWithRoomRevenue = computed(() => {
-    const roomRevenueTotal = localStorage.getItem('totalNumberOfRooms');
+    const roomRevenueTotal = localStorage.getItem(getProjectKey('totalNumberOfRooms'));
     return roomRevenueTotal && parseInt(roomRevenueTotal) > 0 && 
            parseInt(roomRevenueTotal) === totalRooms.value;
   });
@@ -1292,7 +1294,7 @@
   
   // Check for Room Revenue total changes periodically
   setInterval(() => {
-    const roomRevenueTotal = localStorage.getItem('totalNumberOfRooms');
+    const roomRevenueTotal = localStorage.getItem(getProjectKey('totalNumberOfRooms'));
     if (roomRevenueTotal && parseInt(roomRevenueTotal) > 0) {
       const newTotal = parseInt(roomRevenueTotal);
       // Only update if the values are different and we're currently synced
@@ -1498,7 +1500,7 @@
   
   // Sync with Room Revenue total
   function syncWithRoomRevenue() {
-    const roomRevenueTotal = localStorage.getItem('totalNumberOfRooms');
+    const roomRevenueTotal = localStorage.getItem(getProjectKey('totalNumberOfRooms'));
     if (roomRevenueTotal && parseInt(roomRevenueTotal) > 0) {
       const newTotal = parseInt(roomRevenueTotal);
       totalRooms.value = newTotal;
