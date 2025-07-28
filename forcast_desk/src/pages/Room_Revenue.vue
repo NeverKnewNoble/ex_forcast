@@ -1417,6 +1417,7 @@
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
+import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
 import { CircleAlert, BadgeCent, Coffee, Table, AlertTriangle, BedDouble, Plus, PlusCircle, DollarSign, Calculator, Settings, Calendar, X, Check, Save, Loader2, RefreshCw, ChevronDown, ChevronRight, ArrowLeft, ChevronLeft, FolderOpen, Database, AlertCircle, ArrowRight, Percent } from 'lucide-vue-next';
 import alertService from "@/components/ui/ui_utility/alertService.js";
@@ -2064,6 +2065,14 @@ const sidebarCollapsed = ref(false);
 function handleMarketSegmentDataChanged(newData) {
   marketSegmentData.value = newData;
   isSaved.value = false;
+  
+  // Clear calculation cache when market segment data changes
+  const calculationCache = useCalculationCache();
+  const project = selectedProject.value?.project_name || 'default';
+  // Clear the cache for market segmentation calculations
+  if (calculationCache.cache[project] && calculationCache.cache[project]['Market Segmentation']) {
+    calculationCache.cache[project]['Market Segmentation'] = {};
+  }
 }
 
 // Handle market segment data loaded
