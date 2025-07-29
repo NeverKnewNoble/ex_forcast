@@ -208,7 +208,7 @@
                 </div>
                 <div class="flex gap-2 mt-2">
                   <button 
-                    @click="addPayrollRow" 
+                    @click="openAddPayrollModal"
                     :disabled="!selectedProject"
                     :class="[
                       'px-3 py-1.5 text-sm font-medium shadow rounded-md transition-all',
@@ -221,6 +221,9 @@
                   </button>
                   <button @click="resetToDefault" class="px-3 py-1.5 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm font-medium shadow transition-all">
                     Reset to Default
+                  </button>
+                  <button @click="addSamplePayrollData" class="px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm font-medium shadow transition-all">
+                    Load Sample Data
                   </button>
                 </div>
               </div>
@@ -236,7 +239,7 @@
                           <th rowspan="3" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
                             <div class="flex items-center gap-1">
                               <FolderOpen class="w-3 h-3" />
-                              Department
+                              Position
                             </div>
                           </th>
                           <th rowspan="3" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
@@ -312,7 +315,8 @@
                             Total
                           </th>
                           <!-- Annual Percentage Increment Sub-columns -->
-                          <th 
+                          <th
+                            :rowspan="2"
                             v-for="year in visibleYears.slice(1)" 
                             :key="'annual-' + year"
                             class="px-2 py-1 text-center border border-violet-300 font-medium"
@@ -339,25 +343,12 @@
                           >
                             {{ month }}
                           </th>
-                          <!-- Total column -->
-                          <!-- <th 
-                            class="px-2 py-1 text-center border border-violet-300 min-w-[100px] font-semibold"
-                          >
-                            Total
-                          </th> -->
-                          <!-- Annual Percentage Increment year columns -->
-                          <th 
-                            v-for="year in visibleYears.slice(1)" 
-                            :key="'annual-year-' + year"
-                            class="px-2 py-1 text-center border border-violet-300 min-w-[100px] font-medium"
-                          >
-                            {{ year }}
-                          </th>
+
                         </tr>
                       </thead>
                       <tbody class="text-gray-700 bg-white text-sm">
-                        <!-- Category Dividers -->
-                        <template v-for="category in payrollCategories" :key="category">
+                        <!-- Group by actual categories from data -->
+                        <template v-for="category in getUniqueCategories()" :key="category">
                           <tr class="bg-violet-100 border-b-2 border-violet-300">
                             <td 
                               :colspan="4 + (visibleYears.length > 0 ? (isYearCollapsed(visibleYears[0]) ? 1 : 25) : 0) + (visibleYears.length > 1 ? visibleYears.length - 1 : 0)" 
@@ -366,70 +357,82 @@
                               {{ category }}
                             </td>
                           </tr>
-                          <!-- Payroll rows for this category -->
-                          <template v-for="row in getPayrollRowsForCategory(category)" :key="row.id">
-                            <tr class="border-b border-gray-200 hover:bg-violet-50 transition-all duration-200">
-                              <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
-                                {{ row.department }}
+                          <!-- Group by Department Location within each category -->
+                          <template v-for="location in getUniqueLocationsForCategory(category)" :key="'location-' + location">
+                            <!-- Department Location Subdivider -->
+                            <tr class="bg-violet-50 border-b border-violet-200">
+                              <td 
+                                :colspan="4 + (visibleYears.length > 0 ? (isYearCollapsed(visibleYears[0]) ? 1 : 25) : 0) + (visibleYears.length > 1 ? visibleYears.length - 1 : 0)" 
+                                class="px-3 py-1.5 font-semibold text-violet-700 text-left text-sm"
+                              >
+                                {{ location }}
                               </td>
-                              <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
-                                {{ row.designation }}
-                              </td>
-                              <td class="px-3 py-2 text-right border-r border-violet-200">
-                                <span class="font-mono text-sm">{{ formatCurrency(row.salary) }}</span>
-                              </td>
-                              <td class="px-3 py-2 text-right border-r border-violet-200">
-                                <span class="font-mono text-sm">{{ row.count }}</span>
-                              </td>
-                              <!-- Monthly Count cells -->
-                              <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
-                                <td 
-                                  v-for="month in months" 
-                                  :key="'count-cell-' + month"
-                                  contenteditable="true"
-                                  class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
-                                  @input="handlePayrollCellInput(row.id, 'count', visibleYears[0], month, $event)"
-                                  @focus="handlePayrollCellFocus(row.id, 'count', visibleYears[0], month, $event)"
-                                  @blur="handlePayrollCellEdit(row.id, 'count', visibleYears[0], month, $event)"
-                                >
-                                  <span class="font-mono text-xs">{{ getPayrollCellValue(row.id, 'count', visibleYears[0], month) }}</span>
-                                </td>
-                                <!-- Monthly Salary cells -->
-                                <td 
-                                  v-for="month in months" 
-                                  :key="'salary-cell-' + month"
-                                  contenteditable="true"
-                                  class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
-                                  @input="handlePayrollCellInput(row.id, 'salary', visibleYears[0], month, $event)"
-                                  @focus="handlePayrollCellFocus(row.id, 'salary', visibleYears[0], month, $event)"
-                                  @blur="handlePayrollCellEdit(row.id, 'salary', visibleYears[0], month, $event)"
-                                >
-                                  <span class="font-mono text-xs">{{ formatCurrency(getPayrollCellValue(row.id, 'salary', visibleYears[0], month)) }}</span>
-                                </td>
-                              </template>
-                              <!-- Total cell (always visible) -->
-                              <template v-if="visibleYears.length > 0">
-                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
-                                  <span class="font-mono text-xs text-violet-700">
-                                    {{ formatCurrency(calculatePayrollTotal(row.id, visibleYears[0])) }}
-                                  </span>
-                                </td>
-                              </template>
-                              <!-- Annual Percentage Increment cells -->
-                              <template v-if="visibleYears.length > 1">
-                                <td 
-                                  v-for="year in visibleYears.slice(1)" 
-                                  :key="'annual-cell-' + year"
-                                  contenteditable="true"
-                                  class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
-                                  @input="handlePayrollCellInput(row.id, 'annual', year, '', $event)"
-                                  @focus="handlePayrollCellFocus(row.id, 'annual', year, '', $event)"
-                                  @blur="handlePayrollCellEdit(row.id, 'annual', year, '', $event)"
-                                >
-                                  <span class="font-mono text-xs">{{ getPayrollCellValue(row.id, 'annual', year, '') }}%</span>
-                                </td>
-                              </template>
                             </tr>
+                            <!-- Payroll rows for this location -->
+                            <template v-for="row in getPayrollRowsForLocation(category, location)" :key="row.id">
+                              <tr class="border-b border-gray-200 hover:bg-violet-50 transition-all duration-200">
+                                <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
+                                  {{ row.position }}
+                                </td>
+                                <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
+                                  {{ row.designation }}
+                                </td>
+                                <td class="px-3 py-2 text-right border-r border-violet-200">
+                                  <span class="font-mono text-sm">{{ formatCurrency(row.salary) }}</span>
+                                </td>
+                                <td class="px-3 py-2 text-right border-r border-violet-200">
+                                  <span class="font-mono text-sm">{{ row.count }}</span>
+                                </td>
+                                <!-- Monthly Count cells -->
+                                <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                                  <td 
+                                    v-for="month in months" 
+                                    :key="'count-cell-' + month"
+                                    contenteditable="true"
+                                    class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
+                                    @input="handlePayrollCellInput(row.id, 'count', visibleYears[0], month, $event)"
+                                    @focus="handlePayrollCellFocus(row.id, 'count', visibleYears[0], month, $event)"
+                                    @blur="handlePayrollCellEdit(row.id, 'count', visibleYears[0], month, $event)"
+                                  >
+                                    <span class="font-mono text-xs">{{ getPayrollCellValue(row.id, 'count', visibleYears[0], month) }}</span>
+                                  </td>
+                                  <!-- Monthly Salary cells -->
+                                  <td 
+                                    v-for="month in months" 
+                                    :key="'salary-cell-' + month"
+                                    contenteditable="true"
+                                    class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
+                                    @input="handlePayrollCellInput(row.id, 'salary', visibleYears[0], month, $event)"
+                                    @focus="handlePayrollCellFocus(row.id, 'salary', visibleYears[0], month, $event)"
+                                    @blur="handlePayrollCellEdit(row.id, 'salary', visibleYears[0], month, $event)"
+                                  >
+                                    <span class="font-mono text-xs">{{ getPayrollCellValue(row.id, 'salary', visibleYears[0], month) }}</span>
+                                  </td>
+                                </template>
+                                <!-- Total cell (always visible) -->
+                                <template v-if="visibleYears.length > 0">
+                                  <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
+                                    <span class="font-mono text-xs text-violet-700">
+                                      {{ formatCurrency(calculatePayrollTotal(row.id, visibleYears[0])) }}
+                                    </span>
+                                  </td>
+                                </template>
+                                <!-- Annual Percentage Increment cells -->
+                                <template v-if="visibleYears.length > 1">
+                                  <td 
+                                    v-for="year in visibleYears.slice(1)" 
+                                    :key="'annual-cell-' + year"
+                                    contenteditable="true"
+                                    class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
+                                    @input="handlePayrollCellInput(row.id, 'annual', year, '', $event)"
+                                    @focus="handlePayrollCellFocus(row.id, 'annual', year, '', $event)"
+                                    @blur="handlePayrollCellEdit(row.id, 'annual', year, '', $event)"
+                                  >
+                                    <span class="font-mono text-xs">{{ getPayrollCellValue(row.id, 'annual', year, '') }}</span>
+                                  </td>
+                                </template>
+                              </tr>
+                            </template>
                           </template>
                         </template>
                       </tbody>
@@ -545,6 +548,174 @@
         </div>
       </div>
     </transition>
+
+    <!-- Add Payroll Data Modal -->
+    <transition name="fade">
+      <div
+        v-if="showAddPayrollModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      >
+        <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-2xl p-0 overflow-hidden">
+          <!-- Modal Header -->
+          <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
+            <HandCoins class="w-6 h-6 text-white" />
+            <h2 class="text-xl font-bold text-white">Add Payroll Data</h2>
+          </div>
+  
+          <!-- Modal Body -->
+          <div class="p-8 pt-6">
+            <form @submit.prevent="submitPayrollData" class="space-y-6">
+              <!-- Department Selection -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                  Department *
+                </label>
+                <select 
+                  v-model="newPayrollData.department"
+                  required
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                >
+                  <option value="">Select Department</option>
+                  <option v-for="category in payrollCategories" :key="category" :value="category">
+                    {{ category }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Department Location -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  Department Location *
+                </label>
+                <input 
+                  v-model="newPayrollData.departmentLocation"
+                  type="text"
+                  required
+                  placeholder="Enter department location"
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                />
+              </div>
+
+              <!-- Position -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  Position *
+                </label>
+                <select 
+                  v-model="newPayrollData.position"
+                  required
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                >
+                  <option value="">Select Position</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Non-manager">Non-manager</option>
+                </select>
+              </div>
+
+              <!-- Designation -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.861-8.96-2.545M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
+                  </svg>
+                  Designation *
+                </label>
+                <input 
+                  v-model="newPayrollData.designation"
+                  type="text"
+                  required
+                  placeholder="Enter designation"
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                />
+              </div>
+
+              <!-- Salary and Count Row -->
+              <div class="grid grid-cols-2 gap-4">
+                <!-- Salary -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                    </svg>
+                    Salary *
+                  </label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
+                    <input 
+                      v-model.number="newPayrollData.salary"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      required
+                      placeholder="0.00"
+                      class="w-full pl-8 pr-4 py-3 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                    />
+                  </div>
+                </div>
+
+                <!-- Count -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    Count *
+                  </label>
+                  <input 
+                    v-model.number="newPayrollData.count"
+                    type="number"
+                    min="0"
+                    required
+                    placeholder="0"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                  />
+                </div>
+              </div>
+
+              <!-- Error Message -->
+              <div v-if="payrollModalError" class="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
+                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <span class="text-red-800 text-sm">{{ payrollModalError }}</span>
+              </div>
+            </form>
+          </div>
+  
+          <!-- Modal Footer -->
+          <div class="flex justify-end gap-3 px-8 py-4 bg-gray-50 border-t border-violet-100">
+            <button
+              @click="closeAddPayrollModal"
+              class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2"
+            >
+              <X class="w-4 h-4" />
+              Cancel
+            </button>
+            <button
+              @click="submitPayrollData"
+              :disabled="isSubmittingPayroll"
+              class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              <svg v-if="isSubmittingPayroll" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              <Check v-else class="w-4 h-4" />
+              {{ isSubmittingPayroll ? 'Adding...' : 'Add Payroll Data' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
   
 
   </template>
@@ -608,6 +779,17 @@
   const newPayrollRow = ref({});
   const payrollRows = ref([]); // Will hold payroll rows
   const removedDefaultRows = ref([]); // Track removed default rows
+  const showAddPayrollModal = ref(false); // New state for add payroll modal
+  const newPayrollData = reactive({ // New reactive object for add payroll data
+    department: '',
+    departmentLocation: '',
+    position: '',
+    designation: '',
+    salary: 0.00,
+    count: 0,
+  });
+  const isSubmittingPayroll = ref(false); // New state for submitting payroll data
+  const payrollModalError = ref(''); // New state for error message in add payroll modal
 
   // Payroll specific data
   const months = ref(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
@@ -677,44 +859,56 @@
     showAdvanced.value = false;
   }
 
-  function addPayrollRow() {
+  function openAddPayrollModal() {
+    showAddPayrollModal.value = true;
+    newPayrollData.department = '';
+    newPayrollData.departmentLocation = '';
+    newPayrollData.position = '';
+    newPayrollData.designation = '';
+    newPayrollData.salary = 0.00;
+    newPayrollData.count = 0;
+    payrollModalError.value = '';
+  }
+
+  function closeAddPayrollModal() {
+    showAddPayrollModal.value = false;
+  }
+
+  async function submitPayrollData() {
     if (!selectedProject.value) {
       alertService.error("Please select a project first");
       return;
     }
-    const newRow = {
-      id: Date.now(),
-      department: '',
-      designation: '',
-      salary: 0,
-      count: 0,
-      category: 'ROOMS'
-    };
-    payrollRows.value.push(newRow);
-    alertService.success("Payroll row added");
-  }
+    if (!newPayrollData.department || !newPayrollData.departmentLocation || !newPayrollData.position || !newPayrollData.designation || newPayrollData.salary === 0 || newPayrollData.count === 0) {
+      payrollModalError.value = "All fields are required and salary and count must be greater than 0.";
+      return;
+    }
 
-//   async function fetchPayrollData() {
-//     try {
-//       if (!selectedProject.value) {
-//         payrollRows.value = [];
-//         return;
-//       }
-      
-//       const res = await fetch(`/api/resource/Payroll Data?fields=["name","department","designation","salary","count","category"]&filters=[["project","=","${selectedProject.value.project_name}"]]&limit_page_length=1000`);
-//       const data = await res.json();
-//       payrollRows.value = (data.data || []).map(d => ({
-//         id: d.name,
-//         department: d.department,
-//         designation: d.designation,
-//         salary: Number(d.salary) || 0,
-//         count: Number(d.count) || 0,
-//         category: d.category || 'ROOMS'
-//       }));
-//     } catch (err) {
-//       alertService.error("Failed to load payroll data");
-//     }
-//   }
+    isSubmittingPayroll.value = true;
+    payrollModalError.value = '';
+
+    try {
+      const newRow = {
+        id: Date.now(),
+        department: newPayrollData.department,
+        departmentLocation: newPayrollData.departmentLocation,
+        position: newPayrollData.position,
+        designation: newPayrollData.designation,
+        salary: newPayrollData.salary,
+        count: newPayrollData.count,
+        category: newPayrollData.department // Assuming category is based on department
+      };
+      payrollRows.value.push(newRow);
+      alertService.success("Payroll data added successfully!");
+      showAddPayrollModal.value = false;
+    } catch (error) {
+      payrollModalError.value = "Failed to add payroll data. Please try again.";
+      console.error("Error adding payroll data:", error);
+    } finally {
+      isSubmittingPayroll.value = false;
+    }
+  }
+  
   
   // On mount, initialize years
   onMounted(async () => {
@@ -722,11 +916,7 @@
       await initializeProjectService();
       await new Promise(resolve => setTimeout(resolve, 100));
       years.value = await loadYearOptions();
-    //   if (selectedProject.value) {
-    //     await fetchPayrollData();
-    //   } else {
-    //     payrollRows.value = [];
-    //   }
+
       originalPayrollData.value = cloneDeep(payrollRows.value);
       isSaved.value = true;
       isComponentReady.value = true;
@@ -741,9 +931,6 @@
     }
   });
   
-  // Watchers to persist year selection (now handled by Pinia store)
-  // watch(fromYear, ...)
-  // watch(toYear, ...)
   
   // Watch for project changes and reload data
   watch(selectedProject, async (newProject, oldProject) => {
@@ -915,8 +1102,44 @@
     return total;
   }
 
+  function getUniqueCategories() {
+    const uniqueCategories = new Set();
+    payrollRows.value.forEach(row => {
+      uniqueCategories.add(row.category);
+    });
+    return Array.from(uniqueCategories);
+  }
+
   function getPayrollRowsForCategory(category) {
     return payrollRows.value.filter(row => row.category === category);
+  }
+
+  function getUniqueLocationsForCategory(category) {
+    const uniqueLocations = new Set();
+    payrollRows.value
+      .filter(row => row.category === category)
+      .forEach(row => {
+        uniqueLocations.add(row.departmentLocation);
+      });
+    return Array.from(uniqueLocations);
+  }
+
+  function getUniquePositionsForLocation(category, location) {
+    const uniquePositions = new Set();
+    payrollRows.value
+      .filter(row => row.category === category && row.departmentLocation === location)
+      .forEach(row => {
+        uniquePositions.add(row.position);
+      });
+    return Array.from(uniquePositions);
+  }
+
+  function getPayrollRowsForPosition(category, location, position) {
+    return payrollRows.value.filter(row => row.category === category && row.departmentLocation === location && row.position === position);
+  }
+
+  function getPayrollRowsForLocation(category, location) {
+    return payrollRows.value.filter(row => row.category === category && row.departmentLocation === location);
   }
 
   function formatCurrency(value) {
@@ -931,6 +1154,92 @@
   function resetToDefault() {
     payrollRows.value = [];
     alertService.success('Payroll data has been reset to default.');
+  }
+
+  function addSamplePayrollData() {
+    payrollRows.value = [
+      {
+        id: 1,
+        department: 'ROOMS',
+        departmentLocation: 'Front Desk',
+        position: 'Manager',
+        designation: 'Front Office Manager',
+        salary: 5000.00,
+        count: 1,
+        category: 'ROOMS'
+      },
+      {
+        id: 2,
+        department: 'ROOMS',
+        departmentLocation: 'Front Desk',
+        position: 'Non-manager',
+        designation: 'Receptionist',
+        salary: 2500.00,
+        count: 3,
+        category: 'ROOMS'
+      },
+      {
+        id: 3,
+        department: 'ROOMS',
+        departmentLocation: 'Housekeeping',
+        position: 'Manager',
+        designation: 'Housekeeping Manager',
+        salary: 4000.00,
+        count: 1,
+        category: 'ROOMS'
+      },
+      {
+        id: 4,
+        department: 'ROOMS',
+        departmentLocation: 'Housekeeping',
+        position: 'Non-manager',
+        designation: 'Room Attendant',
+        salary: 2200.00,
+        count: 8,
+        category: 'ROOMS'
+      },
+      {
+        id: 5,
+        department: 'FOOD & BEVERAGE',
+        departmentLocation: 'Restaurant',
+        position: 'Manager',
+        designation: 'Restaurant Manager',
+        salary: 4500.00,
+        count: 1,
+        category: 'FOOD & BEVERAGE'
+      },
+      {
+        id: 6,
+        department: 'FOOD & BEVERAGE',
+        departmentLocation: 'Restaurant',
+        position: 'Non-manager',
+        designation: 'Waiter',
+        salary: 2000.00,
+        count: 6,
+        category: 'FOOD & BEVERAGE'
+      },
+      {
+        id: 7,
+        department: 'FOOD & BEVERAGE',
+        departmentLocation: 'Kitchen',
+        position: 'Manager',
+        designation: 'Executive Chef',
+        salary: 5500.00,
+        count: 1,
+        category: 'FOOD & BEVERAGE'
+      },
+      {
+        id: 8,
+        department: 'FOOD & BEVERAGE',
+        departmentLocation: 'Kitchen',
+        position: 'Non-manager',
+        designation: 'Sous Chef',
+        salary: 3500.00,
+        count: 2,
+        category: 'FOOD & BEVERAGE'
+      }
+    ];
+    alertService.success('Sample payroll data loaded successfully.');
   }
   </script>
   
