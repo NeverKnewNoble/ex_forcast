@@ -228,218 +228,409 @@
                 </div>
               </div>
   
+              <!-- No Payroll Data State -->
+              <template v-if="!hasPayrollData">
+                <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
+                  <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
+                    <HandCoins class="w-8 h-8 text-violet-500" />
+                  </div>
+                  <h3 class="text-lg text-violet-700 font-semibold mb-2">No Payroll Data</h3>
+                  <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
+                    There is no payroll data for the selected year range. Add some payroll data to get started.
+                  </p>
+                  <div class="mt-6 flex gap-3">
+                    <button 
+                      @click="openAddPayrollModal"
+                      :disabled="!selectedProject"
+                      :class="[
+                        'px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2',
+                        selectedProject 
+                          ? 'bg-violet-600 text-white hover:bg-violet-700 shadow-md' 
+                          : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                      ]"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                      </svg>
+                      Add Payroll Data
+                    </button>
+                    <button 
+                      @click="addSamplePayrollData"
+                      class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium transition-all flex items-center gap-2 shadow-md"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                      </svg>
+                      Load Sample Data
+                    </button>
+                  </div>
+                </div>
+              </template>
+  
               <!-- Modern Table Container -->
-              <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                  <div class="min-w-full w-max">
-                    <table class="w-full">
-                      <!-- Table Header -->
-                      <thead class="bg-gradient-to-r from-violet-600 to-violet-700 text-white">
-                        <tr>
-                          <th rowspan="3" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
-                            <div class="flex items-center gap-1">
-                              <FolderOpen class="w-3 h-3" />
-                              Position
-                            </div>
-                          </th>
-                          <th rowspan="3" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
-                            <div class="flex items-center gap-1">
-                              <FolderOpen class="w-3 h-3" />
-                              Designation
-                            </div>
-                          </th>
-                          <th rowspan="3" class="px-3 py-2 text-center align-middle border-r border-violet-400 font-semibold text-sm">
-                            <div class="flex items-center gap-1">
-                              <FolderOpen class="w-3 h-3" />
-                              Salary
-                            </div>
-                          </th>
-                          <th rowspan="3" class="px-3 py-2 text-center align-middle border-r border-violet-400 font-semibold text-sm">
-                            <div class="flex items-center gap-1">
-                              <FolderOpen class="w-3 h-3" />
-                              Count
-                            </div>
-                          </th>
-                          <!-- First Year Column -->
-                          <th 
-                            v-if="visibleYears.length > 0" 
-                            :colspan="isYearCollapsed(visibleYears[0]) ? 1 : 25" 
-                            class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm cursor-pointer select-none hover:bg-violet-700 transition-all duration-200 group"
-                            @click="toggleCollapse(visibleYears[0])"
-                            title="Click to collapse/expand"
-                          >
-                            <div class="flex items-center justify-center gap-1">
-                              <span class="font-semibold">{{ visibleYears[0] }}</span>
-                              <ChevronDown 
-                                v-if="!isYearCollapsed(visibleYears[0])" 
-                                class="w-3 h-3 transition-transform group-hover:scale-110" 
-                              />
-                              <ChevronRight 
-                                v-else 
-                                class="w-3 h-3 transition-transform group-hover:scale-110" 
-                              />
-                            </div>
-                          </th>
-                          <!-- Annual Percentage Increment Column -->
-                          <th 
-                            v-if="visibleYears.length > 1" 
-                            :colspan="visibleYears.length - 1" 
-                            class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm"
-                          >
-                            Annual Percentage Increment
-                          </th>
-                        </tr>
-                        <tr class="bg-violet-500/90 text-xs">
-                          <!-- Monthly Count Sub-column -->
-                          <th 
-                            v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])" 
-                            :colspan="12" 
-                            class="px-2 py-1 text-center border border-violet-300 font-medium"
-                          >
-                            Monthly Count
-                          </th>
-                          <!-- Monthly Salary Sub-column -->
-                          <th 
-                            v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])" 
-                            :colspan="12" 
-                            class="px-2 py-1 text-center border border-violet-300 font-medium"
-                          >
-                            Monthly Salary
-                          </th>
-                          <!-- Total Sub-column -->
-                          <th
-                            :rowspan="2"
-                            v-if="visibleYears.length > 0" 
-                            class="px-2 py-1 text-center border border-violet-300 font-semibold min-w-[100px]"
-                          >
-                            Total
-                          </th>
-                          <!-- Annual Percentage Increment Sub-columns -->
-                          <th
-                            :rowspan="2"
-                            v-for="year in visibleYears.slice(1)" 
-                            :key="'annual-' + year"
-                            class="px-2 py-1 text-center border border-violet-300 font-medium"
-                          >
-                            {{ year }}
-                          </th>
-                        </tr>
-                        <tr class="bg-violet-400/90 text-xs">
-                          <!-- Month columns for Monthly Count -->
-                          <th 
-                            v-if="!isYearCollapsed(visibleYears[0])"
-                            v-for="month in months" 
-                            :key="'count-' + month"
-                            class="px-2 py-1 text-center border border-violet-300 min-w-[80px] font-medium"
-                          >
-                            {{ month }}
-                          </th>
-                          <!-- Month columns for Monthly Salary -->
-                          <th 
-                            v-if="!isYearCollapsed(visibleYears[0])"
-                            v-for="month in months" 
-                            :key="'salary-' + month"
-                            class="px-2 py-1 text-center border border-violet-300 min-w-[80px] font-medium"
-                          >
-                            {{ month }}
-                          </th>
-
-                        </tr>
-                      </thead>
-                      <tbody class="text-gray-700 bg-white text-sm">
-                        <!-- Group by actual categories from data -->
-                        <template v-for="category in getUniqueCategories()" :key="category">
-                          <tr class="bg-violet-100 border-b-2 border-violet-300">
-                            <td 
-                              :colspan="4 + (visibleYears.length > 0 ? (isYearCollapsed(visibleYears[0]) ? 1 : 25) : 0) + (visibleYears.length > 1 ? visibleYears.length - 1 : 0)" 
-                              class="px-3 py-2 font-bold text-violet-800 text-left"
+              <template v-else>
+                <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden">
+                  <div class="overflow-x-auto">
+                    <div class="min-w-full w-max">
+                      <table class="w-full">
+                        <!-- Table Header -->
+                        <thead class="bg-gradient-to-r from-violet-600 to-violet-700 text-white">
+                          <tr>
+                            <th rowspan="3" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
+                              <div class="flex items-center gap-1">
+                                <FolderOpen class="w-3 h-3" />
+                                Position
+                              </div>
+                            </th>
+                            <th rowspan="3" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
+                              <div class="flex items-center gap-1">
+                                <FolderOpen class="w-3 h-3" />
+                                Designation
+                              </div>
+                            </th>
+                            <th rowspan="3" class="px-3 py-2 text-center align-middle border-r border-violet-400 font-semibold text-sm">
+                              <div class="flex items-center gap-1">
+                                <FolderOpen class="w-3 h-3" />
+                                Salary
+                              </div>
+                            </th>
+                            <th rowspan="3" class="px-3 py-2 text-center align-middle border-r border-violet-400 font-semibold text-sm">
+                              <div class="flex items-center gap-1">
+                                <FolderOpen class="w-3 h-3" />
+                                Count
+                              </div>
+                            </th>
+                            <!-- First Year Column -->
+                            <th 
+                              v-if="visibleYears.length > 0" 
+                              :colspan="isYearCollapsed(visibleYears[0]) ? 1 : 25" 
+                              class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm cursor-pointer select-none hover:bg-violet-700 transition-all duration-200 group"
+                              @click="toggleCollapse(visibleYears[0])"
+                              title="Click to collapse/expand"
                             >
-                              {{ category }}
-                            </td>
+                              <div class="flex items-center justify-center gap-1">
+                                <span class="font-semibold">{{ visibleYears[0] }}</span>
+                                <ChevronDown 
+                                  v-if="!isYearCollapsed(visibleYears[0])" 
+                                  class="w-3 h-3 transition-transform group-hover:scale-110" 
+                                />
+                                <ChevronRight 
+                                  v-else 
+                                  class="w-3 h-3 transition-transform group-hover:scale-110" 
+                                />
+                              </div>
+                            </th>
+                            <!-- Annual Percentage Increment Column -->
+                            <th 
+                              v-if="visibleYears.length > 1" 
+                              :colspan="visibleYears.length - 1" 
+                              class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm"
+                            >
+                              Annual Percentage Increment
+                            </th>
                           </tr>
-                          <!-- Group by Department Location within each category -->
-                          <template v-for="location in getUniqueLocationsForCategory(category)" :key="'location-' + location">
-                            <!-- Department Location Subdivider -->
-                            <tr class="bg-violet-50 border-b border-violet-200">
+                          <tr class="bg-violet-500/90 text-xs">
+                            <!-- Monthly Count Sub-column -->
+                            <th 
+                              v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])" 
+                              :colspan="12" 
+                              class="px-2 py-1 text-center border border-violet-300 font-medium"
+                            >
+                              Monthly Count
+                            </th>
+                            <!-- Monthly Salary Sub-column -->
+                            <th 
+                              v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])" 
+                              :colspan="12" 
+                              class="px-2 py-1 text-center border border-violet-300 font-medium"
+                            >
+                              Monthly Salary
+                            </th>
+                            <!-- Total Sub-column -->
+                            <th
+                              :rowspan="2"
+                              v-if="visibleYears.length > 0" 
+                              class="px-2 py-1 text-center border border-violet-300 font-semibold min-w-[100px]"
+                            >
+                              Total
+                            </th>
+                            <!-- Annual Percentage Increment Sub-columns -->
+                            <th
+                              :rowspan="2"
+                              v-for="year in visibleYears.slice(1)" 
+                              :key="'annual-' + year"
+                              class="px-2 py-1 text-center border border-violet-300 font-medium"
+                            >
+                              {{ year }}
+                            </th>
+                          </tr>
+                          <tr class="bg-violet-400/90 text-xs">
+                            <!-- Month columns for Monthly Count -->
+                            <th 
+                              v-if="!isYearCollapsed(visibleYears[0])"
+                              v-for="month in months" 
+                              :key="'count-' + month"
+                              class="px-2 py-1 text-center border border-violet-300 min-w-[80px] font-medium"
+                            >
+                              {{ month }}
+                            </th>
+                            <!-- Month columns for Monthly Salary -->
+                            <th 
+                              v-if="!isYearCollapsed(visibleYears[0])"
+                              v-for="month in months" 
+                              :key="'salary-' + month"
+                              class="px-2 py-1 text-center border border-violet-300 min-w-[80px] font-medium"
+                            >
+                              {{ month }}
+                            </th>
+
+                          </tr>
+                        </thead>
+                        <tbody class="text-gray-700 bg-white text-sm">
+                          <!-- Group by actual categories from data -->
+                          <template v-for="category in getUniqueCategories()" :key="category">
+                            <tr class="bg-violet-100 border-b-2 border-violet-300">
                               <td 
                                 :colspan="4 + (visibleYears.length > 0 ? (isYearCollapsed(visibleYears[0]) ? 1 : 25) : 0) + (visibleYears.length > 1 ? visibleYears.length - 1 : 0)" 
-                                class="px-3 py-1.5 font-semibold text-violet-700 text-left text-sm"
+                                class="px-3 py-2 font-bold text-violet-800 text-left"
                               >
-                                {{ location }}
+                                {{ category }}
                               </td>
                             </tr>
-                            <!-- Payroll rows for this location -->
-                            <template v-for="row in getPayrollRowsForLocation(category, location)" :key="row.id">
-                              <tr class="border-b border-gray-200 hover:bg-violet-50 transition-all duration-200">
-                                <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
-                                  {{ row.position }}
+                            <!-- Group by Department Location within each category -->
+                            <template v-for="location in getUniqueLocationsForCategory(category)" :key="'location-' + location">
+                              <!-- Department Location Subdivider -->
+                              <tr class="bg-violet-50 border-b border-violet-200">
+                                <td 
+                                  :colspan="4 + (visibleYears.length > 0 ? (isYearCollapsed(visibleYears[0]) ? 1 : 25) : 0) + (visibleYears.length > 1 ? visibleYears.length - 1 : 0)" 
+                                  class="px-3 py-1.5 font-semibold text-violet-700 text-left text-sm"
+                                >
+                                  {{ location }}
                                 </td>
-                                <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
-                                  {{ row.designation }}
+                              </tr>
+                              <!-- Payroll rows for this location -->
+                              <template v-for="row in getPayrollRowsForLocation(category, location)" :key="row.id">
+                                <tr class="border-b border-gray-200 hover:bg-violet-50 transition-all duration-200">
+                                  <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
+                                    {{ row.position }}
+                                  </td>
+                                  <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
+                                    {{ row.designation }}
+                                  </td>
+                                  <td class="px-3 py-2 text-right border-r border-violet-200">
+                                    <span class="font-mono text-sm">{{ formatCurrency(row.salary) }}</span>
+                                  </td>
+                                  <td class="px-3 py-2 text-right border-r border-violet-200">
+                                    <span class="font-mono text-sm">{{ row.count }}</span>
+                                  </td>
+                                  <!-- Monthly Count cells -->
+                                  <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                                    <td 
+                                      v-for="month in months" 
+                                      :key="'count-cell-' + month"
+                                      contenteditable="true"
+                                      class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
+                                      @input="handlePayrollCellInput(row.id, 'count', visibleYears[0], month, $event)"
+                                      @focus="handlePayrollCellFocus(row.id, 'count', visibleYears[0], month, $event)"
+                                      @blur="handlePayrollCellEdit(row.id, 'count', visibleYears[0], month, $event)"
+                                    >
+                                      <span class="font-mono text-xs">{{ getPayrollCellValue(row.id, 'count', visibleYears[0], month) }}</span>
+                                    </td>
+                                    <!-- Monthly Salary cells -->
+                                    <td 
+                                      v-for="month in months" 
+                                      :key="'salary-cell-' + month"
+                                      contenteditable="true"
+                                      class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
+                                      @input="handlePayrollCellInput(row.id, 'salary', visibleYears[0], month, $event)"
+                                      @focus="handlePayrollCellFocus(row.id, 'salary', visibleYears[0], month, $event)"
+                                      @blur="handlePayrollCellEdit(row.id, 'salary', visibleYears[0], month, $event)"
+                                    >
+                                      <span class="font-mono text-xs">{{ getPayrollCellValue(row.id, 'salary', visibleYears[0], month) }}</span>
+                                    </td>
+                                  </template>
+                                  <!-- Total cell (always visible) -->
+                                  <template v-if="visibleYears.length > 0">
+                                    <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
+                                      <span class="font-mono text-xs text-violet-700">
+                                        {{ formatCurrency(calculatePayrollTotal(row.id, visibleYears[0])) }}
+                                      </span>
+                                    </td>
+                                  </template>
+                                  <!-- Annual Percentage Increment cells -->
+                                  <template v-if="visibleYears.length > 1">
+                                    <td 
+                                      v-for="year in visibleYears.slice(1)" 
+                                      :key="'annual-cell-' + year"
+                                      contenteditable="true"
+                                      class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
+                                      @input="handlePayrollCellInput(row.id, 'annual', year, '', $event)"
+                                      @focus="handlePayrollCellFocus(row.id, 'annual', year, '', $event)"
+                                      @blur="handlePayrollCellEdit(row.id, 'annual', year, '', $event)"
+                                    >
+                                      <span class="font-mono text-xs">{{ getPayrollCellValue(row.id, 'annual', year, '') }}</span>
+                                    </td>
+                                  </template>
+                                </tr>
+                              </template>
+                              
+                              <!-- Sub-Total Management Row -->
+                              <tr class="border-b border-gray-300 bg-gradient-to-r from-violet-100 to-purple-100 shadow-sm">
+                                <td :colspan="3" class="px-3 py-2.5 font-semibold border-r border-violet-300 text-violet-900">
+                                  <div class="flex items-center gap-2">
+                                    <CheckCircle class="w-4 h-4 text-violet-700" />
+                                    Sub-Total Management
+                                  </div>
                                 </td>
-                                <td class="px-3 py-2 text-right border-r border-violet-200">
-                                  <span class="font-mono text-sm">{{ formatCurrency(row.salary) }}</span>
+                                <td class="px-3 py-2.5 text-right border-r border-violet-300">
+                                  <span class="font-mono text-sm font-semibold text-violet-900">{{ formatCurrency(calculateSubTotalManagement(category, location)) }}</span>
                                 </td>
-                                <td class="px-3 py-2 text-right border-r border-violet-200">
-                                  <span class="font-mono text-sm">{{ row.count }}</span>
-                                </td>
-                                <!-- Monthly Count cells -->
+                                
+                                <!-- Monthly Count cells for subtotal -->
                                 <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
                                   <td 
                                     v-for="month in months" 
-                                    :key="'count-cell-' + month"
-                                    contenteditable="true"
-                                    class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
-                                    @input="handlePayrollCellInput(row.id, 'count', visibleYears[0], month, $event)"
-                                    @focus="handlePayrollCellFocus(row.id, 'count', visibleYears[0], month, $event)"
-                                    @blur="handlePayrollCellEdit(row.id, 'count', visibleYears[0], month, $event)"
+                                    :key="'subtotal-mgmt-count-' + month"
+                                    class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
                                   >
-                                    <span class="font-mono text-xs">{{ getPayrollCellValue(row.id, 'count', visibleYears[0], month) }}</span>
+                                    <span class="font-mono text-xs text-violet-900">{{ calculateSubTotalManagementMonthlyCount(category, location, visibleYears[0], month) }}</span>
                                   </td>
-                                  <!-- Monthly Salary cells -->
+                                  <!-- Monthly Salary cells for subtotal -->
                                   <td 
                                     v-for="month in months" 
-                                    :key="'salary-cell-' + month"
-                                    contenteditable="true"
-                                    class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
-                                    @input="handlePayrollCellInput(row.id, 'salary', visibleYears[0], month, $event)"
-                                    @focus="handlePayrollCellFocus(row.id, 'salary', visibleYears[0], month, $event)"
-                                    @blur="handlePayrollCellEdit(row.id, 'salary', visibleYears[0], month, $event)"
+                                    :key="'subtotal-mgmt-salary-' + month"
+                                    class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
                                   >
-                                    <span class="font-mono text-xs">{{ getPayrollCellValue(row.id, 'salary', visibleYears[0], month) }}</span>
+                                    <span class="font-mono text-xs text-violet-900">{{ formatCurrency(calculateSubTotalManagementMonthlySalary(category, location, visibleYears[0], month)) }}</span>
                                   </td>
                                 </template>
-                                <!-- Total cell (always visible) -->
+                                <!-- Total cell for subtotal -->
                                 <template v-if="visibleYears.length > 0">
-                                  <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
-                                    <span class="font-mono text-xs text-violet-700">
-                                      {{ formatCurrency(calculatePayrollTotal(row.id, visibleYears[0])) }}
+                                  <td class="px-2 py-1.5 text-right border border-violet-300 font-semibold bg-violet-200 shadow-inner">
+                                    <span class="font-mono text-xs text-violet-900">
+                                      {{ formatCurrency(calculateSubTotalManagementTotal(category, location, visibleYears[0])) }}
                                     </span>
                                   </td>
                                 </template>
-                                <!-- Annual Percentage Increment cells -->
+                                <!-- Annual Percentage Increment cells for subtotal -->
                                 <template v-if="visibleYears.length > 1">
                                   <td 
                                     v-for="year in visibleYears.slice(1)" 
-                                    :key="'annual-cell-' + year"
-                                    contenteditable="true"
-                                    class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
-                                    @input="handlePayrollCellInput(row.id, 'annual', year, '', $event)"
-                                    @focus="handlePayrollCellFocus(row.id, 'annual', year, '', $event)"
-                                    @blur="handlePayrollCellEdit(row.id, 'annual', year, '', $event)"
+                                    :key="'subtotal-mgmt-annual-' + year"
+                                    class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
                                   >
-                                    <span class="font-mono text-xs">{{ getPayrollCellValue(row.id, 'annual', year, '') }}</span>
+                                    <span class="font-mono text-xs text-violet-900">{{ calculateSubTotalManagementAnnual(category, location, year) }}%</span>
+                                  </td>
+                                </template>
+                              </tr>
+                              
+                              <!-- Sub-Total Non-Management Row -->
+                              <tr class="border-b border-gray-300 bg-gradient-to-r from-violet-100 to-purple-100 shadow-sm">
+                                <td :colspan="3" class="px-3 py-2.5 font-semibold border-r border-violet-300 text-violet-900">
+                                  <div class="flex items-center gap-2">
+                                    <CheckCircle class="w-4 h-4 text-violet-700" />
+                                    Sub-Total Non-Management
+                                  </div>
+                                </td>
+                                <td class="px-3 py-2.5 text-right border-r border-violet-300">
+                                  <span class="font-mono text-sm font-semibold text-violet-900">{{ formatCurrency(calculateSubTotalNonManagement(category, location)) }}</span>
+                                </td>
+                                
+                                <!-- Monthly Count cells for subtotal -->
+                                <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                                  <td 
+                                    v-for="month in months" 
+                                    :key="'subtotal-nonmgmt-count-' + month"
+                                    class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
+                                  >
+                                    <span class="font-mono text-xs text-violet-900">{{ calculateSubTotalNonManagementMonthlyCount(category, location, visibleYears[0], month) }}</span>
+                                  </td>
+                                  <!-- Monthly Salary cells for subtotal -->
+                                  <td 
+                                    v-for="month in months" 
+                                    :key="'subtotal-nonmgmt-salary-' + month"
+                                    class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
+                                  >
+                                    <span class="font-mono text-xs text-violet-900">{{ formatCurrency(calculateSubTotalNonManagementMonthlySalary(category, location, visibleYears[0], month)) }}</span>
+                                  </td>
+                                </template>
+                                <!-- Total cell for subtotal -->
+                                <template v-if="visibleYears.length > 0">
+                                  <td class="px-2 py-1.5 text-right border border-violet-300 font-semibold bg-violet-200 shadow-inner">
+                                    <span class="font-mono text-xs text-violet-900">
+                                      {{ formatCurrency(calculateSubTotalNonManagementTotal(category, location, visibleYears[0])) }}
+                                    </span>
+                                  </td>
+                                </template>
+                                <!-- Annual Percentage Increment cells for subtotal -->
+                                <template v-if="visibleYears.length > 1">
+                                  <td 
+                                    v-for="year in visibleYears.slice(1)" 
+                                    :key="'subtotal-nonmgmt-annual-' + year"
+                                    class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
+                                  >
+                                    <span class="font-mono text-xs text-violet-900">{{ calculateSubTotalNonManagementAnnual(category, location, year) }}%</span>
+                                  </td>
+                                </template>
+                              </tr>
+                              
+                              <!-- Total Row -->
+                              <tr class="border-b-2 border-violet-400 bg-gradient-to-r from-violet-100 to-purple-100 shadow-sm">
+                                <td :colspan="3" class="px-3 py-3 font-bold border-r border-violet-300 text-violet-900">
+                                  <div class="flex items-center gap-2">
+                                    <BarChart3 class="w-5 h-5 text-violet-700" />
+                                    Total
+                                  </div>
+                                </td>
+                                <td class="px-3 py-3 text-right border-r border-violet-300">
+                                  <span class="font-mono text-sm font-bold text-violet-900">{{ formatCurrency(calculateLocationTotal(category, location)) }}</span>
+                                </td>
+                                
+                                <!-- Monthly Count cells for total -->
+                                <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                                  <td 
+                                    v-for="month in months" 
+                                    :key="'total-count-' + month"
+                                    class="px-2 py-2 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-bold"
+                                  >
+                                    <span class="font-mono text-xs text-violet-900">{{ calculateLocationTotalMonthlyCount(category, location, visibleYears[0], month) }}</span>
+                                  </td>
+                                  <!-- Monthly Salary cells for total -->
+                                  <td 
+                                    v-for="month in months" 
+                                    :key="'total-salary-' + month"
+                                    class="px-2 py-2 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-bold"
+                                  >
+                                    <span class="font-mono text-xs text-violet-900">{{ formatCurrency(calculateLocationTotalMonthlySalary(category, location, visibleYears[0], month)) }}</span>
+                                  </td>
+                                </template>
+                                <!-- Total cell for total -->
+                                <template v-if="visibleYears.length > 0">
+                                  <td class="px-2 py-2 text-right border border-violet-300 font-bold bg-violet-200 shadow-inner">
+                                    <span class="font-mono text-xs text-violet-900">
+                                      {{ formatCurrency(calculateLocationTotalTotal(category, location, visibleYears[0])) }}
+                                    </span>
+                                  </td>
+                                </template>
+                                <!-- Annual Percentage Increment cells for total -->
+                                <template v-if="visibleYears.length > 1">
+                                  <td 
+                                    v-for="year in visibleYears.slice(1)" 
+                                    :key="'total-annual-' + year"
+                                    class="px-2 py-2 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-bold"
+                                  >
+                                    <span class="font-mono text-xs text-violet-900">{{ calculateLocationTotalAnnual(category, location, year) }}%</span>
                                   </td>
                                 </template>
                               </tr>
                             </template>
                           </template>
-                        </template>
-                      </tbody>
-                    </table>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </template>
             </template>
   
             <!-- Enhanced No Years Selected State -->
@@ -745,6 +936,8 @@
     Settings, 
     X, 
     Check, 
+    CheckCircle, 
+    BarChart3, 
   } from 'lucide-vue-next';
   import alertService from "@/components/ui/ui_utility/alertService.js";
   import { 
@@ -819,8 +1012,12 @@
   const filteredToYears = computed(() => {
     return getFilteredToYears(years.value);
   });
-  
 
+  // Computed property to check if there's any payroll data
+  const hasPayrollData = computed(() => {
+    return payrollRows.value.length > 0;
+  });
+  
 
   // Computed property to get column labels for a specific year
   const getColumnLabelsForYearLocal = (year) => {
@@ -1240,6 +1437,207 @@
       }
     ];
     alertService.success('Sample payroll data loaded successfully.');
+  }
+
+  // Sub-Total Management Calculations
+  function calculateSubTotalManagement(category, location) {
+    const managementRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location && 
+      row.position === 'Manager'
+    );
+    return managementRows.reduce((sum, row) => sum + (row.salary * row.count), 0);
+  }
+
+  function calculateSubTotalManagementCount(category, location) {
+    const managementRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location && 
+      row.position === 'Manager'
+    );
+    return managementRows.reduce((sum, row) => sum + row.count, 0);
+  }
+
+  function calculateSubTotalManagementMonthlyCount(category, location, year, month) {
+    const managementRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location && 
+      row.position === 'Manager'
+    );
+    return managementRows.reduce((sum, row) => {
+      const count = getPayrollCellValue(row.id, 'count', year, month);
+      return sum + count;
+    }, 0);
+  }
+
+  function calculateSubTotalManagementMonthlySalary(category, location, year, month) {
+    const managementRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location && 
+      row.position === 'Manager'
+    );
+    return managementRows.reduce((sum, row) => {
+      const count = getPayrollCellValue(row.id, 'count', year, month);
+      const salary = getPayrollCellValue(row.id, 'salary', year, month);
+      return sum + (count * salary);
+    }, 0);
+  }
+
+  function calculateSubTotalManagementTotal(category, location, year) {
+    const managementRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location && 
+      row.position === 'Manager'
+    );
+    return managementRows.reduce((sum, row) => {
+      return sum + calculatePayrollTotal(row.id, year);
+    }, 0);
+  }
+
+  function calculateSubTotalManagementAnnual(category, location, year) {
+    const managementRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location && 
+      row.position === 'Manager'
+    );
+    if (managementRows.length === 0) return 0;
+    const totalAnnual = managementRows.reduce((sum, row) => {
+      const annual = getPayrollCellValue(row.id, 'annual', year, '');
+      return sum + annual;
+    }, 0);
+    return Math.round(totalAnnual / managementRows.length);
+  }
+
+  // Sub-Total Non-Management Calculations
+  function calculateSubTotalNonManagement(category, location) {
+    const nonManagementRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location && 
+      row.position === 'Non-manager'
+    );
+    return nonManagementRows.reduce((sum, row) => sum + (row.salary * row.count), 0);
+  }
+
+  function calculateSubTotalNonManagementCount(category, location) {
+    const nonManagementRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location && 
+      row.position === 'Non-manager'
+    );
+    return nonManagementRows.reduce((sum, row) => sum + row.count, 0);
+  }
+
+  function calculateSubTotalNonManagementMonthlyCount(category, location, year, month) {
+    const nonManagementRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location && 
+      row.position === 'Non-manager'
+    );
+    return nonManagementRows.reduce((sum, row) => {
+      const count = getPayrollCellValue(row.id, 'count', year, month);
+      return sum + count;
+    }, 0);
+  }
+
+  function calculateSubTotalNonManagementMonthlySalary(category, location, year, month) {
+    const nonManagementRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location && 
+      row.position === 'Non-manager'
+    );
+    return nonManagementRows.reduce((sum, row) => {
+      const count = getPayrollCellValue(row.id, 'count', year, month);
+      const salary = getPayrollCellValue(row.id, 'salary', year, month);
+      return sum + (count * salary);
+    }, 0);
+  }
+
+  function calculateSubTotalNonManagementTotal(category, location, year) {
+    const nonManagementRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location && 
+      row.position === 'Non-manager'
+    );
+    return nonManagementRows.reduce((sum, row) => {
+      return sum + calculatePayrollTotal(row.id, year);
+    }, 0);
+  }
+
+  function calculateSubTotalNonManagementAnnual(category, location, year) {
+    const nonManagementRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location && 
+      row.position === 'Non-manager'
+    );
+    if (nonManagementRows.length === 0) return 0;
+    const totalAnnual = nonManagementRows.reduce((sum, row) => {
+      const annual = getPayrollCellValue(row.id, 'annual', year, '');
+      return sum + annual;
+    }, 0);
+    return Math.round(totalAnnual / nonManagementRows.length);
+  }
+
+  // Total Location Calculations
+  function calculateLocationTotal(category, location) {
+    const locationRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location
+    );
+    return locationRows.reduce((sum, row) => sum + (row.salary * row.count), 0);
+  }
+
+  function calculateLocationTotalCount(category, location) {
+    const locationRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location
+    );
+    return locationRows.reduce((sum, row) => sum + row.count, 0);
+  }
+
+  function calculateLocationTotalMonthlyCount(category, location, year, month) {
+    const locationRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location
+    );
+    return locationRows.reduce((sum, row) => {
+      const count = getPayrollCellValue(row.id, 'count', year, month);
+      return sum + count;
+    }, 0);
+  }
+
+  function calculateLocationTotalMonthlySalary(category, location, year, month) {
+    const locationRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location
+    );
+    return locationRows.reduce((sum, row) => {
+      const count = getPayrollCellValue(row.id, 'count', year, month);
+      const salary = getPayrollCellValue(row.id, 'salary', year, month);
+      return sum + (count * salary);
+    }, 0);
+  }
+
+  function calculateLocationTotalTotal(category, location, year) {
+    const locationRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location
+    );
+    return locationRows.reduce((sum, row) => {
+      return sum + calculatePayrollTotal(row.id, year);
+    }, 0);
+  }
+
+  function calculateLocationTotalAnnual(category, location, year) {
+    const locationRows = payrollRows.value.filter(row => 
+      row.category === category && 
+      row.departmentLocation === location
+    );
+    if (locationRows.length === 0) return 0;
+    const totalAnnual = locationRows.reduce((sum, row) => {
+      const annual = getPayrollCellValue(row.id, 'annual', year, '');
+      return sum + annual;
+    }, 0);
+    return Math.round(totalAnnual / locationRows.length);
   }
   </script>
   
