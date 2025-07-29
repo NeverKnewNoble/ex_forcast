@@ -51,14 +51,14 @@
    "fieldname": "amount",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "Amount"
+   "label": "Count"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-29 09:58:38.053815",
+ "modified": "2025-07-29 22:49:25.874995",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Payroll Data Items",
