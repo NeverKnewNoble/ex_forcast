@@ -21,7 +21,10 @@ export {
   loadDepartmentLocationOptions,
   loadDesignationOptions,
   fetchPayrollData,
-  savePayrollChanges
+  savePayrollChanges,
+  createDepartment,
+  createDepartmentLocation,
+  createDesignation
 } from './payroll_data_service.js';
 
 // Export from payroll_calculations.js

@@ -395,3 +395,88 @@ export async function submitPayrollData(selectedProject, payrollRows, reloadData
     isSubmittingPayroll.value = false;
   }
 }
+
+// Quick Actions - Create new items
+export async function createDepartment(departmentName) {
+  try {
+    const response = await fetch('/api/method/ex_forcast.api.department_list.create_department', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        department_name: departmentName
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.message && data.message.success) {
+      alertService.success(data.message.message);
+      // Reload department options
+      await loadDepartmentOptions();
+      return data.message.department;
+    } else {
+      throw new Error(data.message?.error || 'Failed to create department');
+    }
+  } catch (error) {
+    alertService.error(error.message || 'Failed to create department');
+    throw error;
+  }
+}
+
+export async function createDepartmentLocation(locationName) {
+  try {
+    const response = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.create_payroll_department_location', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        department_location: locationName
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.message && data.message.success) {
+      alertService.success(data.message.message);
+      // Reload location options
+      await loadDepartmentLocationOptions();
+      return data.message.location;
+    } else {
+      throw new Error(data.message?.error || 'Failed to create department location');
+    }
+  } catch (error) {
+    alertService.error(error.message || 'Failed to create department location');
+    throw error;
+  }
+}
+
+export async function createDesignation(designationName) {
+  try {
+    const response = await fetch('/api/method/ex_forcast.api.designation_list.create_designation', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        designation_name: designationName
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.message && data.message.success) {
+      alertService.success(data.message.message);
+      // Reload designation options
+      await loadDesignationOptions();
+      return data.message.designation;
+    } else {
+      throw new Error(data.message?.error || 'Failed to create designation');
+    }
+  } catch (error) {
+    alertService.error(error.message || 'Failed to create designation');
+    throw error;
+  }
+}
