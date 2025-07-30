@@ -399,7 +399,7 @@
                                     {{ row.designation }}
                                   </td>
                                   <td class="px-3 py-2 text-right border-r border-violet-200">
-                                    <span class="font-mono text-sm">{{ row.salary }}</span>
+                                    <span class="font-mono text-sm">{{ formatMoney(row.salary) }}</span>
                                   </td>
                                   <td class="px-3 py-2 text-right border-r border-violet-200">
                                     <span class="font-mono text-sm">{{ row.count }}</span>
@@ -414,6 +414,7 @@
                                       @input="handlePayrollCellInput(row.id, 'count', visibleYears[0], month, $event)"
                                       @focus="handlePayrollCellFocus(row.id, 'count', visibleYears[0], month, $event)"
                                       @blur="handlePayrollCellEditLocal(row.id, 'count', visibleYears[0], month, $event)"
+                                      @keypress="allowOnlyNumbers($event)"
                                     >
                                       <span class="font-mono text-xs">{{ getPayrollCellValueLocal(row.id, 'count', visibleYears[0], month) }}</span>
                                     </td>
@@ -426,15 +427,16 @@
                                       @input="handlePayrollCellInput(row.id, 'salary', visibleYears[0], month, $event)"
                                       @focus="handlePayrollCellFocus(row.id, 'salary', visibleYears[0], month, $event)"
                                       @blur="handlePayrollCellEditLocal(row.id, 'salary', visibleYears[0], month, $event)"
+                                      @keypress="allowOnlyNumbers($event)"
                                     >
-                                      <span class="font-mono text-xs">{{ getPayrollCellValueLocal(row.id, 'salary', visibleYears[0], month) }}</span>
+                                      <span class="font-mono text-xs">{{ formatMoney(getPayrollCellValueLocal(row.id, 'salary', visibleYears[0], month)) }}</span>
                                     </td>
                                   </template>
                                   <!-- Total cell (always visible) -->
                                   <template v-if="visibleYears.length > 0">
                                     <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
                                       <span class="font-mono text-xs text-violet-700">
-                                        {{ calculatePayrollTotalLocal(row.id, visibleYears[0]) }}
+                                        {{ formatMoney(calculatePayrollTotalLocal(row.id, visibleYears[0])) }}
                                       </span>
                                     </td>
                                   </template>
@@ -449,7 +451,7 @@
                                       @focus="handlePayrollCellFocus(row.id, 'annual', year, '', $event)"
                                       @blur="handlePayrollCellEditLocal(row.id, 'annual', year, '', $event)"
                                     >
-                                      <span class="font-mono text-xs">{{ getPayrollCellValueLocal(row.id, 'annual', year, '') }}</span>
+                                      <span class="font-mono text-xs">{{ formatMoney(getPayrollCellValueLocal(row.id, 'annual', year, '')) }}</span>
                                     </td>
                                   </template>
                                 </tr>
@@ -464,7 +466,7 @@
                                   </div>
                                 </td>
                                 <td class="px-3 py-2.5 text-right border-r border-violet-300">
-                                  <span class="font-mono text-sm font-semibold text-violet-900">{{ calculateSubTotalManagementLocal(category, location) }}</span>
+                                  <span class="font-mono text-sm font-semibold text-violet-900">{{ formatMoney(calculateSubTotalManagementLocal(category, location)) }}</span>
                                 </td>
                                 
                                 <!-- Monthly Count cells for subtotal -->
@@ -482,14 +484,14 @@
                                     :key="'subtotal-mgmt-salary-' + month"
                                     class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
                                   >
-                                    <span class="font-mono text-xs text-violet-900">{{ calculateSubTotalManagementMonthlySalaryLocal(category, location, visibleYears[0], month) }}</span>
+                                    <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateSubTotalManagementMonthlySalaryLocal(category, location, visibleYears[0], month)) }}</span>
                                   </td>
                                 </template>
                                 <!-- Total cell for subtotal -->
                                 <template v-if="visibleYears.length > 0">
                                   <td class="px-2 py-1.5 text-right border border-violet-300 font-semibold bg-violet-200 shadow-inner">
                                     <span class="font-mono text-xs text-violet-900">
-                                      {{ calculateSubTotalManagementTotalLocal(category, location, visibleYears[0]) }}
+                                      {{ formatMoney(calculateSubTotalManagementTotalLocal(category, location, visibleYears[0])) }}
                                     </span>
                                   </td>
                                 </template>
@@ -500,7 +502,7 @@
                                     :key="'subtotal-mgmt-annual-' + year"
                                     class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
                                   >
-                                    <span class="font-mono text-xs text-violet-900">{{ calculateSubTotalManagementAnnualLocal(category, location, year) }}%</span>
+                                    <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateSubTotalManagementAnnualLocal(category, location, year)) }}</span>
                                   </td>
                                 </template>
                               </tr>
@@ -514,7 +516,7 @@
                                   </div>
                                 </td>
                                 <td class="px-3 py-2.5 text-right border-r border-violet-300">
-                                  <span class="font-mono text-sm font-semibold text-violet-900">{{ calculateSubTotalNonManagementLocal(category, location) }}</span>
+                                  <span class="font-mono text-sm font-semibold text-violet-900">{{ formatMoney(calculateSubTotalNonManagementLocal(category, location)) }}</span>
                                 </td>
                                 
                                 <!-- Monthly Count cells for subtotal -->
@@ -532,14 +534,14 @@
                                     :key="'subtotal-nonmgmt-salary-' + month"
                                     class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
                                   >
-                                    <span class="font-mono text-xs text-violet-900">{{ calculateSubTotalNonManagementMonthlySalaryLocal(category, location, visibleYears[0], month) }}</span>
+                                    <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateSubTotalNonManagementMonthlySalaryLocal(category, location, visibleYears[0], month)) }}</span>
                                   </td>
                                 </template>
                                 <!-- Total cell for subtotal -->
                                 <template v-if="visibleYears.length > 0">
                                   <td class="px-2 py-1.5 text-right border border-violet-300 font-semibold bg-violet-200 shadow-inner">
                                     <span class="font-mono text-xs text-violet-900">
-                                      {{ calculateSubTotalNonManagementTotalLocal(category, location, visibleYears[0]) }}
+                                      {{ formatMoney(calculateSubTotalNonManagementTotalLocal(category, location, visibleYears[0])) }}
                                     </span>
                                   </td>
                                 </template>
@@ -550,7 +552,7 @@
                                     :key="'subtotal-nonmgmt-annual-' + year"
                                     class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
                                   >
-                                    <span class="font-mono text-xs text-violet-900">{{ calculateSubTotalNonManagementAnnualLocal(category, location, year) }}%</span>
+                                    <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateSubTotalNonManagementAnnualLocal(category, location, year)) }}</span>
                                   </td>
                                 </template>
                               </tr>
@@ -564,7 +566,7 @@
                                   </div>
                                 </td>
                                 <td class="px-3 py-3 text-right border-r border-violet-300">
-                                  <span class="font-mono text-sm font-bold text-violet-900">{{ calculateLocationTotalLocal(category, location) }}</span>
+                                  <span class="font-mono text-sm font-bold text-violet-900">{{ formatMoney(calculateLocationTotalLocal(category, location)) }}</span>
                                 </td>
                                 
                                 <!-- Monthly Count cells for total -->
@@ -582,14 +584,14 @@
                                     :key="'total-salary-' + month"
                                     class="px-2 py-2 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-bold"
                                   >
-                                    <span class="font-mono text-xs text-violet-900">{{ calculateLocationTotalMonthlySalaryLocal(category, location, visibleYears[0], month) }}</span>
+                                    <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateLocationTotalMonthlySalaryLocal(category, location, visibleYears[0], month)) }}</span>
                                   </td>
                                 </template>
                                 <!-- Total cell for total -->
                                 <template v-if="visibleYears.length > 0">
                                   <td class="px-2 py-2 text-right border border-violet-300 font-bold bg-violet-200 shadow-inner">
                                     <span class="font-mono text-xs text-violet-900">
-                                      {{ calculateLocationTotalTotalLocal(category, location, visibleYears[0]) }}
+                                      {{ formatMoney(calculateLocationTotalTotalLocal(category, location, visibleYears[0])) }}
                                     </span>
                                   </td>
                                 </template>
@@ -600,7 +602,7 @@
                                     :key="'total-annual-' + year"
                                     class="px-2 py-2 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-bold"
                                   >
-                                    <span class="font-mono text-xs text-violet-900">{{ calculateLocationTotalAnnualLocal(category, location, year) }}%</span>
+                                    <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateLocationTotalAnnualLocal(category, location, year)) }}</span>
                                   </td>
                                 </template>
                               </tr>
@@ -747,12 +749,13 @@
             </button>
           </div>
 
+
           <!-- Modal Body -->
           <div class="p-8 pb-0 space-y-6 overflow-y-auto max-h-[calc(95vh-140px)]">
             <!-- Year and Month Select -->
             <div class="grid grid-cols-2 gap-6">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <label class=" text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                   <Calendar class="w-4 h-4 text-violet-600" />
                   Year *
                 </label>
@@ -767,7 +770,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <label class=" text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                   <Calendar class="w-4 h-4 text-violet-600" />
                   Month/Quarter *
                 </label>
@@ -873,13 +876,14 @@
                       Salary *
                     </label>
                     <div class="relative">
-                      <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
                       <input 
-                        v-model.number="row.salary"
-                        type="number"
-                        step="0.01"
-                        min="0"
+                        v-model="row.salary"
+                        type="text"
                         placeholder="0.00"
+                        @keypress="allowOnlyNumbers($event)"
+                        @input="handleSalaryInput($event, row)"
+                        @focus="handleSalaryFocus($event, row)"
+                        @blur="formatSalaryValue(row)"
                         class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
                       />
                     </div>
@@ -895,6 +899,7 @@
                       type="number"
                       min="0"
                       placeholder="0"
+                      @keypress="allowOnlyNumbers($event)"
                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
                     />
                   </div>
@@ -995,7 +1000,6 @@
   // Import months with fallback
   import { months as importedMonths } from "@/components/utility/expense_assumption/index.js";
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  
   // Import payroll service and utilities
   import {
     showAddPayrollModal,
@@ -1054,9 +1058,27 @@
     DEFAULT_PAYROLL_ROW,
     SAMPLE_PAYROLL_DATA,
     FIELD_TYPES,
-    POSITION_FILTERS
+    POSITION_FILTERS,
+    // Utility functions
+    allowOnlyNumbers
   } from '@/components/utility/payroll/index.js';
-  
+
+
+
+
+
+
+  //! Helper function to safely format numbers to 2 decimal places with commas
+  function formatMoney(value) {
+    if (value === null || value === undefined || isNaN(value)) {
+      return '0.00';
+    }
+    const num = parseFloat(value);
+    return num.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
   
   // Reactive state
   const years = ref([]);
@@ -1206,11 +1228,60 @@
   }
 
   function handlePayrollCellInput(rowId, fieldType, year, month, event) {
-    // Handle input changes
+    // Allow only numbers and decimal point for salary and annual fields
+    if (fieldType === 'salary' || fieldType === 'annual') {
+      const value = event.target.textContent.replace(/[^0-9.]/g, '');
+      event.target.textContent = value;
+    }
   }
 
   function handlePayrollCellFocus(rowId, fieldType, year, month, event) {
-    // Handle focus events
+    // Format the number when user starts editing salary or annual fields
+    if (fieldType === 'salary' || fieldType === 'annual') {
+      const value = parseFloat(event.target.textContent);
+      if (!isNaN(value)) {
+        // Show the raw number without commas for easier editing
+        event.target.textContent = value.toString();
+      }
+    }
+  }
+
+  function handleSalaryInput(event, row) {
+    // Allow only numbers and decimal point
+    let value = event.target.value.replace(/[^0-9.]/g, '');
+    
+    // Parse the number and format with commas while typing
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue)) {
+      // Format with commas while typing
+      row.salary = numValue.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    } else {
+      row.salary = value;
+    }
+  }
+
+  function handleSalaryFocus(event, row) {
+    // Show the raw number without commas when user starts editing
+    const value = parseFloat(row.salary);
+    if (!isNaN(value)) {
+      row.salary = value.toString();
+    }
+  }
+
+  function formatSalaryValue(row) {
+    // Format the salary to 2 decimal places with commas when user leaves the field
+    const value = parseFloat(row.salary);
+    if (!isNaN(value)) {
+      row.salary = value.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    } else {
+      row.salary = '0.00';
+    }
   }
 
   // Wrapper function for saveChanges

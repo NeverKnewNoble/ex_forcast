@@ -310,7 +310,7 @@ export function addPayrollRow() {
     departmentLocation: '',
     position: '',
     designation: '',
-    salary: 0,
+    salary: '0.00',
     count: 0
   });
 }

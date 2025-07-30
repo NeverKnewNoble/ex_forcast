@@ -1,5 +1,4 @@
 // Payroll Module Index - Exports all payroll-related functions and constants
-
 // Export from payroll_data_service.js
 export {
   showAddPayrollModal,
@@ -73,3 +72,26 @@ export {
   FIELD_TYPES,
   POSITION_FILTERS
 } from './payroll_constants.js'; 
+
+
+export function allowOnlyNumbers(event) {
+  // Allow: backspace, delete, tab, escape, enter, and navigation keys
+  const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+  if (allowedKeys.includes(event.key) ||
+      // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+      (event.key === 'a' && event.ctrlKey === true) ||
+      (event.key === 'c' && event.ctrlKey === true) ||
+      (event.key === 'v' && event.ctrlKey === true) ||
+      (event.key === 'x' && event.ctrlKey === true)) {
+    return;
+  }
+  
+  // Allow only numbers and decimal point
+  const allowedChars = /[0-9.,]/;
+  if (allowedChars.test(event.key)) {
+    return;
+  }
+  
+  // Prevent the default action for all other keys
+  event.preventDefault();
+}

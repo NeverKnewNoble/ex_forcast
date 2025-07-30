@@ -136,6 +136,19 @@ export function getPayrollCellValue(payrollRows, payrollData, rowId, fieldType, 
  */
 export function handlePayrollCellEdit(changedCells, rowId, fieldType, year, month, event) {
   const newValue = parseFloat(event.target.textContent) || 0;
+  
+  // Format the display with commas for salary and annual fields
+  if (fieldType === 'salary' || fieldType === 'annual') {
+    if (!isNaN(newValue)) {
+      event.target.textContent = newValue.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    } else {
+      event.target.textContent = '0.00';
+    }
+  }
+  
   const existingChangeIndex = changedCells.findIndex(
     cell => cell.rowId === rowId && cell.fieldType === fieldType && cell.year === year && cell.month === month
   );
