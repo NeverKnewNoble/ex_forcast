@@ -114,9 +114,23 @@ export function getPayrollCellValue(payrollRows, payrollData, rowId, fieldType, 
   const row = payrollRows.find(r => r.id === rowId);
   if (!row) return 0;
   
-  if (fieldType === 'count' || fieldType === 'salary') {
-    // For monthly data, return the value from payrollData
-    return payrollData[year]?.[month]?.[rowId]?.[fieldType] || 0;
+  if (fieldType === 'count') {
+    // For count field, first check if there's specific data in payrollData
+    const specificValue = payrollData[year]?.[rowId]?.[fieldType];
+    if (specificValue !== undefined && specificValue !== null) {
+      return specificValue;
+    }
+    // If no specific data found, return the row's count value
+    return row.count || 0;
+  } else if (fieldType === 'salary') {
+    // For salary field, first check if there's specific data in payrollData
+    const specificValue = payrollData[year]?.[rowId]?.[fieldType];
+    if (specificValue !== undefined && specificValue !== null) {
+      return specificValue;
+    }
+    // If no specific data found, calculate as row's salary * monthly count
+    const monthlyCount = getPayrollCellValue(payrollRows, payrollData, rowId, 'count', year, month);
+    return (row.salary || 0) * monthlyCount;
   } else if (fieldType === 'annual') {
     // For annual percentage increment
     return payrollData[year]?.[rowId]?.[fieldType] || 0;
@@ -130,11 +144,10 @@ export function getPayrollCellValue(payrollRows, payrollData, rowId, fieldType, 
  * @param {number} rowId - Row ID
  * @param {string} fieldType - Field type
  * @param {string} year - Year
- * @param {string} month - Month
  * @param {Event} event - Input event
  * @returns {Array} - Updated changed cells array
  */
-export function handlePayrollCellEdit(changedCells, rowId, fieldType, year, month, event) {
+export function handlePayrollCellEdit(changedCells, rowId, fieldType, year, event) {
   const newValue = parseFloat(event.target.textContent) || 0;
   
   // Format the display with commas for salary and annual fields
@@ -150,7 +163,7 @@ export function handlePayrollCellEdit(changedCells, rowId, fieldType, year, mont
   }
   
   const existingChangeIndex = changedCells.findIndex(
-    cell => cell.rowId === rowId && cell.fieldType === fieldType && cell.year === year && cell.month === month
+    cell => cell.rowId === rowId && cell.fieldType === fieldType && cell.year === year
   );
   
   if (existingChangeIndex >= 0) {
@@ -160,7 +173,6 @@ export function handlePayrollCellEdit(changedCells, rowId, fieldType, year, mont
       rowId,
       fieldType,
       year,
-      month,
       newValue
     });
   }
