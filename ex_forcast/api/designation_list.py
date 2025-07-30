@@ -21,3 +21,36 @@ def get_designation_list():
             "success": False,
             "error": str(e)
         }
+
+@frappe.whitelist()
+def create_designation(designation_name):
+    """Create a new designation"""
+    try:
+        # Check if designation already exists
+        if frappe.db.exists("Designation", {"designation_name": designation_name}):
+            return {
+                "success": False,
+                "error": f"Designation '{designation_name}' already exists"
+            }
+        
+        # Create new designation
+        designation = frappe.get_doc({
+            "doctype": "Designation",
+            "designation_name": designation_name
+        })
+        designation.insert()
+        
+        return {
+            "success": True,
+            "message": f"Designation '{designation_name}' created successfully",
+            "designation": {
+                "name": designation.name,
+                "designation_name": designation.designation_name
+            }
+        }
+    except Exception as e:
+        frappe.log_error(f"Error creating designation: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e)
+        }

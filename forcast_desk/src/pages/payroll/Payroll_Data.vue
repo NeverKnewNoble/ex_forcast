@@ -260,25 +260,25 @@
                             <th rowspan="3" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
                               <div class="flex items-center gap-1">
                                 <FolderOpen class="w-3 h-3" />
-                                Position
+                              Position
                               </div>
                             </th>
                             <th rowspan="3" class="px-3 py-2 text-left align-middle border-r border-violet-400 font-semibold text-sm">
                               <div class="flex items-center gap-1">
                                 <FolderOpen class="w-3 h-3" />
-                                Designation
+                              Designation
                               </div>
                             </th>
                             <th rowspan="3" class="px-3 py-2 text-center align-middle border-r border-violet-400 font-semibold text-sm">
                               <div class="flex items-center gap-1">
                                 <FolderOpen class="w-3 h-3" />
-                                Salary
+                              Salary
                               </div>
                             </th>
                             <th rowspan="3" class="px-3 py-2 text-center align-middle border-r border-violet-400 font-semibold text-sm">
                               <div class="flex items-center gap-1">
                                 <FolderOpen class="w-3 h-3" />
-                                Count
+                              Count
                               </div>
                             </th>
                             <!-- First Year Column -->
@@ -785,6 +785,114 @@
               </div>
             </div>
 
+                        <!-- Quick Actions Tab -->
+            <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-6 border border-violet-200 shadow-sm">
+              <div class="flex items-center justify-between mb-4 cursor-pointer" @click="toggleQuickActions">
+                <div class="flex items-center gap-2">
+                  <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                  <h3 class="text-lg font-semibold text-violet-800">Quick Actions</h3>
+                  <span class="text-sm text-violet-600">Create new items on the fly</span>
+                </div>
+                <svg 
+                  :class="['w-5 h-5 text-violet-600 transition-transform duration-200', showQuickActions ? 'rotate-180' : '']" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+              
+              <div v-show="showQuickActions" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Create Department -->
+                <div class="bg-white rounded-lg p-4 border border-violet-200 shadow-sm hover:shadow-md transition-all duration-200">
+                  <div class="flex items-center gap-2 mb-3">
+                    <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                    <h4 class="font-medium text-violet-800">Create Department</h4>
+                  </div>
+                  <div class="flex gap-2">
+                    <input 
+                      v-model="newDepartmentName"
+                      type="text"
+                      placeholder="Enter department name"
+                      class="flex-1 px-3 py-2 border border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all text-sm bg-white"
+                    />
+                    <button 
+                      @click="createNewDepartment"
+                      :disabled="!newDepartmentName.trim() || isCreatingDepartment"
+                      class="px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium shadow-sm hover:shadow-md"
+                    >
+                      <svg v-if="isCreatingDepartment" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                      </svg>
+                      <span v-else>Create</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Create Department Location -->
+                <div class="bg-white rounded-lg p-4 border border-violet-200 shadow-sm hover:shadow-md transition-all duration-200">
+                  <div class="flex items-center gap-2 mb-3">
+                    <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <h4 class="font-medium text-violet-800">Create Location</h4>
+                  </div>
+                  <div class="flex gap-2">
+                    <input 
+                      v-model="newLocationName"
+                      type="text"
+                      placeholder="Enter location name"
+                      class="flex-1 px-3 py-2 border border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all text-sm bg-white"
+                    />
+                    <button 
+                      @click="createNewLocation"
+                      :disabled="!newLocationName.trim() || isCreatingLocation"
+                      class="px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium shadow-sm hover:shadow-md"
+                    >
+                      <svg v-if="isCreatingLocation" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                      </svg>
+                      <span v-else>Create</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Create Designation -->
+                <div class="bg-white rounded-lg p-4 border border-violet-200 shadow-sm hover:shadow-md transition-all duration-200">
+                  <div class="flex items-center gap-2 mb-3">
+                    <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <h4 class="font-medium text-violet-800">Create Designation</h4>
+                  </div>
+                  <div class="flex gap-2">
+                    <input 
+                      v-model="newDesignationName"
+                      type="text"
+                      placeholder="Enter designation name"
+                      class="flex-1 px-3 py-2 border border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all text-sm bg-white"
+                    />
+                    <button 
+                      @click="createNewDesignation"
+                      :disabled="!newDesignationName.trim() || isCreatingDesignation"
+                      class="px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium shadow-sm hover:shadow-md"
+                    >
+                      <svg v-if="isCreatingDesignation" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                      </svg>
+                      <span v-else>Create</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Payroll Data Cards -->
             <div class="space-y-4">
               <div 
@@ -995,7 +1103,7 @@
   } from "@/components/utility/expense_assumption/index.js";
   import { cloneDeep } from 'lodash-es';
   // Import project service
-    import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
+  import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';  
   // Import months with fallback
   import { months as importedMonths } from "@/components/utility/expense_assumption/index.js";
@@ -1019,6 +1127,9 @@
     submitPayrollData,
     fetchPayrollData,
     savePayrollChanges,
+    createDepartment,
+    createDepartmentLocation,
+    createDesignation,
     // Calculation functions
     calculatePayrollTotal,
     calculateSubTotalManagement,
@@ -1062,7 +1173,7 @@
     // Utility functions
     allowOnlyNumbers
   } from '@/components/utility/payroll/index.js';
-
+  
 
 
 
@@ -1092,6 +1203,15 @@
   const saveError = ref("");
   const sidebarCollapsed = ref(false);
   const isComponentReady = ref(false); // Add a flag to track if component is ready
+
+  // Quick Actions state
+  const newDepartmentName = ref('');
+  const newLocationName = ref('');
+  const newDesignationName = ref('');
+  const isCreatingDepartment = ref(false);
+  const isCreatingLocation = ref(false);
+  const isCreatingDesignation = ref(false);
+  const showQuickActions = ref(false);
  
 
 
@@ -1281,6 +1401,65 @@
       });
     } else {
       row.salary = '0.00';
+    }
+  }
+
+  // Quick Actions functions
+  function toggleQuickActions() {
+    showQuickActions.value = !showQuickActions.value;
+  }
+
+  async function createNewDepartment() {
+    if (!newDepartmentName.value.trim()) {
+      alertService.error('Please enter a department name');
+      return;
+    }
+
+    try {
+      isCreatingDepartment.value = true;
+      const department = await createDepartment(newDepartmentName.value.trim());
+      newDepartmentName.value = '';
+      alertService.success(`Department "${department.department_name}" created successfully!`);
+    } catch (error) {
+      console.error('Error creating department:', error);
+    } finally {
+      isCreatingDepartment.value = false;
+    }
+  }
+
+  async function createNewLocation() {
+    if (!newLocationName.value.trim()) {
+      alertService.error('Please enter a location name');
+      return;
+    }
+
+    try {
+      isCreatingLocation.value = true;
+      const location = await createDepartmentLocation(newLocationName.value.trim());
+      newLocationName.value = '';
+      alertService.success(`Location "${location.department_location}" created successfully!`);
+    } catch (error) {
+      console.error('Error creating location:', error);
+    } finally {
+      isCreatingLocation.value = false;
+    }
+  }
+
+  async function createNewDesignation() {
+    if (!newDesignationName.value.trim()) {
+      alertService.error('Please enter a designation name');
+      return;
+    }
+
+    try {
+      isCreatingDesignation.value = true;
+      const designation = await createDesignation(newDesignationName.value.trim());
+      newDesignationName.value = '';
+      alertService.success(`Designation "${designation.designation_name}" created successfully!`);
+    } catch (error) {
+      console.error('Error creating designation:', error);
+    } finally {
+      isCreatingDesignation.value = false;
     }
   }
 
