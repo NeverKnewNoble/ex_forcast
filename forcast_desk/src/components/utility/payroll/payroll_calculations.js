@@ -38,7 +38,7 @@ export function calculateSubTotalManagement(payrollRows, category, location) {
     row.departmentLocation === location && 
     row.position === 'Manager'
   );
-  return managementRows.reduce((sum, row) => sum + (row.salary * row.count), 0);
+  return managementRows.reduce((sum, row) => sum + row.salary, 0);
 }
 
 /**
@@ -158,7 +158,7 @@ export function calculateSubTotalNonManagement(payrollRows, category, location) 
     row.departmentLocation === location && 
     row.position === 'Non-manager'
   );
-  return nonManagementRows.reduce((sum, row) => sum + (row.salary * row.count), 0);
+  return nonManagementRows.reduce((sum, row) => sum + row.salary, 0);
 }
 
 /**

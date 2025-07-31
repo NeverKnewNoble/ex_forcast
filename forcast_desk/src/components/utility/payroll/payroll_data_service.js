@@ -168,40 +168,36 @@ export async function fetchPayrollData(projectName) {
       const transformedRows = [];
       
       Object.keys(data.message).forEach(year => {
-        Object.keys(data.message[year]).forEach(month => {
-          data.message[year][month].forEach(item => {
-            const rowId = Date.now() + Math.random(); // Generate unique ID
-            const row = {
-              id: rowId,
-              department: item.department,
-              departmentLocation: item.department_location,
-              position: item.position,
-              designation: item.designation,
-              salary: item.salary,
-              count: item.amount,
-              category: item.department, // Assuming category is based on department
-              year: year,
-              month: month
-            };
-            
-            transformedRows.push(row);
-            
-            // Initialize payrollData structure
-            if (!transformedData[year]) {
-              transformedData[year] = {};
-            }
-            if (!transformedData[year][month]) {
-              transformedData[year][month] = {};
-            }
-            if (!transformedData[year][month][rowId]) {
-              transformedData[year][month][rowId] = {};
-            }
-            
-            transformedData[year][month][rowId] = {
-              count: item.amount,
-              salary: item.salary
-            };
-          });
+        // API now returns data directly by year, no month nesting
+        data.message[year].forEach(item => {
+          const rowId = Date.now() + Math.random(); // Generate unique ID
+          const row = {
+            id: rowId,
+            department: item.department,
+            departmentLocation: item.department_location,
+            position: item.position,
+            designation: item.designation,
+            salary: item.salary,
+            count: item.amount,
+            category: item.department, // Assuming category is based on department
+            year: year
+            // Removed month since API no longer uses it
+          };
+          
+          transformedRows.push(row);
+          
+          // Initialize payrollData structure - simplified without month
+          if (!transformedData[year]) {
+            transformedData[year] = {};
+          }
+          if (!transformedData[year][rowId]) {
+            transformedData[year][rowId] = {};
+          }
+          
+          transformedData[year][rowId] = {
+            count: item.amount,
+            salary: item.salary
+          };
         });
       });
       
@@ -239,7 +235,6 @@ export async function savePayrollChanges(changes, projectName) {
 
       return {
         year: row.year,
-        month: row.month,
         department: row.department,
         department_location: row.departmentLocation,
         position: row.position,
@@ -299,7 +294,6 @@ export function closeAddPayrollModal() {
 
 export function resetPayrollForm() {
   addPayrollForm.year = '';
-  addPayrollForm.month = '';
   addPayrollForm.rows = [];
   addPayrollRow(); // Add initial row
 }
@@ -327,8 +321,8 @@ export async function submitPayrollData(selectedProject, payrollRows, reloadData
     return;
   }
   
-  if (!addPayrollForm.year || !addPayrollForm.month || addPayrollForm.rows.length === 0) {
-    alertService.error('Please select year, month, and add at least one payroll entry.');
+  if (!addPayrollForm.year || addPayrollForm.rows.length === 0) {
+    alertService.error('Please select year and add at least one payroll entry.');
     return;
   }
   
@@ -353,12 +347,11 @@ export async function submitPayrollData(selectedProject, payrollRows, reloadData
     // Transform data for API
     const apiChanges = cleanRows.map(row => ({
       year: addPayrollForm.year,
-      month: addPayrollForm.month,
-      department: row.department,
+        department: row.department,
       department_location: row.departmentLocation,
-      position: row.position,
-      designation: row.designation,
-      salary: row.salary,
+        position: row.position,
+        designation: row.designation,
+        salary: row.salary,
       amount: row.count
     }));
 
@@ -376,13 +369,13 @@ export async function submitPayrollData(selectedProject, payrollRows, reloadData
     const data = await response.json();
     
     if (data.message && data.message.success) {
-      alertService.success("Payroll data added successfully!");
-      showAddPayrollModal.value = false;
-      resetPayrollForm();
-      
-      // Reload data if callback provided
-      if (reloadData) {
-        await reloadData();
+    alertService.success("Payroll data added successfully!");
+    showAddPayrollModal.value = false;
+    resetPayrollForm();
+    
+    // Reload data if callback provided
+    if (reloadData) {
+      await reloadData();
       }
     } else {
       throw new Error(data.message?.error || 'Failed to add payroll data');

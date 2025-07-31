@@ -392,17 +392,31 @@
                               <!-- Payroll rows for this location -->
                               <template v-for="row in getPayrollRowsForLocationLocal(category, location)" :key="row.id">
                                 <tr class="border-b border-gray-200 hover:bg-violet-50 transition-all duration-200">
+                                  <!-- Position -->
                                   <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
                                     {{ row.position }}
                                   </td>
+                                  <!-- Designation -->
                                   <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
                                     {{ row.designation }}
                                   </td>
-                                  <td class="px-3 py-2 text-right border-r border-violet-200">
-                                    <span class="font-mono text-sm">{{ formatMoney(row.salary) }}</span>
+                                  <!-- Salary (Editable, Reactive, row.salary) -->
+                                  <td
+                                    class="px-3 py-2 text-right border-r border-violet-200 font-mono text-sm"
+                                    contenteditable="true"
+                                    :key="row.id + '-salary-' + row.salary"
+                                    @input="handleTableSalaryInput(row, $event)"
+                                    @focus="handleTableSalaryFocus(row, $event)"
+                                    @blur="handleTableSalaryBlur(row, $event)"
+                                    @keypress="allowOnlyNumbers($event)"
+                                  >
+                                    {{ formatMoney(row.salary) }}
                                   </td>
-                                  <td class="px-3 py-2 text-right border-r border-violet-200">
-                                    <span class="font-mono text-sm">{{ row.count }}</span>
+                                  <!-- Count (Editable, Reactive, row.count) -->
+                                  <td
+                                    class="px-3 py-2 text-right border-r border-violet-200 font-mono text-sm"
+                                  >
+                                    {{ row.count }}
                                   </td>
                                   <!-- Monthly Count cells -->
                                   <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
@@ -752,37 +766,20 @@
 
           <!-- Modal Body -->
           <div class="p-8 pb-0 space-y-6 overflow-y-auto max-h-[calc(95vh-140px)]">
-            <!-- Year and Month Select -->
-            <div class="grid grid-cols-2 gap-6">
-              <div>
-                <label class=" text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <Calendar class="w-4 h-4 text-violet-600" />
-                  Year *
-                </label>
-                <select 
-                  v-model="addPayrollForm.year"
-                  required
-                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
-                >
-                  <option value="">Select Year</option>
-                  <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
-                </select>
-              </div>
-
-              <div>
-                <label class=" text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <Calendar class="w-4 h-4 text-violet-600" />
-                  Month/Quarter *
-                </label>
-                <select 
-                  v-model="addPayrollForm.month"
-                  required
-                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
-                >
-                  <option value="">Select Month/Quarter</option>
-                  <option v-for="month in importedMonths" :key="month" :value="month">{{ month }}</option>
-                </select>
-              </div>
+            <!-- Year Select -->
+            <div class="w-full max-w-md">
+              <label class="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <Calendar class="w-4 h-4 text-violet-600" />
+                Year *
+              </label>
+              <select 
+                v-model="addPayrollForm.year"
+                required
+                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+              >
+                <option value="">Select Year</option>
+                <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+              </select>
             </div>
 
                         <!-- Quick Actions Tab -->
@@ -989,9 +986,9 @@
                         type="text"
                         placeholder="0.00"
                         @keypress="allowOnlyNumbers($event)"
-                        @input="handleSalaryInput($event, row)"
-                        @focus="handleSalaryFocus($event, row)"
-                        @blur="formatSalaryValue(row)"
+                        @input="handleModalSalaryInput($event, row)"
+                        @focus="handleModalSalaryFocus($event, row)"
+                        @blur="handleModalSalaryBlur($event, row)"
                         class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
                       />
                     </div>
@@ -1105,8 +1102,7 @@
   // Import project service
   import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';  
-  // Import months with fallback
-  import { months as importedMonths } from "@/components/utility/expense_assumption/index.js";
+
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   // Import payroll service and utilities
   import {
@@ -1254,6 +1250,30 @@
     // console.log('payrollData changed:', newData);
   }, { deep: true, immediate: true });
 
+  // Watch for changes in payrollRows to trigger reactive updates for monthly cells
+  watch(payrollRows, (newRows, oldRows) => {
+    if (newRows && oldRows) {
+      // Check if any row's salary or count has changed
+      newRows.forEach((newRow, index) => {
+        const oldRow = oldRows[index];
+        if (oldRow && (newRow.salary !== oldRow.salary || newRow.count !== oldRow.count)) {
+          // Force reactive update for all monthly cells of this row
+          if (visibleYears.value.length > 0) {
+            const year = visibleYears.value[0];
+            if (!payrollData.value[year]) {
+              payrollData.value[year] = {};
+            }
+            if (!payrollData.value[year][newRow.id]) {
+              payrollData.value[year][newRow.id] = {};
+            }
+            // Add a timestamp to force reactivity
+            payrollData.value[year][newRow.id]._lastUpdate = Date.now();
+          }
+        }
+      });
+    }
+  }, { deep: true });
+
   // When opening the modal, copy the current settings
   watch(showAdvanced, (val) => {
     if (val) {
@@ -1343,8 +1363,23 @@
   }
 
   function handlePayrollCellEditLocal(rowId, fieldType, year, month, event) {
-    handlePayrollCellEdit(changedCells.value, rowId, fieldType, year, month, event);
+    handlePayrollCellEdit(changedCells.value, rowId, fieldType, year, event);
     isSaved.value = false;
+    
+    // If this is a count field change, trigger reactive update for salary cells
+    if (fieldType === 'count' && month) {
+      // Force a reactive update by triggering a small change to the payrollData
+      // This will cause Vue to re-evaluate the salary cells
+      if (!payrollData.value[year]) {
+        payrollData.value[year] = {};
+      }
+      if (!payrollData.value[year][rowId]) {
+        payrollData.value[year][rowId] = {};
+      }
+      
+      // Add a timestamp to force reactivity
+      payrollData.value[year][rowId]._lastUpdate = Date.now();
+    }
   }
 
   function handlePayrollCellInput(rowId, fieldType, year, month, event) {
@@ -1366,41 +1401,44 @@
     }
   }
 
-  function handleSalaryInput(event, row) {
+  // Modal Salary Handlers (using robust pattern like monthly cells)
+  function handleModalSalaryInput(event, row) {
     // Allow only numbers and decimal point
     let value = event.target.value.replace(/[^0-9.]/g, '');
+    row.salary = value;
+  }
+
+  function handleModalSalaryFocus(event, row) {
+    // Show the raw number without any formatting when user starts editing
+    let rawValue = row.salary;
+    if (typeof rawValue === 'string') {
+      // Remove any commas and formatting
+      rawValue = rawValue.replace(/[^0-9.]/g, '');
+    }
+    event.target.value = rawValue || '';
+  }
+
+  function handleModalSalaryBlur(event, row) {
+    // Get the raw value from the input
+    let rawValue = event.target.value.replace(/[^0-9.]/g, '');
     
-    // Parse the number and format with commas while typing
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue)) {
-      // Format with commas while typing
-      row.salary = numValue.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    } else {
+    // If the raw value is empty or invalid, use the original salary
+    if (!rawValue || rawValue === '') {
+      // Restore the original formatted value
+      event.target.value = formatMoney(row.salary);
+      return;
+    }
+    
+    // Parse as a number (treat as whole number, not decimal)
+    let value = parseFloat(rawValue);
+    if (!isNaN(value)) {
+      // Store the value as a number (not formatted)
       row.salary = value;
-    }
-  }
-
-  function handleSalaryFocus(event, row) {
-    // Show the raw number without commas when user starts editing
-    const value = parseFloat(row.salary);
-    if (!isNaN(value)) {
-      row.salary = value.toString();
-    }
-  }
-
-  function formatSalaryValue(row) {
-    // Format the salary to 2 decimal places with commas when user leaves the field
-    const value = parseFloat(row.salary);
-    if (!isNaN(value)) {
-      row.salary = value.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
+      // Display the formatted value
+      event.target.value = formatMoney(value);
     } else {
-      row.salary = '0.00';
+      // If invalid, restore the original value
+      event.target.value = formatMoney(row.salary);
     }
   }
 
@@ -1647,6 +1685,142 @@
 
   function calculateLocationTotalAnnualLocal(category, location, year) {
     return calculateLocationTotalAnnual(payrollRows.value, category, location, year, getPayrollCellValueLocal);
+  }
+
+  // Table Salary Handlers (using robust pattern like monthly cells)
+  function handleTableSalaryInput(row, event) {
+    let value = event.target.textContent.replace(/[^0-9.]/g, '');
+    row.salary = value;
+    
+    // Trigger reactive update for monthly salary cells
+    if (visibleYears.value.length > 0) {
+      const year = visibleYears.value[0];
+      if (!payrollData.value[year]) {
+        payrollData.value[year] = {};
+      }
+      if (!payrollData.value[year][row.id]) {
+        payrollData.value[year][row.id] = {};
+      }
+      // Add a timestamp to force reactivity
+      payrollData.value[year][row.id]._lastUpdate = Date.now();
+    }
+  }
+
+  function handleTableSalaryFocus(row, event) {
+    // Show the raw number without any formatting when user starts editing
+    let rawValue = row.salary;
+    if (typeof rawValue === 'string') {
+      // Remove any commas and formatting
+      rawValue = rawValue.replace(/[^0-9.]/g, '');
+    }
+    event.target.textContent = rawValue || '';
+  }
+
+  function handleTableSalaryBlur(row, event) {
+    // Get the raw value from the cell content
+    let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
+    
+    // If the raw value is empty or invalid, use the original salary
+    if (!rawValue || rawValue === '') {
+      // Restore the original formatted value
+      event.target.textContent = formatMoney(row.salary);
+      return;
+    }
+    
+    // Parse as a number (treat as whole number, not decimal)
+    let value = parseFloat(rawValue);
+    if (!isNaN(value)) {
+      // Store the value as a number (not formatted)
+      row.salary = value;
+      // Display the formatted value
+      event.target.textContent = formatMoney(value);
+      // Mark as unsaved
+      isSaved.value = false;
+      
+      // Trigger reactive update for monthly salary cells
+      if (visibleYears.value.length > 0) {
+        const year = visibleYears.value[0];
+        if (!payrollData.value[year]) {
+          payrollData.value[year] = {};
+        }
+        if (!payrollData.value[year][row.id]) {
+          payrollData.value[year][row.id] = {};
+        }
+        // Add a timestamp to force reactivity
+        payrollData.value[year][row.id]._lastUpdate = Date.now();
+      }
+    } else {
+      // If invalid, restore the original value
+      event.target.textContent = formatMoney(row.salary);
+    }
+  }
+
+  // Table Count Handlers (using robust pattern like monthly cells)
+  function handleTableCountInput(row, event) {
+    let value = event.target.textContent.replace(/[^0-9]/g, '');
+    row.count = value;
+    
+    // Trigger reactive update for monthly count and salary cells
+    if (visibleYears.value.length > 0) {
+      const year = visibleYears.value[0];
+      if (!payrollData.value[year]) {
+        payrollData.value[year] = {};
+      }
+      if (!payrollData.value[year][row.id]) {
+        payrollData.value[year][row.id] = {};
+      }
+      // Add a timestamp to force reactivity
+      payrollData.value[year][row.id]._lastUpdate = Date.now();
+    }
+  }
+
+  function handleTableCountFocus(row, event) {
+    // Show the raw number without any formatting when user starts editing
+    let rawValue = row.count;
+    if (typeof rawValue === 'string') {
+      // Remove any commas and formatting
+      rawValue = rawValue.replace(/[^0-9]/g, '');
+    }
+    event.target.textContent = rawValue || '';
+  }
+
+  function handleTableCountBlur(row, event) {
+    // Get the raw value from the cell content
+    let rawValue = event.target.textContent.replace(/[^0-9]/g, '');
+    
+    // If the raw value is empty or invalid, use the original count
+    if (!rawValue || rawValue === '') {
+      // Restore the original value
+      event.target.textContent = row.count || '0';
+      return;
+    }
+    
+    // Parse as a number
+    let value = parseInt(rawValue, 10);
+    if (!isNaN(value)) {
+      // Store the value as a number
+      row.count = value;
+      // Display the value
+      event.target.textContent = value;
+      // Mark as unsaved
+      isSaved.value = false;
+      
+      // Trigger reactive update for monthly count and salary cells
+      if (visibleYears.value.length > 0) {
+        const year = visibleYears.value[0];
+        if (!payrollData.value[year]) {
+          payrollData.value[year] = {};
+        }
+        if (!payrollData.value[year][row.id]) {
+          payrollData.value[year][row.id] = {};
+        }
+        // Add a timestamp to force reactivity
+        payrollData.value[year][row.id]._lastUpdate = Date.now();
+      }
+    } else {
+      // If invalid, restore the original value
+      event.target.textContent = row.count || '0';
+    }
   }
   </script>
   

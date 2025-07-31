@@ -6,15 +6,10 @@ import json
 def payroll_data_display(project=None):
     """Fetch Payroll data from Payroll Data doctype"""
     try:
-        # Define month order for SQL ordering
-        month_order = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-
         # SQL query to get Payroll data with project filter
         query = """
             SELECT 
                 parent.year,
-                parent.month,
                 child.department,
                 child.department_location,
                 child.position,
@@ -32,23 +27,19 @@ def payroll_data_display(project=None):
         # Add project filter if provided
         if project:
             query += " WHERE parent.project = %s"
-            query += " ORDER BY CAST(parent.year AS UNSIGNED) ASC, FIELD(parent.month, {month_order})".format(
-                month_order="'" + "', '".join(month_order) + "'"
-            )
+            query += " ORDER BY CAST(parent.year AS UNSIGNED) ASC"
             raw_results = frappe.db.sql(query, (project,), as_dict=True)
         else:
-            query += " ORDER BY CAST(parent.year AS UNSIGNED) ASC, FIELD(parent.month, {month_order})".format(
-                month_order="'" + "', '".join(month_order) + "'"
-            )
+            query += " ORDER BY CAST(parent.year AS UNSIGNED) ASC"
             raw_results = frappe.db.sql(query, as_dict=True)
         
         frappe.logger().info(f"Raw SQL results: {raw_results}")
 
-        # Nested dict: year -> month -> list of payroll rows
-        grouped_data = defaultdict(lambda: defaultdict(list))
+        # Group data by year -> list of payroll rows
+        grouped_data = defaultdict(list)
 
         for row in raw_results:
-            grouped_data[row['year']][row['month']].append({
+            grouped_data[row['year']].append({
                 "department": row['department'],
                 "department_location": row['department_location'],
                 "position": row['position'],
@@ -57,8 +48,8 @@ def payroll_data_display(project=None):
                 "amount": row['amount'] or 0
             })
 
-        # Convert defaultdicts to normal dicts for JSON serialization
-        result = {year: dict(months) for year, months in grouped_data.items()}
+        # Convert defaultdict to normal dict for JSON serialization
+        result = dict(grouped_data)
         frappe.logger().info(f"Final result: {result}")
         return result
 
@@ -72,7 +63,6 @@ def upsert_payroll_data_items(changes, project=None):
     """
     changes: JSON string or list of dicts, each with:
       - year
-      - month
       - department
       - department_location
       - position
@@ -96,7 +86,6 @@ def upsert_payroll_data_items(changes, project=None):
         for change in changes:
             try:
                 year = change.get("year")
-                month = change.get("month")
                 department = change.get("department")
                 department_location = change.get("department_location")
                 position = change.get("position")
@@ -104,24 +93,23 @@ def upsert_payroll_data_items(changes, project=None):
                 salary = change.get("salary")
                 amount = change.get("amount")
 
-                frappe.logger().info(f"Processing change: year={year}, month={month}, department={department}, department_location={department_location}, position={position}, designation={designation}, salary={salary}, amount={amount}")
+                frappe.logger().info(f"Processing change: year={year}, department={department}, department_location={department_location}, position={position}, designation={designation}, salary={salary}, amount={amount}")
 
-                if not all([year, month, department, department_location, position, designation]):
+                if not all([year, department, department_location, position, designation]):
                     frappe.logger().warning(f"Skipping invalid Payroll data change: {change}")
                     continue
 
                 # Find or create parent document with project filter
                 parent = frappe.db.get_value(
                     "Payroll Data",
-                    {"year": year, "month": month, "project": project} if project else {"year": year, "month": month},
+                    {"year": year, "project": project} if project else {"year": year},
                     "name"
                 )
                 if not parent:
-                    frappe.logger().info(f"Creating new parent document for year={year}, month={month}, project={project}")
+                    frappe.logger().info(f"Creating new parent document for year={year}, project={project}")
                     parent_doc = frappe.get_doc({
                         "doctype": "Payroll Data",
                         "year": year,
-                        "month": month,
                         "project": project,  # Add project field
                         "payroll_data": []
                     })
@@ -303,7 +291,6 @@ def test_payroll_upsert():
         test_changes = [
             {
                 "year": "2024",
-                "month": "Jan",
                 "department": "ROOMS",
                 "department_location": "Front Desk",
                 "position": "Manager",
