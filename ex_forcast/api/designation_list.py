@@ -54,3 +54,6 @@ def create_designation(designation_name):
             "success": False,
             "error": str(e)
         }
+    
+# http://127.0.0.1:8000/api/v2/method/ex_forcast.api.designation_list.get_designation_list
+# http://127.0.0.1:8000/api/v2/method/ex_forcast.api.designation_list.create_designation

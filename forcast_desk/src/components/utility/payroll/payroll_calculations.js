@@ -30,7 +30,7 @@ export function calculatePayrollTotal(rowId, year, months, getPayrollCellValue) 
  * @param {Array} payrollRows - Array of payroll rows
  * @param {string} category - Category filter
  * @param {string} location - Location filter
- * @returns {number} - Sub-total amount
+ * @returns {number} - Sub-total count
  */
 export function calculateSubTotalManagement(payrollRows, category, location) {
   const managementRows = payrollRows.filter(row => 
@@ -38,7 +38,7 @@ export function calculateSubTotalManagement(payrollRows, category, location) {
     row.departmentLocation === location && 
     row.position === 'Manager'
   );
-  return managementRows.reduce((sum, row) => sum + row.salary, 0);
+  return managementRows.reduce((sum, row) => sum + row.count, 0);
 }
 
 /**
@@ -150,7 +150,7 @@ export function calculateSubTotalManagementAnnual(payrollRows, category, locatio
  * @param {Array} payrollRows - Array of payroll rows
  * @param {string} category - Category filter
  * @param {string} location - Location filter
- * @returns {number} - Sub-total amount
+ * @returns {number} - Sub-total count
  */
 export function calculateSubTotalNonManagement(payrollRows, category, location) {
   const nonManagementRows = payrollRows.filter(row => 
@@ -158,7 +158,7 @@ export function calculateSubTotalNonManagement(payrollRows, category, location) 
     row.departmentLocation === location && 
     row.position === 'Non-manager'
   );
-  return nonManagementRows.reduce((sum, row) => sum + row.salary, 0);
+  return nonManagementRows.reduce((sum, row) => sum + row.count, 0);
 }
 
 /**
@@ -270,14 +270,14 @@ export function calculateSubTotalNonManagementAnnual(payrollRows, category, loca
  * @param {Array} payrollRows - Array of payroll rows
  * @param {string} category - Category filter
  * @param {string} location - Location filter
- * @returns {number} - Total amount
+ * @returns {number} - Total count
  */
 export function calculateLocationTotal(payrollRows, category, location) {
   const locationRows = payrollRows.filter(row => 
     row.category === category && 
     row.departmentLocation === location
   );
-  return locationRows.reduce((sum, row) => sum + (row.salary * row.count), 0);
+  return locationRows.reduce((sum, row) => sum + row.count, 0);
 }
 
 /**

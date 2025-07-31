@@ -435,7 +435,7 @@
                                     <!-- Monthly Salary cells -->
                                     <td 
                                       v-for="month in months" 
-                                      :key="'salary-cell-' + month"
+                                      :key="'salary-cell-' + month + '-' + (payrollData[visibleYears[0]]?.[row.id]?._lastUpdate || 0)"
                                       contenteditable="true"
                                       class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
                                       @input="handlePayrollCellInput(row.id, 'salary', visibleYears[0], month, $event)"
@@ -480,7 +480,7 @@
                                   </div>
                                 </td>
                                 <td class="px-3 py-2.5 text-right border-r border-violet-300">
-                                  <span class="font-mono text-sm font-semibold text-violet-900">{{ formatMoney(calculateSubTotalManagementLocal(category, location)) }}</span>
+                                  <span class="font-mono text-sm font-semibold text-violet-900">{{ calculateSubTotalManagementLocal(category, location) }}</span>
                                 </td>
                                 
                                 <!-- Monthly Count cells for subtotal -->
@@ -530,7 +530,7 @@
                                   </div>
                                 </td>
                                 <td class="px-3 py-2.5 text-right border-r border-violet-300">
-                                  <span class="font-mono text-sm font-semibold text-violet-900">{{ formatMoney(calculateSubTotalNonManagementLocal(category, location)) }}</span>
+                                  <span class="font-mono text-sm font-semibold text-violet-900">{{ calculateSubTotalNonManagementLocal(category, location) }}</span>
                                 </td>
                                 
                                 <!-- Monthly Count cells for subtotal -->
@@ -580,7 +580,7 @@
                                   </div>
                                 </td>
                                 <td class="px-3 py-3 text-right border-r border-violet-300">
-                                  <span class="font-mono text-sm font-bold text-violet-900">{{ formatMoney(calculateLocationTotalLocal(category, location)) }}</span>
+                                  <span class="font-mono text-sm font-bold text-violet-900">{{ calculateLocationTotalLocal(category, location) }}</span>
                                 </td>
                                 
                                 <!-- Monthly Count cells for total -->
@@ -1272,6 +1272,9 @@
         }
       });
     }
+    
+    // No need to initialize monthly count cells since we're using getter/setter pattern
+    // The monthly count cells will automatically get the main count value when no override exists
   }, { deep: true });
 
   // When opening the modal, copy the current settings
@@ -1307,7 +1310,7 @@
 
       // Load initial payroll data if project is selected
       if (selectedProject.value) {
-        await fetchPayrollData(selectedProject.value.project_name);
+        await fetchPayrollData(selectedProject.value.project_name, fromYear.value, toYear.value);
       }
 
       originalPayrollData.value = cloneDeep(payrollRows.value);
@@ -1333,7 +1336,7 @@
         // console.log('Reloading Payroll data for new project:', newProject.project_name);
         
         // Reload Payroll data for the new project
-        await fetchPayrollData(newProject.project_name);
+        await fetchPayrollData(newProject.project_name, fromYear.value, toYear.value);
         originalPayrollData.value = cloneDeep(payrollRows.value);
         
         // Reset any unsaved changes
@@ -1357,28 +1360,105 @@
     }
   }, { deep: true });
 
+  // Watch for year range changes and reload data
+  watch([fromYear, toYear], async ([newFromYear, newToYear], [oldFromYear, oldToYear]) => {
+    // Only reload if both years are selected and they've actually changed
+    if (selectedProject.value && newFromYear && newToYear && 
+        (newFromYear !== oldFromYear || newToYear !== oldToYear)) {
+      try {
+        await fetchPayrollData(selectedProject.value.project_name, newFromYear, newToYear);
+        originalPayrollData.value = cloneDeep(payrollRows.value);
+        
+        // Reset any unsaved changes
+        changedCells.value = [];
+        isSaved.value = true;
+        saveError.value = "";
+        
+        console.log(`Payroll data filtered for years ${newFromYear}-${newToYear}`);
+      } catch (error) {
+        console.error('Error reloading Payroll data for new year range:', error);
+        alertService.error("Failed to load data for selected year range. Please try again.");
+      }
+    }
+  }, { deep: true });
+
   function clearYearSelection() {
     clearYearSettings();
     isSaved.value = false;
   }
 
+  // Function to get monthly count value with getter/setter pattern
+  function getMonthlyCountValue(rowId, year, month) {
+    const row = payrollRows.value.find(r => r.id === rowId);
+    if (!row) return 0;
+    
+    // Check if there's an override for this specific month
+    const countData = payrollData.value[year]?.[rowId]?.['count'];
+    if (countData && typeof countData === 'object' && countData !== null) {
+      const overrideValue = countData[month];
+      if (overrideValue !== undefined && overrideValue !== null) {
+        return overrideValue;
+      }
+    }
+    
+    // If no override exists, return the main count value (getter behavior)
+    return row.count || 0;
+  }
+
+  // Function to set monthly count value with getter/setter pattern
+  function setMonthlyCountValue(rowId, year, month, newValue) {
+    // Ensure the data structure exists
+    if (!payrollData.value[year]) {
+      payrollData.value[year] = {};
+    }
+    if (!payrollData.value[year][rowId]) {
+      payrollData.value[year][rowId] = {};
+    }
+    if (typeof payrollData.value[year][rowId]['count'] !== 'object' || 
+        payrollData.value[year][rowId]['count'] === null) {
+      payrollData.value[year][rowId]['count'] = {};
+    }
+    
+    // Store the override value for this specific month
+    payrollData.value[year][rowId]['count'][month] = newValue;
+  }
+
   function handlePayrollCellEditLocal(rowId, fieldType, year, month, event) {
-    handlePayrollCellEdit(changedCells.value, rowId, fieldType, year, event);
+    const newValue = parseFloat(event.target.textContent) || 0;
+    
+    // Store the value in payrollData for immediate reactivity
+    if (!payrollData.value[year]) {
+      payrollData.value[year] = {};
+    }
+    if (!payrollData.value[year][rowId]) {
+      payrollData.value[year][rowId] = {};
+    }
+    
+    // For count fields, use the setter pattern
+    if (fieldType === 'count' && month) {
+      // Use the setter function to store the override value
+      setMonthlyCountValue(rowId, year, month, newValue);
+    } else {
+      // For other fields, store globally
+      payrollData.value[year][rowId][fieldType] = newValue;
+    }
+    
+    // Call the original handler for change tracking
+    // This will add the change to changedCells array for saving to backend
+    handlePayrollCellEdit(changedCells.value, rowId, fieldType, year, month, event);
     isSaved.value = false;
     
     // If this is a count field change, trigger reactive update for salary cells
     if (fieldType === 'count' && month) {
       // Force a reactive update by triggering a small change to the payrollData
       // This will cause Vue to re-evaluate the salary cells
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][rowId]) {
-        payrollData.value[year][rowId] = {};
-      }
-      
-      // Add a timestamp to force reactivity
       payrollData.value[year][rowId]._lastUpdate = Date.now();
+      
+      // Also trigger a more explicit update for the specific month
+      if (!payrollData.value[year][rowId].monthlyUpdates) {
+        payrollData.value[year][rowId].monthlyUpdates = {};
+      }
+      payrollData.value[year][rowId].monthlyUpdates[month] = Date.now();
     }
   }
 
@@ -1388,16 +1468,33 @@
       const value = event.target.textContent.replace(/[^0-9.]/g, '');
       event.target.textContent = value;
     }
+    // Allow only numbers for count fields
+    if (fieldType === 'count') {
+      const value = event.target.textContent.replace(/[^0-9]/g, '');
+      event.target.textContent = value;
+    }
   }
 
   function handlePayrollCellFocus(rowId, fieldType, year, month, event) {
     // Format the number when user starts editing salary or annual fields
     if (fieldType === 'salary' || fieldType === 'annual') {
-      const value = parseFloat(event.target.textContent);
-      if (!isNaN(value)) {
-        // Show the raw number without commas for easier editing
-        event.target.textContent = value.toString();
+      // For salary cells, get the raw calculated value
+      if (fieldType === 'salary' && month) {
+        const rawValue = getPayrollCellValueLocal(rowId, fieldType, year, month);
+        event.target.textContent = rawValue.toString();
+      } else {
+        // For other fields, parse the current text content
+        const value = parseFloat(event.target.textContent.replace(/[^0-9.]/g, ''));
+        if (!isNaN(value)) {
+          // Show the raw number without commas for easier editing
+          event.target.textContent = value.toString();
+        }
       }
+    }
+    // For count fields, show the raw number for easier editing
+    if (fieldType === 'count') {
+      const rawValue = getPayrollCellValueLocal(rowId, fieldType, year, month);
+      event.target.textContent = rawValue.toString();
     }
   }
 
@@ -1515,10 +1612,12 @@
       // Save payroll data changes
       const result = await savePayrollChanges(changedCells.value, selectedProject.value?.project_name);
       
-      // Reload from backend after save
-      await fetchPayrollData(selectedProject.value?.project_name);
-      originalPayrollData.value = cloneDeep(payrollRows.value);
+      // Clear changed cells BEFORE reloading data to prevent rowId mismatch
       changedCells.value = [];
+      
+      // Reload from backend after save
+      await fetchPayrollData(selectedProject.value?.project_name, fromYear.value, toYear.value);
+      originalPayrollData.value = cloneDeep(payrollRows.value);
       isSaved.value = true;
       alertService.success("Changes saved successfully");
       isSaving.value = false;
@@ -1568,6 +1667,10 @@
   }
 
   function getPayrollCellValueLocal(rowId, fieldType, year, month) {
+    // Use the new getter/setter pattern for monthly count cells
+    if (fieldType === 'count' && month) {
+      return getMonthlyCountValue(rowId, year, month);
+    }
     return getPayrollCellValue(payrollRows.value, payrollData, rowId, fieldType, year, month);
   }
 
@@ -1798,14 +1901,15 @@
     // Parse as a number
     let value = parseInt(rawValue, 10);
     if (!isNaN(value)) {
-      // Store the value as a number
+      // ✅ FIXED: Only update the base count, don't affect monthly overrides
       row.count = value;
       // Display the value
       event.target.textContent = value;
       // Mark as unsaved
       isSaved.value = false;
       
-      // Trigger reactive update for monthly count and salary cells
+      // ✅ FIXED: Trigger reactive update for monthly salary cells only
+      // Monthly count cells should NOT be affected by base count changes
       if (visibleYears.value.length > 0) {
         const year = visibleYears.value[0];
         if (!payrollData.value[year]) {
@@ -1814,7 +1918,7 @@
         if (!payrollData.value[year][row.id]) {
           payrollData.value[year][row.id] = {};
         }
-        // Add a timestamp to force reactivity
+        // Add a timestamp to force reactivity for salary calculations
         payrollData.value[year][row.id]._lastUpdate = Date.now();
       }
     } else {

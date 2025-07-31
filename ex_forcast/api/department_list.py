@@ -64,3 +64,6 @@ def create_department(department_name):
             "success": False,
             "error": str(e)
         }
+    
+# http://127.0.0.1:8000/api/v2/method/ex_forcast.api.department_list.get_department_list
+# http://127.0.0.1:8000/api/v2/method/ex_forcast.api.department_list.create_department

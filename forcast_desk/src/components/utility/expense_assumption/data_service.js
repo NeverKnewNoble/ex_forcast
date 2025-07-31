@@ -8,7 +8,7 @@ export async function loadYearOptions() {
     // console.log('Raw API response:', data);
     const filteredOptions = data.data.options.filter(option => option);
     // console.log('Filtered year options:', filteredOptions);
-    return filteredOptions;
+    return filteredOptions; 
   } catch (error) {
     console.error("Error loading year options:", error);
     return [];

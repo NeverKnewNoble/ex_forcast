@@ -152,7 +152,7 @@ export async function loadDesignationOptions() {
 }
 
 // Fetch payroll data from API
-export async function fetchPayrollData(projectName) {
+export async function fetchPayrollData(projectName, fromYear = null, toYear = null) {
   try {
     if (!projectName) {
       console.warn('No project name provided for payroll data fetch');
@@ -168,9 +168,29 @@ export async function fetchPayrollData(projectName) {
       const transformedRows = [];
       
       Object.keys(data.message).forEach(year => {
+        // Filter by year range if provided
+        if (fromYear && toYear) {
+          const yearNum = parseInt(year);
+          const fromYearNum = parseInt(fromYear);
+          const toYearNum = parseInt(toYear);
+          
+          if (yearNum < fromYearNum || yearNum > toYearNum) {
+            return; // Skip this year if it's outside the selected range
+          }
+        }
+        
         // API now returns data directly by year, no month nesting
         data.message[year].forEach(item => {
-          const rowId = Date.now() + Math.random(); // Generate unique ID
+          // Use the backend's unique_id as the rowId, or generate one if it doesn't exist
+          // For existing records without unique_id, we'll use a combination of business fields as fallback
+          let rowId;
+          if (item.unique_id) {
+            rowId = item.unique_id;
+          } else {
+            // Fallback: create a stable ID from business fields for existing records
+            rowId = `${item.department}_${item.department_location}_${item.position}_${item.designation}_${year}`;
+          }
+          
           const row = {
             id: rowId,
             department: item.department,
@@ -180,7 +200,8 @@ export async function fetchPayrollData(projectName) {
             salary: item.salary,
             count: item.amount,
             category: item.department, // Assuming category is based on department
-            year: year
+            year: year,
+            unique_id: item.unique_id // Include the unique_id from backend
             // Removed month since API no longer uses it
           };
           
@@ -195,8 +216,12 @@ export async function fetchPayrollData(projectName) {
           }
           
           transformedData[year][rowId] = {
-            count: item.amount,
-            salary: item.salary
+            salary: item.salary,
+            unique_id: item.unique_id, // Store unique_id in payrollData as well
+            // Store monthly counts from backend if they exist
+            ...(item.monthly_count && Object.keys(item.monthly_count).length > 0 && {
+              count: item.monthly_count
+            })
           };
         });
       });
@@ -226,22 +251,82 @@ export async function savePayrollChanges(changes, projectName) {
       return { status: 'success', message: 'No changes to save' };
     }
 
+    console.log('Saving payroll changes:', {
+      changesCount: changes.length,
+      projectName,
+      availableRows: payrollRows.value.length
+    });
+
+    // Group changes by row to collect monthly counts
+    const changesByRow = {};
+    
+    changes.forEach(change => {
+      console.log('Processing change:', change);
+      if (!changesByRow[change.rowId]) {
+        changesByRow[change.rowId] = {
+          changes: [],
+          monthly_count: {},
+          baseCountChanged: false
+        };
+      }
+      
+      changesByRow[change.rowId].changes.push(change);
+      
+      // ✅ FIXED: Proper handling of base count vs monthly overrides
+      if (change.fieldType === 'count') {
+        if (change.month && change.isOverride) {
+          // This is a monthly override
+          changesByRow[change.rowId].monthly_count[change.month] = change.newValue;
+        } else if (!change.month) {
+          // This is a base count change
+          changesByRow[change.rowId].baseCountChanged = true;
+          changesByRow[change.rowId].baseCount = change.newValue;
+        }
+      }
+    });
+
+    console.log('Changes grouped by row:', Object.keys(changesByRow));
+
     // Transform changes to API format
-    const apiChanges = changes.map(change => {
-      const row = payrollRows.value.find(r => r.id === change.rowId);
+    const apiChanges = Object.keys(changesByRow).map(rowId => {
+      const row = payrollRows.value.find(r => r.id === rowId);
       if (!row) {
-        throw new Error(`Row with ID ${change.rowId} not found`);
+        console.error('Row not found. Available rows:', payrollRows.value.map(r => ({ 
+          id: r.id, 
+          unique_id: r.unique_id,
+          department: r.department, 
+          position: r.position 
+        })));
+        throw new Error(`Row with ID ${rowId} not found. Available rows: ${payrollRows.value.length}`);
       }
 
-      return {
+      const rowChanges = changesByRow[rowId];
+      const latestChange = rowChanges.changes[rowChanges.changes.length - 1];
+
+      console.log('Processing change for row:', {
+        rowId,
+        unique_id: row.unique_id,
+        department: row.department,
+        position: row.position,
+        fieldType: latestChange.fieldType,
+        newValue: latestChange.newValue
+      });
+
+      const apiChange = {
         year: row.year,
         department: row.department,
         department_location: row.departmentLocation,
         position: row.position,
         designation: row.designation,
-        salary: change.fieldType === 'salary' ? change.newValue : row.salary,
-        amount: change.fieldType === 'count' ? change.newValue : row.count
+        salary: latestChange.fieldType === 'salary' ? latestChange.newValue : row.salary,
+        // ✅ FIXED: Use base count from changes if it was modified, otherwise use row count
+        amount: rowChanges.baseCountChanged ? rowChanges.baseCount : row.count,
+        unique_id: row.unique_id || null, // Include the unique_id, or null if not available
+        monthly_count: Object.keys(rowChanges.monthly_count).length > 0 ? rowChanges.monthly_count : undefined
       };
+      
+      console.log('API change being sent:', apiChange);
+      return apiChange;
     });
 
     const response = await fetch('/api/method/ex_forcast.api.call_and_save_payroll_data.upsert_payroll_data_items', {

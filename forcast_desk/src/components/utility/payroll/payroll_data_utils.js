@@ -115,12 +115,25 @@ export function getPayrollCellValue(payrollRows, payrollData, rowId, fieldType, 
   if (!row) return 0;
   
   if (fieldType === 'count') {
-    // For count field, first check if there's specific data in payrollData
-    const specificValue = payrollData[year]?.[rowId]?.[fieldType];
-    if (specificValue !== undefined && specificValue !== null) {
-      return specificValue;
+    // ✅ FIXED: Proper separation between base count and monthly overrides
+    
+    // For monthly count cells, check for overrides first
+    if (month) {
+      const countData = payrollData[year]?.[rowId]?.[fieldType];
+      
+      // Check if there's a monthly override for this specific month
+      if (countData && typeof countData === 'object' && countData !== null) {
+        const overrideValue = countData[month];
+        if (overrideValue !== undefined && overrideValue !== null) {
+          return overrideValue; // Return the override value
+        }
+      }
+      
+      // If no override exists, return the base count (getter behavior)
+      return row.count || 0;
     }
-    // If no specific data found, return the row's count value
+    
+    // For non-monthly contexts (like the main count column), return the base count
     return row.count || 0;
   } else if (fieldType === 'salary') {
     // For salary field, first check if there's specific data in payrollData
@@ -130,7 +143,9 @@ export function getPayrollCellValue(payrollRows, payrollData, rowId, fieldType, 
     }
     // If no specific data found, calculate as row's salary * monthly count
     const monthlyCount = getPayrollCellValue(payrollRows, payrollData, rowId, 'count', year, month);
-    return (row.salary || 0) * monthlyCount;
+    const calculatedSalary = (row.salary || 0) * monthlyCount;
+    
+    return calculatedSalary;
   } else if (fieldType === 'annual') {
     // For annual percentage increment
     return payrollData[year]?.[rowId]?.[fieldType] || 0;
@@ -144,10 +159,11 @@ export function getPayrollCellValue(payrollRows, payrollData, rowId, fieldType, 
  * @param {number} rowId - Row ID
  * @param {string} fieldType - Field type
  * @param {string} year - Year
+ * @param {string} month - Month (optional)
  * @param {Event} event - Input event
  * @returns {Array} - Updated changed cells array
  */
-export function handlePayrollCellEdit(changedCells, rowId, fieldType, year, event) {
+export function handlePayrollCellEdit(changedCells, rowId, fieldType, year, month, event) {
   const newValue = parseFloat(event.target.textContent) || 0;
   
   // Format the display with commas for salary and annual fields
@@ -162,19 +178,26 @@ export function handlePayrollCellEdit(changedCells, rowId, fieldType, year, even
     }
   }
   
+  // ✅ FIXED: Proper handling of monthly count overrides
+  // For count fields with month, this is a monthly override
+  // For count fields without month, this is a base count update
+  const changeData = {
+    rowId,
+    fieldType,
+    year,
+    month,
+    newValue,
+    isOverride: fieldType === 'count' && month // Mark if this is a monthly override
+  };
+  
   const existingChangeIndex = changedCells.findIndex(
-    cell => cell.rowId === rowId && cell.fieldType === fieldType && cell.year === year
+    cell => cell.rowId === rowId && cell.fieldType === fieldType && cell.year === year && cell.month === month
   );
   
   if (existingChangeIndex >= 0) {
-    changedCells[existingChangeIndex].newValue = newValue;
+    changedCells[existingChangeIndex] = changeData;
   } else {
-    changedCells.push({
-      rowId,
-      fieldType,
-      year,
-      newValue
-    });
+    changedCells.push(changeData);
   }
   
   return changedCells;

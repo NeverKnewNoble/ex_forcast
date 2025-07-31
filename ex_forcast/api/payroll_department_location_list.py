@@ -54,3 +54,7 @@ def create_payroll_department_location(department_location):
             "success": False,
             "error": str(e)
         } 
+    
+
+# http://127.0.0.1:8000/api/v2/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list
+# http://127.0.0.1:8000/api/v2/method/ex_forcast.api.payroll_department_location_list.create_payroll_department_location

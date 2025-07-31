@@ -53,6 +53,7 @@ const routes = [
     path: '/payroll_data',
     component: () => import('@/pages/payroll/Payroll_Data.vue'),
   },
+
 ]
 
 let router = createRouter({
