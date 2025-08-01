@@ -148,7 +148,6 @@ import {
   CircleArrowLeft,
   ChevronDown,
   ChevronUp,
-  Book,
   HandCoins,
   Ellipsis,
   Plus,
@@ -184,7 +183,6 @@ const menuItems = [
     icon: Sheet,
     children: [
       { text: "Payroll Data", route: "/payroll_data", icon: HandCoins },
-      { text: "Payroll Model Test", route: "/payroll-model-test", icon: Book },
       { text: "Payroll Related", route: "/", icon: Ellipsis },
       { text: "Bonus", route: "/", icon: Ellipsis }
     ]

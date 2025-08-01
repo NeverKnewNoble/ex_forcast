@@ -432,7 +432,9 @@
                                     >
                                       <span class="font-mono text-xs">{{ getPayrollCellValueLocal(row.id, 'count', visibleYears[0], month) }}</span>
                                     </td>
-                                    <!-- Monthly Salary cells -->
+                                  </template>
+                                  <!-- Monthly Salary cells -->
+                                  <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
                                     <td 
                                       v-for="month in months" 
                                       :key="'salary-cell-' + month + '-' + (payrollData[visibleYears[0]]?.[row.id]?._lastUpdate || 0)"
@@ -492,7 +494,9 @@
                                   >
                                     <span class="font-mono text-xs text-violet-900">{{ calculateSubTotalManagementMonthlyCountLocal(category, location, visibleYears[0], month) }}</span>
                                   </td>
-                                  <!-- Monthly Salary cells for subtotal -->
+                                </template>
+                                <!-- Monthly Salary cells for subtotal -->
+                                <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
                                   <td 
                                     v-for="month in months" 
                                     :key="'subtotal-mgmt-salary-' + month"
@@ -542,7 +546,9 @@
                                   >
                                     <span class="font-mono text-xs text-violet-900">{{ calculateSubTotalNonManagementMonthlyCountLocal(category, location, visibleYears[0], month) }}</span>
                                   </td>
-                                  <!-- Monthly Salary cells for subtotal -->
+                                </template>
+                                <!-- Monthly Salary cells for subtotal -->
+                                <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
                                   <td 
                                     v-for="month in months" 
                                     :key="'subtotal-nonmgmt-salary-' + month"
@@ -592,7 +598,9 @@
                                   >
                                     <span class="font-mono text-xs text-violet-900">{{ calculateLocationTotalMonthlyCountLocal(category, location, visibleYears[0], month) }}</span>
                                   </td>
-                                  <!-- Monthly Salary cells for total -->
+                                </template>
+                                <!-- Monthly Salary cells for total -->
+                                <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
                                   <td 
                                     v-for="month in months" 
                                     :key="'total-salary-' + month"
@@ -1099,12 +1107,8 @@
     isYearCollapsed
   } from "@/components/utility/expense_assumption/index.js";
   import { cloneDeep } from 'lodash-es';
-  // Import project service
   import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';  
-
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  // Import payroll service and utilities
   import {
     showAddPayrollModal,
     isSubmittingPayroll,
@@ -1167,27 +1171,13 @@
     FIELD_TYPES,
     POSITION_FILTERS,
     // Utility functions
-    allowOnlyNumbers
+    allowOnlyNumbers,
   } from '@/components/utility/payroll/index.js';
   
 
 
 
-
-
-  //! Helper function to safely format numbers to 2 decimal places with commas
-  function formatMoney(value) {
-    if (value === null || value === undefined || isNaN(value)) {
-      return '0.00';
-    }
-    const num = parseFloat(value);
-    return num.toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-  }
-  
-  // Reactive state
+  // ************ Reactive state ****************
   const years = ref([]);
   const displayMode = ref("monthly");
   const showAdvanced = ref(false);
@@ -1200,17 +1190,32 @@
   const sidebarCollapsed = ref(false);
   const isComponentReady = ref(false); // Add a flag to track if component is ready
 
-  // Quick Actions state
+  // ************ Quick Actions state ****************
   const newDepartmentName = ref('');
   const newLocationName = ref('');
   const newDesignationName = ref('');
-  const isCreatingDepartment = ref(false);
+  const isCreatingDepartment = ref(false);  
   const isCreatingLocation = ref(false);
   const isCreatingDesignation = ref(false);
   const showQuickActions = ref(false);
  
 
+  //! Helper function to safely format numbers to 2 decimal places with commas
+  function formatMoney(value) {
+    if (value === null || value === undefined || isNaN(value)) {
+      return '0.00';
+    }
+    const num = parseFloat(value);
+    return num.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
 
+
+
+  // Months
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   // ! Cache for calculations
   const calculationCache = useCalculationCache();  
@@ -1629,10 +1634,8 @@
     }
   };
 
-
-
-  // ! Unsaved Changes Warning Modal
-  // ! Watch for unsaved changes to show warning on page refresh
+  // ************ Unsaved Changes Warning Modal ****************
+  // ************ Watch for unsaved changes to show warning on page refresh ****************
   watch(isSaved, (newValue) => {
     if (!newValue) {
       // Add beforeunload event listener when there are unsaved changes
@@ -1710,11 +1713,6 @@
   function resetToDefaultLocal() {
     resetToDefault(payrollRows.value);
     alertService.success('Payroll data has been reset to default.');
-  }
-
-  function addSamplePayrollDataLocal() {
-    addSamplePayrollData(payrollRows.value);
-    alertService.success('Sample payroll data loaded successfully.');
   }
 
   // Local wrapper functions for calculations
