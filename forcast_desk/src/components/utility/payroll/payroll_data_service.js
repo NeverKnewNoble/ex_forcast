@@ -225,9 +225,11 @@ export async function fetchPayrollData(projectName, fromYear = null, toYear = nu
             salary: item.salary,
             unique_id: item.unique_id, // Store unique_id in payrollData as well
             // Store monthly counts from backend if they exist
-            ...(item.monthly_count && Object.keys(item.monthly_count).length > 0 && {
-              count: item.monthly_count
-            })
+            count: item.monthly_count && Object.keys(item.monthly_count).length > 0 
+              ? item.monthly_count 
+              : {},
+            // Initialize salary as empty object for monthly overrides
+            salary: {}
           };
         });
       });

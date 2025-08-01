@@ -18,9 +18,9 @@ export function calculatePayrollTotal(rowId, year, months, getPayrollCellValue) 
   }
   
   months.forEach(month => {
-    const count = getPayrollCellValue(rowId, 'count', year, month);
-    const salary = getPayrollCellValue(rowId, 'salary', year, month);
-    total += count * salary;
+    // Get the monthly salary value (already calculated as count * base salary)
+    const monthlySalary = getPayrollCellValue(rowId, 'salary', year, month);
+    total += monthlySalary;
   });
   return total;
 }
@@ -96,9 +96,9 @@ export function calculateSubTotalManagementMonthlySalary(payrollRows, category, 
     row.position === 'Manager'
   );
   return managementRows.reduce((sum, row) => {
-    const count = getPayrollCellValue(row.id, 'count', year, month);
-    const salary = getPayrollCellValue(row.id, 'salary', year, month);
-    return sum + (count * salary);
+    // Get the monthly salary value (already calculated as count * base salary)
+    const monthlySalary = getPayrollCellValue(row.id, 'salary', year, month);
+    return sum + monthlySalary;
   }, 0);
 }
 
@@ -216,9 +216,9 @@ export function calculateSubTotalNonManagementMonthlySalary(payrollRows, categor
     row.position === 'Non-manager'
   );
   return nonManagementRows.reduce((sum, row) => {
-    const count = getPayrollCellValue(row.id, 'count', year, month);
-    const salary = getPayrollCellValue(row.id, 'salary', year, month);
-    return sum + (count * salary);
+    // Get the monthly salary value (already calculated as count * base salary)
+    const monthlySalary = getPayrollCellValue(row.id, 'salary', year, month);
+    return sum + monthlySalary;
   }, 0);
 }
 
@@ -332,9 +332,9 @@ export function calculateLocationTotalMonthlySalary(payrollRows, category, locat
     row.departmentLocation === location
   );
   return locationRows.reduce((sum, row) => {
-    const count = getPayrollCellValue(row.id, 'count', year, month);
-    const salary = getPayrollCellValue(row.id, 'salary', year, month);
-    return sum + (count * salary);
+    // Get the monthly salary value (already calculated as count * base salary)
+    const monthlySalary = getPayrollCellValue(row.id, 'salary', year, month);
+    return sum + monthlySalary;
   }, 0);
 }
 
