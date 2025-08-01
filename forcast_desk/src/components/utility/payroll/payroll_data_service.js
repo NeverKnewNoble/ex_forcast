@@ -28,10 +28,11 @@ export const payrollRows = ref([]);
 import { months } from "@/components/utility/expense_assumption/index.js";
 export { months };
 
-// API calls
+
+//! ************ Department Options ****************
 export async function loadDepartmentOptions() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.call_and_save_payroll_data.get_departments_list');
+    const response = await fetch('/api/method/ex_forcast.api.department_list.get_department_list');
     const data = await response.json();
     
     if (data.message && data.message.success) {
@@ -63,9 +64,11 @@ export async function loadDepartmentOptions() {
   }
 }
 
+
+//! ************ Department Location Options ****************
 export async function loadDepartmentLocationOptions() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.call_and_save_payroll_data.get_department_locations_list');
+    const response = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list');
     const data = await response.json();
     
     if (data.message && data.message.success) {
@@ -101,9 +104,11 @@ export async function loadDepartmentLocationOptions() {
   }
 }
 
+
+//! ************ Designation Options ****************
 export async function loadDesignationOptions() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.call_and_save_payroll_data.get_designations_list');
+    const response = await fetch('/api/method/ex_forcast.api.designation_list.get_designation_list');
     const data = await response.json();
     
     if (data.message && data.message.success) {
@@ -151,7 +156,8 @@ export async function loadDesignationOptions() {
   }
 }
 
-// Fetch payroll data from API
+
+//! ************ Fetch payroll data from API ****************
 export async function fetchPayrollData(projectName, fromYear = null, toYear = null) {
   try {
     if (!projectName) {
@@ -229,7 +235,7 @@ export async function fetchPayrollData(projectName, fromYear = null, toYear = nu
       payrollData.value = transformedData;
       payrollRows.value = transformedRows;
       
-      console.log('Payroll data loaded successfully:', transformedRows.length, 'rows');
+      // console.log('Payroll data loaded successfully:', transformedRows.length, 'rows');
     } else {
       console.error('Failed to load payroll data:', data.message?.error);
       alertService.error('Failed to load payroll data');
@@ -240,7 +246,8 @@ export async function fetchPayrollData(projectName, fromYear = null, toYear = nu
   }
 }
 
-// Save payroll changes to API
+
+//! ************ Save payroll changes to API ****************
 export async function savePayrollChanges(changes, projectName) {
   try {
     if (!projectName) {
@@ -272,7 +279,7 @@ export async function savePayrollChanges(changes, projectName) {
       
       changesByRow[change.rowId].changes.push(change);
       
-      // ✅ FIXED: Proper handling of base count vs monthly overrides
+      // Proper handling of base count vs monthly overrides
       if (change.fieldType === 'count') {
         if (change.month && change.isOverride) {
           // This is a monthly override
@@ -319,7 +326,7 @@ export async function savePayrollChanges(changes, projectName) {
         position: row.position,
         designation: row.designation,
         salary: latestChange.fieldType === 'salary' ? latestChange.newValue : row.salary,
-        // ✅ FIXED: Use base count from changes if it was modified, otherwise use row count
+        // Use base count from changes if it was modified, otherwise use row count
         amount: rowChanges.baseCountChanged ? rowChanges.baseCount : row.count,
         unique_id: row.unique_id || null, // Include the unique_id, or null if not available
         monthly_count: Object.keys(rowChanges.monthly_count).length > 0 ? rowChanges.monthly_count : undefined
@@ -329,6 +336,7 @@ export async function savePayrollChanges(changes, projectName) {
       return apiChange;
     });
 
+    //! ************ Save payroll changes to API ****************
     const response = await fetch('/api/method/ex_forcast.api.call_and_save_payroll_data.upsert_payroll_data_items', {
       method: 'POST',
       headers: {
@@ -354,7 +362,8 @@ export async function savePayrollChanges(changes, projectName) {
   }
 }
 
-// Modal functions
+
+//! ************ Modal functions ****************
 export function openAddPayrollModal() {
   showAddPayrollModal.value = true;
   resetPayrollForm();
@@ -400,6 +409,8 @@ export function removePayrollRow(index) {
   }
 }
 
+
+//! ************ Submit payroll data to API ****************
 export async function submitPayrollData(selectedProject, payrollRows, reloadData) {
   if (!selectedProject) {
     alertService.error("Please select a project first");
@@ -440,6 +451,7 @@ export async function submitPayrollData(selectedProject, payrollRows, reloadData
       amount: row.count
     }));
 
+    //! ************ Submit payroll data to API ****************
     const response = await fetch('/api/method/ex_forcast.api.call_and_save_payroll_data.upsert_payroll_data_items', {
       method: 'POST',
       headers: {
@@ -474,7 +486,8 @@ export async function submitPayrollData(selectedProject, payrollRows, reloadData
   }
 }
 
-// Quick Actions - Create new items
+
+//! ************ Create new items ****************
 export async function createDepartment(departmentName) {
   try {
     const response = await fetch('/api/method/ex_forcast.api.department_list.create_department', {
@@ -503,6 +516,8 @@ export async function createDepartment(departmentName) {
   }
 }
 
+
+//! ************ Create new department location ****************
 export async function createDepartmentLocation(locationName) {
   try {
     const response = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.create_payroll_department_location', {
@@ -531,6 +546,8 @@ export async function createDepartmentLocation(locationName) {
   }
 }
 
+
+//! ************ Create new designation ****************
 export async function createDesignation(designationName) {
   try {
     const response = await fetch('/api/method/ex_forcast.api.designation_list.create_designation', {
