@@ -404,7 +404,7 @@
                                   <td
                                     class="px-3 py-2 text-right border-r border-violet-200 font-mono text-sm"
                                     contenteditable="true"
-                                    :key="row.id + '-salary-' + row.salary"
+                                    :key="row.id + '-salary'"
                                     @input="handleTableSalaryInput(row, $event)"
                                     @focus="handleTableSalaryFocus(row, $event)"
                                     @blur="handleTableSalaryBlur(row, $event)"
@@ -422,7 +422,7 @@
                                   <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
                                     <td 
                                       v-for="month in months" 
-                                      :key="'count-cell-' + month"
+                                      :key="'count-cell-' + month + '-' + (getPayrollCellValueLocal(row.id, 'count', visibleYears[0], month) || 0)"
                                       contenteditable="true"
                                       class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
                                       @input="handlePayrollCellInput(row.id, 'count', visibleYears[0], month, $event)"
@@ -437,13 +437,8 @@
                                   <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
                                     <td 
                                       v-for="month in months" 
-                                      :key="'salary-cell-' + month + '-' + (payrollData[visibleYears[0]]?.[row.id]?._lastUpdate || 0)"
-                                      contenteditable="true"
-                                      class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
-                                      @input="handlePayrollCellInput(row.id, 'salary', visibleYears[0], month, $event)"
-                                      @focus="handlePayrollCellFocus(row.id, 'salary', visibleYears[0], month, $event)"
-                                      @blur="handlePayrollCellEditLocal(row.id, 'salary', visibleYears[0], month, $event)"
-                                      @keypress="allowOnlyNumbers($event)"
+                                      :key="'salary-cell-' + month + '-' + (payrollData[visibleYears[0]]?.[row.id]?._lastUpdate || 0) + '-' + (payrollData[visibleYears[0]]?.[row.id]?._forceUpdate || 0) + '-' + (getPayrollCellValueLocal(row.id, 'count', visibleYears[0], month) || 0)"
+                                      class="px-2 py-1 text-right border border-violet-200 bg-gray-50"
                                     >
                                       <span class="font-mono text-xs">{{ formatMoney(getPayrollCellValueLocal(row.id, 'salary', visibleYears[0], month)) }}</span>
                                     </td>
@@ -790,7 +785,7 @@
               </select>
             </div>
 
-                        <!-- Quick Actions Tab -->
+            <!-- Quick Actions Tab -->
             <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-6 border border-violet-200 shadow-sm">
               <div class="flex items-center justify-between mb-4 cursor-pointer" @click="toggleQuickActions">
                 <div class="flex items-center gap-2">
@@ -1072,7 +1067,7 @@
   
   
   <script setup>
-  import { ref, onMounted, computed, watch, onUnmounted, reactive } from "vue";
+  import { ref, onMounted, computed, watch, onUnmounted, reactive, nextTick } from "vue";
   import { storeToRefs } from 'pinia';
   import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
   import Sidebar from "@/components/ui/Sidebar.vue";
@@ -1240,6 +1235,41 @@
     return hasPayrollData(payrollRows.value);
   });
 
+  // Computed property to track monthly count changes for better reactivity
+  const monthlyCountTracker = computed(() => {
+    if (!visibleYears.value.length || !payrollRows.value.length) return 0;
+    
+    const year = visibleYears.value[0];
+    let tracker = 0;
+    
+    payrollRows.value.forEach(row => {
+      months.forEach(month => {
+        const countValue = getPayrollCellValueLocal(row.id, 'count', year, month);
+        tracker += countValue || 0;
+      });
+    });
+    
+    return tracker;
+  });
+
+  // Computed property for monthly salary calculations to ensure reactivity
+  const monthlySalaryTracker = computed(() => {
+    if (!visibleYears.value.length || !payrollRows.value.length) return 0;
+    
+    const year = visibleYears.value[0];
+    let tracker = 0;
+    
+    payrollRows.value.forEach(row => {
+      months.forEach(month => {
+        const countValue = getPayrollCellValueLocal(row.id, 'count', year, month);
+        const salary = row.salary || 0;
+        tracker += (countValue || 0) * salary;
+      });
+    });
+    
+    return tracker;
+  });
+
 
   // Watch for changes in visible years to initialize advanced modes
   watch(visibleYears, () => {
@@ -1265,14 +1295,33 @@
           // Force reactive update for all monthly cells of this row
           if (visibleYears.value.length > 0) {
             const year = visibleYears.value[0];
+            
+            // Ensure data structure is properly initialized
             if (!payrollData.value[year]) {
               payrollData.value[year] = {};
             }
             if (!payrollData.value[year][newRow.id]) {
               payrollData.value[year][newRow.id] = {};
             }
+            
+            // Ensure count and salary structures are objects
+            ensureCountDataStructure(newRow.id, year);
+            ensureSalaryDataStructure(newRow.id, year);
+            
             // Add a timestamp to force reactivity
             payrollData.value[year][newRow.id]._lastUpdate = Date.now();
+            
+            // If salary changed, update all monthly salary calculations
+            if (newRow.salary !== oldRow.salary) {
+              months.forEach(month => {
+                const countValue = getPayrollCellValueLocal(newRow.id, 'count', year, month);
+                const calculatedSalary = (countValue || 0) * (newRow.salary || 0);
+                
+                // Ensure salary data structure is correct
+                ensureSalaryDataStructure(newRow.id, year);
+                payrollData.value[year][newRow.id].salary[month] = calculatedSalary;
+              });
+            }
           }
         }
       });
@@ -1379,7 +1428,7 @@
         isSaved.value = true;
         saveError.value = "";
         
-        console.log(`Payroll data filtered for years ${newFromYear}-${newToYear}`);
+        // console.log(`Payroll data filtered for years ${newFromYear}-${newToYear}`);
       } catch (error) {
         console.error('Error reloading Payroll data for new year range:', error);
         alertService.error("Failed to load data for selected year range. Please try again.");
@@ -1392,14 +1441,47 @@
     isSaved.value = false;
   }
 
+  // Helper function to ensure count data structure is correct
+  function ensureCountDataStructure(rowId, year) {
+    if (!payrollData.value[year]) {
+      payrollData.value[year] = {};
+    }
+    if (!payrollData.value[year][rowId]) {
+      payrollData.value[year][rowId] = {};
+    }
+    if (typeof payrollData.value[year][rowId]['count'] !== 'object' || 
+        payrollData.value[year][rowId]['count'] === null ||
+        Array.isArray(payrollData.value[year][rowId]['count'])) {
+      payrollData.value[year][rowId]['count'] = {};
+    }
+  }
+
+  // Helper function to ensure salary data structure is correct
+  function ensureSalaryDataStructure(rowId, year) {
+    if (!payrollData.value[year]) {
+      payrollData.value[year] = {};
+    }
+    if (!payrollData.value[year][rowId]) {
+      payrollData.value[year][rowId] = {};
+    }
+    if (typeof payrollData.value[year][rowId]['salary'] !== 'object' || 
+        payrollData.value[year][rowId]['salary'] === null ||
+        Array.isArray(payrollData.value[year][rowId]['salary'])) {
+      payrollData.value[year][rowId]['salary'] = {};
+    }
+  }
+
   // Function to get monthly count value with getter/setter pattern
   function getMonthlyCountValue(rowId, year, month) {
     const row = payrollRows.value.find(r => r.id === rowId);
     if (!row) return 0;
     
+    // Ensure the data structure is correct
+    ensureCountDataStructure(rowId, year);
+    
     // Check if there's an override for this specific month
     const countData = payrollData.value[year]?.[rowId]?.['count'];
-    if (countData && typeof countData === 'object' && countData !== null) {
+    if (countData && typeof countData === 'object' && countData !== null && !Array.isArray(countData)) {
       const overrideValue = countData[month];
       if (overrideValue !== undefined && overrideValue !== null) {
         return overrideValue;
@@ -1412,17 +1494,8 @@
 
   // Function to set monthly count value with getter/setter pattern
   function setMonthlyCountValue(rowId, year, month, newValue) {
-    // Ensure the data structure exists
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][rowId]) {
-      payrollData.value[year][rowId] = {};
-    }
-    if (typeof payrollData.value[year][rowId]['count'] !== 'object' || 
-        payrollData.value[year][rowId]['count'] === null) {
-      payrollData.value[year][rowId]['count'] = {};
-    }
+    // Ensure the data structure is correct
+    ensureCountDataStructure(rowId, year);
     
     // Store the override value for this specific month
     payrollData.value[year][rowId]['count'][month] = newValue;
@@ -1460,10 +1533,31 @@
       payrollData.value[year][rowId]._lastUpdate = Date.now();
       
       // Also trigger a more explicit update for the specific month
-      if (!payrollData.value[year][rowId].monthlyUpdates) {
+      if (!payrollData.value[year][rowId].monthlyUpdates || 
+          typeof payrollData.value[year][rowId].monthlyUpdates !== 'object' ||
+          Array.isArray(payrollData.value[year][rowId].monthlyUpdates)) {
         payrollData.value[year][rowId].monthlyUpdates = {};
       }
       payrollData.value[year][rowId].monthlyUpdates[month] = Date.now();
+      
+      // Force reactivity for salary calculations by updating the salary field
+      // This ensures Vue detects the dependency change
+      const row = payrollRows.value.find(r => r.id === rowId);
+      if (row) {
+        // Trigger a reactive update by accessing the salary calculation
+        const countValue = getMonthlyCountValue(rowId, year, month);
+        const calculatedSalary = (countValue || 0) * (row.salary || 0);
+        
+        // Store this in payrollData to ensure reactivity
+        ensureSalaryDataStructure(rowId, year);
+        payrollData.value[year][rowId].salary[month] = calculatedSalary;
+        
+        // Force a reactive update by triggering nextTick
+        nextTick(() => {
+          // This will ensure Vue re-evaluates the salary cells
+          payrollData.value[year][rowId]._forceUpdate = Date.now();
+        });
+      }
     }
   }
 
@@ -1674,6 +1768,18 @@
     if (fieldType === 'count' && month) {
       return getMonthlyCountValue(rowId, year, month);
     }
+    
+    // For salary calculations, ensure reactivity to monthly count changes
+    if (fieldType === 'salary' && month) {
+      // Force reactivity by accessing the monthly count data
+      const countValue = getMonthlyCountValue(rowId, year, month);
+      const row = payrollRows.value.find(r => r.id === rowId);
+      if (!row) return 0;
+      
+      // Calculate salary as count * base salary
+      return (countValue || 0) * (row.salary || 0);
+    }
+    
     return getPayrollCellValue(payrollRows.value, payrollData, rowId, fieldType, year, month);
   }
 

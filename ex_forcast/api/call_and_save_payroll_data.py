@@ -242,8 +242,13 @@ def update_monthly_counts(item_name, monthly_count, unique_id=None):
         # Get the parent Payroll Data document
         parent_doc = frappe.get_doc("Payroll Data", parent_name)
         
-        # Remove existing monthly count records for this unique_id
-        parent_doc.monthly_count = [item for item in parent_doc.monthly_count if item.row != unique_id]
+        # Remove existing monthly count records for this unique_id and specific months
+        # Only remove the months that are being updated, not all months
+        months_to_update = set(monthly_count.keys())
+        parent_doc.monthly_count = [
+            item for item in parent_doc.monthly_count 
+            if not (item.row == unique_id and item.month in months_to_update)
+        ]
         
         # Add new monthly count records
         for month, count in monthly_count.items():

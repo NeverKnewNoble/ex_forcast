@@ -1,7 +1,7 @@
 // Payroll Data Utils - Handles data manipulation and utility functions
 
 /**
- * Get unique categories from payroll rows
+ *! Get unique categories from payroll rows
  * @param {Array} payrollRows - Array of payroll rows
  * @returns {Array} - Array of unique categories
  */
@@ -14,7 +14,7 @@ export function getUniqueCategories(payrollRows) {
 }
 
 /**
- * Get payroll rows for a specific category
+ *! Get payroll rows for a specific category
  * @param {Array} payrollRows - Array of payroll rows
  * @param {string} category - Category to filter by
  * @returns {Array} - Filtered payroll rows
@@ -24,7 +24,7 @@ export function getPayrollRowsForCategory(payrollRows, category) {
 }
 
 /**
- * Get unique locations for a specific category
+ *! Get unique locations for a specific category
  * @param {Array} payrollRows - Array of payroll rows
  * @param {string} category - Category to filter by
  * @returns {Array} - Array of unique locations
@@ -40,7 +40,7 @@ export function getUniqueLocationsForCategory(payrollRows, category) {
 }
 
 /**
- * Get unique positions for a specific location within a category
+ *! Get unique positions for a specific location within a category
  * @param {Array} payrollRows - Array of payroll rows
  * @param {string} category - Category to filter by
  * @param {string} location - Location to filter by
@@ -57,7 +57,7 @@ export function getUniquePositionsForLocation(payrollRows, category, location) {
 }
 
 /**
- * Get payroll rows for a specific position within a location and category
+ *! Get payroll rows for a specific position within a location and category
  * @param {Array} payrollRows - Array of payroll rows
  * @param {string} category - Category to filter by
  * @param {string} location - Location to filter by
@@ -73,21 +73,35 @@ export function getPayrollRowsForPosition(payrollRows, category, location, posit
 }
 
 /**
- * Get payroll rows for a specific location within a category
+ *! Get payroll rows for a specific location within a category
  * @param {Array} payrollRows - Array of payroll rows
  * @param {string} category - Category to filter by
  * @param {string} location - Location to filter by
- * @returns {Array} - Filtered payroll rows
+ * @returns {Array} - Filtered payroll rows sorted with managers first
  */
 export function getPayrollRowsForLocation(payrollRows, category, location) {
-  return payrollRows.filter(row => 
+  const filteredRows = payrollRows.filter(row => 
     row.category === category && 
     row.departmentLocation === location
   );
+  
+  // Sort rows: managers first, then non-managers
+  return filteredRows.sort((a, b) => {
+    // If a is manager and b is not, a comes first
+    if (a.position === 'Manager' && b.position !== 'Manager') {
+      return -1;
+    }
+    // If b is manager and a is not, b comes first
+    if (b.position === 'Manager' && a.position !== 'Manager') {
+      return 1;
+    }
+    // If both are the same position type, maintain original order
+    return 0;
+  });
 }
 
 /**
- * Format currency value
+ *! Format currency value
  * @param {number} value - Value to format
  * @returns {string} - Formatted currency string
  */
@@ -101,7 +115,7 @@ export function formatCurrency(value) {
 }
 
 /**
- * Get payroll cell value
+ *! Get payroll cell value
  * @param {Array} payrollRows - Array of payroll rows
  * @param {Object} payrollData - Payroll data object
  * @param {number} rowId - Row ID
@@ -122,7 +136,7 @@ export function getPayrollCellValue(payrollRows, payrollData, rowId, fieldType, 
       const countData = payrollData[year]?.[rowId]?.[fieldType];
       
       // Check if there's a monthly override for this specific month
-      if (countData && typeof countData === 'object' && countData !== null) {
+      if (countData && typeof countData === 'object' && countData !== null && !Array.isArray(countData)) {
         const overrideValue = countData[month];
         if (overrideValue !== undefined && overrideValue !== null) {
           return overrideValue; // Return the override value
@@ -154,7 +168,7 @@ export function getPayrollCellValue(payrollRows, payrollData, rowId, fieldType, 
 }
 
 /**
- * Handle payroll cell edit
+ *! Handle payroll cell edit
  * @param {Array} changedCells - Array to track changed cells
  * @param {number} rowId - Row ID
  * @param {string} fieldType - Field type
@@ -204,7 +218,7 @@ export function handlePayrollCellEdit(changedCells, rowId, fieldType, year, mont
 }
 
 /**
- * Save payroll changes (deprecated - use savePayrollChanges from payroll_data_service.js)
+ *! Save payroll changes (deprecated - use savePayrollChanges from payroll_data_service.js)
  * @param {Array} changes - Array of changes to save
  * @param {string} projectName - Project name
  * @returns {Promise<boolean>} - Success status
@@ -216,7 +230,7 @@ export async function savePayrollChanges(changes, projectName) {
 }
 
 /**
- * Add sample payroll data
+ *! Add sample payroll data
  * @param {Array} payrollRows - Array to add sample data to
  * @returns {Array} - Updated payroll rows array
  */
@@ -309,7 +323,7 @@ export function addSamplePayrollData(payrollRows) {
 }
 
 /**
- * Reset payroll data to default
+ *! Reset payroll data to default
  * @param {Array} payrollRows - Array to reset
  * @returns {Array} - Empty payroll rows array
  */
@@ -319,7 +333,7 @@ export function resetToDefault(payrollRows) {
 }
 
 /**
- * Check if there's any payroll data
+ *! Check if there's any payroll data
  * @param {Array} payrollRows - Array of payroll rows
  * @returns {boolean} - Whether there's payroll data
  */
