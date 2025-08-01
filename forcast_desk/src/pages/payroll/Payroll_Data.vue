@@ -176,6 +176,17 @@
                       Advanced
                     </button>
                   </div>
+                  
+                  <!-- Annual Percentage Increment Button -->
+                  <div class="mt-3">
+                    <button 
+                      @click="showAnnualIncrement = true" 
+                      class="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
+                    >
+                      <TrendingUp class="w-4 h-4" />
+                      Annual Percentage Increment
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -462,7 +473,7 @@
                                       @focus="handlePayrollCellFocus(row.id, 'annual', year, '', $event)"
                                       @blur="handlePayrollCellEditLocal(row.id, 'annual', year, '', $event)"
                                     >
-                                      <span class="font-mono text-xs">{{ formatMoney(getPayrollCellValueLocal(row.id, 'annual', year, '')) }}</span>
+                                      <span class="font-mono text-xs">{{ formatMoney(calculateAnnualIncrementLocal(row.id, year)) }}</span>
                                     </td>
                                   </template>
                                 </tr>
@@ -515,7 +526,7 @@
                                     :key="'subtotal-mgmt-annual-' + year"
                                     class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
                                   >
-                                    <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateSubTotalManagementAnnualLocal(category, location, year)) }}</span>
+                                    <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateSubTotalManagementAnnualIncrementLocal(category, location, year)) }}</span>
                                   </td>
                                 </template>
                               </tr>
@@ -567,7 +578,7 @@
                                     :key="'subtotal-nonmgmt-annual-' + year"
                                     class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
                                   >
-                                    <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateSubTotalNonManagementAnnualLocal(category, location, year)) }}</span>
+                                    <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateSubTotalNonManagementAnnualIncrementLocal(category, location, year)) }}</span>
                                   </td>
                                 </template>
                               </tr>
@@ -619,7 +630,7 @@
                                     :key="'total-annual-' + year"
                                     class="px-2 py-2 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-bold"
                                   >
-                                    <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateLocationTotalAnnualLocal(category, location, year)) }}</span>
+                                    <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateLocationTotalAnnualIncrementLocal(category, location, year)) }}</span>
                                   </td>
                                 </template>
                               </tr>
@@ -740,7 +751,93 @@
       </div>
     </transition>
 
+    <!-- Annual Percentage Increment Modal -->
+    <transition name="fade">
+      <div
+        v-if="showAnnualIncrement"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      >
+        <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-4xl p-0 overflow-hidden">
+          <!-- Modal Header -->
+          <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+            <h2 class="text-xl font-bold text-white">Annual Percentage Increment</h2>
+          </div>
 
+          <!-- Modal Body -->
+          <div class="p-8 pt-6">
+            <!-- Message when no years selected -->
+            <div v-if="!visibleYears.length" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
+              <AlertTriangle class="w-6 h-6 text-yellow-600" />
+              <span class="text-yellow-800 font-medium">Please select both "From Year" and "To Year" to configure annual increments.</span>
+            </div>
+
+            <div v-if="visibleYears.length" class="space-y-6">
+              <!-- Instructions -->
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span class="font-medium text-blue-800">Instructions</span>
+                </div>
+                <p class="text-blue-700 text-sm">
+                  Set the annual percentage increment for each year (excluding the first year). This will be applied to all payroll rows for the specified years.
+                  The increment will be displayed in the "Annual Percentage Increment" column in the table.
+                </p>
+              </div>
+
+              <!-- Year Increments -->
+              <div class="space-y-4 max-h-[50vh] overflow-auto pr-2">
+                <div
+                  v-for="year in visibleYears.slice(1)"
+                  :key="'increment-' + year"
+                  class="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50"
+                >
+                  <span class="font-medium text-gray-700 flex items-center gap-2">
+                    <Calendar class="w-4 h-4 text-violet-600" />
+                    {{ year }}
+                  </span>
+                  <div class="flex items-center gap-2">
+                    <input
+                      v-model.number="annualIncrementData[year]"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      placeholder="0.00"
+                      class="px-4 py-2 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-right w-24"
+                    />
+                    <span class="text-gray-600 font-medium">%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Footer -->
+          <div class="flex justify-end gap-3 px-8 py-4 bg-gray-50 border-t border-violet-100">
+            <button
+              @click="cancelAnnualIncrement"
+              class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2"
+            >
+              <X class="w-4 h-4" />
+              Cancel
+            </button>
+            <button
+              v-if="visibleYears.length"
+              @click="applyAnnualIncrement"
+              class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2"
+            >
+              <Check class="w-4 h-4" />
+              Apply
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
 
     <!-- Add Payroll Data Modal -->
     <transition name="fade">
@@ -785,7 +882,7 @@
               </select>
             </div>
 
-            <!-- Quick Actions Tab -->
+                        <!-- Quick Actions Tab -->
             <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-6 border border-violet-200 shadow-sm">
               <div class="flex items-center justify-between mb-4 cursor-pointer" @click="toggleQuickActions">
                 <div class="flex items-center gap-2">
@@ -1089,7 +1186,8 @@
     Plus, 
     Trash2,
     FolderOpen,
-    ChevronDown
+    ChevronDown,
+    TrendingUp
   } from 'lucide-vue-next';
   import alertService from "@/components/ui/ui_utility/alertService.js";
   import { 
@@ -1176,7 +1274,9 @@
   const years = ref([]);
   const displayMode = ref("monthly");
   const showAdvanced = ref(false);
+  const showAnnualIncrement = ref(false);
   const tempAdvancedModes = ref({});
+  const annualIncrementData = ref({});
   const isSaved = ref(false);
   const originalPayrollData = ref({});
   const changedCells = ref([]); // {rowId, fieldType, year, month, newValue}
@@ -1345,6 +1445,17 @@
 
   function cancelAdvancedSettings() {
     showAdvanced.value = false;
+  }
+
+  function applyAnnualIncrement() {
+    // Apply the annual increment data
+    // This will be used to display the annual percentage increment column
+    showAnnualIncrement.value = false;
+    alertService.success("Annual percentage increments applied successfully");
+  }
+
+  function cancelAnnualIncrement() {
+    showAnnualIncrement.value = false;
   }
 
   // Wrapper function for submitting payroll data
@@ -1788,6 +1899,19 @@
     return calculatePayrollTotal(rowId, year, months, getPayrollCellValueLocal);
   }
 
+  function calculateAnnualIncrementLocal(rowId, year) {
+    // Get the total for the first year (baseline)
+    const firstYear = visibleYears.value[0];
+    const firstYearTotal = calculatePayrollTotalLocal(rowId, firstYear);
+    
+    // Get the percentage increment for this year
+    const percentageIncrement = annualIncrementData.value[year] || 0;
+    
+    // Calculate: First year total + (First year total × Percentage increment)
+    const incrementAmount = (firstYearTotal * percentageIncrement) / 100;
+    return firstYearTotal + incrementAmount;
+  }
+
   function getUniqueCategoriesLocal() {
     return getUniqueCategories(payrollRows.value);
   }
@@ -1892,6 +2016,34 @@
 
   function calculateLocationTotalAnnualLocal(category, location, year) {
     return calculateLocationTotalAnnual(payrollRows.value, category, location, year, getPayrollCellValueLocal);
+  }
+
+  function calculateSubTotalManagementAnnualIncrementLocal(category, location, year) {
+    const managementRows = getPayrollRowsForLocationLocal(category, location).filter(row => 
+      row.position === 'Manager'
+    );
+    
+    return managementRows.reduce((sum, row) => {
+      return sum + calculateAnnualIncrementLocal(row.id, year);
+    }, 0);
+  }
+
+  function calculateSubTotalNonManagementAnnualIncrementLocal(category, location, year) {
+    const nonManagementRows = getPayrollRowsForLocationLocal(category, location).filter(row => 
+      row.position === 'Non-manager'
+    );
+    
+    return nonManagementRows.reduce((sum, row) => {
+      return sum + calculateAnnualIncrementLocal(row.id, year);
+    }, 0);
+  }
+
+  function calculateLocationTotalAnnualIncrementLocal(category, location, year) {
+    // Total = Sub-Total Management + Sub-Total Non-Management
+    const managementSubtotal = calculateSubTotalManagementAnnualIncrementLocal(category, location, year);
+    const nonManagementSubtotal = calculateSubTotalNonManagementAnnualIncrementLocal(category, location, year);
+    
+    return managementSubtotal + nonManagementSubtotal;
   }
 
   // Table Salary Handlers (using robust pattern like monthly cells)
