@@ -435,21 +435,6 @@ bench migrate
 
 ---
 
-## 🤝 Contributing
-
-We welcome contributions! Please read our contributing guidelines and submit pull requests for any improvements.
-
-### Contribution Guidelines
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ---
 
 **Ex Forecast** - Transform your business decisions with forecasting insights.
