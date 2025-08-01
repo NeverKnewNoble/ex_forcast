@@ -10,7 +10,8 @@
   "position",
   "designation",
   "salary",
-  "amount"
+  "amount",
+  "unique_id"
  ],
  "fields": [
   {
@@ -52,13 +53,18 @@
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Count"
+  },
+  {
+   "fieldname": "unique_id",
+   "fieldtype": "Data",
+   "label": "Unique_ID"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-29 22:49:25.874995",
+ "modified": "2025-07-30 21:26:45.548216",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Payroll Data Items",
