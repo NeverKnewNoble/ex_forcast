@@ -176,24 +176,83 @@
                       Advanced
                     </button>
                   </div>
-                  
-                  <!-- Annual Percentage Increment Button -->
-                  <div class="mt-3">
-                    <button 
-                      @click="showAnnualIncrement = true" 
-                      class="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
-                    >
-                      <TrendingUp class="w-4 h-4" />
-                      Annual Percentage Increment
-                    </button>
+                </div>
+
+                
+              </div>
+
+              <!-- Total Number of Rooms Section -->
+              <div class="mt-4">
+                <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <BedDouble class="w-5 h-5 text-violet-600" />
+                    Total Number of Rooms
+                  </h3>
+                  <div class="space-y-3">
+                    <div>
+                      <div class="relative">
+                        <input
+                          v-model="totalRooms"
+                          type="number"
+                          min="1"
+                          class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-lg font-semibold text-gray-900 rooms-input"
+                          placeholder="Enter total number of rooms"
+                          @input="handleTotalRoomsChange"
+                          @blur="handleTotalRoomsBlur"
+                          @keyup.enter="$event.target.blur()"
+                        />
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                          <span class="text-gray-400 text-sm font-medium">rooms</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Sync Button -->
+                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                      
+                      <button 
+                        @click="syncWithRoomRevenue"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium shadow-sm"
+                        :class="isSyncedWithRoomRevenue 
+                          ? 'bg-green-500 hover:bg-green-600 text-white shadow-green-200' 
+                          : 'bg-violet-500 hover:bg-violet-600 text-white shadow-violet-200'"
+                      >
+                        <RefreshCw class="w-4 h-4" />
+                        {{ isSyncedWithRoomRevenue ? 'Synced' : 'Unsynced' }}
+                      </button>
+                      
+                      <p class="text-xs text-gray-500 mt-2 text-center">
+                        {{ isSyncedWithRoomRevenue 
+                          ? 'Your total rooms are synchronized with the Room Revenue page' 
+                          : 'Click to sync with the total rooms from Room Revenue page' }}
+                      </p>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 flex items-center gap-1">
+                      This value is used for payroll calculations and projections
+                    </p>
+                    
+                    <!-- Annual Percentage Increment Button -->
+                    <div class="mt-3">
+                      <button 
+                        @click="showAnnualIncrement = true" 
+                        class="w-full flex items-center justify-left gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
+                      >
+                        <!-- <TrendingUp class="w-4 h-4" /> -->
+                        Annual Percentage Increment
+                      </button>
+                    </div>
+            
                   </div>
                 </div>
               </div>
+
+
+
             </div>
               </div>
             </transition>
           </div>
-  
 
 
 
@@ -259,6 +318,8 @@
                 </div>
               </template>
   
+
+
               <!-- Modern Table Container -->
               <template v-else>
                 <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden">
@@ -636,6 +697,115 @@
                               </tr>
                             </template>
                           </template>
+                          
+                          <!-- 2 Empty Rows -->
+                          <tr class="h-4 bg-gradient-to-r from-violet-100 to-indigo-100"></tr>
+                          <tr class="h-4 bg-gradient-to-r from-violet-100 to-indigo-100"></tr>
+                          
+                          <!-- Total Hotel Row -->
+                          <tr class="border-b-2 border-violet-400 bg-gradient-to-r from-violet-100 to-indigo-100 shadow-sm">
+                            <td :colspan="3" class="px-3 py-3 font-bold border-r border-violet-300 text-violet-900">
+                              <div class="flex items-center gap-2">
+                                <Building2 class="w-5 h-5 text-violet-700" />
+                                Total Hotel
+                              </div>
+                            </td>
+                            <td class="px-3 py-3 text-right border-r border-violet-300">
+                              <span class="font-mono text-sm font-bold text-violet-900">{{ calculateHotelTotalLocal() }}</span>
+                            </td>
+                            
+                            <!-- Monthly Count cells for hotel total -->
+                            <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                              <td 
+                                v-for="month in months" 
+                                :key="'hotel-count-' + month"
+                                class="px-2 py-2 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-indigo-100 font-bold"
+                              >
+                                <span class="font-mono text-xs text-violet-900">{{ calculateHotelTotalMonthlyCountLocal(visibleYears[0], month) }}</span>
+                              </td>
+                            </template>
+                            <!-- Monthly Salary cells for hotel total -->
+                            <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                              <td 
+                                v-for="month in months" 
+                                :key="'hotel-salary-' + month"
+                                class="px-2 py-2 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-indigo-100 font-bold"
+                              >
+                                <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateHotelTotalMonthlySalaryLocal(visibleYears[0], month)) }}</span>
+                              </td>
+                            </template>
+                            <!-- Total cell for hotel total -->
+                            <template v-if="visibleYears.length > 0">
+                              <td class="px-2 py-2 text-right border border-violet-300 font-bold bg-violet-200 shadow-inner">
+                                <span class="font-mono text-xs text-violet-900">
+                                  {{ formatMoney(calculateHotelTotalTotalLocal(visibleYears[0])) }}
+                                </span>
+                              </td>
+                            </template>
+                            <!-- Annual Percentage Increment cells for hotel total -->
+                            <template v-if="visibleYears.length > 1">
+                              <td 
+                                v-for="year in visibleYears.slice(1)" 
+                                :key="'hotel-annual-' + year"
+                                class="px-2 py-2 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-indigo-100 font-bold"
+                              >
+                                <span class="font-mono text-xs text-violet-900">{{ formatMoney(calculateHotelTotalAnnualIncrementLocal(year)) }}</span>
+                              </td>
+                            </template>
+                          </tr>
+                          
+
+                          <!-- Employee/Room Ratio Row -->
+                          <tr class="border-b-2 border-green-400 bg-gradient-to-r from-green-100 to-emerald-100 shadow-sm">
+                            <td :colspan="3" class="px-3 py-3 font-bold border-r border-green-300 text-green-900">
+                              <div class="flex items-center gap-2">
+                                <Users class="w-5 h-5 text-green-700" />
+                                Employee/Room Ratio
+                              </div>
+                            </td>
+                            <td class="px-3 py-3 text-right border-r border-green-300">
+                              <span class="font-mono text-sm font-bold text-green-900">{{ calculateEmployeeRoomRatioLocal() }}</span>
+                            </td>
+                            
+                            <!-- Monthly Count cells for ratio -->
+                            <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                              <td 
+                                v-for="month in months" 
+                                :key="'ratio-count-' + month"
+                                class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-emerald-100 font-bold"
+                              >
+                                <span class="font-mono text-xs text-green-900">{{ calculateEmployeeRoomRatioMonthlyLocal(visibleYears[0], month) }}</span>
+                              </td>
+                            </template>
+                            <!-- Monthly Salary cells for ratio -->
+                            <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                              <td 
+                                v-for="month in months" 
+                                :key="'ratio-salary-' + month"
+                                class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-emerald-100 font-bold"
+                              >
+                                <span class="font-mono text-xs text-green-900">{{ formatMoney(calculateEmployeeRoomRatioSalaryLocal(visibleYears[0], month)) }}</span>
+                              </td>
+                            </template>
+                            <!-- Total cell for ratio -->
+                            <template v-if="visibleYears.length > 0">
+                              <td class="px-2 py-2 text-right border border-green-300 font-bold bg-green-200 shadow-inner">
+                                <span class="font-mono text-xs text-green-900">
+                                  {{ formatMoney(calculateEmployeeRoomRatioTotalLocal(visibleYears[0])) }}
+                                </span>
+                              </td>
+                            </template>
+                            <!-- Annual Percentage Increment cells for ratio -->
+                            <template v-if="visibleYears.length > 1">
+                              <td 
+                                v-for="year in visibleYears.slice(1)" 
+                                :key="'ratio-annual-' + year"
+                                class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-emerald-100 font-bold"
+                              >
+                                <span class="font-mono text-xs text-green-900">{{ formatMoney(calculateEmployeeRoomRatioAnnualIncrementLocal(year)) }}</span>
+                              </td>
+                            </template>
+                          </tr>
                         </tbody>
                       </table>
                     </div>
@@ -808,6 +978,8 @@
                       max="100"
                       step="0.01"
                       placeholder="0.00"
+                      required
+                      @keypress="allowOnlyNumbers($event)"
                       class="px-4 py-2 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-right w-24"
                     />
                     <span class="text-gray-600 font-medium">%</span>
@@ -1187,7 +1359,10 @@
     Trash2,
     FolderOpen,
     ChevronDown,
-    TrendingUp
+    TrendingUp,
+    Building2,
+    Users,
+    BedDouble
   } from 'lucide-vue-next';
   import alertService from "@/components/ui/ui_utility/alertService.js";
   import { 
@@ -1201,7 +1376,8 @@
   } from "@/components/utility/expense_assumption/index.js";
   import { cloneDeep } from 'lodash-es';
   import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
-  import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';  
+  import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+  import { getProjectKey } from '@/components/utility/projectLocalStorage.js';  
   import {
     showAddPayrollModal,
     isSubmittingPayroll,
@@ -1243,6 +1419,16 @@
     calculateLocationTotalMonthlySalary,
     calculateLocationTotalTotal,
     calculateLocationTotalAnnual,
+    calculateHotelTotal,
+    calculateHotelTotalMonthlyCount,
+    calculateHotelTotalMonthlySalary,
+    calculateHotelTotalTotal,
+    calculateHotelTotalAnnual,
+    calculateEmployeeRoomRatio,
+    calculateEmployeeRoomRatioMonthly,
+    calculateEmployeeRoomRatioSalary,
+    calculateEmployeeRoomRatioTotal,
+    calculateEmployeeRoomRatioAnnual,
     // Utility functions
     getUniqueCategories,
     getPayrollRowsForCategory,
@@ -1276,7 +1462,8 @@
   const showAdvanced = ref(false);
   const showAnnualIncrement = ref(false);
   const tempAdvancedModes = ref({});
-  const annualIncrementData = ref({});
+  // Use Pinia store for annual increment data persistence
+  // (will be consolidated with existing yearSettingsStore below)
   const isSaved = ref(false);
   const originalPayrollData = ref({});
   const changedCells = ref([]); // {rowId, fieldType, year, month, newValue}
@@ -1293,6 +1480,16 @@
   const isCreatingLocation = ref(false);
   const isCreatingDesignation = ref(false);
   const showQuickActions = ref(false);
+  
+  // Total Rooms functionality
+  const totalRooms = ref(0); // Default value
+  
+  // Check if total rooms is synced with Room Revenue page
+  const isSyncedWithRoomRevenue = computed(() => {
+    const roomRevenueTotal = localStorage.getItem(getProjectKey('totalNumberOfRooms'));
+    return roomRevenueTotal && parseInt(roomRevenueTotal) > 0 && 
+           parseInt(roomRevenueTotal) === totalRooms.value;
+  });
  
 
   //! Helper function to safely format numbers to 2 decimal places with commas
@@ -1316,7 +1513,7 @@
   const calculationCache = useCalculationCache();  
   // Pinia store for year settings
   const yearSettingsStore = useYearSettingsStore();
-  const { fromYear, toYear, advancedModes } = storeToRefs(yearSettingsStore);
+  const { fromYear, toYear, advancedModes, annualIncrementData } = storeToRefs(yearSettingsStore);
   const { setFromYear, setToYear, setAdvancedModes, clearYearSettings, getFilteredToYears } = yearSettingsStore;
 
   // Computed properties
@@ -1481,6 +1678,12 @@
       originalPayrollData.value = cloneDeep(payrollRows.value);
       isSaved.value = true;
       isComponentReady.value = true;
+      
+      // Initialize total rooms from localStorage
+      const savedRooms = localStorage.getItem('totalRooms');
+      if (savedRooms) {
+        totalRooms.value = parseInt(savedRooms) || 100;
+      }
       
       // Check if we should show refresh success alert
       if (localStorage.getItem('showRefreshSuccess') === 'true') {
@@ -1865,6 +2068,23 @@
   onUnmounted(() => {
     window.removeEventListener('beforeunload', handleBeforeUnload);
   });
+  
+  // Watch for totalRooms changes
+  watch(totalRooms, (newValue) => {
+    localStorage.setItem('totalRooms', newValue.toString());
+  });
+  
+  // Check for Room Revenue total changes periodically
+  setInterval(() => {
+    const roomRevenueTotal = localStorage.getItem(getProjectKey('totalNumberOfRooms'));
+    if (roomRevenueTotal && parseInt(roomRevenueTotal) > 0) {
+      const newTotal = parseInt(roomRevenueTotal);
+      if (newTotal !== totalRooms.value && isSyncedWithRoomRevenue.value) {
+        totalRooms.value = newTotal;
+        localStorage.setItem('totalRooms', newTotal.toString());
+      }
+    }
+  }, 1000);
 
   // Refresh table functionality - reload entire page
   function refreshTable() {
@@ -2016,6 +2236,97 @@
 
   function calculateLocationTotalAnnualLocal(category, location, year) {
     return calculateLocationTotalAnnual(payrollRows.value, category, location, year, getPayrollCellValueLocal);
+  }
+
+  // Hotel Total Local Functions
+  function calculateHotelTotalLocal() {
+    console.log('calculateHotelTotalLocal called');
+    console.log('payrollRows.value:', payrollRows.value);
+    const result = calculateHotelTotal(payrollRows.value);
+    console.log('calculateHotelTotalLocal result:', result);
+    return result;
+  }
+
+  function calculateHotelTotalMonthlyCountLocal(year, month) {
+    return calculateHotelTotalMonthlyCount(payrollRows.value, year, month, getPayrollCellValueLocal);
+  }
+
+  function calculateHotelTotalMonthlySalaryLocal(year, month) {
+    return calculateHotelTotalMonthlySalary(payrollRows.value, year, month, getPayrollCellValueLocal);
+  }
+
+  function calculateHotelTotalTotalLocal(year) {
+    return calculateHotelTotalTotal(payrollRows.value, year, calculatePayrollTotalLocal);
+  }
+
+  function calculateHotelTotalAnnualLocal(year) {
+    return calculateHotelTotalAnnual(payrollRows.value, year, getPayrollCellValueLocal);
+  }
+
+  // Employee/Room Ratio Local Functions
+  function calculateEmployeeRoomRatioLocal() {
+    return calculateEmployeeRoomRatio(payrollRows.value, totalRooms.value);
+  }
+
+  function calculateEmployeeRoomRatioMonthlyLocal(year, month) {
+    return calculateEmployeeRoomRatioMonthly(payrollRows.value, year, month, getPayrollCellValueLocal, totalRooms.value);
+  }
+
+  function calculateEmployeeRoomRatioSalaryLocal(year, month) {
+    return calculateEmployeeRoomRatioSalary(payrollRows.value, year, month, getPayrollCellValueLocal, totalRooms.value);
+  }
+
+  function calculateEmployeeRoomRatioTotalLocal(year) {
+    return calculateEmployeeRoomRatioTotal(payrollRows.value, year, calculatePayrollTotalLocal, totalRooms.value);
+  }
+
+  function calculateEmployeeRoomRatioAnnualLocal(year) {
+    return calculateEmployeeRoomRatioAnnual(payrollRows.value, year, getPayrollCellValueLocal, totalRooms.value);
+  }
+
+  // Hotel Total Annual Increment Local Functions
+  function calculateHotelTotalAnnualIncrementLocal(year) {
+    const hotelRows = payrollRows.value;
+    
+    return hotelRows.reduce((sum, row) => {
+      return sum + calculateAnnualIncrementLocal(row.id, year);
+    }, 0);
+  }
+
+  // Employee/Room Ratio Annual Increment Local Functions
+  function calculateEmployeeRoomRatioAnnualIncrementLocal(year) {
+    // Get hotel total annual increment (sum of all payroll rows across all categories)
+    const hotelTotalAnnualIncrement = calculateHotelTotalAnnualIncrementLocal(year);
+    return totalRooms.value > 0 ? (hotelTotalAnnualIncrement / totalRooms.value) : 0;
+  }
+  
+  // Total Rooms handlers
+  function handleTotalRoomsChange(event) {
+    const value = parseInt(event.target.value) || 1;
+    if (value < 1) {
+      totalRooms.value = 1;
+    } else {
+      totalRooms.value = value;
+    }
+  }
+  
+  function handleTotalRoomsBlur(event) {
+    const value = parseInt(event.target.value) || 1;
+    totalRooms.value = Math.max(1, value);
+    localStorage.setItem('totalRooms', totalRooms.value.toString());
+  }
+  
+  // Sync with Room Revenue total
+  function syncWithRoomRevenue() {
+    const roomRevenueTotal = localStorage.getItem(getProjectKey('totalNumberOfRooms'));
+    if (roomRevenueTotal && parseInt(roomRevenueTotal) > 0) {
+      const newTotal = parseInt(roomRevenueTotal);
+      totalRooms.value = newTotal;
+      localStorage.setItem('totalRooms', newTotal.toString());
+      alertService.success(`Synced With Room Revenue Room Total`);
+    } else {
+      alertService.warning('No Room Revenue total found. Please set a total in the Room Revenue page first.');
+    }
   }
 
   function calculateSubTotalManagementAnnualIncrementLocal(category, location, year) {

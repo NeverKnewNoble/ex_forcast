@@ -47,7 +47,17 @@ export {
   calculateLocationTotalMonthlyCount,
   calculateLocationTotalMonthlySalary,
   calculateLocationTotalTotal,
-  calculateLocationTotalAnnual
+  calculateLocationTotalAnnual,
+  calculateHotelTotal,
+  calculateHotelTotalMonthlyCount,
+  calculateHotelTotalMonthlySalary,
+  calculateHotelTotalTotal,
+  calculateHotelTotalAnnual,
+  calculateEmployeeRoomRatio,
+  calculateEmployeeRoomRatioMonthly,
+  calculateEmployeeRoomRatioSalary,
+  calculateEmployeeRoomRatioTotal,
+  calculateEmployeeRoomRatioAnnual
 } from './payroll_calculations.js';
 
 // Export from payroll_data_utils.js
