@@ -9,6 +9,7 @@ export const useYearSettingsStore = defineStore('yearSettings', () => {
   const fromYear = ref('');
   const toYear = ref('');
   const advancedModes = ref({});
+  const annualIncrementData = ref({});
 
   // Function to load settings for current project
   function loadProjectSettings() {
@@ -25,6 +26,7 @@ export const useYearSettingsStore = defineStore('yearSettings', () => {
     fromYear.value = localStorage.getItem(getProjectKey('expenseEstimateFromYear')) || '';
     toYear.value = localStorage.getItem(getProjectKey('expenseEstimateToYear')) || '';
     advancedModes.value = JSON.parse(localStorage.getItem(getProjectKey('expenseEstimateAdvancedModes')) || '{}');
+    annualIncrementData.value = JSON.parse(localStorage.getItem(getProjectKey('payrollAnnualIncrementData')) || '{}');
   }
 
   // Actions
@@ -57,11 +59,13 @@ export const useYearSettingsStore = defineStore('yearSettings', () => {
     fromYear.value = '';
     toYear.value = '';
     advancedModes.value = {};
+    annualIncrementData.value = {};
     
     // Clear project-specific localStorage items
     localStorage.removeItem(getProjectKey('expenseEstimateFromYear'));
     localStorage.removeItem(getProjectKey('expenseEstimateToYear'));
     localStorage.removeItem(getProjectKey('expenseEstimateAdvancedModes'));
+    localStorage.removeItem(getProjectKey('payrollAnnualIncrementData'));
   }
 
   // Function to get filtered years for "To Year" dropdown
@@ -89,11 +93,13 @@ export const useYearSettingsStore = defineStore('yearSettings', () => {
   watch(fromYear, (val) => localStorage.setItem(getProjectKey('expenseEstimateFromYear'), val));
   watch(toYear, (val) => localStorage.setItem(getProjectKey('expenseEstimateToYear'), val));
   watch(advancedModes, (val) => localStorage.setItem(getProjectKey('expenseEstimateAdvancedModes'), JSON.stringify(val)), { deep: true });
+  watch(annualIncrementData, (val) => localStorage.setItem(getProjectKey('payrollAnnualIncrementData'), JSON.stringify(val)), { deep: true });
 
   return {
     fromYear,
     toYear,
     advancedModes,
+    annualIncrementData,
     setFromYear,
     setToYear,
     setAdvancedMode,

@@ -13,9 +13,7 @@
   "laundry_tab",
   "payroll_data",
   "monthly_count_tab",
-  "monthly_count",
-  "monthly_salary_tab",
-  "monthly_salary"
+  "monthly_count"
  ],
  "fields": [
   {
@@ -53,26 +51,15 @@
    "label": "Monthly Count"
   },
   {
-   "fieldname": "monthly_salary_tab",
-   "fieldtype": "Tab Break",
-   "label": "Monthly Salary "
-  },
-  {
    "fieldname": "monthly_count",
    "fieldtype": "Table",
    "label": "Monthly Count",
    "options": "Payroll Monthly Count"
-  },
-  {
-   "fieldname": "monthly_salary",
-   "fieldtype": "Table",
-   "label": "Monthly Salary",
-   "options": "Monthly Salary"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-30 16:11:18.835010",
+ "modified": "2025-08-01 23:39:21.098920",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Payroll Data",
