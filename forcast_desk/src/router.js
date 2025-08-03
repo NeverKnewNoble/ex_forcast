@@ -53,6 +53,11 @@ const routes = [
     path: '/payroll_data',
     component: () => import('@/pages/payroll/Payroll_Data.vue'),
   },
+  {
+    name: 'Payroll_Related',
+    path: '/payroll_related',
+    component: () => import('@/pages/payroll/Payroll_Related.vue'),
+  },
 
 ]
 

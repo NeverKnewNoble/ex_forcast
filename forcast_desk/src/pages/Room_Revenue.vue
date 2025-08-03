@@ -324,7 +324,7 @@
                 </div>
                 <div class="space-y-8">
                   <!-- Table 1: Available Beds -->
-                  <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden">
+                  <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
                     <div class="bg-gradient-to-r from-violet-600 to-violet-700 text-white px-6 py-4">
                       <h2 class="text-xl font-bold flex items-center gap-2"><BedDouble class="w-5 h-5" /> Available Beds</h2>
                       <p class="text-violet-100 text-sm font-semibold">Note: Auto Calculated</p>
@@ -445,7 +445,7 @@
                   </div>
 
                   <!-- Table 2: Occupied Beds -->
-                  <div class="bg-white rounded-lg border border-blue-200 shadow-sm overflow-hidden">
+                  <div class="bg-white rounded-lg border border-blue-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
                     <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4">
                       <h2 class="text-xl font-bold flex items-center gap-2"><BedDouble class="w-5 h-5" /> Occupied Beds</h2>
                       <p class="text-blue-100 text-sm">Percentage of beds occupied</p>
@@ -566,7 +566,7 @@
                   </div>
 
                   <!-- Table 3: Rate -->
-                  <div class="bg-white rounded-lg border border-green-200 shadow-sm overflow-hidden">
+                  <div class="bg-white rounded-lg border border-green-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
                     <div class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4">
                       <h2 class="text-xl font-bold flex items-center gap-2"><DollarSign class="w-5 h-5" /> Rate</h2>
                       <p class="text-green-100 text-sm">Room rates per night</p>
@@ -687,7 +687,7 @@
                   </div>
 
                   <!-- Table 4: Revenue -->
-                  <div class="bg-white rounded-lg border border-orange-200 shadow-sm overflow-hidden">
+                  <div class="bg-white rounded-lg border border-orange-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
                     <div class="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-4">
                       <h2 class="text-xl font-bold flex items-center gap-2"><Calculator class="w-5 h-5" /> Revenue</h2>
                       <p class="text-orange-100 text-sm">Calculated revenue (Available Beds × Occupied Beds % × Rate)</p>

@@ -183,7 +183,7 @@ const menuItems = [
     icon: Sheet,
     children: [
       { text: "Payroll Data", route: "/payroll_data", icon: HandCoins },
-      { text: "Payroll Related", route: "/", icon: Ellipsis },
+      { text: "Payroll Related", route: "/payroll_related", icon: Ellipsis },
       { text: "Bonus", route: "/", icon: Ellipsis }
     ]
   },

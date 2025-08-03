@@ -34,18 +34,14 @@
                     v-if="!isSaved"
                     class="flex items-center gap-2 text-sm font-medium text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-200"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                    </svg>
+                    <AlertTriangle class="w-4 h-4" />
                     Unsaved
                   </div>
                   <div
                     v-else
                     class="flex items-center gap-2 text-sm font-medium text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
+                    <Check class="w-4 h-4" />
                     All Saved
                   </div>
                 </div>
@@ -56,25 +52,19 @@
                   @click="saveChangesWrapper"
                   class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
                 >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-                  </svg>
+                  <Download class="w-4 h-4" />
                   Save
                 </button>
                 <button
                   v-if="isSaving"
                   class="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg cursor-not-allowed"
                 >
-                  <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                  </svg>
+                  <Loader2 class="w-4 h-4 animate-spin" />
                   Saving...
                 </button>
               </div>
               <span v-if="saveError" class="mt-2 text-xs text-red-500 flex items-center gap-1">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <AlertCircle class="w-3 h-3" />
                 {{ saveError }}
               </span>
             </div>
@@ -82,9 +72,7 @@
             <!-- Action Buttons Section -->
             <div class="mb-8">
               <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
+                <Plus class="w-4 h-4 text-violet-600" />
                 Quick Actions
               </h3>
 
@@ -93,9 +81,7 @@
                 :disabled="!selectedProject"          
                 class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-xl hover:from-violet-600 hover:to-violet-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 font-medium"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
+                <Plus class="w-5 h-5" />
                 Add Payroll Row
               </button>
 
@@ -114,9 +100,7 @@
             <div class="flex-1">
               <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
-                  </svg>
+                  <Filter class="w-5 h-5 text-violet-600" />
                   Year Range Filter
                 </h3>
                 
@@ -124,9 +108,7 @@
                   <div class="grid grid-cols-2 gap-3">
                     <div>
                       <label class="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
-                        <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        </svg>
+                        <Calendar class="w-3 h-3 text-gray-500" />
                         From Year
                       </label>
                       <select 
@@ -140,9 +122,7 @@
   
                     <div>
                       <label class="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
-                        <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        </svg>
+                        <Calendar class="w-3 h-3 text-gray-500" />
                         To Year
                       </label>
                       <select 
@@ -202,7 +182,7 @@
                           @keyup.enter="$event.target.blur()"
                         />
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                          <span class="text-gray-400 text-sm font-medium">rooms</span>
+                          <span class="text-gray-400 text-sm mr-8 font-medium">rooms</span>
                         </div>
                       </div>
                     </div>
@@ -322,8 +302,8 @@
 
               <!-- Modern Table Container -->
               <template v-else>
-                <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden">
-                  <div class="overflow-x-auto">
+                <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
+                  <div class="overflow-x-auto max-w-[100%] md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
                     <div class="min-w-full w-max">
                       <table class="w-full">
                         <!-- Table Header -->
@@ -1362,7 +1342,11 @@
     TrendingUp,
     Building2,
     Users,
-    BedDouble
+    BedDouble,
+    Download,
+    Loader2,
+    AlertCircle,
+    Filter
   } from 'lucide-vue-next';
   import alertService from "@/components/ui/ui_utility/alertService.js";
   import { 
