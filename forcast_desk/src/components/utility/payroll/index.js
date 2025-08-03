@@ -1,4 +1,5 @@
 // Payroll Module Index - Exports all payroll-related functions and constants
+
 // Export from payroll_data_service.js
 export {
   showAddPayrollModal,
@@ -26,6 +27,16 @@ export {
   createDepartmentLocation,
   createDesignation
 } from './payroll_data_service.js';
+
+// Export from data_constructors
+export {
+  payrollDataConstructor,
+  PayrollDataConstructor,
+  transformApiToFrontend,
+  transformFrontendToApi,
+  validatePayrollData,
+  createDefaultRow
+} from './data_constructors/index.js';
 
 // Export from payroll_calculations.js
 export {
@@ -81,7 +92,6 @@ export {
   PAYROLL_CATEGORIES,
   POSITION_TYPES,
   DEFAULT_PAYROLL_ROW,
-  SAMPLE_PAYROLL_DATA,
   FIELD_TYPES,
   POSITION_FILTERS
 } from './payroll_constants.js'; 
