@@ -232,8 +232,8 @@
               </div>
   
               <!-- Modern Table Container -->
-              <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
+              <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
+                <div class="overflow-x-auto max-w-[100%] md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
                   <div class="min-w-full w-max">
                     <table class="w-full">
                       <!-- Table Header -->

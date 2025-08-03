@@ -7,10 +7,5 @@ export {
   transformApiToFrontend,
   transformFrontendToApi,
   validatePayrollData,
-  createDefaultRow,
-  // Related page functions
-  transformRelatedPageData,
-  transformRelatedPageToApi,
-  validateRelatedPageData,
-  createDefaultRelatedRow
+  createDefaultRow
 } from './payrollDataConstructor.js'; 
