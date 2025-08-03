@@ -1446,12 +1446,16 @@
     PAYROLL_CATEGORIES,
     POSITION_TYPES,
     DEFAULT_PAYROLL_ROW,
-    SAMPLE_PAYROLL_DATA,
     FIELD_TYPES,
     POSITION_FILTERS,
     // Utility functions
     allowOnlyNumbers,
   } from '@/components/utility/payroll/index.js';
+  import { 
+    transformApiToFrontend, 
+    transformFrontendToApi, 
+    validatePayrollData
+  } from '@/components/utility/payroll/data_constructors/index.js';
   
 
 
@@ -2240,10 +2244,10 @@
 
   // Hotel Total Local Functions
   function calculateHotelTotalLocal() {
-    console.log('calculateHotelTotalLocal called');
-    console.log('payrollRows.value:', payrollRows.value);
+    // console.log('calculateHotelTotalLocal called');
+    // console.log('payrollRows.value:', payrollRows.value);
     const result = calculateHotelTotal(payrollRows.value);
-    console.log('calculateHotelTotalLocal result:', result);
+    // console.log('calculateHotelTotalLocal result:', result);
     return result;
   }
 

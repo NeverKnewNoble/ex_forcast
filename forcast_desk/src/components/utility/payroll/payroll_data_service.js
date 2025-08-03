@@ -2,6 +2,7 @@
 
 import { ref, reactive } from 'vue';
 import alertService from "@/components/ui/ui_utility/alertService.js";
+import { payrollDataConstructor, transformApiToFrontend, transformFrontendToApi, validatePayrollData } from './data_constructors/index.js';
 
 // Modal state
 export const showAddPayrollModal = ref(false);
@@ -169,75 +170,24 @@ export async function fetchPayrollData(projectName, fromYear = null, toYear = nu
     const data = await response.json();
     
     if (data.message && !data.message.error) {
-      // Transform API data to match frontend structure
-      const transformedData = {};
-      const transformedRows = [];
+      // Use data constructor to transform API response
+      const transformedResult = transformApiToFrontend(data, projectName, fromYear, toYear);
       
-      Object.keys(data.message).forEach(year => {
-        // Filter by year range if provided
-        if (fromYear && toYear) {
-          const yearNum = parseInt(year);
-          const fromYearNum = parseInt(fromYear);
-          const toYearNum = parseInt(toYear);
-          
-          if (yearNum < fromYearNum || yearNum > toYearNum) {
-            return; // Skip this year if it's outside the selected range
-          }
+      // Validate the transformed data
+      const validation = validatePayrollData(transformedResult, 'frontend');
+      if (!validation.isValid) {
+        console.warn('Payroll data validation warnings:', validation.warnings);
+        if (validation.errors.length > 0) {
+          console.error('Payroll data validation errors:', validation.errors);
+          alertService.error('Payroll data contains validation errors');
+          return;
         }
-        
-        // API now returns data directly by year, no month nesting
-        data.message[year].forEach(item => {
-          // Use the backend's unique_id as the rowId, or generate one if it doesn't exist
-          // For existing records without unique_id, we'll use a combination of business fields as fallback
-          let rowId;
-          if (item.unique_id) {
-            rowId = item.unique_id;
-          } else {
-            // Fallback: create a stable ID from business fields for existing records
-            rowId = `${item.department}_${item.department_location}_${item.position}_${item.designation}_${year}`;
-          }
-          
-          const row = {
-            id: rowId,
-            department: item.department,
-            departmentLocation: item.department_location,
-            position: item.position,
-            designation: item.designation,
-            salary: item.salary,
-            count: item.amount,
-            category: item.department, // Assuming category is based on department
-            year: year,
-            unique_id: item.unique_id // Include the unique_id from backend
-            // Removed month since API no longer uses it
-          };
-          
-          transformedRows.push(row);
-          
-          // Initialize payrollData structure - simplified without month
-          if (!transformedData[year]) {
-            transformedData[year] = {};
-          }
-          if (!transformedData[year][rowId]) {
-            transformedData[year][rowId] = {};
-          }
-          
-          transformedData[year][rowId] = {
-            salary: item.salary,
-            unique_id: item.unique_id, // Store unique_id in payrollData as well
-            // Store monthly counts from backend if they exist
-            count: item.monthly_count && Object.keys(item.monthly_count).length > 0 
-              ? item.monthly_count 
-              : {},
-            // Initialize salary as empty object for monthly overrides
-            salary: {}
-          };
-        });
-      });
+      }
       
-      payrollData.value = transformedData;
-      payrollRows.value = transformedRows;
+      payrollData.value = transformedResult.payrollData;
+      payrollRows.value = transformedResult.payrollRows;
       
-      // console.log('Payroll data loaded successfully:', transformedRows.length, 'rows');
+      // console.log('Payroll data loaded successfully:', transformedResult.totalRows, 'rows');
     } else {
       console.error('Failed to load payroll data:', data.message?.error);
       alertService.error('Failed to load payroll data');
@@ -260,17 +210,17 @@ export async function savePayrollChanges(changes, projectName) {
       return { status: 'success', message: 'No changes to save' };
     }
 
-    console.log('Saving payroll changes:', {
-      changesCount: changes.length,
-      projectName,
-      availableRows: payrollRows.value.length
-    });
+    // console.log('Saving payroll changes:', {
+    //   changesCount: changes.length,
+    //   projectName,
+    //   availableRows: payrollRows.value.length
+    // });
 
     // Group changes by row to collect monthly counts
     const changesByRow = {};
     
     changes.forEach(change => {
-      console.log('Processing change:', change);
+      // console.log('Processing change:', change);
       if (!changesByRow[change.rowId]) {
         changesByRow[change.rowId] = {
           changes: [],
@@ -294,9 +244,9 @@ export async function savePayrollChanges(changes, projectName) {
       }
     });
 
-    console.log('Changes grouped by row:', Object.keys(changesByRow));
+    // console.log('Changes grouped by row:', Object.keys(changesByRow));
 
-    // Transform changes to API format
+    // Transform changes to API format using data constructor
     const apiChanges = Object.keys(changesByRow).map(rowId => {
       const row = payrollRows.value.find(r => r.id === rowId);
       if (!row) {
@@ -312,31 +262,54 @@ export async function savePayrollChanges(changes, projectName) {
       const rowChanges = changesByRow[rowId];
       const latestChange = rowChanges.changes[rowChanges.changes.length - 1];
 
-      console.log('Processing change for row:', {
-        rowId,
-        unique_id: row.unique_id,
-        department: row.department,
-        position: row.position,
-        fieldType: latestChange.fieldType,
-        newValue: latestChange.newValue
-      });
+      // console.log('Processing change for row:', {
+      //   rowId,
+      //   unique_id: row.unique_id,
+      //   department: row.department,
+      //   position: row.position,
+      //   fieldType: latestChange.fieldType,
+      //   newValue: latestChange.newValue
+      // });
 
-      const apiChange = {
-        year: row.year,
-        department: row.department,
-        department_location: row.departmentLocation,
-        position: row.position,
-        designation: row.designation,
+      // Create updated row data for transformation
+      const updatedRow = {
+        ...row,
         salary: latestChange.fieldType === 'salary' ? latestChange.newValue : row.salary,
-        // Use base count from changes if it was modified, otherwise use row count
-        amount: rowChanges.baseCountChanged ? rowChanges.baseCount : row.count,
-        unique_id: row.unique_id || null, // Include the unique_id, or null if not available
-        monthly_count: Object.keys(rowChanges.monthly_count).length > 0 ? rowChanges.monthly_count : undefined
+        count: rowChanges.baseCountChanged ? rowChanges.baseCount : row.count
       };
+
+      // Use data constructor to transform to API format
+      const apiChange = payrollDataConstructor.transformRowToApiFormat(updatedRow, payrollData.value);
       
-      console.log('API change being sent:', apiChange);
+      // Add monthly count data if exists
+      if (Object.keys(rowChanges.monthly_count).length > 0) {
+        apiChange.monthly_count = rowChanges.monthly_count;
+      }
+      
+      // console.log('API change being sent:', apiChange);
       return apiChange;
     });
+
+    // Validate API changes before sending
+    const validationData = {
+      payrollRows: apiChanges.map(change => ({
+        department: change.department,
+        departmentLocation: change.department_location,
+        position: change.position,
+        designation: change.designation,
+        salary: change.salary,
+        count: change.amount
+      })),
+      projectName
+    };
+    
+    const validation = validatePayrollData(validationData, 'frontend');
+    if (!validation.isValid) {
+      console.warn('Payroll changes validation warnings:', validation.warnings);
+      if (validation.errors.length > 0) {
+        throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+      }
+    }
 
     //! ************ Save payroll changes to API ****************
     const response = await fetch('/api/method/ex_forcast.api.call_and_save_payroll_data.upsert_payroll_data_items', {
@@ -353,7 +326,7 @@ export async function savePayrollChanges(changes, projectName) {
     const data = await response.json();
     
     if (data.message && data.message.success) {
-      console.log('Payroll changes saved successfully:', data.message);
+      // console.log('Payroll changes saved successfully:', data.message);
       return { status: 'success', message: 'Changes saved successfully' };
     } else {
       throw new Error(data.message?.error || 'Failed to save changes');
@@ -395,14 +368,9 @@ export function resetPayrollForm() {
 }
 
 export function addPayrollRow() {
-  addPayrollForm.rows.push({
-    department: '',
-    departmentLocation: '',
-    position: '',
-    designation: '',
-    salary: '0.00',
-    count: 0
-  });
+  // Use data constructor to create default row
+  const defaultRow = payrollDataConstructor.createDefaultRow();
+  addPayrollForm.rows.push(defaultRow);
 }
 
 export function removePayrollRow(index) {
@@ -438,20 +406,29 @@ export async function submitPayrollData(selectedProject, payrollRows, reloadData
     return;
   }
   
+  // Validate data using constructor
+  const validationData = {
+    payrollRows: cleanRows,
+    projectName: selectedProject.project_name
+  };
+  
+  const validation = validatePayrollData(validationData, 'frontend');
+  if (!validation.isValid) {
+    alertService.error(`Validation failed: ${validation.errors.join(', ')}`);
+    return;
+  }
+  
   isSubmittingPayroll.value = true;
   payrollModalError.value = '';
   
   try {
-    // Transform data for API
-    const apiChanges = cleanRows.map(row => ({
-      year: addPayrollForm.year,
-        department: row.department,
-      department_location: row.departmentLocation,
-        position: row.position,
-        designation: row.designation,
-        salary: row.salary,
-      amount: row.count
-    }));
+    // Use data constructor to transform frontend data to API format
+    const apiPayload = transformFrontendToApi(cleanRows, {}, selectedProject.project_name);
+    
+    // Add year to each item
+    apiPayload.changes.forEach(item => {
+      item.year = addPayrollForm.year;
+    });
 
     //! ************ Submit payroll data to API ****************
     const response = await fetch('/api/method/ex_forcast.api.call_and_save_payroll_data.upsert_payroll_data_items', {
@@ -459,22 +436,19 @@ export async function submitPayrollData(selectedProject, payrollRows, reloadData
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        changes: apiChanges,
-        project: selectedProject.project_name
-      })
+      body: JSON.stringify(apiPayload)
     });
 
     const data = await response.json();
     
     if (data.message && data.message.success) {
-    alertService.success("Payroll data added successfully!");
-    showAddPayrollModal.value = false;
-    resetPayrollForm();
-    
-    // Reload data if callback provided
-    if (reloadData) {
-      await reloadData();
+      alertService.success("Payroll data added successfully!");
+      showAddPayrollModal.value = false;
+      resetPayrollForm();
+      
+      // Reload data if callback provided
+      if (reloadData) {
+        await reloadData();
       }
     } else {
       throw new Error(data.message?.error || 'Failed to add payroll data');
