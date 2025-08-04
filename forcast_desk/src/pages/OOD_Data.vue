@@ -180,19 +180,7 @@
           <div class="flex-1 p-4">
             <!-- No Project Selected State -->
             <template v-if="!selectedProject">
-              <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
-                <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
-                  <CircleAlert class="w-8 h-8 text-violet-500" />
-                  </div>
-                <h3 class="text-lg text-violet-700 font-semibold mb-2">No Project Selected</h3>
-                <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
-                  Please select a project from the dashboard to view and manage other operating departments data.
-                </p>
-                <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
-                  <ArrowLeft class="w-3 h-3" />
-                  <span>Use the project selector in the dashboard to get started</span>
-                </div>
-                </div>
+              <NoProjectSelectedState />
             </template>
             
             
@@ -1005,23 +993,7 @@
   
             <!-- Enhanced No Years Selected State -->
             <template v-else-if="selectedProject">
-              <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
-                <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
-                  <CircleAlert class="w-8 h-8 text-violet-500" />
-                </div>
-                <h3 class="text-lg text-violet-700 font-semibold mb-2">
-                  {{ fromYear && !toYear ? 'Select "To Year"' : !fromYear && toYear ? 'Select "From Year"' : 'No Years Selected' }}
-                </h3>
-                <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
-                  {{ fromYear && !toYear ? 'You have selected a From Year, now please select a To Year to display the tables.' : 
-                     !fromYear && toYear ? 'You have selected a To Year, now please select a From Year to display the tables.' :
-                       'Please select both "From Year" and "To Year" in the left panel to display the tables.' }}
-                </p>
-                <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
-                  <ArrowLeft class="w-3 h-3" />
-                  <span>Use the filters on the left to get started</span>
-                </div>
-              </div>
+              <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
             </template>
           </div>
         </div>
@@ -1159,7 +1131,9 @@
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
   
   // Import project service
-  import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
+import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
+import NoProjectSelectedState from '@/components/ui/ood/NoProjectSelectedState.vue';
+import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
   
   // Reactive state
   const years = ref([]);

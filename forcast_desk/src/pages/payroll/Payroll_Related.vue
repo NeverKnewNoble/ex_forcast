@@ -224,19 +224,7 @@
         <div class="flex-1 p-4">
           <!-- No Project Selected State -->
           <template v-if="!selectedProject">
-            <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
-              <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
-                <CircleAlert class="w-8 h-8 text-violet-500" />
-              </div>
-              <h3 class="text-lg text-violet-700 font-semibold mb-2">No Project Selected</h3>
-              <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
-                Please select a project from the dashboard to view and manage payroll data.
-              </p>
-              <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
-                <ArrowLeft class="w-3 h-3" />
-                <span>Use the project selector in the dashboard to get started</span>
-              </div>
-            </div>
+            <NoProjectSelectedState />
           </template>
           
           <!-- Table Header with Stats -->
@@ -252,32 +240,7 @@
 
             <!-- No Payroll Data State -->
             <template v-if="!hasPayrollDataComputed">
-              <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
-                <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
-                  <Ellipsis class="w-8 h-8 text-violet-500" />
-                </div>
-                <h3 class="text-lg text-violet-700 font-semibold mb-2">No Payroll Data</h3>
-                <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
-                  There is no payroll data for the selected year range. Add some payroll data to get started.
-                </p>
-                <div class="mt-6 flex gap-3">
-                  <button 
-                    @click="openAddPayrollModal"
-                    :disabled="!selectedProject"
-                    :class="[
-                      'px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2',
-                      selectedProject 
-                        ? 'bg-violet-600 text-white hover:bg-violet-700 shadow-md' 
-                        : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                    ]"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    Add Payroll Data
-                  </button>
-                </div>
-              </div>
+              <NoPayrollDataState />
             </template>
 
 
@@ -318,21 +281,11 @@
                           <!-- First Year Column -->
                           <th 
                             v-if="visibleYears.length > 0" 
-                            :colspan="isYearCollapsed(visibleYears[0]) ? 1 : 12" 
-                            class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm cursor-pointer select-none hover:bg-violet-700 transition-all duration-200 group"
-                            @click="toggleCollapse(visibleYears[0])"
-                            title="Click to collapse/expand"
+                            colspan="12" 
+                            class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm"
                           >
                             <div class="flex items-center justify-center gap-1">
                               <span class="font-semibold">{{ visibleYears[0] }}</span>
-                              <ChevronDown 
-                                v-if="!isYearCollapsed(visibleYears[0])" 
-                                class="w-3 h-3 transition-transform group-hover:scale-110" 
-                              />
-                              <ChevronRight 
-                                v-else 
-                                class="w-3 h-3 transition-transform group-hover:scale-110" 
-                              />
                             </div>
                           </th>
                           <!-- Payroll Taxes Column -->
@@ -366,8 +319,8 @@
                         <tr class="bg-violet-500/90 text-xs">
                           <!-- Monthly Count Sub-column -->
                           <th 
-                            v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])" 
-                            :colspan="12" 
+                            v-if="visibleYears.length > 0" 
+                            colspan="12" 
                             class="px-2 py-1 text-center border border-violet-300 font-medium"
                           >
                             Monthly Count
@@ -398,7 +351,6 @@
                         <tr class="bg-violet-400/90 text-xs">
                           <!-- Month columns for Monthly Count -->
                           <th 
-                            v-if="!isYearCollapsed(visibleYears[0])"
                             v-for="month in months" 
                             :key="'count-' + month"
                             class="px-2 py-1 text-center border border-violet-300 min-w-[80px] font-medium"
@@ -480,7 +432,7 @@
                         <template v-for="category in getUniqueCategoriesLocal()" :key="category">
                           <tr class="bg-violet-100 border-b-2 border-violet-300">
                             <td 
-                              :colspan="4 + (visibleYears.length > 0 ? (isYearCollapsed(visibleYears[0]) ? 1 : 25) : 0) + (visibleYears.length > 1 ? visibleYears.length - 1 : 0) + 13" 
+                              :colspan="4 + (visibleYears.length > 0 ? 25 : 0) + (visibleYears.length > 1 ? visibleYears.length - 1 : 0) + 13" 
                               class="px-3 py-2 font-bold text-violet-800 text-left"
                             >
                               {{ category }}
@@ -491,7 +443,7 @@
                             <!-- Department Location Subdivider -->
                             <tr class="bg-violet-50 border-b border-violet-200">
                               <td 
-                                :colspan="4 + (visibleYears.length > 0 ? (isYearCollapsed(visibleYears[0]) ? 1 : 25) : 0) + (visibleYears.length > 1 ? visibleYears.length - 1 : 0) + 13" 
+                                :colspan="4 + (visibleYears.length > 0 ? 25 : 0) + (visibleYears.length > 1 ? visibleYears.length - 1 : 0) + 13" 
                                 class="px-3 py-1.5 font-semibold text-violet-700 text-left text-sm"
                               >
                                 {{ location }}
@@ -511,12 +463,7 @@
                                 <!-- Salary (Editable, Reactive, row.salary) -->
                                 <td
                                   class="px-3 py-2 text-right border-r border-violet-200 font-mono text-sm"
-                                  contenteditable="true"
                                   :key="row.id + '-salary'"
-                                  @input="handleTableSalaryInput(row, $event)"
-                                  @focus="handleTableSalaryFocus(row, $event)"
-                                  @blur="handleTableSalaryBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
                                 >
                                   {{ formatMoney(row.salary) }}
                                 </td>
@@ -527,16 +474,11 @@
                                   {{ row.count }}
                                 </td>
                                 <!-- Monthly Count cells -->
-                                <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                                <template v-if="visibleYears.length > 0">
                                   <td 
                                     v-for="month in months" 
                                     :key="'count-cell-' + month + '-' + (getPayrollCellValueLocal(row.id, 'count', visibleYears[0], month) || 0)"
-                                    contenteditable="true"
                                     class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
-                                    @input="handlePayrollCellInput(row.id, 'count', visibleYears[0], month, $event)"
-                                    @focus="handlePayrollCellFocus(row.id, 'count', visibleYears[0], month, $event)"
-                                    @blur="handlePayrollCellEditLocal(row.id, 'count', visibleYears[0], month, $event)"
-                                    @keypress="allowOnlyNumbers($event)"
                                   >
                                     <span class="font-mono text-xs">{{ getPayrollCellValueLocal(row.id, 'count', visibleYears[0], month) }}</span>
                                   </td>
@@ -550,18 +492,13 @@
                                   @input="handleTaxPercentageInput(row, $event)"
                                   @focus="handleTaxPercentageFocus(row, $event)"
                                   @blur="handleTaxPercentageBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
+                                  @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
-                                  <span class="font-mono text-xs text-green-700">{{ getTaxPercentage(row) || '0.00' }}</span>
+                                  <span class="font-mono text-xs text-green-700">{{ getTaxPercentage(row) || '0.00' }}%</span>
                                 </td>
                                 <td 
-                                  class="px-2 py-1 text-right border border-green-200 hover:bg-green-50 outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 bg-green-50"
-                                  contenteditable="true"
+                                  class="px-2 py-1 text-right border border-green-200 hover:bg-green-50 outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 bg-green-50"                           
                                   :key="row.id + '-tax-total'"
-                                  @input="handleTaxTotalInput(row, $event)"
-                                  @focus="handleTaxTotalFocus(row, $event)"
-                                  @blur="handleTaxTotalBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
                                 >
                                   <span class="font-mono text-xs text-green-700">{{ getTaxTotal(row) || '0.00' }}</span>
                                 </td>
@@ -574,7 +511,7 @@
                                   @input="handleVacationInput(row, $event)"
                                   @focus="handleVacationFocus(row, $event)"
                                   @blur="handleVacationBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
+                                  @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-yellow-700">{{ getVacation(row) || '0.00' }}</span>
                                 </td>
@@ -585,7 +522,7 @@
                                   @input="handleRelocationInput(row, $event)"
                                   @focus="handleRelocationFocus(row, $event)"
                                   @blur="handleRelocationBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
+                                  @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-yellow-700">{{ getRelocation(row) || '0.00' }}</span>
                                 </td>
@@ -596,7 +533,7 @@
                                   @input="handleSeverenceIndemnityInput(row, $event)"
                                   @focus="handleSeverenceIndemnityFocus(row, $event)"
                                   @blur="handleSeverenceIndemnityBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
+                                  @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-yellow-700">{{ getSeverenceIndemnity(row) || '0.00' }}</span>
                                 </td>
@@ -607,7 +544,7 @@
                                   @input="handleOtherInput(row, $event)"
                                   @focus="handleOtherFocus(row, $event)"
                                   @blur="handleOtherBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
+                                  @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-yellow-700">{{ getOther(row) || '0.00' }}</span>
                                 </td>
@@ -620,7 +557,7 @@
                                   @input="handleMedicalInput(row, $event)"
                                   @focus="handleMedicalFocus(row, $event)"
                                   @blur="handleMedicalBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
+                                  @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getMedical(row) || '0.00' }}</span>
                                 </td>
@@ -631,7 +568,7 @@
                                   @input="handleUniformsInput(row, $event)"
                                   @focus="handleUniformsFocus(row, $event)"
                                   @blur="handleUniformsBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
+                                  @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getUniforms(row) || '0.00' }}</span>
                                 </td>
@@ -642,7 +579,7 @@
                                   @input="handleEmployeeMealInput(row, $event)"
                                   @focus="handleEmployeeMealFocus(row, $event)"
                                   @blur="handleEmployeeMealBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
+                                  @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getEmployeeMeal(row) || '0.00' }}</span>
                                 </td>
@@ -653,7 +590,7 @@
                                   @input="handleTransportInput(row, $event)"
                                   @focus="handleTransportFocus(row, $event)"
                                   @blur="handleTransportBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
+                                  @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getTransport(row) || '0.00' }}</span>
                                 </td>
@@ -664,7 +601,7 @@
                                   @input="handleTelephoneInput(row, $event)"
                                   @focus="handleTelephoneFocus(row, $event)"
                                   @blur="handleTelephoneBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
+                                  @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getTelephone(row) || '0.00' }}</span>
                                 </td>
@@ -675,7 +612,7 @@
                                   @input="handleAirTicketInput(row, $event)"
                                   @focus="handleAirTicketFocus(row, $event)"
                                   @blur="handleAirTicketBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
+                                  @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getAirTicket(row) || '0.00' }}</span>
                                 </td>
@@ -686,7 +623,7 @@
                                   @input="handleBenefitsOtherInput(row, $event)"
                                   @focus="handleBenefitsOtherFocus(row, $event)"
                                   @blur="handleBenefitsOtherBlur(row, $event)"
-                                  @keypress="allowOnlyNumbers($event)"
+                                  @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getBenefitsOther(row) || '0.00' }}</span>
                                 </td>
@@ -707,7 +644,7 @@
                               </td>
                               
                               <!-- Monthly Count cells for subtotal -->
-                              <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                              <template v-if="visibleYears.length > 0">
                                 <td 
                                   v-for="month in months" 
                                   :key="'subtotal-mgmt-count-' + month"
@@ -803,7 +740,7 @@
                               </td>
                               
                               <!-- Monthly Count cells for subtotal -->
-                              <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                              <template v-if="visibleYears.length > 0">
                                 <td 
                                   v-for="month in months" 
                                   :key="'subtotal-nonmgmt-count-' + month"
@@ -899,7 +836,7 @@
                               </td>
                               
                               <!-- Monthly Count cells for total -->
-                              <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                              <template v-if="visibleYears.length > 0">
                                 <td 
                                   v-for="month in months" 
                                   :key="'total-count-' + month"
@@ -1001,7 +938,7 @@
                           </td>
                           
                           <!-- Monthly Count cells for hotel total -->
-                          <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                          <template v-if="visibleYears.length > 0">
                             <td 
                               v-for="month in months" 
                               :key="'hotel-count-' + month"
@@ -1098,7 +1035,7 @@
                           </td>
                           
                           <!-- Monthly Count cells for ratio -->
-                          <template v-if="visibleYears.length > 0 && !isYearCollapsed(visibleYears[0])">
+                          <template v-if="visibleYears.length > 0">
                             <td 
                               v-for="month in months" 
                               :key="'ratio-count-' + month"
@@ -1188,42 +1125,27 @@
             </template>
           </template>
 
-          <!-- Enhanced No Years Selected State -->
-          <template v-else-if="selectedProject">
-            <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
-              <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
-                <CircleAlert class="w-8 h-8 text-violet-500" />
-              </div>
-              <h3 class="text-lg text-violet-700 font-semibold mb-2">
-                {{ fromYear && !toYear ? 'Select "To Year"' : !fromYear && toYear ? 'Select "From Year"' : 'No Years Selected' }}
-              </h3>
-              <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
-                {{ fromYear && !toYear ? 'You have selected a From Year, now please select a To Year to display the expense table.' : 
-                   !fromYear && toYear ? 'You have selected a To Year, now please select a From Year to display the expense table.' :
-                     'Please select both "From Year" and "To Year" in the left panel to display the expense table.' }}
-              </p>
-              <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
-                <ArrowLeft class="w-3 h-3" />
-                <span>Use the filters on the left to get started</span>
+          <!-- Tabbed Related Tables Container -->
+          <div v-if="visibleYears.length && isComponentReady" class="mt-8">
+            <div class="mb-4">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
+                  <Table class="w-3 h-3 text-white" />
+                </div>
+                <h2 class="text-lg font-bold text-gray-800">Payroll Related Data</h2>
               </div>
             </div>
+            <PayrollRelatedTabs />
+          </div>
+
+          <!-- Enhanced No Years Selected State -->
+          <template v-else-if="selectedProject">
+            <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
           </template>
           
           <!-- Fallback for when project is selected but no years -->
           <template v-else>
-            <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
-              <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
-                <CircleAlert class="w-8 h-8 text-violet-500" />
-              </div>
-              <h3 class="text-lg text-violet-700 font-semibold mb-2">No Project Selected</h3>
-              <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
-                Please select a project from the dashboard to view and manage payroll data.
-              </p>
-              <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
-                <ArrowLeft class="w-3 h-3" />
-                <span>Use the project selector in the dashboard to get started</span>
-              </div>
-            </div>
+            <NoProjectSelectedState />
           </template>
         </div>
       </div>
@@ -1346,6 +1268,11 @@ import {
 } from "@/components/utility/expense_assumption/index.js";
 import { cloneDeep } from 'lodash-es';
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
+import PayrollRelatedTabs from '@/components/ui/payroll/PayrollRelatedTabs.vue';
+import NoPayrollDataState from '@/components/ui/payroll/NoPayrollDataState.vue';
+import NoProjectSelectedState from '@/components/ui/payroll/NoProjectSelectedState.vue';
+import NoYearsSelectedState from '@/components/ui/payroll/NoYearsSelectedState.vue';
+import LoadingState from '@/components/ui/payroll/LoadingState.vue';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
 import { getProjectKey } from '@/components/utility/projectLocalStorage.js';  
 import {
@@ -1411,6 +1338,21 @@ import {
   transformFrontendToApi, 
   validatePayrollData
 } from '@/components/utility/payroll/data_constructors/index.js';
+
+// Import payroll related data constructor and utilities
+import {
+  payrollRelatedDataConstructor,
+  getRelatedFieldValue,
+  setRelatedFieldValue,
+  formatCurrency as formatRelatedCurrency,
+  formatPercentage,
+  allowOnlyNumbers as allowOnlyNumbersRelated,
+  allowOnlyNumbersAndDecimal,
+  findMatchingPayrollRow,
+  generateRelatedRowId,
+  hasRelatedDataChanges,
+  getRelatedDataSummary
+} from '@/components/utility/payroll_related/index.js';
 
 
 
@@ -2371,38 +2313,22 @@ function handleTableCountBlur(row, event) {
 
 // Payroll Taxes Handlers
 function getTaxPercentage(row) {
-  // Get tax percentage from payroll data or default to 0
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    const taxData = payrollData.value[year]?.[row.id]?.tax_percentage;
-    return taxData !== undefined ? taxData : 0;
-  }
-  return 0;
+  return getRelatedFieldValue(row, 'tax_percentage');
 }
 
 function getTaxTotal(row) {
   // Calculate tax total based on salary and tax percentage
   const taxPercentage = getTaxPercentage(row);
   const salary = row.salary || 0;
-  return (salary * taxPercentage / 100).toFixed(2);
+  const count = row.count || 0;
+  const taxTotal = (salary * count * taxPercentage) / 100;
+  return formatRelatedCurrency(taxTotal);
 }
 
 function handleTaxPercentageInput(row, event) {
   let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.tax_percentage = value;
-  
-  // Store in payrollData for persistence
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    payrollData.value[year][row.id].tax_percentage = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
-  }
+  setRelatedFieldValue(row, 'tax_percentage', value);
+  isSaved.value = false;
 }
 
 function handleTaxPercentageFocus(row, event) {
@@ -2420,24 +2346,11 @@ function handleTaxPercentageBlur(row, event) {
   
   let value = parseFloat(rawValue);
   if (!isNaN(value)) {
-    row.tax_percentage = value;
-    event.target.textContent = value.toFixed(2);
+    setRelatedFieldValue(row, 'tax_percentage', value);
+    event.target.textContent = formatPercentage(value);
     isSaved.value = false;
-    
-    // Store in payrollData
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      payrollData.value[year][row.id].tax_percentage = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
   } else {
-    event.target.textContent = '0.00';
+    event.target.textContent = '0.00%';
   }
 }
 
@@ -2614,57 +2527,26 @@ function calculateEmployeeRoomRatioTaxTotalLocal() {
 
 // Supplementary Pay Handlers
 function getVacation(row) {
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    const vacationData = payrollData.value[year]?.[row.id]?.vacation;
-    return vacationData !== undefined ? vacationData : 0;
-  }
-  return 0;
+  return getRelatedFieldValue(row, 'vacation');
 }
 
 function getRelocation(row) {
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    const relocationData = payrollData.value[year]?.[row.id]?.relocation;
-    return relocationData !== undefined ? relocationData : 0;
-  }
-  return 0;
+  return getRelatedFieldValue(row, 'relocation');
 }
 
 function getSeverenceIndemnity(row) {
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    const severenceData = payrollData.value[year]?.[row.id]?.severence_indemnity;
-    return severenceData !== undefined ? severenceData : 0;
-  }
-  return 0;
+  return getRelatedFieldValue(row, 'severence_indemnity');
 }
 
 function getOther(row) {
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    const otherData = payrollData.value[year]?.[row.id]?.other;
-    return otherData !== undefined ? otherData : 0;
-  }
-  return 0;
+  return getRelatedFieldValue(row, 'other');
 }
 
 // Vacation Handlers
 function handleVacationInput(row, event) {
   let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.vacation = value;
-  
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    payrollData.value[year][row.id].vacation = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
-  }
+  setRelatedFieldValue(row, 'vacation', value);
+  isSaved.value = false;
 }
 
 function handleVacationFocus(row, event) {
@@ -2682,21 +2564,9 @@ function handleVacationBlur(row, event) {
   
   let value = parseFloat(rawValue);
   if (!isNaN(value)) {
-    row.vacation = value;
-    event.target.textContent = formatMoney(value);
+    setRelatedFieldValue(row, 'vacation', value);
+    event.target.textContent = formatRelatedCurrency(value);
     isSaved.value = false;
-    
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      payrollData.value[year][row.id].vacation = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
   } else {
     event.target.textContent = '0.00';
   }
@@ -2705,19 +2575,8 @@ function handleVacationBlur(row, event) {
 // Relocation Handlers
 function handleRelocationInput(row, event) {
   let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.relocation = value;
-  
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    payrollData.value[year][row.id].relocation = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
-  }
+  setRelatedFieldValue(row, 'relocation', value);
+  isSaved.value = false;
 }
 
 function handleRelocationFocus(row, event) {
@@ -2735,21 +2594,9 @@ function handleRelocationBlur(row, event) {
   
   let value = parseFloat(rawValue);
   if (!isNaN(value)) {
-    row.relocation = value;
-    event.target.textContent = formatMoney(value);
+    setRelatedFieldValue(row, 'relocation', value);
+    event.target.textContent = formatRelatedCurrency(value);
     isSaved.value = false;
-    
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      payrollData.value[year][row.id].relocation = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
   } else {
     event.target.textContent = '0.00';
   }
@@ -2758,19 +2605,8 @@ function handleRelocationBlur(row, event) {
 // Severence & Indemnity Handlers
 function handleSeverenceIndemnityInput(row, event) {
   let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.severence_indemnity = value;
-  
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    payrollData.value[year][row.id].severence_indemnity = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
-  }
+  setRelatedFieldValue(row, 'severence_indemnity', value);
+  isSaved.value = false;
 }
 
 function handleSeverenceIndemnityFocus(row, event) {
@@ -2788,21 +2624,9 @@ function handleSeverenceIndemnityBlur(row, event) {
   
   let value = parseFloat(rawValue);
   if (!isNaN(value)) {
-    row.severence_indemnity = value;
-    event.target.textContent = formatMoney(value);
+    setRelatedFieldValue(row, 'severence_indemnity', value);
+    event.target.textContent = formatRelatedCurrency(value);
     isSaved.value = false;
-    
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      payrollData.value[year][row.id].severence_indemnity = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
   } else {
     event.target.textContent = '0.00';
   }
@@ -2811,19 +2635,8 @@ function handleSeverenceIndemnityBlur(row, event) {
 // Other Handlers
 function handleOtherInput(row, event) {
   let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.other = value;
-  
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    payrollData.value[year][row.id].other = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
-  }
+  setRelatedFieldValue(row, 'other', value);
+  isSaved.value = false;
 }
 
 function handleOtherFocus(row, event) {
@@ -2841,21 +2654,9 @@ function handleOtherBlur(row, event) {
   
   let value = parseFloat(rawValue);
   if (!isNaN(value)) {
-    row.other = value;
-    event.target.textContent = formatMoney(value);
+    setRelatedFieldValue(row, 'other', value);
+    event.target.textContent = formatRelatedCurrency(value);
     isSaved.value = false;
-    
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      payrollData.value[year][row.id].other = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
   } else {
     event.target.textContent = '0.00';
   }
@@ -3080,84 +2881,38 @@ function calculateEmployeeRoomRatioOtherLocal() {
 
 // Employee Benefits Handlers
 function getMedical(row) {
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    const medicalData = payrollData.value[year]?.[row.id]?.medical;
-    return medicalData !== undefined ? medicalData : 0;
-  }
-  return 0;
+  return getRelatedFieldValue(row, 'medical');
 }
 
 function getUniforms(row) {
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    const uniformsData = payrollData.value[year]?.[row.id]?.uniforms;
-    return uniformsData !== undefined ? uniformsData : 0;
-  }
-  return 0;
+  return getRelatedFieldValue(row, 'uniforms');
 }
 
 function getEmployeeMeal(row) {
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    const employeeMealData = payrollData.value[year]?.[row.id]?.employee_meal;
-    return employeeMealData !== undefined ? employeeMealData : 0;
-  }
-  return 0;
+  return getRelatedFieldValue(row, 'employee_meal');
 }
 
 function getTransport(row) {
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    const transportData = payrollData.value[year]?.[row.id]?.transport;
-    return transportData !== undefined ? transportData : 0;
-  }
-  return 0;
+  return getRelatedFieldValue(row, 'transport');
 }
 
 function getTelephone(row) {
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    const telephoneData = payrollData.value[year]?.[row.id]?.telephone;
-    return telephoneData !== undefined ? telephoneData : 0;
-  }
-  return 0;
+  return getRelatedFieldValue(row, 'telephone');
 }
 
 function getAirTicket(row) {
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    const airTicketData = payrollData.value[year]?.[row.id]?.air_ticket;
-    return airTicketData !== undefined ? airTicketData : 0;
-  }
-  return 0;
+  return getRelatedFieldValue(row, 'air_ticket');
 }
 
 function getBenefitsOther(row) {
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    const benefitsOtherData = payrollData.value[year]?.[row.id]?.benefits_other;
-    return benefitsOtherData !== undefined ? benefitsOtherData : 0;
-  }
-  return 0;
+  return getRelatedFieldValue(row, 'other');
 }
 
 // Medical Handlers
 function handleMedicalInput(row, event) {
   let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.medical = value;
-  
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    payrollData.value[year][row.id].medical = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
-  }
+  setRelatedFieldValue(row, 'medical', value);
+  isSaved.value = false;
 }
 
 function handleMedicalFocus(row, event) {
@@ -3175,21 +2930,9 @@ function handleMedicalBlur(row, event) {
   
   let value = parseFloat(rawValue);
   if (!isNaN(value)) {
-    row.medical = value;
-    event.target.textContent = formatMoney(value);
+    setRelatedFieldValue(row, 'medical', value);
+    event.target.textContent = formatRelatedCurrency(value);
     isSaved.value = false;
-    
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      payrollData.value[year][row.id].medical = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
   } else {
     event.target.textContent = '0.00';
   }
@@ -3198,19 +2941,8 @@ function handleMedicalBlur(row, event) {
 // Uniforms Handlers
 function handleUniformsInput(row, event) {
   let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.uniforms = value;
-  
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    payrollData.value[year][row.id].uniforms = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
-  }
+  setRelatedFieldValue(row, 'uniforms', value);
+  isSaved.value = false;
 }
 
 function handleUniformsFocus(row, event) {
@@ -3228,21 +2960,9 @@ function handleUniformsBlur(row, event) {
   
   let value = parseFloat(rawValue);
   if (!isNaN(value)) {
-    row.uniforms = value;
-    event.target.textContent = formatMoney(value);
+    setRelatedFieldValue(row, 'uniforms', value);
+    event.target.textContent = formatRelatedCurrency(value);
     isSaved.value = false;
-    
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      payrollData.value[year][row.id].uniforms = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
   } else {
     event.target.textContent = '0.00';
   }
@@ -3251,19 +2971,8 @@ function handleUniformsBlur(row, event) {
 // Employee Meal Handlers
 function handleEmployeeMealInput(row, event) {
   let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.employee_meal = value;
-  
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    payrollData.value[year][row.id].employee_meal = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
-  }
+  setRelatedFieldValue(row, 'employee_meal', value);
+  isSaved.value = false;
 }
 
 function handleEmployeeMealFocus(row, event) {
@@ -3281,21 +2990,9 @@ function handleEmployeeMealBlur(row, event) {
   
   let value = parseFloat(rawValue);
   if (!isNaN(value)) {
-    row.employee_meal = value;
-    event.target.textContent = formatMoney(value);
+    setRelatedFieldValue(row, 'employee_meal', value);
+    event.target.textContent = formatRelatedCurrency(value);
     isSaved.value = false;
-    
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      payrollData.value[year][row.id].employee_meal = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
   } else {
     event.target.textContent = '0.00';
   }
@@ -3304,19 +3001,8 @@ function handleEmployeeMealBlur(row, event) {
 // Transport Handlers
 function handleTransportInput(row, event) {
   let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.transport = value;
-  
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    payrollData.value[year][row.id].transport = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
-  }
+  setRelatedFieldValue(row, 'transport', value);
+  isSaved.value = false;
 }
 
 function handleTransportFocus(row, event) {
@@ -3334,21 +3020,9 @@ function handleTransportBlur(row, event) {
   
   let value = parseFloat(rawValue);
   if (!isNaN(value)) {
-    row.transport = value;
-    event.target.textContent = formatMoney(value);
+    setRelatedFieldValue(row, 'transport', value);
+    event.target.textContent = formatRelatedCurrency(value);
     isSaved.value = false;
-    
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      payrollData.value[year][row.id].transport = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
   } else {
     event.target.textContent = '0.00';
   }
@@ -3357,19 +3031,8 @@ function handleTransportBlur(row, event) {
 // Telephone Handlers
 function handleTelephoneInput(row, event) {
   let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.telephone = value;
-  
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    payrollData.value[year][row.id].telephone = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
-  }
+  setRelatedFieldValue(row, 'telephone', value);
+  isSaved.value = false;
 }
 
 function handleTelephoneFocus(row, event) {
@@ -3387,21 +3050,9 @@ function handleTelephoneBlur(row, event) {
   
   let value = parseFloat(rawValue);
   if (!isNaN(value)) {
-    row.telephone = value;
-    event.target.textContent = formatMoney(value);
+    setRelatedFieldValue(row, 'telephone', value);
+    event.target.textContent = formatRelatedCurrency(value);
     isSaved.value = false;
-    
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      payrollData.value[year][row.id].telephone = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
   } else {
     event.target.textContent = '0.00';
   }
@@ -3410,19 +3061,8 @@ function handleTelephoneBlur(row, event) {
 // Air Ticket Handlers
 function handleAirTicketInput(row, event) {
   let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.air_ticket = value;
-  
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    payrollData.value[year][row.id].air_ticket = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
-  }
+  setRelatedFieldValue(row, 'air_ticket', value);
+  isSaved.value = false;
 }
 
 function handleAirTicketFocus(row, event) {
@@ -3440,21 +3080,9 @@ function handleAirTicketBlur(row, event) {
   
   let value = parseFloat(rawValue);
   if (!isNaN(value)) {
-    row.air_ticket = value;
-    event.target.textContent = formatMoney(value);
+    setRelatedFieldValue(row, 'air_ticket', value);
+    event.target.textContent = formatRelatedCurrency(value);
     isSaved.value = false;
-    
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      payrollData.value[year][row.id].air_ticket = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
   } else {
     event.target.textContent = '0.00';
   }
@@ -3463,19 +3091,8 @@ function handleAirTicketBlur(row, event) {
 // Benefits Other Handlers
 function handleBenefitsOtherInput(row, event) {
   let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.benefits_other = value;
-  
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    payrollData.value[year][row.id].benefits_other = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
-  }
+  setRelatedFieldValue(row, 'benefits_other', value);
+  isSaved.value = false;
 }
 
 function handleBenefitsOtherFocus(row, event) {
@@ -3493,21 +3110,9 @@ function handleBenefitsOtherBlur(row, event) {
   
   let value = parseFloat(rawValue);
   if (!isNaN(value)) {
-    row.benefits_other = value;
-    event.target.textContent = formatMoney(value);
+    setRelatedFieldValue(row, 'benefits_other', value);
+    event.target.textContent = formatRelatedCurrency(value);
     isSaved.value = false;
-    
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      payrollData.value[year][row.id].benefits_other = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
   } else {
     event.target.textContent = '0.00';
   }

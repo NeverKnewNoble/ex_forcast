@@ -273,43 +273,9 @@
             <div v-else>
               <!-- Status Messages -->
               <div v-if="roomData.status" class="mb-6">
-                <div v-if="roomData.status === 'no_project_selected'" class="bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-xl p-6 text-center">
-                  <div class="flex flex-col items-center gap-4">
-                    <div class="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-500 rounded-full flex items-center justify-center shadow-lg">
-                      <FolderOpen class="w-8 h-8 text-white" />
-                    </div>
-                    <div>
-                      <h3 class="text-xl font-bold text-amber-800 mb-2">No Project Selected</h3>
-                      <p class="text-amber-700 mb-4">Please select a project on the dashboard to view room revenue data.</p>
-                      <router-link 
-                        to="/dashboard" 
-                        class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-                      >
-                        <ArrowRight class="w-4 h-4" />
-                        Go to Dashboard
-                      </router-link>
-                    </div>
-                  </div>
-                </div>
+                <NoProjectSelectedState v-if="roomData.status === 'no_project_selected'" />
                 
-                <div v-else-if="roomData.status === 'error'" class="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-xl p-6 text-center">
-                  <div class="flex flex-col items-center gap-4">
-                    <div class="w-16 h-16 bg-gradient-to-br from-red-400 to-red-500 rounded-full flex items-center justify-center shadow-lg">
-                      <AlertCircle class="w-8 h-8 text-white" />
-                    </div>
-                    <div>
-                      <h3 class="text-xl font-bold text-red-800 mb-2">Error Loading Data</h3>
-                      <p class="text-red-700 mb-4">{{ roomData.message }}</p>
-                      <button 
-                        @click="refreshRoomRevenueData"
-                        class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-                      >
-                        <RefreshCw class="w-4 h-4" />
-                        Try Again
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <ErrorState v-else-if="roomData.status === 'error'" :message="roomData.message" @retry="refreshRoomRevenueData" />
               </div>
 
               <!-- Table Header with Stats -->
@@ -808,23 +774,7 @@
 
               <!-- No Years Selected -->
               <template v-else-if="!roomData.status">
-                <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
-                  <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
-                    <CircleAlert class="w-8 h-8 text-violet-500" />
-                  </div>
-                  <h3 class="text-lg text-violet-700 font-semibold mb-2">
-                    {{ fromYear && !toYear ? 'Select "To Year"' : !fromYear && toYear ? 'Select "From Year"' : 'No Years Selected' }}
-                  </h3>
-                  <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
-                    {{ fromYear && !toYear ? 'You have selected a From Year, now please select a To Year to display the room revenue tables.' : 
-                       !fromYear && toYear ? 'You have selected a To Year, now please select a From Year to display the room revenue tables.' :
-                         'Please select both "From Year" and "To Year" in the left panel to display the room revenue tables.' }}
-                  </p>
-                  <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
-                    <ArrowLeft class="w-3 h-3" />
-                    <span>Use the filters on the left to get started</span>
-                  </div>
-                </div>
+                <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
               </template>
             </div>
           </div>
@@ -1486,6 +1436,9 @@ import { createRoomPackage } from '@/components/utility/room_revenue_assumpt./ro
 
 // Import market segmentation utilities
 import { MARKET_SEGMENT_CATEGORIES, MARKET_SEGMENTS } from "@/components/utility/room_revenue_assumpt./market_segments.js";
+import NoProjectSelectedState from '@/components/ui/room/NoProjectSelectedState.vue';
+import ErrorState from '@/components/ui/room/ErrorState.vue';
+import NoYearsSelectedState from '@/components/ui/room/NoYearsSelectedState.vue';
 
 
 // Pinia store for year settings

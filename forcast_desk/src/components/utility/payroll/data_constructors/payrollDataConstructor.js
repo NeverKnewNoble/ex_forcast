@@ -371,6 +371,30 @@ export class PayrollDataConstructor {
   }
 
   /**
+   *! Find matching payroll row based on unique_id or other linking fields
+   * @param {Object} item - Item to match against
+   * @param {Array} payrollRows - Reference payroll rows
+   * @returns {Object|null} - Matching payroll row or null
+   */
+  findMatchingPayrollRow(item, payrollRows) {
+    // First try to match by unique_id if the item has a payroll_id reference
+    if (item.payroll_id) {
+      const match = payrollRows.find(row => row.unique_id === item.payroll_id);
+      if (match) return match;
+    }
+
+    // Try to match by department, location, position, designation
+    return payrollRows.find(payrollRow => {
+      return (
+        payrollRow.department === (item.department || item.department_location) &&
+        payrollRow.departmentLocation === (item.departmentLocation || item.department_location) &&
+        payrollRow.position === item.position &&
+        payrollRow.designation === item.designation
+      );
+    });
+  }
+
+  /**
    *! Merge API changes with existing data
    * @param {Object} existingData - Existing payroll data
    * @param {Array} apiChanges - New API changes
