@@ -184,57 +184,18 @@
         <!-- Right Side - Table Area -->
         <div class="flex-1 p-4">
           <!-- No Project Selected State -->
-          <div v-if="expenseData.status === 'no_project_selected'" class="flex flex-col items-center justify-center h-96">
-            <div class="w-24 h-24 bg-gradient-to-br from-violet-100 to-violet-200 rounded-full flex items-center justify-center mb-6">
-              <FolderOpen class="w-12 h-12 text-violet-600" />
-            </div>
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">No Project Selected</h3>
-            <p class="text-gray-600 mb-6 text-center max-w-md">
-              Please go to the Dashboard and select a project to view and manage expense data.
-            </p>
-            <router-link 
-              to="/dashboard" 
-              class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-lg hover:from-violet-600 hover:to-violet-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-            >
-              <ArrowLeft class="w-4 h-4" />
-              Go to Dashboard
-            </router-link>
+          <div v-if="expenseData.status === 'no_project_selected'">
+            <NoProjectSelectedState />
           </div>
 
           <!-- No Data State -->
-          <div v-else-if="expenseData.status === 'no_data'" class="flex flex-col items-center justify-center h-96">
-            <div class="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mb-6">
-              <Receipt class="w-12 h-12 text-blue-600" />
-            </div>
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">No Expense Data Found</h3>
-            <p class="text-gray-600 mb-6 text-center max-w-md">
-              The project <span class="font-semibold text-violet-600">{{ expenseData.project }}</span> doesn't have any expense data yet.
-            </p>
-            <button 
-              @click="showAddExpenseModal = true"
-              class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-lg hover:from-violet-600 hover:to-violet-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-            >
-              <Plus class="w-4 h-4" />
-              Add First Expense
-            </button>
+          <div v-else-if="expenseData.status === 'no_data'">
+            <NoDataState :project="expenseData.project" @add-expense="showAddExpenseModal = true" />
           </div>
 
           <!-- Error State -->
-          <div v-else-if="expenseData.status === 'error'" class="flex flex-col items-center justify-center h-96">
-            <div class="w-24 h-24 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center mb-6">
-              <AlertTriangle class="w-12 h-12 text-red-600" />
-            </div>
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">Error Loading Data</h3>
-            <p class="text-gray-600 mb-6 text-center max-w-md">
-              {{ expenseData.message }}
-            </p>
-            <button 
-              @click="refreshTable"
-              class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-lg hover:from-violet-600 hover:to-violet-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-            >
-              <RefreshCw class="w-4 h-4" />
-              Try Again
-            </button>
+          <div v-else-if="expenseData.status === 'error'">
+            <ErrorState :message="expenseData.message" @retry="refreshTable" />
           </div>
 
           <!-- Table Header with Stats -->
@@ -467,23 +428,7 @@
 
           <!-- Enhanced No Years Selected State -->
           <template v-else>
-            <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
-              <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
-                <CircleAlert class="w-8 h-8 text-violet-500" />
-              </div>
-              <h3 class="text-lg text-violet-700 font-semibold mb-2">
-                {{ fromYear && !toYear ? 'Select "To Year"' : !fromYear && toYear ? 'Select "From Year"' : 'No Years Selected' }}
-              </h3>
-              <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
-                {{ fromYear && !toYear ? 'You have selected a From Year, now please select a To Year to display the expense table.' : 
-                   !fromYear && toYear ? 'You have selected a To Year, now please select a From Year to display the expense table.' :
-                     'Please select both "From Year" and "To Year" in the left panel to display the expense table.' }}
-              </p>
-              <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
-                <ArrowLeft class="w-3 h-3" />
-                <span>Use the filters on the left to get started</span>
-              </div>
-            </div>
+            <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
           </template>
         </div>
       </div>
@@ -867,6 +812,10 @@ import {
 import { saveChanges } from "@/components/utility/expense_assumption/save_changes.js";
 import { submitAddExpense } from "@/components/utility/expense_assumption/submit_add_expense.js";
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
+import NoProjectSelectedState from '@/components/ui/expense/NoProjectSelectedState.vue';
+import NoDataState from '@/components/ui/expense/NoDataState.vue';
+import ErrorState from '@/components/ui/expense/ErrorState.vue';
+import NoYearsSelectedState from '@/components/ui/expense/NoYearsSelectedState.vue';
 
 
 // Reactive state

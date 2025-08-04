@@ -13,7 +13,11 @@
   "laundry_tab",
   "payroll_data",
   "monthly_count_tab",
-  "monthly_count"
+  "monthly_count",
+  "payroll_related_tab",
+  "payroll_taxes",
+  "supplementary_pay",
+  "employee_benefits"
  ],
  "fields": [
   {
@@ -55,11 +59,34 @@
    "fieldtype": "Table",
    "label": "Monthly Count",
    "options": "Payroll Monthly Count"
+  },
+  {
+   "fieldname": "payroll_related_tab",
+   "fieldtype": "Tab Break",
+   "label": "Payroll related"
+  },
+  {
+   "fieldname": "payroll_taxes",
+   "fieldtype": "Table",
+   "label": "Payroll Taxes",
+   "options": "Payroll Related Tax Details Items"
+  },
+  {
+   "fieldname": "supplementary_pay",
+   "fieldtype": "Table",
+   "label": "Supplementary Pay",
+   "options": "Payroll Related Supplementary Details Items"
+  },
+  {
+   "fieldname": "employee_benefits",
+   "fieldtype": "Table",
+   "label": "Employee Benefits",
+   "options": "Payroll Related Benefits Details Items"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-01 23:39:21.098920",
+ "modified": "2025-08-04 12:30:44.439397",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Payroll Data",
