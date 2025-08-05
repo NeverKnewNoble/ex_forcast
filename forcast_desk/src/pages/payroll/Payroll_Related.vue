@@ -649,7 +649,7 @@
                               <td 
                                 class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalManagementTaxPercentageLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
+                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalManagementTaxPercentageLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}%</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
@@ -745,7 +745,7 @@
                               <td 
                                 class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalNonManagementTaxPercentageLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
+                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalNonManagementTaxPercentageLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}%</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
@@ -841,7 +841,7 @@
                               <td 
                                 class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-green-900">{{ calculateLocationTotalTaxPercentageLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
+                                <span class="font-mono text-xs text-green-900">{{ calculateLocationTotalTaxPercentageLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}%</span>
                               </td>
                               <td 
                                 class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
@@ -943,7 +943,7 @@
                           <td 
                             class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-green-900">{{ safeCalculateHotelTotalTaxPercentageLocal() }}</span>
+                                                            <span class="font-mono text-xs text-green-900">{{ safeCalculateHotelTotalTaxPercentageLocal() }}%</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
@@ -1040,71 +1040,71 @@
                           <td 
                             class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-green-900">{{ calculateEmployeeRoomRatioTaxPercentageLocal() }}</span>
+                                                            <span class="font-mono text-xs text-green-900">{{ calculateEmployeeRoomRatioTaxPercentageLocal(payrollRows, totalRooms) }}%</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-green-900">{{ calculateEmployeeRoomRatioTaxTotalLocal() }}</span>
+                                                            <span class="font-mono text-xs text-green-900">{{ calculateEmployeeRoomRatioTaxTotalLocal(payrollRows, totalRooms) }}</span>
                           </td>
                           
                           <!-- Supplementary Pay cells for ratio -->
                           <td 
                             class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioVacationLocal() }}</span>
+                                                            <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioVacationLocal(payrollRows, totalRooms) }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioRelocationLocal() }}</span>
+                                                            <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioRelocationLocal(payrollRows, totalRooms) }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioSeverenceIndemnityLocal() }}</span>
+                                                            <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioSeverenceIndemnityLocal(payrollRows, totalRooms) }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioOtherLocal() }}</span>
+                                                            <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioOtherLocal(payrollRows, totalRooms) }}</span>
                           </td>
                           
                           <!-- Employee Benefits cells for ratio -->
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioMedicalLocal() }}</span>
+                                                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioMedicalLocal(payrollRows, totalRooms) }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioUniformsLocal() }}</span>
+                                                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioUniformsLocal(payrollRows, totalRooms) }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioEmployeeMealLocal() }}</span>
+                                                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioEmployeeMealLocal(payrollRows, totalRooms) }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioTransportLocal() }}</span>
+                                                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioTransportLocal(payrollRows, totalRooms) }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioTelephoneLocal() }}</span>
+                                                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioTelephoneLocal(payrollRows, totalRooms) }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioAirTicketLocal() }}</span>
+                                                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioAirTicketLocal(payrollRows, totalRooms) }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioBenefitsOtherLocal() }}</span>
+                                                            <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioBenefitsOtherLocal(payrollRows, totalRooms) }}</span>
                           </td>
 
                         </tr>

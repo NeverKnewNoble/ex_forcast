@@ -194,7 +194,7 @@ export function setRelatedFieldValue(row, field, value) {
       'transport': 'transport',
       'telephone': 'telephone',
       'air_ticket': 'air_ticket',
-      'benefits_other': 'benefits_other'
+      'benefits_other': 'other'
     };
 
     const fieldName = fieldMappings[field];
