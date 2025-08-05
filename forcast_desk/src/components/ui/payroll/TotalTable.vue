@@ -119,7 +119,7 @@
                     </div>
                   </td>
                   <td class="px-3 py-2.5 text-right border-r border-blue-300">
-                    <span class="font-mono text-sm font-semibold text-blue-900">{{ calculateSubTotalManagementCount(category, location) }}</span>
+                    <span class="font-mono text-sm font-semibold text-blue-900">{{ calculateSubTotalManagementCountLocal(category, location) }}</span>
                   </td>
                   <!-- Monthly cells for subtotal -->
                   <td 
@@ -144,7 +144,7 @@
                     </div>
                   </td>
                   <td class="px-3 py-2.5 text-right border-r border-blue-300">
-                    <span class="font-mono text-sm font-semibold text-blue-900">{{ calculateSubTotalNonManagementCount(category, location) }}</span>
+                    <span class="font-mono text-sm font-semibold text-blue-900">{{ calculateSubTotalNonManagementCountLocal(category, location) }}</span>
                   </td>
                   <!-- Monthly cells for subtotal -->
                   <td 
@@ -169,7 +169,7 @@
                     </div>
                   </td>
                   <td class="px-3 py-3 text-right border-r border-blue-300">
-                    <span class="font-mono text-sm font-bold text-blue-900">{{ calculateLocationTotalCount(category, location) }}</span>
+                    <span class="font-mono text-sm font-bold text-blue-900">{{ calculateLocationTotalCountLocal(category, location) }}</span>
                   </td>
                   <!-- Monthly cells for total -->
                   <td 
@@ -200,7 +200,7 @@
                 </div>
               </td>
               <td class="px-3 py-3 text-right border-r border-blue-300">
-                <span class="font-mono text-sm font-bold text-blue-900">{{ calculateHotelTotalCount() }}</span>
+                <span class="font-mono text-sm font-bold text-blue-900">{{ calculateHotelTotalCountLocal() }}</span>
               </td>
               <!-- Monthly cells for hotel total -->
               <td 
@@ -225,7 +225,7 @@
                 </div>
               </td>
               <td class="px-3 py-3 text-right border-r border-blue-300">
-                <span class="font-mono text-sm font-bold text-blue-900">{{ calculateEmployeeRoomRatio() }}</span>
+                <span class="font-mono text-sm font-bold text-blue-900">{{ calculateEmployeeRoomRatioLocal() }}</span>
               </td>
               <!-- Monthly cells for ratio -->
               <td 
@@ -250,6 +250,14 @@
 <script setup>
 import { FolderOpen, CheckCircle, BarChart3, Building2, Users } from 'lucide-vue-next';
 import { getPayrollRowsForLocation } from '@/components/utility/payroll/payroll_data_utils.js';
+// Import the standardized calculation functions from payroll utility
+import {
+  calculateSubTotalManagementCount,
+  calculateSubTotalNonManagementCount,
+  calculateLocationTotalCount,
+  calculateHotelTotal,
+  calculateEmployeeRoomRatio
+} from '@/components/utility/payroll/payroll_calculations.js';
 
 // Props
 const props = defineProps({
@@ -304,36 +312,36 @@ function getUniqueLocationsForCategory(category) {
   return Array.from(locations).sort();
 }
 
-
-
-// Calculation functions
-function calculateSubTotalManagementCount(category, location) {
-  const managementRows = getPayrollRowsForLocation(props.payrollRows, category, location).filter(row => 
-    row.position_type === 'management' || row.position?.toLowerCase().includes('manager')
-  );
-  return managementRows.reduce((sum, row) => sum + (row.count || 0), 0);
+// Local wrapper functions for calculations - using the same functions as Payroll_Related.vue
+function calculateSubTotalManagementCountLocal(category, location) {
+  return calculateSubTotalManagementCount(props.payrollRows, category, location);
 }
 
-function calculateSubTotalNonManagementCount(category, location) {
-  const nonManagementRows = getPayrollRowsForLocation(props.payrollRows, category, location).filter(row => 
-    !(row.position_type === 'management' || row.position?.toLowerCase().includes('manager'))
-  );
-  return nonManagementRows.reduce((sum, row) => sum + (row.count || 0), 0);
+function calculateSubTotalNonManagementCountLocal(category, location) {
+  return calculateSubTotalNonManagementCount(props.payrollRows, category, location);
 }
 
-function calculateLocationTotalCount(category, location) {
-  const rows = getPayrollRowsForLocation(props.payrollRows, category, location);
-  return rows.reduce((sum, row) => sum + (row.count || 0), 0);
+function calculateLocationTotalCountLocal(category, location) {
+  return calculateLocationTotalCount(props.payrollRows, category, location);
 }
 
-function calculateHotelTotalCount() {
-  return props.payrollRows.reduce((sum, row) => sum + (row.count || 0), 0);
+function calculateHotelTotalCountLocal() {
+  // Defensive check for payrollRows
+  if (!props.payrollRows || !Array.isArray(props.payrollRows)) {
+    return 0;
+  }
+  
+  return calculateHotelTotal(props.payrollRows);
 }
 
-function calculateEmployeeRoomRatio() {
-  const totalEmployees = calculateHotelTotalCount();
+function calculateEmployeeRoomRatioLocal() {
+  // Defensive check for payrollRows
+  if (!props.payrollRows || !Array.isArray(props.payrollRows)) {
+    return 0;
+  }
+  
   const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
-  return totalRooms > 0 ? (totalEmployees / totalRooms).toFixed(2) : '0.00';
+  return calculateEmployeeRoomRatio(props.payrollRows, totalRooms);
 }
 </script>
 
