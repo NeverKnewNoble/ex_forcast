@@ -3,6 +3,7 @@
 
 import { payrollRelatedDataConstructor } from './index.js';
 import { calculatePayrollTaxes, calculateSupplementaryPay, calculateEmployeeBenefits } from './related_calculations.js';
+import { getPayrollRelatedValue } from './payroll_related_data_service.js';
 
 /**
  *! Transform API data to frontend format for payroll related data
@@ -89,26 +90,84 @@ export function validateRelatedData(data, type = 'frontend') {
  *! Get field value for a specific row and field
  * @param {Object} row - Payroll row
  * @param {string} field - Field name
+ * @param {string} year - Year (optional)
  * @returns {number} - Field value
  */
-export function getRelatedFieldValue(row, field) {
+export function getRelatedFieldValue(row, field, year = null) {
   try {
+    // Try to get the current year from multiple sources
+    let currentYear = year;
+    
+    if (!currentYear) {
+      // Try to get from the component's visibleYears if available
+      // This will be passed from the component
+      if (window.__currentVisibleYears && window.__currentVisibleYears.length > 0) {
+        currentYear = window.__currentVisibleYears[0];
+      }
+    }
+    
+    // If still not found, use current year
+    if (!currentYear) {
+      currentYear = new Date().getFullYear().toString();
+    }
+    
+    if (!currentYear) {
+      console.warn('No current year found for payroll related data');
+      return 0;
+    }
+    
+    // Map field names to the expected format for getPayrollRelatedValue
     const fieldMappings = {
-      'tax_percentage': row.tax_percentage,
-      'vacation': row.vacation,
-      'relocation': row.relocation,
-      'severence_indemnity': row.severence_indemnity,
-      'other': row.other,
-      'medical': row.medical,
-      'uniforms': row.uniforms,
-      'employee_meal': row.employee_meal,
-      'transport': row.transport,
-      'telephone': row.telephone,
-      'air_ticket': row.air_ticket,
-      'benefits_other': row.benefits_other
+      'tax_percentage': 'tax_percentage',
+      'vacation': 'supplementary_vacation',
+      'relocation': 'supplementary_relocation',
+      'severence_indemnity': 'supplementary_severence_indemnity',
+      'other': 'supplementary_other',
+      'medical': 'benefit_medical',
+      'uniforms': 'benefit_uniforms',
+      'employee_meal': 'benefit_employee_meal',
+      'transport': 'benefit_transport',
+      'telephone': 'benefit_telephone',
+      'air_ticket': 'benefit_air_ticket',
+      'benefits_other': 'benefit_other'
     };
 
-    return fieldMappings[field] || 0;
+    const mappedField = fieldMappings[field];
+    
+    if (!mappedField) {
+      console.warn(`No mapping found for field: ${field}`);
+      return 0;
+    }
+
+    // Use the global payroll related data if available
+    if (window.__payrollRelatedData && window.__payrollRelatedData[currentYear]) {
+      const yearData = window.__payrollRelatedData[currentYear];
+      
+      // Handle different field types
+      if (field === 'tax_percentage') {
+        return yearData.payroll_taxes?.[row.id]?.tax_percentage || 0;
+      }
+      
+      if (field.startsWith('supplementary_') || field === 'vacation' || field === 'relocation' || field === 'severence_indemnity' || field === 'other') {
+        let detail = field;
+        if (field === 'vacation') detail = 'vacation';
+        else if (field === 'relocation') detail = 'relocation';
+        else if (field === 'severence_indemnity') detail = 'severence_indemnity';
+        else if (field === 'other') detail = 'other';
+        
+        return yearData.supplementary_pay?.[row.id]?.[detail] || 0;
+      }
+      
+      if (field === 'medical' || field === 'uniforms' || field === 'employee_meal' || field === 'transport' || field === 'telephone' || field === 'air_ticket' || field === 'benefits_other') {
+        let benefit = field;
+        if (field === 'benefits_other') benefit = 'other';
+        
+        return yearData.employee_benefits?.[row.id]?.[benefit] || 0;
+      }
+    }
+
+    // Fallback to the service function
+    return getPayrollRelatedValue(row.id, mappedField, currentYear);
   } catch (error) {
     console.error('Error getting related field value:', error);
     return 0;
@@ -250,16 +309,7 @@ export function allowOnlyNumbers(event) {
   }
 }
 
-/**
- *! Allow only numbers and decimal point in input
- * @param {Event} event - Input event
- */
-export function allowOnlyNumbersAndDecimal(event) {
-  const charCode = event.which ? event.which : event.keyCode;
-  if (charCode > 31 && (charCode < 48 || charCode > 57) && charCode !== 46) {
-    event.preventDefault();
-  }
-}
+
 
 /**
  *! Find matching payroll row for related data

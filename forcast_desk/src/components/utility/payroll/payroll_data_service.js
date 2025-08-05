@@ -187,7 +187,11 @@ export async function fetchPayrollData(projectName, fromYear = null, toYear = nu
       payrollData.value = transformedResult.payrollData;
       payrollRows.value = transformedResult.payrollRows;
       
-      // console.log('Payroll data loaded successfully:', transformedResult.totalRows, 'rows');
+      // console.log('Payroll data loaded successfully:', {
+      //   totalRows: transformedResult.totalRows,
+      //   payrollRowsLength: transformedResult.payrollRows?.length,
+      //   payrollDataKeys: Object.keys(transformedResult.payrollData || {})
+      // });
     } else {
       console.error('Failed to load payroll data:', data.message?.error);
       alertService.error('Failed to load payroll data');

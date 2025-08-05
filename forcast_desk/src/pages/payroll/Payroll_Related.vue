@@ -28,41 +28,41 @@
 
           <!-- Save Status Section -->
           <div class="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <div
-                  v-if="!isSaved"
-                  class="flex items-center gap-2 text-sm font-medium text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-200"
-                >
-                  <AlertTriangle class="w-4 h-4" />
-                  Unsaved
+                          <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div
+                    v-if="hasUnsavedChanges"
+                    class="flex items-center gap-2 text-sm font-medium text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-200"
+                  >
+                    <AlertTriangle class="w-4 h-4" />
+                    Unsaved
+                  </div>
+                  <div
+                    v-else
+                    class="flex items-center gap-2 text-sm font-medium text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200"
+                  >
+                    <Check class="w-4 h-4" />
+                    All Saved
+                  </div>
                 </div>
-                <div
-                  v-else
-                  class="flex items-center gap-2 text-sm font-medium text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200"
+                
+                <button
+                  v-if="!isSaving && hasUnsavedChanges"
+                  :disabled="isSaving"
+                  @click="saveChangesWrapper"
+                  class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
                 >
-                  <Check class="w-4 h-4" />
-                  All Saved
-                </div>
+                  <Download class="w-4 h-4" />
+                  Save
+                </button>
+                <button
+                  v-if="isSaving"
+                  class="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg cursor-not-allowed"
+                >
+                  <Loader2 class="w-4 h-4 animate-spin" />
+                  Saving...
+                </button>
               </div>
-              
-              <button
-                v-if="!isSaving && !isSaved"
-                :disabled="isSaving"
-                @click="saveChangesWrapper"
-                class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-              >
-                <Download class="w-4 h-4" />
-                Save
-              </button>
-              <button
-                v-if="isSaving"
-                class="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg cursor-not-allowed"
-              >
-                <Loader2 class="w-4 h-4 animate-spin" />
-                Saving...
-              </button>
-            </div>
             <span v-if="saveError" class="mt-2 text-xs text-red-500 flex items-center gap-1">
               <AlertCircle class="w-3 h-3" />
               {{ saveError }}
@@ -184,16 +184,16 @@
                     <button 
                       @click="syncWithRoomRevenue"
                       class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium shadow-sm"
-                      :class="isSyncedWithRoomRevenue 
+                      :class="isSyncedWithRoomRevenueComputed 
                         ? 'bg-green-500 hover:bg-green-600 text-white shadow-green-200' 
                         : 'bg-violet-500 hover:bg-violet-600 text-white shadow-violet-200'"
                     >
                       <RefreshCw class="w-4 h-4" />
-                      {{ isSyncedWithRoomRevenue ? 'Synced' : 'Unsynced' }}
+                      {{ isSyncedWithRoomRevenueComputed ? 'Synced' : 'Unsynced' }}
                     </button>
                     
                     <p class="text-xs text-gray-500 mt-2 text-center">
-                      {{ isSyncedWithRoomRevenue 
+                      {{ isSyncedWithRoomRevenueComputed 
                         ? 'Your total rooms are synchronized with the Room Revenue page' 
                         : 'Click to sync with the total rooms from Room Revenue page' }}
                     </p>
@@ -489,9 +489,9 @@
                                   class="px-2 py-1 text-right border border-green-200 hover:bg-green-50 outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 bg-green-50"
                                   contenteditable="true"
                                   :key="row.id + '-tax-percentage'"
-                                  @input="handleTaxPercentageInput(row, $event)"
+                                  @input="handleTaxPercentageInput(row, $event, isSaved, visibleYears)"
                                   @focus="handleTaxPercentageFocus(row, $event)"
-                                  @blur="handleTaxPercentageBlur(row, $event)"
+                                  @blur="handleTaxPercentageBlur(row, $event, isSaved, visibleYears)"
                                   @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-green-700">{{ getTaxPercentage(row) || '0.00' }}%</span>
@@ -508,9 +508,9 @@
                                   class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200 bg-yellow-50"
                                   contenteditable="true"
                                   :key="row.id + '-vacation'"
-                                  @input="handleVacationInput(row, $event)"
+                                  @input="handleVacationInput(row, $event, isSaved, visibleYears)"
                                   @focus="handleVacationFocus(row, $event)"
-                                  @blur="handleVacationBlur(row, $event)"
+                                  @blur="handleVacationBlur(row, $event, isSaved, visibleYears)"
                                   @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-yellow-700">{{ getVacation(row) || '0.00' }}</span>
@@ -519,9 +519,9 @@
                                   class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200 bg-yellow-50"
                                   contenteditable="true"
                                   :key="row.id + '-relocation'"
-                                  @input="handleRelocationInput(row, $event)"
+                                  @input="handleRelocationInput(row, $event, isSaved, visibleYears)"
                                   @focus="handleRelocationFocus(row, $event)"
-                                  @blur="handleRelocationBlur(row, $event)"
+                                  @blur="handleRelocationBlur(row, $event, isSaved, visibleYears)"
                                   @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-yellow-700">{{ getRelocation(row) || '0.00' }}</span>
@@ -530,9 +530,9 @@
                                   class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200 bg-yellow-50"
                                   contenteditable="true"
                                   :key="row.id + '-severence-indemnity'"
-                                  @input="handleSeverenceIndemnityInput(row, $event)"
+                                  @input="handleSeverenceIndemnityInput(row, $event, isSaved, visibleYears)"
                                   @focus="handleSeverenceIndemnityFocus(row, $event)"
-                                  @blur="handleSeverenceIndemnityBlur(row, $event)"
+                                  @blur="handleSeverenceIndemnityBlur(row, $event, isSaved, visibleYears)"
                                   @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-yellow-700">{{ getSeverenceIndemnity(row) || '0.00' }}</span>
@@ -541,9 +541,9 @@
                                   class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200 bg-yellow-50"
                                   contenteditable="true"
                                   :key="row.id + '-other'"
-                                  @input="handleOtherInput(row, $event)"
+                                  @input="handleOtherInput(row, $event, isSaved, visibleYears)"
                                   @focus="handleOtherFocus(row, $event)"
-                                  @blur="handleOtherBlur(row, $event)"
+                                  @blur="handleOtherBlur(row, $event, isSaved, visibleYears)"
                                   @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-yellow-700">{{ getOther(row) || '0.00' }}</span>
@@ -554,9 +554,9 @@
                                   class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 bg-blue-50"
                                   contenteditable="true"
                                   :key="row.id + '-medical'"
-                                  @input="handleMedicalInput(row, $event)"
+                                  @input="handleMedicalInput(row, $event, isSaved, visibleYears)"
                                   @focus="handleMedicalFocus(row, $event)"
-                                  @blur="handleMedicalBlur(row, $event)"
+                                  @blur="handleMedicalBlur(row, $event, isSaved, visibleYears)"
                                   @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getMedical(row) || '0.00' }}</span>
@@ -565,9 +565,9 @@
                                   class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 bg-blue-50"
                                   contenteditable="true"
                                   :key="row.id + '-uniforms'"
-                                  @input="handleUniformsInput(row, $event)"
+                                  @input="handleUniformsInput(row, $event, isSaved, visibleYears)"
                                   @focus="handleUniformsFocus(row, $event)"
-                                  @blur="handleUniformsBlur(row, $event)"
+                                  @blur="handleUniformsBlur(row, $event, isSaved, visibleYears)"
                                   @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getUniforms(row) || '0.00' }}</span>
@@ -576,9 +576,9 @@
                                   class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 bg-blue-50"
                                   contenteditable="true"
                                   :key="row.id + '-employee-meal'"
-                                  @input="handleEmployeeMealInput(row, $event)"
+                                  @input="handleEmployeeMealInput(row, $event, isSaved, visibleYears)"
                                   @focus="handleEmployeeMealFocus(row, $event)"
-                                  @blur="handleEmployeeMealBlur(row, $event)"
+                                  @blur="handleEmployeeMealBlur(row, $event, isSaved, visibleYears)"
                                   @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getEmployeeMeal(row) || '0.00' }}</span>
@@ -587,9 +587,9 @@
                                   class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 bg-blue-50"
                                   contenteditable="true"
                                   :key="row.id + '-transport'"
-                                  @input="handleTransportInput(row, $event)"
+                                  @input="handleTransportInput(row, $event, isSaved, visibleYears)"
                                   @focus="handleTransportFocus(row, $event)"
-                                  @blur="handleTransportBlur(row, $event)"
+                                  @blur="handleTransportBlur(row, $event, isSaved, visibleYears)"
                                   @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getTransport(row) || '0.00' }}</span>
@@ -598,9 +598,9 @@
                                   class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 bg-blue-50"
                                   contenteditable="true"
                                   :key="row.id + '-telephone'"
-                                  @input="handleTelephoneInput(row, $event)"
+                                  @input="handleTelephoneInput(row, $event, isSaved, visibleYears)"
                                   @focus="handleTelephoneFocus(row, $event)"
-                                  @blur="handleTelephoneBlur(row, $event)"
+                                  @blur="handleTelephoneBlur(row, $event, isSaved, visibleYears)"
                                   @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getTelephone(row) || '0.00' }}</span>
@@ -609,9 +609,9 @@
                                   class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 bg-blue-50"
                                   contenteditable="true"
                                   :key="row.id + '-air-ticket'"
-                                  @input="handleAirTicketInput(row, $event)"
+                                  @input="handleAirTicketInput(row, $event, isSaved, visibleYears)"
                                   @focus="handleAirTicketFocus(row, $event)"
-                                  @blur="handleAirTicketBlur(row, $event)"
+                                  @blur="handleAirTicketBlur(row, $event, isSaved, visibleYears)"
                                   @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getAirTicket(row) || '0.00' }}</span>
@@ -620,9 +620,9 @@
                                   class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 bg-blue-50"
                                   contenteditable="true"
                                   :key="row.id + '-benefits-other'"
-                                  @input="handleBenefitsOtherInput(row, $event)"
+                                  @input="handleBenefitsOtherInput(row, $event, isSaved, visibleYears)"
                                   @focus="handleBenefitsOtherFocus(row, $event)"
-                                  @blur="handleBenefitsOtherBlur(row, $event)"
+                                  @blur="handleBenefitsOtherBlur(row, $event, isSaved, visibleYears)"
                                   @keypress="allowOnlyNumbersAndDecimal($event)"
                                 >
                                   <span class="font-mono text-xs text-blue-700">{{ getBenefitsOther(row) || '0.00' }}</span>
@@ -658,71 +658,71 @@
                               <td 
                                 class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalManagementTaxPercentageLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalManagementTaxPercentageLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalManagementTaxTotalLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalManagementTaxTotalLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               
                               <!-- Supplementary Pay cells for subtotal -->
                               <td 
                                 class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementVacationLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementVacationLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementRelocationLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementRelocationLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementSeverenceIndemnityLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementSeverenceIndemnityLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementOtherLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementOtherLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               
                               <!-- Employee Benefits cells for subtotal -->
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementMedicalLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementMedicalLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementUniformsLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementUniformsLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementEmployeeMealLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementEmployeeMealLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementTransportLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementTransportLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementTelephoneLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementTelephoneLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementAirTicketLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementAirTicketLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementBenefitsOtherLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementBenefitsOtherLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
 
                             </tr>
@@ -754,71 +754,71 @@
                               <td 
                                 class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalNonManagementTaxPercentageLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalNonManagementTaxPercentageLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalNonManagementTaxTotalLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalNonManagementTaxTotalLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               
                               <!-- Supplementary Pay cells for subtotal -->
                               <td 
                                 class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementVacationLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementVacationLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementRelocationLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementRelocationLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementSeverenceIndemnityLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementSeverenceIndemnityLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementOtherLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementOtherLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               
                               <!-- Employee Benefits cells for subtotal -->
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementMedicalLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementMedicalLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementUniformsLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementUniformsLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementEmployeeMealLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementEmployeeMealLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementTransportLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementTransportLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementTelephoneLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementTelephoneLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementAirTicketLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementAirTicketLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementBenefitsOtherLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementBenefitsOtherLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
 
                             </tr>
@@ -850,71 +850,71 @@
                               <td 
                                 class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-green-900">{{ calculateLocationTotalTaxPercentageLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-green-900">{{ calculateLocationTotalTaxPercentageLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-green-900">{{ calculateLocationTotalTaxTotalLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-green-900">{{ calculateLocationTotalTaxTotalLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               
                               <!-- Supplementary Pay cells for total -->
                               <td 
                                 class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalVacationLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalVacationLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalRelocationLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalRelocationLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalSeverenceIndemnityLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalSeverenceIndemnityLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalOtherLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalOtherLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               
                               <!-- Employee Benefits cells for total -->
                               <td 
                                 class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalMedicalLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalMedicalLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalUniformsLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalUniformsLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalEmployeeMealLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalEmployeeMealLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalTransportLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalTransportLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalTelephoneLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalTelephoneLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalAirTicketLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalAirTicketLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
                               <td 
                                 class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalBenefitsOtherLocal(category, location) }}</span>
+                                <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalBenefitsOtherLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                               </td>
 
                             </tr>
@@ -952,71 +952,71 @@
                           <td 
                             class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-green-900">{{ calculateHotelTotalTaxPercentageLocal() }}</span>
+                            <span class="font-mono text-xs text-green-900">{{ safeCalculateHotelTotalTaxPercentageLocal() }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-green-900">{{ calculateHotelTotalTaxTotalLocal() }}</span>
+                            <span class="font-mono text-xs text-green-900">{{ safeCalculateHotelTotalTaxTotalLocal() }}</span>
                           </td>
                           
                           <!-- Supplementary Pay cells for hotel total -->
                           <td 
                             class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalVacationLocal() }}</span>
+                            <span class="font-mono text-xs text-yellow-900">{{ safeCalculateHotelTotalVacationLocal() }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalRelocationLocal() }}</span>
+                            <span class="font-mono text-xs text-yellow-900">{{ safeCalculateHotelTotalRelocationLocal() }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalSeverenceIndemnityLocal() }}</span>
+                            <span class="font-mono text-xs text-yellow-900">{{ safeCalculateHotelTotalSeverenceIndemnityLocal() }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalOtherLocal() }}</span>
+                            <span class="font-mono text-xs text-yellow-900">{{ safeCalculateHotelTotalOtherLocal() }}</span>
                           </td>
                           
                           <!-- Employee Benefits cells for hotel total -->
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalMedicalLocal() }}</span>
+                            <span class="font-mono text-xs text-blue-900">{{ safeCalculateHotelTotalMedicalLocal() }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalUniformsLocal() }}</span>
+                            <span class="font-mono text-xs text-blue-900">{{ safeCalculateHotelTotalUniformsLocal() }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalEmployeeMealLocal() }}</span>
+                            <span class="font-mono text-xs text-blue-900">{{ safeCalculateHotelTotalEmployeeMealLocal() }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalTransportLocal() }}</span>
+                            <span class="font-mono text-xs text-blue-900">{{ safeCalculateHotelTotalTransportLocal() }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalTelephoneLocal() }}</span>
+                            <span class="font-mono text-xs text-blue-900">{{ safeCalculateHotelTotalTelephoneLocal() }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalAirTicketLocal() }}</span>
+                            <span class="font-mono text-xs text-blue-900">{{ safeCalculateHotelTotalAirTicketLocal() }}</span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                           >
-                            <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalBenefitsOtherLocal() }}</span>
+                            <span class="font-mono text-xs text-blue-900">{{ safeCalculateHotelTotalBenefitsOtherLocal() }}</span>
                           </td>
 
                         </tr>
@@ -1135,7 +1135,16 @@
                 <h2 class="text-lg font-bold text-gray-800">Payroll Related Data</h2>
               </div>
             </div>
-            <PayrollRelatedTabs />
+            <PayrollRelatedTabs 
+              :payroll-rows="payrollRows"
+              :payroll-data="payrollData"
+              :visible-years="visibleYears"
+              :months="months"
+              :payroll-related-data="payrollRelatedData"
+              :add-payroll-related-change="addPayrollRelatedChange"
+              :get-payroll-related-value="getPayrollRelatedValue"
+              :set-payroll-related-value="setPayrollRelatedValue"
+            />
           </div>
 
           <!-- Enhanced No Years Selected State -->
@@ -1151,73 +1160,6 @@
       </div>
     </div>
   </div>
-
-
-  <!-- Advanced Setting Modal -->
-  <transition name="fade">
-    <div
-      v-if="showAdvanced"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-    >
-      <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-lg p-0 overflow-hidden">
-        <!-- Modal Header -->
-        <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
-          <Settings class="w-6 h-6 text-white" />
-          <h2 class="text-xl font-bold text-white">Advanced Display Mode Settings</h2>
-        </div>
-
-        <!-- Modal Body -->
-        <div class="p-8 pt-6">
-          <!-- Message when no years selected -->
-          <div v-if="!visibleYears.length" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
-            <AlertTriangle class="w-6 h-6 text-yellow-600" />
-            <span class="text-yellow-800 font-medium">Please select both \"From Year\" and \"To Year\" to configure advanced settings.</span>
-          </div>
-
-          <div v-if="visibleYears.length" class="space-y-4 max-h-[50vh] overflow-auto pr-2">
-            <div
-              v-for="year in visibleYears"
-              :key="'adv-' + year"
-              class="flex justify-between items-center border-b pb-2"
-            >
-              <span class="font-medium text-gray-700 flex items-center gap-2">
-                <Calendar class="w-4 h-4 text-violet-600" />
-                {{ year }}
-              </span>
-              <select
-                v-model="tempAdvancedModes[year]"
-                class="px-6 py-2 border rounded-md focus:ring-violet-500"
-              >
-                <option value="monthly">Monthly</option>
-                <option value="quarterly">Quarterly</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="flex justify-end gap-3 px-8 py-4 bg-gray-50 border-t border-violet-100">
-          <button
-            @click="cancelAdvancedSettings"
-            class="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2"
-          >
-            <X class="w-4 h-4" />
-            Cancel
-          </button>
-          <button
-            v-if="visibleYears.length"
-            @click="applyAdvancedSettings"
-            class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2"
-          >
-            <Check class="w-4 h-4" />
-            Apply
-          </button>
-        </div>
-      </div>
-    </div>
-  </transition>
-
-
 
 </template>
 
@@ -1333,12 +1275,6 @@ import {
   // Utility functions
   allowOnlyNumbers,
 } from '@/components/utility/payroll/index.js';
-import { 
-  transformApiToFrontend, 
-  transformFrontendToApi, 
-  validatePayrollData
-} from '@/components/utility/payroll/data_constructors/index.js';
-
 // Import payroll related data constructor and utilities
 import {
   payrollRelatedDataConstructor,
@@ -1351,11 +1287,168 @@ import {
   findMatchingPayrollRow,
   generateRelatedRowId,
   hasRelatedDataChanges,
-  getRelatedDataSummary
+  getRelatedDataSummary,
+  // Import extracted functions
+  formatMoney,
+  getTaxPercentage,
+  getTaxTotal,
+  handleTaxPercentageInput,
+  handleTaxPercentageFocus,
+  handleTaxPercentageBlur,
+  handleTaxTotalInput,
+  handleTaxTotalFocus,
+  handleTaxTotalBlur,
+  getVacation,
+  getRelocation,
+  getSeverenceIndemnity,
+  getOther,
+  handleVacationInput,
+  handleVacationFocus,
+  handleVacationBlur,
+  handleRelocationInput,
+  handleRelocationFocus,
+  handleRelocationBlur,
+  handleSeverenceIndemnityInput,
+  handleSeverenceIndemnityFocus,
+  handleSeverenceIndemnityBlur,
+  handleOtherInput,
+  handleOtherFocus,
+  handleOtherBlur,
+  getMedical,
+  getUniforms,
+  getEmployeeMeal,
+  getTransport,
+  getTelephone,
+  getAirTicket,
+  getBenefitsOther,
+  handleMedicalInput,
+  handleMedicalFocus,
+  handleMedicalBlur,
+  handleUniformsInput,
+  handleUniformsFocus,
+  handleUniformsBlur,
+  handleEmployeeMealInput,
+  handleEmployeeMealFocus,
+  handleEmployeeMealBlur,
+  handleTransportInput,
+  handleTransportFocus,
+  handleTransportBlur,
+  handleTelephoneInput,
+  handleTelephoneFocus,
+  handleTelephoneBlur,
+  handleAirTicketInput,
+  handleAirTicketFocus,
+  handleAirTicketBlur,
+  handleBenefitsOtherInput,
+  handleBenefitsOtherFocus,
+  handleBenefitsOtherBlur,
+  calculateSubTotalManagementTaxPercentageLocal,
+  calculateSubTotalManagementTaxTotalLocal,
+  calculateSubTotalNonManagementTaxPercentageLocal,
+  calculateSubTotalNonManagementTaxTotalLocal,
+  calculateLocationTotalTaxPercentageLocal,
+  calculateLocationTotalTaxTotalLocal,
+  calculateHotelTotalTaxPercentageLocal,
+  calculateHotelTotalTaxTotalLocal,
+  calculateEmployeeRoomRatioTaxPercentageLocal,
+  calculateEmployeeRoomRatioTaxTotalLocal,
+  calculateSubTotalManagementVacationLocal,
+  calculateSubTotalManagementRelocationLocal,
+  calculateSubTotalManagementSeverenceIndemnityLocal,
+  calculateSubTotalManagementOtherLocal,
+  calculateSubTotalNonManagementVacationLocal,
+  calculateSubTotalNonManagementRelocationLocal,
+  calculateSubTotalNonManagementSeverenceIndemnityLocal,
+  calculateSubTotalNonManagementOtherLocal,
+  calculateLocationTotalVacationLocal,
+  calculateLocationTotalRelocationLocal,
+  calculateLocationTotalSeverenceIndemnityLocal,
+  calculateLocationTotalOtherLocal,
+  calculateHotelTotalVacationLocal,
+  calculateHotelTotalRelocationLocal,
+  calculateHotelTotalSeverenceIndemnityLocal,
+  calculateHotelTotalOtherLocal,
+  calculateEmployeeRoomRatioVacationLocal,
+  calculateEmployeeRoomRatioRelocationLocal,
+  calculateEmployeeRoomRatioSeverenceIndemnityLocal,
+  calculateEmployeeRoomRatioOtherLocal,
+  calculateSubTotalManagementMedicalLocal,
+  calculateSubTotalManagementUniformsLocal,
+  calculateSubTotalManagementEmployeeMealLocal,
+  calculateSubTotalManagementTransportLocal,
+  calculateSubTotalManagementTelephoneLocal,
+  calculateSubTotalManagementAirTicketLocal,
+  calculateSubTotalManagementBenefitsOtherLocal,
+  calculateSubTotalNonManagementMedicalLocal,
+  calculateSubTotalNonManagementUniformsLocal,
+  calculateSubTotalNonManagementEmployeeMealLocal,
+  calculateSubTotalNonManagementTransportLocal,
+  calculateSubTotalNonManagementTelephoneLocal,
+  calculateSubTotalNonManagementAirTicketLocal,
+  calculateSubTotalNonManagementBenefitsOtherLocal,
+  calculateLocationTotalMedicalLocal,
+  calculateLocationTotalUniformsLocal,
+  calculateLocationTotalEmployeeMealLocal,
+  calculateLocationTotalTransportLocal,
+  calculateLocationTotalTelephoneLocal,
+  calculateLocationTotalAirTicketLocal,
+  calculateLocationTotalBenefitsOtherLocal,
+  calculateHotelTotalMedicalLocal,
+  calculateHotelTotalUniformsLocal,
+  calculateHotelTotalEmployeeMealLocal,
+  calculateHotelTotalTransportLocal,
+  calculateHotelTotalTelephoneLocal,
+  calculateHotelTotalAirTicketLocal,
+  calculateHotelTotalBenefitsOtherLocal,
+  calculateEmployeeRoomRatioMedicalLocal,
+  calculateEmployeeRoomRatioUniformsLocal,
+  calculateEmployeeRoomRatioEmployeeMealLocal,
+  calculateEmployeeRoomRatioTransportLocal,
+  calculateEmployeeRoomRatioTelephoneLocal,
+  calculateEmployeeRoomRatioAirTicketLocal,
+  calculateEmployeeRoomRatioBenefitsOtherLocal,
+  isSyncedWithRoomRevenue,
+  handleTotalRoomsChange,
+  handleTotalRoomsBlur,
+  syncWithRoomRevenue,
+  refreshTable,
+  handleBeforeUnload,
+  applyAdvancedSettings,
+  cancelAdvancedSettings,
+  clearYearSelection,
+  ensureCountDataStructure,
+  ensureSalaryDataStructure,
+  getMonthlyCountValue,
+  setMonthlyCountValue,
+  handlePayrollCellEditLocal,
+  handlePayrollCellInput,
+  handlePayrollCellFocus,
+  handleModalSalaryInput,
+  handleModalSalaryFocus,
+  handleModalSalaryBlur,
+  handleTableSalaryInput,
+  handleTableSalaryFocus,
+  handleTableSalaryBlur,
+  handleTableCountInput,
+  handleTableCountFocus,
+  handleTableCountBlur
 } from '@/components/utility/payroll_related/index.js';
 
-
-
+// Import payroll related data service
+import {
+  fetchPayrollRelatedData,
+  savePayrollRelatedChanges,
+  addPayrollRelatedChange,
+  getPayrollRelatedValue,
+  setPayrollRelatedValue,
+  hasPayrollRelatedChanges,
+  clearPayrollRelatedChanges,
+  getPayrollRelatedChangesForAPI,
+  payrollRelatedData,
+  payrollRelatedChanges,
+  isSavingPayrollRelated,
+  payrollRelatedSaveError
+} from '@/components/utility/payroll_related/payroll_related_data_service.js';
 
 // ************ Reactive state ****************
 const years = ref([]);
@@ -1372,6 +1465,17 @@ const saveError = ref("");
 const sidebarCollapsed = ref(false);
 const isComponentReady = ref(false); // Add a flag to track if component is ready
 
+// Ensure payrollRows is always initialized as an array (never undefined)
+// Note: payrollRows is imported from the payroll service, but we ensure it's always an array
+// Utility function to safely assign fetched data to payrollRows
+function setPayrollRowsSafe(fetchedRows) {
+  // Ensure payrollRows.value is always an array
+  if (!payrollRows.value) {
+    payrollRows.value = [];
+  }
+  payrollRows.value = Array.isArray(fetchedRows) ? fetchedRows : [];
+}
+
 // ************ Quick Actions state ****************
 const newDepartmentName = ref('');
 const newLocationName = ref('');
@@ -1385,25 +1489,9 @@ const showQuickActions = ref(false);
 const totalRooms = ref(0); // Default value
 
 // Check if total rooms is synced with Room Revenue page
-const isSyncedWithRoomRevenue = computed(() => {
-  const roomRevenueTotal = localStorage.getItem(getProjectKey('totalNumberOfRooms'));
-  return roomRevenueTotal && parseInt(roomRevenueTotal) > 0 && 
-         parseInt(roomRevenueTotal) === totalRooms.value;
+const isSyncedWithRoomRevenueComputed = computed(() => {
+  return isSyncedWithRoomRevenue(totalRooms.value);
 });
-
-
-//! Helper function to safely format numbers to 2 decimal places with commas
-function formatMoney(value) {
-  if (value === null || value === undefined || isNaN(value)) {
-    return '0.00';
-  }
-  const num = parseFloat(value);
-  return num.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
-}
-
 
 
 // Months
@@ -1430,6 +1518,11 @@ const filteredToYears = computed(() => {
 // Computed property to check if there's any payroll data
 const hasPayrollDataComputed = computed(() => {
   return hasPayrollData(payrollRows.value);
+});
+
+// Computed property to check if there are unsaved changes (including payroll related)
+const hasUnsavedChanges = computed(() => {
+  return changedCells.value.length > 0 || hasPayrollRelatedChanges();
 });
 
 // Computed property to track monthly count changes for better reactivity
@@ -1475,6 +1568,9 @@ watch(visibleYears, () => {
       yearSettingsStore.setAdvancedMode(year, displayMode.value);
     }
   });
+  
+  // Set the current visible years for the payroll related functions
+  window.__currentVisibleYears = visibleYears.value;
 });
 
 // Watch for changes in payrollData to ensure calculated fields update
@@ -1482,8 +1578,22 @@ watch(payrollData, (newData, oldData) => {
   // console.log('payrollData changed:', newData);
 }, { deep: true, immediate: true });
 
+// Watch for payroll related data changes
+watch(payrollRelatedData, (newData, oldData) => {
+  // console.log('payrollRelatedData changed:', newData);
+  
+  // Make payroll related data available globally for the utility functions
+  window.__payrollRelatedData = newData;
+}, { deep: true, immediate: true });
+
 // Watch for changes in payrollRows to trigger reactive updates for monthly cells
 watch(payrollRows, (newRows, oldRows) => {
+  // Ensure payrollRows is always an array
+  if (!newRows || !Array.isArray(newRows)) {
+    payrollRows.value = [];
+    return;
+  }
+  
   if (newRows && oldRows) {
     // Check if any row's salary or count has changed
     newRows.forEach((newRow, index) => {
@@ -1502,8 +1612,8 @@ watch(payrollRows, (newRows, oldRows) => {
           }
           
           // Ensure count and salary structures are objects
-          ensureCountDataStructure(newRow.id, year);
-          ensureSalaryDataStructure(newRow.id, year);
+          ensureCountDataStructure(newRow.id, year, payrollData);
+          ensureSalaryDataStructure(newRow.id, year, payrollData);
           
           // Add a timestamp to force reactivity
           payrollData.value[year][newRow.id]._lastUpdate = Date.now();
@@ -1515,7 +1625,7 @@ watch(payrollRows, (newRows, oldRows) => {
               const calculatedSalary = (countValue || 0) * (newRow.salary || 0);
               
               // Ensure salary data structure is correct
-              ensureSalaryDataStructure(newRow.id, year);
+              ensureSalaryDataStructure(newRow.id, year, payrollData);
               payrollData.value[year][newRow.id].salary[month] = calculatedSalary;
             });
           }
@@ -1535,15 +1645,6 @@ watch(showAdvanced, (val) => {
   }
 });
 
-function applyAdvancedSettings() {
-  setAdvancedModes({ ...tempAdvancedModes.value });
-  showAdvanced.value = false;
-}
-
-function cancelAdvancedSettings() {
-  showAdvanced.value = false;
-}
-
 
 
 // Wrapper function for submitting payroll data
@@ -1561,9 +1662,20 @@ onMounted(async () => {
     await new Promise(resolve => setTimeout(resolve, 100));
     years.value = await loadYearOptions();
 
+    // Ensure payrollRows is always an array
+    if (!payrollRows.value || !Array.isArray(payrollRows.value)) {
+      payrollRows.value = [];
+    }
+
     // Load initial payroll data if project is selected
     if (selectedProject.value) {
       await fetchPayrollData(selectedProject.value.project_name, fromYear.value, toYear.value);
+      // Also load payroll related data
+      await fetchPayrollRelatedData(selectedProject.value.project_name, fromYear.value, toYear.value);
+      
+      // Initialize global variables for payroll related functions
+      window.__currentVisibleYears = visibleYears.value;
+      window.__payrollRelatedData = payrollRelatedData.value;
     }
 
     originalPayrollData.value = cloneDeep(payrollRows.value);
@@ -1598,8 +1710,16 @@ watch(selectedProject, async (newProject, oldProject) => {
       await fetchPayrollData(newProject.project_name, fromYear.value, toYear.value);
       originalPayrollData.value = cloneDeep(payrollRows.value);
       
+      // Reload Payroll Related data for the new project
+      await fetchPayrollRelatedData(newProject.project_name, fromYear.value, toYear.value);
+      
+      // Update global variables for payroll related functions
+      window.__currentVisibleYears = visibleYears.value;
+      window.__payrollRelatedData = payrollRelatedData.value;
+      
       // Reset any unsaved changes
       changedCells.value = [];
+      clearPayrollRelatedChanges();
       isSaved.value = true;
       saveError.value = "";
       
@@ -1614,6 +1734,7 @@ watch(selectedProject, async (newProject, oldProject) => {
     payrollRows.value = [];
     originalPayrollData.value = cloneDeep(payrollRows.value);
     changedCells.value = [];
+    clearPayrollRelatedChanges();
     isSaved.value = true;
     saveError.value = "";
   }
@@ -1626,7 +1747,13 @@ watch([fromYear, toYear], async ([newFromYear, newToYear], [oldFromYear, oldToYe
       (newFromYear !== oldFromYear || newToYear !== oldToYear)) {
     try {
       await fetchPayrollData(selectedProject.value.project_name, newFromYear, newToYear);
+      // Also load payroll related data for the new year range
+      await fetchPayrollRelatedData(selectedProject.value.project_name, newFromYear, newToYear);
       originalPayrollData.value = cloneDeep(payrollRows.value);
+      
+      // Update global variables for payroll related functions
+      window.__currentVisibleYears = visibleYears.value;
+      window.__payrollRelatedData = payrollRelatedData.value;
       
       // Reset any unsaved changes
       changedCells.value = [];
@@ -1641,207 +1768,6 @@ watch([fromYear, toYear], async ([newFromYear, newToYear], [oldFromYear, oldToYe
   }
 }, { deep: true });
 
-function clearYearSelection() {
-  clearYearSettings();
-  isSaved.value = false;
-}
-
-// Helper function to ensure count data structure is correct
-function ensureCountDataStructure(rowId, year) {
-  if (!payrollData.value[year]) {
-    payrollData.value[year] = {};
-  }
-  if (!payrollData.value[year][rowId]) {
-    payrollData.value[year][rowId] = {};
-  }
-  if (typeof payrollData.value[year][rowId]['count'] !== 'object' || 
-      payrollData.value[year][rowId]['count'] === null ||
-      Array.isArray(payrollData.value[year][rowId]['count'])) {
-    payrollData.value[year][rowId]['count'] = {};
-  }
-}
-
-// Helper function to ensure salary data structure is correct
-function ensureSalaryDataStructure(rowId, year) {
-  if (!payrollData.value[year]) {
-    payrollData.value[year] = {};
-  }
-  if (!payrollData.value[year][rowId]) {
-    payrollData.value[year][rowId] = {};
-  }
-  if (typeof payrollData.value[year][rowId]['salary'] !== 'object' || 
-      payrollData.value[year][rowId]['salary'] === null ||
-      Array.isArray(payrollData.value[year][rowId]['salary'])) {
-    payrollData.value[year][rowId]['salary'] = {};
-  }
-}
-
-// Function to get monthly count value with getter/setter pattern
-function getMonthlyCountValue(rowId, year, month) {
-  const row = payrollRows.value.find(r => r.id === rowId);
-  if (!row) return 0;
-  
-  // Ensure the data structure is correct
-  ensureCountDataStructure(rowId, year);
-  
-  // Check if there's an override for this specific month
-  const countData = payrollData.value[year]?.[rowId]?.['count'];
-  if (countData && typeof countData === 'object' && countData !== null && !Array.isArray(countData)) {
-    const overrideValue = countData[month];
-    if (overrideValue !== undefined && overrideValue !== null) {
-      return overrideValue;
-    }
-  }
-  
-  // If no override exists, return the main count value (getter behavior)
-  return row.count || 0;
-}
-
-// Function to set monthly count value with getter/setter pattern
-function setMonthlyCountValue(rowId, year, month, newValue) {
-  // Ensure the data structure is correct
-  ensureCountDataStructure(rowId, year);
-  
-  // Store the override value for this specific month
-  payrollData.value[year][rowId]['count'][month] = newValue;
-}
-
-function handlePayrollCellEditLocal(rowId, fieldType, year, month, event) {
-  const newValue = parseFloat(event.target.textContent) || 0;
-  
-  // Store the value in payrollData for immediate reactivity
-  if (!payrollData.value[year]) {
-    payrollData.value[year] = {};
-  }
-  if (!payrollData.value[year][rowId]) {
-    payrollData.value[year][rowId] = {};
-  }
-  
-  // For count fields, use the setter pattern
-  if (fieldType === 'count' && month) {
-    // Use the setter function to store the override value
-    setMonthlyCountValue(rowId, year, month, newValue);
-  } else {
-    // For other fields, store globally
-    payrollData.value[year][rowId][fieldType] = newValue;
-  }
-  
-  // Call the original handler for change tracking
-  // This will add the change to changedCells array for saving to backend
-  handlePayrollCellEdit(changedCells.value, rowId, fieldType, year, month, event);
-  isSaved.value = false;
-  
-  // If this is a count field change, trigger reactive update for salary cells
-  if (fieldType === 'count' && month) {
-    // Force a reactive update by triggering a small change to the payrollData
-    // This will cause Vue to re-evaluate the salary cells
-    payrollData.value[year][rowId]._lastUpdate = Date.now();
-    
-    // Also trigger a more explicit update for the specific month
-    if (!payrollData.value[year][rowId].monthlyUpdates || 
-        typeof payrollData.value[year][rowId].monthlyUpdates !== 'object' ||
-        Array.isArray(payrollData.value[year][rowId].monthlyUpdates)) {
-      payrollData.value[year][rowId].monthlyUpdates = {};
-    }
-    payrollData.value[year][rowId].monthlyUpdates[month] = Date.now();
-    
-    // Force reactivity for salary calculations by updating the salary field
-    // This ensures Vue detects the dependency change
-    const row = payrollRows.value.find(r => r.id === rowId);
-    if (row) {
-      // Trigger a reactive update by accessing the salary calculation
-      const countValue = getMonthlyCountValue(rowId, year, month);
-      const calculatedSalary = (countValue || 0) * (row.salary || 0);
-      
-      // Store this in payrollData to ensure reactivity
-      ensureSalaryDataStructure(rowId, year);
-      payrollData.value[year][rowId].salary[month] = calculatedSalary;
-      
-      // Force a reactive update by triggering nextTick
-      nextTick(() => {
-        // This will ensure Vue re-evaluates the salary cells
-        payrollData.value[year][rowId]._forceUpdate = Date.now();
-      });
-    }
-  }
-}
-
-function handlePayrollCellInput(rowId, fieldType, year, month, event) {
-  // Allow only numbers and decimal point for salary and annual fields
-  if (fieldType === 'salary' || fieldType === 'annual') {
-    const value = event.target.textContent.replace(/[^0-9.]/g, '');
-    event.target.textContent = value;
-  }
-  // Allow only numbers for count fields
-  if (fieldType === 'count') {
-    const value = event.target.textContent.replace(/[^0-9]/g, '');
-    event.target.textContent = value;
-  }
-}
-
-function handlePayrollCellFocus(rowId, fieldType, year, month, event) {
-  // Format the number when user starts editing salary or annual fields
-  if (fieldType === 'salary' || fieldType === 'annual') {
-    // For salary cells, get the raw calculated value
-    if (fieldType === 'salary' && month) {
-      const rawValue = getPayrollCellValueLocal(rowId, fieldType, year, month);
-      event.target.textContent = rawValue.toString();
-    } else {
-      // For other fields, parse the current text content
-      const value = parseFloat(event.target.textContent.replace(/[^0-9.]/g, ''));
-      if (!isNaN(value)) {
-        // Show the raw number without commas for easier editing
-        event.target.textContent = value.toString();
-      }
-    }
-  }
-  // For count fields, show the raw number for easier editing
-  if (fieldType === 'count') {
-    const rawValue = getPayrollCellValueLocal(rowId, fieldType, year, month);
-    event.target.textContent = rawValue.toString();
-  }
-}
-
-// Modal Salary Handlers (using robust pattern like monthly cells)
-function handleModalSalaryInput(event, row) {
-  // Allow only numbers and decimal point
-  let value = event.target.value.replace(/[^0-9.]/g, '');
-  row.salary = value;
-}
-
-function handleModalSalaryFocus(event, row) {
-  // Show the raw number without any formatting when user starts editing
-  let rawValue = row.salary;
-  if (typeof rawValue === 'string') {
-    // Remove any commas and formatting
-    rawValue = rawValue.replace(/[^0-9.]/g, '');
-  }
-  event.target.value = rawValue || '';
-}
-
-function handleModalSalaryBlur(event, row) {
-  // Get the raw value from the input
-  let rawValue = event.target.value.replace(/[^0-9.]/g, '');
-  
-  // If the raw value is empty or invalid, use the original salary
-  if (!rawValue || rawValue === '') {
-    // Restore the original formatted value
-    event.target.value = formatMoney(row.salary);
-    return;
-  }
-  
-  // Parse as a number (treat as whole number, not decimal)
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    // Store the value as a number (not formatted)
-    row.salary = value;
-    // Display the formatted value
-    event.target.value = formatMoney(value);
-  } else {
-    // If invalid, restore the original value
-    event.target.value = formatMoney(row.salary);
-  }
-}
 
 // Quick Actions functions
 function toggleQuickActions() {
@@ -1908,24 +1834,40 @@ const saveChangesWrapper = async () => {
     isSaving.value = true;
     saveError.value = "";
     
-    if (changedCells.value.length === 0) {
+    let hasChanges = false;
+    
+    // Save payroll data changes
+    if (changedCells.value.length > 0) {
+      const result = await savePayrollChanges(changedCells.value, selectedProject.value?.project_name);
+      changedCells.value = [];
+      hasChanges = true;
+    }
+    
+    // Save payroll related data changes
+    if (hasPayrollRelatedChanges()) {
+      const payrollRelatedChangesForAPI = getPayrollRelatedChangesForAPI();
+      await savePayrollRelatedChanges(payrollRelatedChangesForAPI, selectedProject.value?.project_name);
+      clearPayrollRelatedChanges();
+      hasChanges = true;
+    }
+    
+    if (!hasChanges) {
       isSaving.value = false;
       return;
     }
     
-    // Save payroll data changes
-    const result = await savePayrollChanges(changedCells.value, selectedProject.value?.project_name);
-    
-    // Clear changed cells BEFORE reloading data to prevent rowId mismatch
-    changedCells.value = [];
-    
     // Reload from backend after save
     await fetchPayrollData(selectedProject.value?.project_name, fromYear.value, toYear.value);
+    await fetchPayrollRelatedData(selectedProject.value?.project_name, fromYear.value, toYear.value);
     originalPayrollData.value = cloneDeep(payrollRows.value);
+    
+    // Update global variables for payroll related functions
+    window.__currentVisibleYears = visibleYears.value;
+    window.__payrollRelatedData = payrollRelatedData.value;
+    
     isSaved.value = true;
     alertService.success("Changes saved successfully");
     isSaving.value = false;
-    return result;
   } catch (err) {
     saveError.value = err.message || "Failed to save changes";
     alertService.error(saveError.value);
@@ -1945,15 +1887,6 @@ watch(isSaved, (newValue) => {
   }
 });
 
-// Handle beforeunload event to show warning
-function handleBeforeUnload(event) {
-  if (!isSaved.value) {
-    // Standard browser warning
-    event.preventDefault();
-    event.returnValue = 'You have unsaved changes that may be discarded if not saved. Are you sure you want to leave?';
-    return event.returnValue;
-  }
-}
 
 // Clean up event listeners when component is unmounted
 onUnmounted(() => {
@@ -1977,24 +1910,18 @@ setInterval(() => {
   }
 }, 1000);
 
-// Refresh table functionality - reload entire page
-function refreshTable() {
-  // Set flag to show success alert after reload
-  localStorage.setItem('showRefreshSuccess', 'true');
-  // Reload the entire page
-  window.location.reload();
-}
+
 
 function getPayrollCellValueLocal(rowId, fieldType, year, month) {
   // Use the new getter/setter pattern for monthly count cells
   if (fieldType === 'count' && month) {
-    return getMonthlyCountValue(rowId, year, month);
+    return getMonthlyCountValue(rowId, year, month, payrollRows, payrollData);
   }
   
   // For salary calculations, ensure reactivity to monthly count changes
   if (fieldType === 'salary' && month) {
     // Force reactivity by accessing the monthly count data
-    const countValue = getMonthlyCountValue(rowId, year, month);
+    const countValue = getMonthlyCountValue(rowId, year, month, payrollRows, payrollData);
     const row = payrollRows.value.find(r => r.id === rowId);
     if (!row) return 0;
     
@@ -2005,10 +1932,7 @@ function getPayrollCellValueLocal(rowId, fieldType, year, month) {
   return getPayrollCellValue(payrollRows.value, payrollData, rowId, fieldType, year, month);
 }
 
-
-  
-  
-
+// ************ Getters ****************
 function getUniqueCategoriesLocal() {
   return getUniqueCategories(payrollRows.value);
 }
@@ -2055,10 +1979,7 @@ function calculateSubTotalManagementMonthlyCountLocal(category, location, year, 
   return calculateSubTotalManagementMonthlyCount(payrollRows.value, category, location, year, month, getPayrollCellValueLocal);
 }
 
-
-
-
-
+// ************ Local Functions ****************
 function calculateSubTotalManagementAnnualLocal(category, location, year) {
   return calculateSubTotalManagementAnnual(payrollRows.value, category, location, year, getPayrollCellValueLocal);
 }
@@ -2074,9 +1995,6 @@ function calculateSubTotalNonManagementCountLocal(category, location) {
 function calculateSubTotalNonManagementMonthlyCountLocal(category, location, year, month) {
   return calculateSubTotalNonManagementMonthlyCount(payrollRows.value, category, location, year, month, getPayrollCellValueLocal);
 }
-
-
-
 
 
 function calculateSubTotalNonManagementAnnualLocal(category, location, year) {
@@ -2096,9 +2014,6 @@ function calculateLocationTotalMonthlyCountLocal(category, location, year, month
 }
 
 
-
-
-
 function calculateLocationTotalAnnualLocal(category, location, year) {
   return calculateLocationTotalAnnual(payrollRows.value, category, location, year, getPayrollCellValueLocal);
 }
@@ -2107,1398 +2022,159 @@ function calculateLocationTotalAnnualLocal(category, location, year) {
 function calculateHotelTotalLocal() {
   // console.log('calculateHotelTotalLocal called');
   // console.log('payrollRows.value:', payrollRows.value);
+  
+  // Defensive check for payrollRows.value
+  if (!payrollRows.value || !Array.isArray(payrollRows.value)) {
+    return 0;
+  }
+  
   const result = calculateHotelTotal(payrollRows.value);
   // console.log('calculateHotelTotalLocal result:', result);
   return result;
 }
 
 function calculateHotelTotalMonthlyCountLocal(year, month) {
+  // Defensive check for payrollRows.value
+  if (!payrollRows.value || !Array.isArray(payrollRows.value)) {
+    return 0;
+  }
+  
   return calculateHotelTotalMonthlyCount(payrollRows.value, year, month, getPayrollCellValueLocal);
 }
 
 
-
-
-
 function calculateHotelTotalAnnualLocal(year) {
+  // Defensive check for payrollRows.value
+  if (!payrollRows.value || !Array.isArray(payrollRows.value)) {
+    return 0;
+  }
+  
   return calculateHotelTotalAnnual(payrollRows.value, year, getPayrollCellValueLocal);
 }
 
 // Employee/Room Ratio Local Functions
 function calculateEmployeeRoomRatioLocal() {
+  // Defensive check for payrollRows.value
+  if (!payrollRows.value || !Array.isArray(payrollRows.value)) {
+    return 0;
+  }
+  
   return calculateEmployeeRoomRatio(payrollRows.value, totalRooms.value);
 }
 
 function calculateEmployeeRoomRatioMonthlyLocal(year, month) {
+  // Defensive check for payrollRows.value
+  if (!payrollRows.value || !Array.isArray(payrollRows.value)) {
+    return 0;
+  }
+  
   return calculateEmployeeRoomRatioMonthly(payrollRows.value, year, month, getPayrollCellValueLocal, totalRooms.value);
 }
 
 
-
-
-
 function calculateEmployeeRoomRatioAnnualLocal(year) {
+  // Defensive check for payrollRows.value
+  if (!payrollRows.value || !Array.isArray(payrollRows.value)) {
+    return 0;
+  }
+  
   return calculateEmployeeRoomRatioAnnual(payrollRows.value, year, getPayrollCellValueLocal, totalRooms.value);
 }
 
 
-
-// Total Rooms handlers
-function handleTotalRoomsChange(event) {
-  const value = parseInt(event.target.value) || 1;
-  if (value < 1) {
-    totalRooms.value = 1;
-  } else {
-    totalRooms.value = value;
+// Safe wrapper methods for hotel total calculations
+function safeCalculateHotelTotalTaxPercentageLocal() {
+  if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
+    console.warn('safeCalculateHotelTotalTaxPercentageLocal called with empty or undefined payrollRows');
+    return '0.00';
   }
+  return calculateHotelTotalTaxPercentageLocal(payrollRows.value);
 }
 
-function handleTotalRoomsBlur(event) {
-  const value = parseInt(event.target.value) || 1;
-  totalRooms.value = Math.max(1, value);
-  localStorage.setItem('totalRooms', totalRooms.value.toString());
-}
-
-// Sync with Room Revenue total
-function syncWithRoomRevenue() {
-  const roomRevenueTotal = localStorage.getItem(getProjectKey('totalNumberOfRooms'));
-  if (roomRevenueTotal && parseInt(roomRevenueTotal) > 0) {
-    const newTotal = parseInt(roomRevenueTotal);
-    totalRooms.value = newTotal;
-    localStorage.setItem('totalRooms', newTotal.toString());
-    alertService.success(`Synced With Room Revenue Room Total`);
-  } else {
-    alertService.warning('No Room Revenue total found. Please set a total in the Room Revenue page first.');
+function safeCalculateHotelTotalTaxTotalLocal() {
+  if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
+    return formatMoney(0);
   }
+  return calculateHotelTotalTaxTotalLocal(payrollRows.value);
 }
 
-
-
-// Table Salary Handlers (using robust pattern like monthly cells)
-function handleTableSalaryInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.salary = value;
-  
-  // Trigger reactive update for monthly salary cells
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    // Add a timestamp to force reactivity
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
+function safeCalculateHotelTotalVacationLocal() {
+  if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
+    return formatMoney(0);
   }
+  return calculateHotelTotalVacationLocal(payrollRows.value);
 }
 
-function handleTableSalaryFocus(row, event) {
-  // Show the raw number without any formatting when user starts editing
-  let rawValue = row.salary;
-  if (typeof rawValue === 'string') {
-    // Remove any commas and formatting
-    rawValue = rawValue.replace(/[^0-9.]/g, '');
+function safeCalculateHotelTotalRelocationLocal() {
+  if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
+    return formatMoney(0);
   }
-  event.target.textContent = rawValue || '';
+  return calculateHotelTotalRelocationLocal(payrollRows.value);
 }
 
-function handleTableSalaryBlur(row, event) {
-  // Get the raw value from the cell content
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  // If the raw value is empty or invalid, use the original salary
-  if (!rawValue || rawValue === '') {
-    // Restore the original formatted value
-    event.target.textContent = formatMoney(row.salary);
-    return;
+function safeCalculateHotelTotalSeverenceIndemnityLocal() {
+  if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
+    return formatMoney(0);
   }
-  
-  // Parse as a number (treat as whole number, not decimal)
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    // Store the value as a number (not formatted)
-    row.salary = value;
-    // Display the formatted value
-    event.target.textContent = formatMoney(value);
-    // Mark as unsaved
-    isSaved.value = false;
-    
-    // Trigger reactive update for monthly salary cells
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      // Add a timestamp to force reactivity
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
-  } else {
-    // If invalid, restore the original value
-    event.target.textContent = formatMoney(row.salary);
+  return calculateHotelTotalSeverenceIndemnityLocal(payrollRows.value);
+}
+
+function safeCalculateHotelTotalOtherLocal() {
+  if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
+    return formatMoney(0);
   }
+  return calculateHotelTotalOtherLocal(payrollRows.value);
 }
 
-// Table Count Handlers (using robust pattern like monthly cells)
-function handleTableCountInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9]/g, '');
-  row.count = value;
-  
-  // Trigger reactive update for monthly count and salary cells
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    // Add a timestamp to force reactivity
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
+function safeCalculateHotelTotalMedicalLocal() {
+  if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
+    return formatMoney(0);
   }
+  return calculateHotelTotalMedicalLocal(payrollRows.value);
 }
 
-function handleTableCountFocus(row, event) {
-  // Show the raw number without any formatting when user starts editing
-  let rawValue = row.count;
-  if (typeof rawValue === 'string') {
-    // Remove any commas and formatting
-    rawValue = rawValue.replace(/[^0-9]/g, '');
+function safeCalculateHotelTotalUniformsLocal() {
+  if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
+    return formatMoney(0);
   }
-  event.target.textContent = rawValue || '';
+  return calculateHotelTotalUniformsLocal(payrollRows.value);
 }
 
-function handleTableCountBlur(row, event) {
-  // Get the raw value from the cell content
-  let rawValue = event.target.textContent.replace(/[^0-9]/g, '');
-  
-  // If the raw value is empty or invalid, use the original count
-  if (!rawValue || rawValue === '') {
-    // Restore the original value
-    event.target.textContent = row.count || '0';
-    return;
+function safeCalculateHotelTotalEmployeeMealLocal() {
+  if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
+    return formatMoney(0);
   }
-  
-  // Parse as a number
-  let value = parseInt(rawValue, 10);
-  if (!isNaN(value)) {
-    // ✅ FIXED: Only update the base count, don't affect monthly overrides
-    row.count = value;
-    // Display the value
-    event.target.textContent = value;
-    // Mark as unsaved
-    isSaved.value = false;
-    
-    // ✅ FIXED: Trigger reactive update for monthly salary cells only
-    // Monthly count cells should NOT be affected by base count changes
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      // Add a timestamp to force reactivity for salary calculations
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
-  } else {
-    // If invalid, restore the original value
-    event.target.textContent = row.count || '0';
+  return calculateHotelTotalEmployeeMealLocal(payrollRows.value);
+}
+
+function safeCalculateHotelTotalTransportLocal() {
+  if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
+    return formatMoney(0);
   }
+  return calculateHotelTotalTransportLocal(payrollRows.value);
 }
 
-// Payroll Taxes Handlers
-function getTaxPercentage(row) {
-  return getRelatedFieldValue(row, 'tax_percentage');
-}
-
-function getTaxTotal(row) {
-  // Calculate tax total based on salary and tax percentage
-  const taxPercentage = getTaxPercentage(row);
-  const salary = row.salary || 0;
-  const count = row.count || 0;
-  const taxTotal = (salary * count * taxPercentage) / 100;
-  return formatRelatedCurrency(taxTotal);
-}
-
-function handleTaxPercentageInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  setRelatedFieldValue(row, 'tax_percentage', value);
-  isSaved.value = false;
-}
-
-function handleTaxPercentageFocus(row, event) {
-  const rawValue = getTaxPercentage(row);
-  event.target.textContent = rawValue.toString();
-}
-
-function handleTaxPercentageBlur(row, event) {
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  if (!rawValue || rawValue === '') {
-    event.target.textContent = '0.00';
-    return;
+function safeCalculateHotelTotalTelephoneLocal() {
+  if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
+    return formatMoney(0);
   }
-  
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    setRelatedFieldValue(row, 'tax_percentage', value);
-    event.target.textContent = formatPercentage(value);
-    isSaved.value = false;
-  } else {
-    event.target.textContent = '0.00%';
+  return calculateHotelTotalTelephoneLocal(payrollRows.value);
+}
+
+function safeCalculateHotelTotalAirTicketLocal() {
+  if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
+    return formatMoney(0);
   }
+  return calculateHotelTotalAirTicketLocal(payrollRows.value);
 }
 
-function handleTaxTotalInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  row.tax_total = value;
-  
-  // Store in payrollData for persistence
-  if (visibleYears.value.length > 0) {
-    const year = visibleYears.value[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
-    }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
-    }
-    payrollData.value[year][row.id].tax_total = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
+function safeCalculateHotelTotalBenefitsOtherLocal() {
+  if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
+    return formatMoney(0);
   }
-}
-
-function handleTaxTotalFocus(row, event) {
-  const rawValue = getTaxTotal(row);
-  event.target.textContent = rawValue.toString();
-}
-
-function handleTaxTotalBlur(row, event) {
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  if (!rawValue || rawValue === '') {
-    event.target.textContent = '0.00';
-    return;
-  }
-  
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    row.tax_total = value;
-    event.target.textContent = formatMoney(value);
-    isSaved.value = false;
-    
-    // Store in payrollData
-    if (visibleYears.value.length > 0) {
-      const year = visibleYears.value[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
-      }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
-      }
-      payrollData.value[year][row.id].tax_total = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
-    }
-  } else {
-    event.target.textContent = '0.00';
-  }
-}
-
-// Payroll Taxes Calculation Functions
-function calculateSubTotalManagementTaxPercentageLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const managementRows = rows.filter(row => 
-    row.position && row.position.toLowerCase().includes('manager') ||
-    row.position && row.position.toLowerCase().includes('director') ||
-    row.position && row.position.toLowerCase().includes('supervisor')
-  );
-  
-  if (managementRows.length === 0) return 0;
-  
-  const totalTaxPercentage = managementRows.reduce((sum, row) => {
-    return sum + getTaxPercentage(row);
-  }, 0);
-  
-  return (totalTaxPercentage / managementRows.length).toFixed(2);
-}
-
-function calculateSubTotalManagementTaxTotalLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const managementRows = rows.filter(row => 
-    row.position && row.position.toLowerCase().includes('manager') ||
-    row.position && row.position.toLowerCase().includes('director') ||
-    row.position && row.position.toLowerCase().includes('supervisor')
-  );
-  
-  const totalTaxAmount = managementRows.reduce((sum, row) => {
-    return sum + parseFloat(getTaxTotal(row));
-  }, 0);
-  
-  return formatMoney(totalTaxAmount);
-}
-
-function calculateSubTotalNonManagementTaxPercentageLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const nonManagementRows = rows.filter(row => 
-    !(row.position && row.position.toLowerCase().includes('manager')) &&
-    !(row.position && row.position.toLowerCase().includes('director')) &&
-    !(row.position && row.position.toLowerCase().includes('supervisor'))
-  );
-  
-  if (nonManagementRows.length === 0) return 0;
-  
-  const totalTaxPercentage = nonManagementRows.reduce((sum, row) => {
-    return sum + getTaxPercentage(row);
-  }, 0);
-  
-  return (totalTaxPercentage / nonManagementRows.length).toFixed(2);
-}
-
-function calculateSubTotalNonManagementTaxTotalLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const nonManagementRows = rows.filter(row => 
-    !(row.position && row.position.toLowerCase().includes('manager')) &&
-    !(row.position && row.position.toLowerCase().includes('director')) &&
-    !(row.position && row.position.toLowerCase().includes('supervisor'))
-  );
-  
-  const totalTaxAmount = nonManagementRows.reduce((sum, row) => {
-    return sum + parseFloat(getTaxTotal(row));
-  }, 0);
-  
-  return formatMoney(totalTaxAmount);
-}
-
-function calculateLocationTotalTaxPercentageLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  
-  if (rows.length === 0) return 0;
-  
-  const totalTaxPercentage = rows.reduce((sum, row) => {
-    return sum + getTaxPercentage(row);
-  }, 0);
-  
-  return (totalTaxPercentage / rows.length).toFixed(2);
-}
-
-function calculateLocationTotalTaxTotalLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  
-  const totalTaxAmount = rows.reduce((sum, row) => {
-    return sum + parseFloat(getTaxTotal(row));
-  }, 0);
-  
-  return formatMoney(totalTaxAmount);
-}
-
-function calculateHotelTotalTaxPercentageLocal() {
-  const allRows = payrollRows.value;
-  
-  if (allRows.length === 0) return 0;
-  
-  const totalTaxPercentage = allRows.reduce((sum, row) => {
-    return sum + getTaxPercentage(row);
-  }, 0);
-  
-  return (totalTaxPercentage / allRows.length).toFixed(2);
-}
-
-function calculateHotelTotalTaxTotalLocal() {
-  const allRows = payrollRows.value;
-  
-  const totalTaxAmount = allRows.reduce((sum, row) => {
-    return sum + parseFloat(getTaxTotal(row));
-  }, 0);
-  
-  return formatMoney(totalTaxAmount);
-}
-
-function calculateEmployeeRoomRatioTaxPercentageLocal() {
-  return calculateHotelTotalTaxPercentageLocal();
-}
-
-function calculateEmployeeRoomRatioTaxTotalLocal() {
-  return calculateHotelTotalTaxTotalLocal();
-}
-
-// Supplementary Pay Handlers
-function getVacation(row) {
-  return getRelatedFieldValue(row, 'vacation');
-}
-
-function getRelocation(row) {
-  return getRelatedFieldValue(row, 'relocation');
-}
-
-function getSeverenceIndemnity(row) {
-  return getRelatedFieldValue(row, 'severence_indemnity');
-}
-
-function getOther(row) {
-  return getRelatedFieldValue(row, 'other');
-}
-
-// Vacation Handlers
-function handleVacationInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  setRelatedFieldValue(row, 'vacation', value);
-  isSaved.value = false;
-}
-
-function handleVacationFocus(row, event) {
-  const rawValue = getVacation(row);
-  event.target.textContent = rawValue.toString();
-}
-
-function handleVacationBlur(row, event) {
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  if (!rawValue || rawValue === '') {
-    event.target.textContent = '0.00';
-    return;
-  }
-  
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    setRelatedFieldValue(row, 'vacation', value);
-    event.target.textContent = formatRelatedCurrency(value);
-    isSaved.value = false;
-  } else {
-    event.target.textContent = '0.00';
-  }
-}
-
-// Relocation Handlers
-function handleRelocationInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  setRelatedFieldValue(row, 'relocation', value);
-  isSaved.value = false;
-}
-
-function handleRelocationFocus(row, event) {
-  const rawValue = getRelocation(row);
-  event.target.textContent = rawValue.toString();
-}
-
-function handleRelocationBlur(row, event) {
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  if (!rawValue || rawValue === '') {
-    event.target.textContent = '0.00';
-    return;
-  }
-  
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    setRelatedFieldValue(row, 'relocation', value);
-    event.target.textContent = formatRelatedCurrency(value);
-    isSaved.value = false;
-  } else {
-    event.target.textContent = '0.00';
-  }
-}
-
-// Severence & Indemnity Handlers
-function handleSeverenceIndemnityInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  setRelatedFieldValue(row, 'severence_indemnity', value);
-  isSaved.value = false;
-}
-
-function handleSeverenceIndemnityFocus(row, event) {
-  const rawValue = getSeverenceIndemnity(row);
-  event.target.textContent = rawValue.toString();
-}
-
-function handleSeverenceIndemnityBlur(row, event) {
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  if (!rawValue || rawValue === '') {
-    event.target.textContent = '0.00';
-    return;
-  }
-  
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    setRelatedFieldValue(row, 'severence_indemnity', value);
-    event.target.textContent = formatRelatedCurrency(value);
-    isSaved.value = false;
-  } else {
-    event.target.textContent = '0.00';
-  }
-}
-
-// Other Handlers
-function handleOtherInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  setRelatedFieldValue(row, 'other', value);
-  isSaved.value = false;
-}
-
-function handleOtherFocus(row, event) {
-  const rawValue = getOther(row);
-  event.target.textContent = rawValue.toString();
-}
-
-function handleOtherBlur(row, event) {
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  if (!rawValue || rawValue === '') {
-    event.target.textContent = '0.00';
-    return;
-  }
-  
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    setRelatedFieldValue(row, 'other', value);
-    event.target.textContent = formatRelatedCurrency(value);
-    isSaved.value = false;
-  } else {
-    event.target.textContent = '0.00';
-  }
-}
-
-// Supplementary Pay Calculation Functions
-function calculateSubTotalManagementVacationLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const managementRows = rows.filter(row => 
-    row.position && row.position.toLowerCase().includes('manager') ||
-    row.position && row.position.toLowerCase().includes('director') ||
-    row.position && row.position.toLowerCase().includes('supervisor')
-  );
-  
-  const totalVacation = managementRows.reduce((sum, row) => {
-    return sum + parseFloat(getVacation(row));
-  }, 0);
-  
-  return formatMoney(totalVacation);
-}
-
-function calculateSubTotalManagementRelocationLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const managementRows = rows.filter(row => 
-    row.position && row.position.toLowerCase().includes('manager') ||
-    row.position && row.position.toLowerCase().includes('director') ||
-    row.position && row.position.toLowerCase().includes('supervisor')
-  );
-  
-  const totalRelocation = managementRows.reduce((sum, row) => {
-    return sum + parseFloat(getRelocation(row));
-  }, 0);
-  
-  return formatMoney(totalRelocation);
-}
-
-function calculateSubTotalManagementSeverenceIndemnityLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const managementRows = rows.filter(row => 
-    row.position && row.position.toLowerCase().includes('manager') ||
-    row.position && row.position.toLowerCase().includes('director') ||
-    row.position && row.position.toLowerCase().includes('supervisor')
-  );
-  
-  const totalSeverenceIndemnity = managementRows.reduce((sum, row) => {
-    return sum + parseFloat(getSeverenceIndemnity(row));
-  }, 0);
-  
-  return formatMoney(totalSeverenceIndemnity);
-}
-
-function calculateSubTotalManagementOtherLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const managementRows = rows.filter(row => 
-    row.position && row.position.toLowerCase().includes('manager') ||
-    row.position && row.position.toLowerCase().includes('director') ||
-    row.position && row.position.toLowerCase().includes('supervisor')
-  );
-  
-  const totalOther = managementRows.reduce((sum, row) => {
-    return sum + parseFloat(getOther(row));
-  }, 0);
-  
-  return formatMoney(totalOther);
-}
-
-function calculateSubTotalNonManagementVacationLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const nonManagementRows = rows.filter(row => 
-    !(row.position && row.position.toLowerCase().includes('manager')) &&
-    !(row.position && row.position.toLowerCase().includes('director')) &&
-    !(row.position && row.position.toLowerCase().includes('supervisor'))
-  );
-  
-  const totalVacation = nonManagementRows.reduce((sum, row) => {
-    return sum + parseFloat(getVacation(row));
-  }, 0);
-  
-  return formatMoney(totalVacation);
-}
-
-function calculateSubTotalNonManagementRelocationLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const nonManagementRows = rows.filter(row => 
-    !(row.position && row.position.toLowerCase().includes('manager')) &&
-    !(row.position && row.position.toLowerCase().includes('director')) &&
-    !(row.position && row.position.toLowerCase().includes('supervisor'))
-  );
-  
-  const totalRelocation = nonManagementRows.reduce((sum, row) => {
-    return sum + parseFloat(getRelocation(row));
-  }, 0);
-  
-  return formatMoney(totalRelocation);
-}
-
-function calculateSubTotalNonManagementSeverenceIndemnityLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const nonManagementRows = rows.filter(row => 
-    !(row.position && row.position.toLowerCase().includes('manager')) &&
-    !(row.position && row.position.toLowerCase().includes('director')) &&
-    !(row.position && row.position.toLowerCase().includes('supervisor'))
-  );
-  
-  const totalSeverenceIndemnity = nonManagementRows.reduce((sum, row) => {
-    return sum + parseFloat(getSeverenceIndemnity(row));
-  }, 0);
-  
-  return formatMoney(totalSeverenceIndemnity);
-}
-
-function calculateSubTotalNonManagementOtherLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const nonManagementRows = rows.filter(row => 
-    !(row.position && row.position.toLowerCase().includes('manager')) &&
-    !(row.position && row.position.toLowerCase().includes('director')) &&
-    !(row.position && row.position.toLowerCase().includes('supervisor'))
-  );
-  
-  const totalOther = nonManagementRows.reduce((sum, row) => {
-    return sum + parseFloat(getOther(row));
-  }, 0);
-  
-  return formatMoney(totalOther);
-}
-
-function calculateLocationTotalVacationLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  
-  const totalVacation = rows.reduce((sum, row) => {
-    return sum + parseFloat(getVacation(row));
-  }, 0);
-  
-  return formatMoney(totalVacation);
-}
-
-function calculateLocationTotalRelocationLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  
-  const totalRelocation = rows.reduce((sum, row) => {
-    return sum + parseFloat(getRelocation(row));
-  }, 0);
-  
-  return formatMoney(totalRelocation);
-}
-
-function calculateLocationTotalSeverenceIndemnityLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  
-  const totalSeverenceIndemnity = rows.reduce((sum, row) => {
-    return sum + parseFloat(getSeverenceIndemnity(row));
-  }, 0);
-  
-  return formatMoney(totalSeverenceIndemnity);
-}
-
-function calculateLocationTotalOtherLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  
-  const totalOther = rows.reduce((sum, row) => {
-    return sum + parseFloat(getOther(row));
-  }, 0);
-  
-  return formatMoney(totalOther);
-}
-
-function calculateHotelTotalVacationLocal() {
-  const allRows = payrollRows.value;
-  
-  const totalVacation = allRows.reduce((sum, row) => {
-    return sum + parseFloat(getVacation(row));
-  }, 0);
-  
-  return formatMoney(totalVacation);
-}
-
-function calculateHotelTotalRelocationLocal() {
-  const allRows = payrollRows.value;
-  
-  const totalRelocation = allRows.reduce((sum, row) => {
-    return sum + parseFloat(getRelocation(row));
-  }, 0);
-  
-  return formatMoney(totalRelocation);
-}
-
-function calculateHotelTotalSeverenceIndemnityLocal() {
-  const allRows = payrollRows.value;
-  
-  const totalSeverenceIndemnity = allRows.reduce((sum, row) => {
-    return sum + parseFloat(getSeverenceIndemnity(row));
-  }, 0);
-  
-  return formatMoney(totalSeverenceIndemnity);
-}
-
-function calculateHotelTotalOtherLocal() {
-  const allRows = payrollRows.value;
-  
-  const totalOther = allRows.reduce((sum, row) => {
-    return sum + parseFloat(getOther(row));
-  }, 0);
-  
-  return formatMoney(totalOther);
-}
-
-function calculateEmployeeRoomRatioVacationLocal() {
-  return calculateHotelTotalVacationLocal();
-}
-
-function calculateEmployeeRoomRatioRelocationLocal() {
-  return calculateHotelTotalRelocationLocal();
-}
-
-function calculateEmployeeRoomRatioSeverenceIndemnityLocal() {
-  return calculateHotelTotalSeverenceIndemnityLocal();
-}
-
-function calculateEmployeeRoomRatioOtherLocal() {
-  return calculateHotelTotalOtherLocal();
-}
-
-// Employee Benefits Handlers
-function getMedical(row) {
-  return getRelatedFieldValue(row, 'medical');
-}
-
-function getUniforms(row) {
-  return getRelatedFieldValue(row, 'uniforms');
-}
-
-function getEmployeeMeal(row) {
-  return getRelatedFieldValue(row, 'employee_meal');
-}
-
-function getTransport(row) {
-  return getRelatedFieldValue(row, 'transport');
-}
-
-function getTelephone(row) {
-  return getRelatedFieldValue(row, 'telephone');
-}
-
-function getAirTicket(row) {
-  return getRelatedFieldValue(row, 'air_ticket');
-}
-
-function getBenefitsOther(row) {
-  return getRelatedFieldValue(row, 'other');
-}
-
-// Medical Handlers
-function handleMedicalInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  setRelatedFieldValue(row, 'medical', value);
-  isSaved.value = false;
-}
-
-function handleMedicalFocus(row, event) {
-  const rawValue = getMedical(row);
-  event.target.textContent = rawValue.toString();
-}
-
-function handleMedicalBlur(row, event) {
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  if (!rawValue || rawValue === '') {
-    event.target.textContent = '0.00';
-    return;
-  }
-  
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    setRelatedFieldValue(row, 'medical', value);
-    event.target.textContent = formatRelatedCurrency(value);
-    isSaved.value = false;
-  } else {
-    event.target.textContent = '0.00';
-  }
-}
-
-// Uniforms Handlers
-function handleUniformsInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  setRelatedFieldValue(row, 'uniforms', value);
-  isSaved.value = false;
-}
-
-function handleUniformsFocus(row, event) {
-  const rawValue = getUniforms(row);
-  event.target.textContent = rawValue.toString();
-}
-
-function handleUniformsBlur(row, event) {
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  if (!rawValue || rawValue === '') {
-    event.target.textContent = '0.00';
-    return;
-  }
-  
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    setRelatedFieldValue(row, 'uniforms', value);
-    event.target.textContent = formatRelatedCurrency(value);
-    isSaved.value = false;
-  } else {
-    event.target.textContent = '0.00';
-  }
-}
-
-// Employee Meal Handlers
-function handleEmployeeMealInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  setRelatedFieldValue(row, 'employee_meal', value);
-  isSaved.value = false;
-}
-
-function handleEmployeeMealFocus(row, event) {
-  const rawValue = getEmployeeMeal(row);
-  event.target.textContent = rawValue.toString();
-}
-
-function handleEmployeeMealBlur(row, event) {
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  if (!rawValue || rawValue === '') {
-    event.target.textContent = '0.00';
-    return;
-  }
-  
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    setRelatedFieldValue(row, 'employee_meal', value);
-    event.target.textContent = formatRelatedCurrency(value);
-    isSaved.value = false;
-  } else {
-    event.target.textContent = '0.00';
-  }
-}
-
-// Transport Handlers
-function handleTransportInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  setRelatedFieldValue(row, 'transport', value);
-  isSaved.value = false;
-}
-
-function handleTransportFocus(row, event) {
-  const rawValue = getTransport(row);
-  event.target.textContent = rawValue.toString();
-}
-
-function handleTransportBlur(row, event) {
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  if (!rawValue || rawValue === '') {
-    event.target.textContent = '0.00';
-    return;
-  }
-  
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    setRelatedFieldValue(row, 'transport', value);
-    event.target.textContent = formatRelatedCurrency(value);
-    isSaved.value = false;
-  } else {
-    event.target.textContent = '0.00';
-  }
-}
-
-// Telephone Handlers
-function handleTelephoneInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  setRelatedFieldValue(row, 'telephone', value);
-  isSaved.value = false;
-}
-
-function handleTelephoneFocus(row, event) {
-  const rawValue = getTelephone(row);
-  event.target.textContent = rawValue.toString();
-}
-
-function handleTelephoneBlur(row, event) {
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  if (!rawValue || rawValue === '') {
-    event.target.textContent = '0.00';
-    return;
-  }
-  
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    setRelatedFieldValue(row, 'telephone', value);
-    event.target.textContent = formatRelatedCurrency(value);
-    isSaved.value = false;
-  } else {
-    event.target.textContent = '0.00';
-  }
-}
-
-// Air Ticket Handlers
-function handleAirTicketInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  setRelatedFieldValue(row, 'air_ticket', value);
-  isSaved.value = false;
-}
-
-function handleAirTicketFocus(row, event) {
-  const rawValue = getAirTicket(row);
-  event.target.textContent = rawValue.toString();
-}
-
-function handleAirTicketBlur(row, event) {
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  if (!rawValue || rawValue === '') {
-    event.target.textContent = '0.00';
-    return;
-  }
-  
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    setRelatedFieldValue(row, 'air_ticket', value);
-    event.target.textContent = formatRelatedCurrency(value);
-    isSaved.value = false;
-  } else {
-    event.target.textContent = '0.00';
-  }
-}
-
-// Benefits Other Handlers
-function handleBenefitsOtherInput(row, event) {
-  let value = event.target.textContent.replace(/[^0-9.]/g, '');
-  setRelatedFieldValue(row, 'benefits_other', value);
-  isSaved.value = false;
-}
-
-function handleBenefitsOtherFocus(row, event) {
-  const rawValue = getBenefitsOther(row);
-  event.target.textContent = rawValue.toString();
-}
-
-function handleBenefitsOtherBlur(row, event) {
-  let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
-  
-  if (!rawValue || rawValue === '') {
-    event.target.textContent = '0.00';
-    return;
-  }
-  
-  let value = parseFloat(rawValue);
-  if (!isNaN(value)) {
-    setRelatedFieldValue(row, 'benefits_other', value);
-    event.target.textContent = formatRelatedCurrency(value);
-    isSaved.value = false;
-  } else {
-    event.target.textContent = '0.00';
-  }
-}
-
-// Employee Benefits Calculation Functions
-function calculateSubTotalManagementMedicalLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const managementRows = rows.filter(row => 
-    row.position && row.position.toLowerCase().includes('manager') ||
-    row.position && row.position.toLowerCase().includes('director') ||
-    row.position && row.position.toLowerCase().includes('supervisor')
-  );
-  
-  const totalMedical = managementRows.reduce((sum, row) => {
-    return sum + parseFloat(getMedical(row));
-  }, 0);
-  
-  return formatMoney(totalMedical);
-}
-
-function calculateSubTotalManagementUniformsLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const managementRows = rows.filter(row => 
-    row.position && row.position.toLowerCase().includes('manager') ||
-    row.position && row.position.toLowerCase().includes('director') ||
-    row.position && row.position.toLowerCase().includes('supervisor')
-  );
-  
-  const totalUniforms = managementRows.reduce((sum, row) => {
-    return sum + parseFloat(getUniforms(row));
-  }, 0);
-  
-  return formatMoney(totalUniforms);
-}
-
-function calculateSubTotalManagementEmployeeMealLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const managementRows = rows.filter(row => 
-    row.position && row.position.toLowerCase().includes('manager') ||
-    row.position && row.position.toLowerCase().includes('director') ||
-    row.position && row.position.toLowerCase().includes('supervisor')
-  );
-  
-  const totalEmployeeMeal = managementRows.reduce((sum, row) => {
-    return sum + parseFloat(getEmployeeMeal(row));
-  }, 0);
-  
-  return formatMoney(totalEmployeeMeal);
-}
-
-function calculateSubTotalManagementTransportLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const managementRows = rows.filter(row => 
-    row.position && row.position.toLowerCase().includes('manager') ||
-    row.position && row.position.toLowerCase().includes('director') ||
-    row.position && row.position.toLowerCase().includes('supervisor')
-  );
-  
-  const totalTransport = managementRows.reduce((sum, row) => {
-    return sum + parseFloat(getTransport(row));
-  }, 0);
-  
-  return formatMoney(totalTransport);
-}
-
-function calculateSubTotalManagementTelephoneLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const managementRows = rows.filter(row => 
-    row.position && row.position.toLowerCase().includes('manager') ||
-    row.position && row.position.toLowerCase().includes('director') ||
-    row.position && row.position.toLowerCase().includes('supervisor')
-  );
-  
-  const totalTelephone = managementRows.reduce((sum, row) => {
-    return sum + parseFloat(getTelephone(row));
-  }, 0);
-  
-  return formatMoney(totalTelephone);
-}
-
-function calculateSubTotalManagementAirTicketLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const managementRows = rows.filter(row => 
-    row.position && row.position.toLowerCase().includes('manager') ||
-    row.position && row.position.toLowerCase().includes('director') ||
-    row.position && row.position.toLowerCase().includes('supervisor')
-  );
-  
-  const totalAirTicket = managementRows.reduce((sum, row) => {
-    return sum + parseFloat(getAirTicket(row));
-  }, 0);
-  
-  return formatMoney(totalAirTicket);
-}
-
-function calculateSubTotalManagementBenefitsOtherLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const managementRows = rows.filter(row => 
-    row.position && row.position.toLowerCase().includes('manager') ||
-    row.position && row.position.toLowerCase().includes('director') ||
-    row.position && row.position.toLowerCase().includes('supervisor')
-  );
-  
-  const totalBenefitsOther = managementRows.reduce((sum, row) => {
-    return sum + parseFloat(getBenefitsOther(row));
-  }, 0);
-  
-  return formatMoney(totalBenefitsOther);
-}
-
-function calculateSubTotalNonManagementMedicalLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const nonManagementRows = rows.filter(row => 
-    !(row.position && row.position.toLowerCase().includes('manager')) &&
-    !(row.position && row.position.toLowerCase().includes('director')) &&
-    !(row.position && row.position.toLowerCase().includes('supervisor'))
-  );
-  
-  const totalMedical = nonManagementRows.reduce((sum, row) => {
-    return sum + parseFloat(getMedical(row));
-  }, 0);
-  
-  return formatMoney(totalMedical);
-}
-
-function calculateSubTotalNonManagementUniformsLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const nonManagementRows = rows.filter(row => 
-    !(row.position && row.position.toLowerCase().includes('manager')) &&
-    !(row.position && row.position.toLowerCase().includes('director')) &&
-    !(row.position && row.position.toLowerCase().includes('supervisor'))
-  );
-  
-  const totalUniforms = nonManagementRows.reduce((sum, row) => {
-    return sum + parseFloat(getUniforms(row));
-  }, 0);
-  
-  return formatMoney(totalUniforms);
-}
-
-function calculateSubTotalNonManagementEmployeeMealLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const nonManagementRows = rows.filter(row => 
-    !(row.position && row.position.toLowerCase().includes('manager')) &&
-    !(row.position && row.position.toLowerCase().includes('director')) &&
-    !(row.position && row.position.toLowerCase().includes('supervisor'))
-  );
-  
-  const totalEmployeeMeal = nonManagementRows.reduce((sum, row) => {
-    return sum + parseFloat(getEmployeeMeal(row));
-  }, 0);
-  
-  return formatMoney(totalEmployeeMeal);
-}
-
-function calculateSubTotalNonManagementTransportLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const nonManagementRows = rows.filter(row => 
-    !(row.position && row.position.toLowerCase().includes('manager')) &&
-    !(row.position && row.position.toLowerCase().includes('director')) &&
-    !(row.position && row.position.toLowerCase().includes('supervisor'))
-  );
-  
-  const totalTransport = nonManagementRows.reduce((sum, row) => {
-    return sum + parseFloat(getTransport(row));
-  }, 0);
-  
-  return formatMoney(totalTransport);
-}
-
-function calculateSubTotalNonManagementTelephoneLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const nonManagementRows = rows.filter(row => 
-    !(row.position && row.position.toLowerCase().includes('manager')) &&
-    !(row.position && row.position.toLowerCase().includes('director')) &&
-    !(row.position && row.position.toLowerCase().includes('supervisor'))
-  );
-  
-  const totalTelephone = nonManagementRows.reduce((sum, row) => {
-    return sum + parseFloat(getTelephone(row));
-  }, 0);
-  
-  return formatMoney(totalTelephone);
-}
-
-function calculateSubTotalNonManagementAirTicketLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const nonManagementRows = rows.filter(row => 
-    !(row.position && row.position.toLowerCase().includes('manager')) &&
-    !(row.position && row.position.toLowerCase().includes('director')) &&
-    !(row.position && row.position.toLowerCase().includes('supervisor'))
-  );
-  
-  const totalAirTicket = nonManagementRows.reduce((sum, row) => {
-    return sum + parseFloat(getAirTicket(row));
-  }, 0);
-  
-  return formatMoney(totalAirTicket);
-}
-
-function calculateSubTotalNonManagementBenefitsOtherLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  const nonManagementRows = rows.filter(row => 
-    !(row.position && row.position.toLowerCase().includes('manager')) &&
-    !(row.position && row.position.toLowerCase().includes('director')) &&
-    !(row.position && row.position.toLowerCase().includes('supervisor'))
-  );
-  
-  const totalBenefitsOther = nonManagementRows.reduce((sum, row) => {
-    return sum + parseFloat(getBenefitsOther(row));
-  }, 0);
-  
-  return formatMoney(totalBenefitsOther);
-}
-
-function calculateLocationTotalMedicalLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  
-  const totalMedical = rows.reduce((sum, row) => {
-    return sum + parseFloat(getMedical(row));
-  }, 0);
-  
-  return formatMoney(totalMedical);
-}
-
-function calculateLocationTotalUniformsLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  
-  const totalUniforms = rows.reduce((sum, row) => {
-    return sum + parseFloat(getUniforms(row));
-  }, 0);
-  
-  return formatMoney(totalUniforms);
-}
-
-function calculateLocationTotalEmployeeMealLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  
-  const totalEmployeeMeal = rows.reduce((sum, row) => {
-    return sum + parseFloat(getEmployeeMeal(row));
-  }, 0);
-  
-  return formatMoney(totalEmployeeMeal);
-}
-
-function calculateLocationTotalTransportLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  
-  const totalTransport = rows.reduce((sum, row) => {
-    return sum + parseFloat(getTransport(row));
-  }, 0);
-  
-  return formatMoney(totalTransport);
-}
-
-function calculateLocationTotalTelephoneLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  
-  const totalTelephone = rows.reduce((sum, row) => {
-    return sum + parseFloat(getTelephone(row));
-  }, 0);
-  
-  return formatMoney(totalTelephone);
-}
-
-function calculateLocationTotalAirTicketLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  
-  const totalAirTicket = rows.reduce((sum, row) => {
-    return sum + parseFloat(getAirTicket(row));
-  }, 0);
-  
-  return formatMoney(totalAirTicket);
-}
-
-function calculateLocationTotalBenefitsOtherLocal(category, location) {
-  const rows = getPayrollRowsForLocationLocal(category, location);
-  
-  const totalBenefitsOther = rows.reduce((sum, row) => {
-    return sum + parseFloat(getBenefitsOther(row));
-  }, 0);
-  
-  return formatMoney(totalBenefitsOther);
-}
-
-function calculateHotelTotalMedicalLocal() {
-  const allRows = payrollRows.value;
-  
-  const totalMedical = allRows.reduce((sum, row) => {
-    return sum + parseFloat(getMedical(row));
-  }, 0);
-  
-  return formatMoney(totalMedical);
-}
-
-function calculateHotelTotalUniformsLocal() {
-  const allRows = payrollRows.value;
-  
-  const totalUniforms = allRows.reduce((sum, row) => {
-    return sum + parseFloat(getUniforms(row));
-  }, 0);
-  
-  return formatMoney(totalUniforms);
-}
-
-function calculateHotelTotalEmployeeMealLocal() {
-  const allRows = payrollRows.value;
-  
-  const totalEmployeeMeal = allRows.reduce((sum, row) => {
-    return sum + parseFloat(getEmployeeMeal(row));
-  }, 0);
-  
-  return formatMoney(totalEmployeeMeal);
-}
-
-function calculateHotelTotalTransportLocal() {
-  const allRows = payrollRows.value;
-  
-  const totalTransport = allRows.reduce((sum, row) => {
-    return sum + parseFloat(getTransport(row));
-  }, 0);
-  
-  return formatMoney(totalTransport);
-}
-
-function calculateHotelTotalTelephoneLocal() {
-  const allRows = payrollRows.value;
-  
-  const totalTelephone = allRows.reduce((sum, row) => {
-    return sum + parseFloat(getTelephone(row));
-  }, 0);
-  
-  return formatMoney(totalTelephone);
-}
-
-function calculateHotelTotalAirTicketLocal() {
-  const allRows = payrollRows.value;
-  
-  const totalAirTicket = allRows.reduce((sum, row) => {
-    return sum + parseFloat(getAirTicket(row));
-  }, 0);
-  
-  return formatMoney(totalAirTicket);
-}
-
-function calculateHotelTotalBenefitsOtherLocal() {
-  const allRows = payrollRows.value;
-  
-  const totalBenefitsOther = allRows.reduce((sum, row) => {
-    return sum + parseFloat(getBenefitsOther(row));
-  }, 0);
-  
-  return formatMoney(totalBenefitsOther);
-}
-
-function calculateEmployeeRoomRatioMedicalLocal() {
-  return calculateHotelTotalMedicalLocal();
-}
-
-function calculateEmployeeRoomRatioUniformsLocal() {
-  return calculateHotelTotalUniformsLocal();
-}
-
-function calculateEmployeeRoomRatioEmployeeMealLocal() {
-  return calculateHotelTotalEmployeeMealLocal();
-}
-
-function calculateEmployeeRoomRatioTransportLocal() {
-  return calculateHotelTotalTransportLocal();
-}
-
-function calculateEmployeeRoomRatioTelephoneLocal() {
-  return calculateHotelTotalTelephoneLocal();
-}
-
-function calculateEmployeeRoomRatioAirTicketLocal() {
-  return calculateHotelTotalAirTicketLocal();
-}
-
-function calculateEmployeeRoomRatioBenefitsOtherLocal() {
-  return calculateHotelTotalBenefitsOtherLocal();
+  return calculateHotelTotalBenefitsOtherLocal(payrollRows.value);
 }
 </script>
-
-
 
 
 <style scoped>
