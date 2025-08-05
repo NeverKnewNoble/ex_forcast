@@ -30,7 +30,16 @@
           </div>
           <h3 class="text-lg font-semibold text-gray-800">Payroll Taxes</h3>
         </div>
-        <PayrollTaxesTable />
+            <PayrollTaxesTable 
+            :payroll-rows="payrollRows" 
+            :payroll-data="payrollData"
+            :visible-years="visibleYears"
+            :months="months"
+            :payroll-related-data="payrollRelatedData"
+            :add-payroll-related-change="addPayrollRelatedChange"
+            :get-payroll-related-value="getPayrollRelatedValue"
+            :set-payroll-related-value="setPayrollRelatedValue"
+          />
       </div>
 
       <!-- Supplementary Pay Tab -->
@@ -41,7 +50,16 @@
           </div>
           <h3 class="text-lg font-semibold text-gray-800">Supplementary Pay</h3>
         </div>
-        <SupplementaryPayTable />
+            <SupplementaryPayTable 
+            :payroll-rows="payrollRows" 
+            :payroll-data="payrollData"
+            :visible-years="visibleYears"
+            :months="months"
+            :payroll-related-data="payrollRelatedData"
+            :add-payroll-related-change="addPayrollRelatedChange"
+            :get-payroll-related-value="getPayrollRelatedValue"
+            :set-payroll-related-value="setPayrollRelatedValue"
+          />
       </div>
 
       <!-- Total Tab -->
@@ -52,7 +70,16 @@
           </div>
           <h3 class="text-lg font-semibold text-gray-800">Total</h3>
         </div>
-        <TotalTable />
+            <TotalTable 
+            :payroll-rows="payrollRows" 
+            :payroll-data="payrollData"
+            :visible-years="visibleYears"
+            :months="months"
+            :payroll-related-data="payrollRelatedData"
+            :add-payroll-related-change="addPayrollRelatedChange"
+            :get-payroll-related-value="getPayrollRelatedValue"
+            :set-payroll-related-value="setPayrollRelatedValue"
+          />
       </div>
     </div>
   </div>
@@ -64,6 +91,42 @@ import { Shield, Gift, BarChart3 } from 'lucide-vue-next';
 import PayrollTaxesTable from './PayrollTaxesTable.vue';
 import SupplementaryPayTable from './SupplementaryPayTable.vue';
 import TotalTable from './TotalTable.vue';
+
+// Props
+const props = defineProps({
+  payrollRows: {
+    type: Array,
+    default: () => []
+  },
+  payrollData: {
+    type: Object,
+    default: () => ({})
+  },
+  visibleYears: {
+    type: Array,
+    default: () => []
+  },
+  months: {
+    type: Array,
+    default: () => ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+  },
+  payrollRelatedData: {
+    type: Object,
+    default: () => ({})
+  },
+  addPayrollRelatedChange: {
+    type: Function,
+    default: () => {}
+  },
+  getPayrollRelatedValue: {
+    type: Function,
+    default: () => {}
+  },
+  setPayrollRelatedValue: {
+    type: Function,
+    default: () => {}
+  }
+});
 
 // Tab state
 const activeTab = ref('payroll-taxes');
