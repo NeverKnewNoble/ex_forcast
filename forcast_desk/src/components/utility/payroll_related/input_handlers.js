@@ -371,7 +371,7 @@ export function getAirTicket(row) {
 }
 
 export function getBenefitsOther(row) {
-  return getRelatedFieldValue(row, 'other');
+  return getRelatedFieldValue(row, 'benefits_other');
 }
 
 // Medical Handlers
