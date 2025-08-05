@@ -76,7 +76,7 @@
                   </td>
                 </tr>
                 <!-- Payroll rows for this location -->
-                <template v-for="row in getPayrollRowsForLocation(category, location)" :key="row.id">
+                <template v-for="row in getPayrollRowsForLocation(props.payrollRows, category, location)" :key="row.id">
             <tr class="border-b border-gray-200 hover:bg-green-50 transition-all duration-200">
                     <!-- Position -->
               <td class="px-3 py-2 font-medium border-r border-green-200 text-gray-700">
@@ -248,6 +248,7 @@
 
 <script setup>
 import { FolderOpen, CheckCircle, BarChart3, Building2, Users } from 'lucide-vue-next';
+import { getPayrollRowsForLocation } from '@/components/utility/payroll/payroll_data_utils.js';
 
 // Props
 const props = defineProps({
@@ -323,31 +324,25 @@ function getUniqueLocationsForCategory(category) {
   return result;
 }
 
-function getPayrollRowsForLocation(category, location) {
-  const result = props.payrollRows.filter(row => 
-    row.category === category && row.departmentLocation === location
-  );
-  // console.log('PayrollTaxesTable - rows for location', location, ':', result);
-  return result;
-}
+
 
 // Calculation functions
 function calculateSubTotalManagementCount(category, location) {
-  const managementRows = getPayrollRowsForLocation(category, location).filter(row => 
+  const managementRows = getPayrollRowsForLocation(props.payrollRows, category, location).filter(row => 
     row.position_type === 'management' || row.position?.toLowerCase().includes('manager')
   );
   return managementRows.reduce((sum, row) => sum + (row.count || 0), 0);
 }
 
 function calculateSubTotalNonManagementCount(category, location) {
-  const nonManagementRows = getPayrollRowsForLocation(category, location).filter(row => 
+  const nonManagementRows = getPayrollRowsForLocation(props.payrollRows, category, location).filter(row => 
     !(row.position_type === 'management' || row.position?.toLowerCase().includes('manager'))
   );
   return nonManagementRows.reduce((sum, row) => sum + (row.count || 0), 0);
 }
 
 function calculateLocationTotalCount(category, location) {
-  const rows = getPayrollRowsForLocation(category, location);
+  const rows = getPayrollRowsForLocation(props.payrollRows, category, location);
   return rows.reduce((sum, row) => sum + (row.count || 0), 0);
 }
 

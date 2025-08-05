@@ -28,7 +28,7 @@
 
           <!-- Save Status Section -->
           <div class="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
-                          <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <div
                     v-if="hasUnsavedChanges"
@@ -198,12 +198,6 @@
                         : 'Click to sync with the total rooms from Room Revenue page' }}
                     </p>
                   </div>
-                  
-                  <!-- <p class="text-xs text-gray-500 flex items-center gap-1">
-                    This value is used for payroll calculations and projections
-                  </p> -->
-                  
-
           
                 </div>
               </div>
@@ -215,9 +209,6 @@
             </div>
           </transition>
         </div>
-
-
-
 
 
         <!-- Right Side - Table Area -->
