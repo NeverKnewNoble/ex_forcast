@@ -76,7 +76,7 @@
               <tr class="bg-blue-500/90 text-xs">
                 <!-- Medical Monthly Sub-columns -->
                 <th 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'medical-' + month"
                   class="px-2 py-1 text-center border border-blue-300 min-w-[80px] font-medium"
                 >
@@ -88,7 +88,7 @@
                 </th>
                 <!-- Uniforms Monthly Sub-columns -->
                 <th 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'uniforms-' + month"
                   class="px-2 py-1 text-center border border-blue-300 min-w-[80px] font-medium"
                 >
@@ -100,7 +100,7 @@
                 </th>
                 <!-- Employee Meal Monthly Sub-columns -->
                 <th 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'employee-meal-' + month"
                   class="px-2 py-1 text-center border border-blue-300 min-w-[80px] font-medium"
                 >
@@ -112,7 +112,7 @@
                 </th>
                 <!-- Transport Monthly Sub-columns -->
                 <th 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'transport-' + month"
                   class="px-2 py-1 text-center border border-blue-300 min-w-[80px] font-medium"
                 >
@@ -124,7 +124,7 @@
                 </th>
                 <!-- Telephone Monthly Sub-columns -->
                 <th 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'telephone-' + month"
                   class="px-2 py-1 text-center border border-blue-300 min-w-[80px] font-medium"
                 >
@@ -136,7 +136,7 @@
                 </th>
                 <!-- Air Ticket Monthly Sub-columns -->
                 <th 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'air-ticket-' + month"
                   class="px-2 py-1 text-center border border-blue-300 min-w-[80px] font-medium"
                 >
@@ -148,7 +148,7 @@
                 </th>
                 <!-- Other Monthly Sub-columns -->
                 <th 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'other-' + month"
                   class="px-2 py-1 text-center border border-blue-300 min-w-[80px] font-medium"
                 >
@@ -203,7 +203,7 @@
                       </td>
                       <!-- Medical Monthly Values -->
                       <td 
-                        v-for="month in months" 
+                        v-for="month in monthsList" 
                         :key="'medical-value-' + month + '-' + row.id"
                         class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                       >
@@ -211,11 +211,11 @@
                       </td>
                       <!-- Medical Total -->
                       <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
-                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalMedicalValueLocal(row, visibleYears[0], months) }}</span>
+                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalMedicalValueLocal(row, visibleYears[0], monthsList) }}</span>
                       </td>
                       <!-- Uniforms Monthly Values -->
                       <td 
-                        v-for="month in months" 
+                        v-for="month in monthsList" 
                         :key="'uniforms-value-' + month + '-' + row.id"
                         class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                       >
@@ -223,11 +223,11 @@
                       </td>
                       <!-- Uniforms Total -->
                       <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
-                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalUniformsValueLocal(row, visibleYears[0], months) }}</span>
+                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalUniformsValueLocal(row, visibleYears[0], monthsList) }}</span>
                       </td>
                       <!-- Employee Meal Monthly Values -->
                       <td 
-                        v-for="month in months" 
+                        v-for="month in monthsList" 
                         :key="'employee-meal-value-' + month + '-' + row.id"
                         class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                       >
@@ -235,11 +235,11 @@
                       </td>
                       <!-- Employee Meal Total -->
                       <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
-                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalEmployeeMealValueLocal(row, visibleYears[0], months) }}</span>
+                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalEmployeeMealValueLocal(row, visibleYears[0], monthsList) }}</span>
                       </td>
                       <!-- Transport Monthly Values -->
                       <td 
-                        v-for="month in months" 
+                        v-for="month in monthsList" 
                         :key="'transport-value-' + month + '-' + row.id"
                         class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                       >
@@ -247,11 +247,11 @@
                       </td>
                       <!-- Transport Total -->
                       <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
-                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalTransportValueLocal(row, visibleYears[0], months) }}</span>
+                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalTransportValueLocal(row, visibleYears[0], monthsList) }}</span>
                       </td>
                       <!-- Telephone Monthly Values -->
                       <td 
-                        v-for="month in months" 
+                        v-for="month in monthsList" 
                         :key="'telephone-value-' + month + '-' + row.id"
                         class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                       >
@@ -259,11 +259,11 @@
                       </td>
                       <!-- Telephone Total -->
                       <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
-                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalTelephoneValueLocal(row, visibleYears[0], months) }}</span>
+                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalTelephoneValueLocal(row, visibleYears[0], monthsList) }}</span>
                       </td>
                       <!-- Air Ticket Monthly Values -->
                       <td 
-                        v-for="month in months" 
+                        v-for="month in monthsList" 
                         :key="'air-ticket-value-' + month + '-' + row.id"
                         class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                       >
@@ -271,11 +271,11 @@
                       </td>
                       <!-- Air Ticket Total -->
                       <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
-                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalAirTicketValueLocal(row, visibleYears[0], months) }}</span>
+                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalAirTicketValueLocal(row, visibleYears[0], monthsList) }}</span>
                       </td>
                       <!-- Other Monthly Values -->
                       <td 
-                        v-for="month in months" 
+                        v-for="month in monthsList" 
                         :key="'other-value-' + month + '-' + row.id"
                         class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                       >
@@ -283,7 +283,7 @@
                       </td>
                       <!-- Other Total -->
                       <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
-                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalBenefitsOtherValueLocal(row, visibleYears[0], months) }}</span>
+                        <span class="font-mono text-xs text-blue-900">{{ calculateTotalBenefitsOtherValueLocal(row, visibleYears[0], monthsList) }}</span>
                       </td>
                     </tr>
                   </template>
@@ -301,7 +301,7 @@
                     </td>
                     <!-- Medical Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-mgmt-medical-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -309,11 +309,11 @@
                     </td>
                     <!-- Medical Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementMedicalTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementMedicalTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Uniforms Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-mgmt-uniforms-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -321,11 +321,11 @@
                     </td>
                     <!-- Uniforms Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementUniformsTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementUniformsTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Employee Meal Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-mgmt-employee-meal-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -333,11 +333,11 @@
                     </td>
                     <!-- Employee Meal Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementEmployeeMealTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementEmployeeMealTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Transport Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-mgmt-transport-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -345,11 +345,11 @@
                     </td>
                     <!-- Transport Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementTransportTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementTransportTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Telephone Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-mgmt-telephone-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -357,11 +357,11 @@
                     </td>
                     <!-- Telephone Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementTelephoneTotalLocal(category, location, visibleYears[0], month) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementTelephoneTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Air Ticket Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-mgmt-air-ticket-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -369,11 +369,11 @@
                     </td>
                     <!-- Air Ticket Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementAirTicketTotalLocal(category, location, visibleYears[0], month) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementAirTicketTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Other Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-mgmt-other-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -381,7 +381,7 @@
                     </td>
                     <!-- Other Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementBenefitsOtherTotalLocal(category, location, visibleYears[0], month) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementBenefitsOtherTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                   </tr>
                   
@@ -398,7 +398,7 @@
                     </td>
                     <!-- Medical Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-nonmgmt-medical-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -406,11 +406,11 @@
                     </td>
                     <!-- Medical Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementMedicalTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementMedicalTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Uniforms Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-nonmgmt-uniforms-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -418,11 +418,11 @@
                     </td>
                     <!-- Uniforms Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementUniformsTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementUniformsTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Employee Meal Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-nonmgmt-employee-meal-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -430,11 +430,11 @@
                     </td>
                     <!-- Employee Meal Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementEmployeeMealTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementEmployeeMealTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Transport Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-nonmgmt-transport-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -442,11 +442,11 @@
                     </td>
                     <!-- Transport Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementTransportTotalLocal(category, location, visibleYears[0], month) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementTransportTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Telephone Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-nonmgmt-telephone-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -454,11 +454,11 @@
                     </td>
                     <!-- Telephone Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementTelephoneTotalLocal(category, location, visibleYears[0], month) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementTelephoneTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Air Ticket Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-nonmgmt-air-ticket-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -466,11 +466,11 @@
                     </td>
                     <!-- Air Ticket Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementAirTicketTotalLocal(category, location, visibleYears[0], month) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementAirTicketTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Other Monthly cells for subtotal -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'subtotal-nonmgmt-other-' + month"
                       class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                     >
@@ -478,7 +478,7 @@
                     </td>
                     <!-- Other Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementBenefitsOtherTotalLocal(category, location, visibleYears[0], month) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementBenefitsOtherTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                   </tr>
                   
@@ -495,7 +495,7 @@
                     </td>
                     <!-- Medical Monthly cells for total -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'total-medical-' + month"
                       class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                     >
@@ -503,11 +503,11 @@
                     </td>
                     <!-- Medical Total for total -->
                     <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalMedicalTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalMedicalTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Uniforms Monthly cells for total -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'total-uniforms-' + month"
                       class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                     >
@@ -515,11 +515,11 @@
                     </td>
                     <!-- Uniforms Total for total -->
                     <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalUniformsTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalUniformsTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Employee Meal Monthly cells for total -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'total-employee-meal-' + month"
                       class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                     >
@@ -527,11 +527,11 @@
                     </td>
                     <!-- Employee Meal Total for total -->
                     <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalEmployeeMealTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalEmployeeMealTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Transport Monthly cells for total -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'total-transport-' + month"
                       class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                     >
@@ -539,11 +539,11 @@
                     </td>
                     <!-- Transport Total for total -->
                     <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalTransportTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalTransportTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Telephone Monthly cells for total -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'total-telephone-' + month"
                       class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                     >
@@ -551,11 +551,11 @@
                     </td>
                     <!-- Telephone Total for total -->
                     <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalTelephoneTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalTelephoneTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Air Ticket Monthly cells for total -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'total-air-ticket-' + month"
                       class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                     >
@@ -563,11 +563,11 @@
                     </td>
                     <!-- Air Ticket Total for total -->
                     <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalAirTicketTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalAirTicketTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                     <!-- Other Monthly cells for total -->
                     <td 
-                      v-for="month in months" 
+                      v-for="month in monthsList" 
                       :key="'total-other-' + month"
                       class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                     >
@@ -575,7 +575,7 @@
                     </td>
                     <!-- Other Total for total -->
                     <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalBenefitsOtherTotalLocal(category, location, visibleYears[0], months) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalBenefitsOtherTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
                     </td>
                   </tr>
                 </template>
@@ -598,7 +598,7 @@
                 </td>
                 <!-- Medical Monthly cells for hotel total -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'hotel-medical-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -606,11 +606,11 @@
                 </td>
                 <!-- Medical Total for hotel total -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalMedicalTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalMedicalTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
                 <!-- Uniforms Monthly cells for hotel total -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'hotel-uniforms-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -618,11 +618,11 @@
                 </td>
                 <!-- Uniforms Total for hotel total -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalUniformsTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalUniformsTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
                 <!-- Employee Meal Monthly cells for hotel total -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'hotel-employee-meal-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -630,11 +630,11 @@
                 </td>
                 <!-- Employee Meal Total for hotel total -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalEmployeeMealTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalEmployeeMealTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
                 <!-- Transport Monthly cells for hotel total -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'hotel-transport-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -642,11 +642,11 @@
                 </td>
                 <!-- Transport Total for hotel total -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalTransportTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalTransportTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
                 <!-- Telephone Monthly cells for hotel total -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'hotel-telephone-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -654,11 +654,11 @@
                 </td>
                 <!-- Telephone Total for hotel total -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalTelephoneTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalTelephoneTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
                 <!-- Air Ticket Monthly cells for hotel total -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'hotel-air-ticket-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -666,11 +666,11 @@
                 </td>
                 <!-- Air Ticket Total for hotel total -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalAirTicketTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalAirTicketTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
                 <!-- Other Monthly cells for hotel total -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'hotel-other-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -678,7 +678,7 @@
                 </td>
                 <!-- Other Total for hotel total -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalBenefitsOtherTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalBenefitsOtherTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
               </tr>
               
@@ -695,7 +695,7 @@
                 </td>
                 <!-- Medical Monthly cells for ratio -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'ratio-medical-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -703,11 +703,11 @@
                 </td>
                 <!-- Medical Total for ratio -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioMedicalTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioMedicalTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
                 <!-- Uniforms Monthly cells for ratio -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'ratio-uniforms-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -715,11 +715,11 @@
                 </td>
                 <!-- Uniforms Total for ratio -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioUniformsTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioUniformsTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
                 <!-- Employee Meal Monthly cells for ratio -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'ratio-employee-meal-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -727,11 +727,11 @@
                 </td>
                 <!-- Employee Meal Total for ratio -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioEmployeeMealTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioEmployeeMealTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
                 <!-- Transport Monthly cells for ratio -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'ratio-transport-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -739,11 +739,11 @@
                 </td>
                 <!-- Transport Total for ratio -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioTransportTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioTransportTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
                 <!-- Telephone Monthly cells for ratio -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'ratio-telephone-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -751,11 +751,11 @@
                 </td>
                 <!-- Telephone Total for ratio -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioTelephoneTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioTelephoneTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
                 <!-- Air Ticket Monthly cells for ratio -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'ratio-air-ticket-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -763,11 +763,11 @@
                 </td>
                 <!-- Air Ticket Total for ratio -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioAirTicketTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioAirTicketTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
                 <!-- Other Monthly cells for ratio -->
                 <td 
-                  v-for="month in months" 
+                  v-for="month in monthsList" 
                   :key="'ratio-other-' + month"
                   class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                 >
@@ -775,7 +775,7 @@
                 </td>
                 <!-- Other Total for ratio -->
                 <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioBenefitsOtherTotalLocal(visibleYears[0], months) }}</span>
+                  <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioBenefitsOtherTotalLocal(visibleYears[0], monthsList) }}</span>
                 </td>
               </tr>
             </tbody>
@@ -788,7 +788,7 @@
   <script setup>
   import { FolderOpen, CheckCircle, BarChart3, Building2, Users } from 'lucide-vue-next';
   import { getPayrollRowsForLocation } from '@/components/utility/payroll/payroll_data_utils.js';
-  import { watch } from 'vue';
+  import { watch, computed } from 'vue';
   // Import the standardized calculation functions from payroll utility
   import {
     calculateSubTotalManagementCount,
@@ -840,15 +840,18 @@
     }
   });
 
+  // Computed property to ensure months are reactive
+  const monthsList = computed(() => props.months || ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]);
+
   // Debug props
   watch(() => props, (newProps) => {
-    console.log('EmployeeBenefitsTable props updated:', {
-      payrollRowsLength: newProps.payrollRows?.length,
-      payrollData: newProps.payrollData,
-      payrollRelatedData: newProps.payrollRelatedData,
-      visibleYears: newProps.visibleYears,
-      months: newProps.months
-    });
+    // console.log('EmployeeBenefitsTable props updated:', {
+    //   payrollRowsLength: newProps.payrollRows?.length,
+    //   payrollData: newProps.payrollData,
+    //   payrollRelatedData: newProps.payrollRelatedData,
+    //   visibleYears: newProps.visibleYears,
+    //   months: newProps.months
+    // });
   }, { deep: true, immediate: true });
 
   // Helper function to format money
@@ -918,30 +921,30 @@
 
   // Helper function to get monthly count value (similar to Payroll_Related.vue)
   function getMonthlyCountValueLocal(rowId, year, month) {
-    console.log('Getting monthly count for:', { rowId, year, month, payrollData: props.payrollData });
+    // console.log('Getting monthly count for:', { rowId, year, month, payrollData: props.payrollData }); 
     
     // Defensive check for payrollData - handle both ref and direct object
     const payrollDataValue = props.payrollData?.value || props.payrollData;
     if (!payrollDataValue) {
-      console.log('No payrollData available');
+      // console.log('No payrollData available');
       return 0;
     }
     
     const row = props.payrollRows.find(r => r.id === rowId);
     if (!row) {
-      console.log('No row found for ID:', rowId);
+      // console.log('No row found for ID:', rowId);
       return 0;
     }
     
-    console.log('Found row:', row);
+    // console.log('Found row:', row);
     
     // Check if there's an override for this specific month
     const countData = payrollDataValue[year]?.[rowId]?.['count'];
-    console.log('Count data for year/month:', countData);
+    // console.log('Count data for year/month:', countData);
     
     if (countData && typeof countData === 'object' && countData !== null && !Array.isArray(countData)) {
       const overrideValue = countData[month];
-      console.log('Override value for month', month, ':', overrideValue);
+      // console.log('Override value for month', month, ':', overrideValue);
       if (overrideValue !== undefined && overrideValue !== null) {
         return overrideValue;
       }
@@ -949,19 +952,19 @@
     
     // If no override exists, return the main count value (getter behavior)
     const mainCount = row.count || 0;
-    console.log('Using main count value:', mainCount);
+    // console.log('Using main count value:', mainCount);
     return mainCount;
   }
 
   // Helper function to get employee benefits values from payroll related data
   function getEmployeeBenefitsValue(row, field) {
     if (!props.visibleYears || props.visibleYears.length === 0) {
-      console.log('No visible years available');
+      // console.log('No visible years available');
       return 0;
     }
     
     const year = props.visibleYears[0];
-    console.log('Getting employee benefits value for:', { rowId: row.id, field, year, payrollRelatedData: props.payrollRelatedData });
+    // console.log('Getting employee benefits value for:', { rowId: row.id, field, year, payrollRelatedData: props.payrollRelatedData });
     
     // Handle different data structures for payrollRelatedData
     let payrollRelatedDataValue = props.payrollRelatedData;
@@ -980,11 +983,11 @@
     }
     
     if (!yearData) {
-      console.log('No year data found for year:', year);
+      // console.log('No year data found for year:', year);
       return 0;
     }
     
-    console.log('Year data found:', yearData);
+    // console.log('Year data found:', yearData);
     
     // Map field names to the expected format
     const fieldMappings = {
@@ -999,7 +1002,7 @@
     
     const mappedField = fieldMappings[field];
     if (!mappedField) {
-      console.log('No mapping found for field:', field);
+      // console.log('No mapping found for field:', field);
       return 0;
     }
     
@@ -1016,10 +1019,10 @@
       employeeBenefitsData = yearData[row.id];
     }
     
-    console.log('Employee benefits data for row:', row.id, employeeBenefitsData);
+    // console.log('Employee benefits data for row:', row.id, employeeBenefitsData); 
     
     const value = employeeBenefitsData?.[mappedField] || 0;
-    console.log('Final value for field', field, ':', value);
+    // console.log('Final value for field', field, ':', value);
     
     return value;
   }
@@ -1029,7 +1032,7 @@
     const medicalBase = getEmployeeBenefitsValue(row, 'medical');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = medicalBase * monthlyCount;
-    console.log('Medical calculation:', { rowId: row.id, medicalBase, monthlyCount, monthlyValue });
+    // console.log('Medical calculation:', { rowId: row.id, medicalBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 
@@ -1037,7 +1040,7 @@
     const uniformsBase = getEmployeeBenefitsValue(row, 'uniforms');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = uniformsBase * monthlyCount;
-    console.log('Uniforms calculation:', { rowId: row.id, uniformsBase, monthlyCount, monthlyValue });
+    // console.log('Uniforms calculation:', { rowId: row.id, uniformsBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 
@@ -1045,7 +1048,7 @@
     const employeeMealBase = getEmployeeBenefitsValue(row, 'employee_meal');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = employeeMealBase * monthlyCount;
-    console.log('Employee meal calculation:', { rowId: row.id, employeeMealBase, monthlyCount, monthlyValue });
+    // console.log('Employee meal calculation:', { rowId: row.id, employeeMealBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 
@@ -1053,7 +1056,7 @@
     const transportBase = getEmployeeBenefitsValue(row, 'transport');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = transportBase * monthlyCount;
-    console.log('Transport calculation:', { rowId: row.id, transportBase, monthlyCount, monthlyValue });
+    // console.log('Transport calculation:', { rowId: row.id, transportBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 
@@ -1061,7 +1064,7 @@
     const telephoneBase = getEmployeeBenefitsValue(row, 'telephone');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = telephoneBase * monthlyCount;
-    console.log('Telephone calculation:', { rowId: row.id, telephoneBase, monthlyCount, monthlyValue });
+    // console.log('Telephone calculation:', { rowId: row.id, telephoneBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 
@@ -1069,7 +1072,7 @@
     const airTicketBase = getEmployeeBenefitsValue(row, 'air_ticket');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = airTicketBase * monthlyCount;
-    console.log('Air ticket calculation:', { rowId: row.id, airTicketBase, monthlyCount, monthlyValue });
+    // console.log('Air ticket calculation:', { rowId: row.id, airTicketBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 
@@ -1077,13 +1080,14 @@
     const benefitsOtherBase = getEmployeeBenefitsValue(row, 'benefits_other');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = benefitsOtherBase * monthlyCount;
-    console.log('Benefits other calculation:', { rowId: row.id, benefitsOtherBase, monthlyCount, monthlyValue });
+    // console.log('Benefits other calculation:', { rowId: row.id, benefitsOtherBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 
   function calculateTotalMedicalValueLocal(row, year, months) {
+    const monthsToUse = months || monthsList.value;
     const medicalBase = getEmployeeBenefitsValue(row, 'medical');
-    const totalCount = months.reduce((sum, month) => {
+    const totalCount = monthsToUse.reduce((sum, month) => {
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + monthlyCount;
     }, 0);
@@ -1092,8 +1096,9 @@
   }
 
   function calculateTotalUniformsValueLocal(row, year, months) {
+    const monthsToUse = months || monthsList.value;
     const uniformsBase = getEmployeeBenefitsValue(row, 'uniforms');
-    const totalCount = months.reduce((sum, month) => {
+    const totalCount = monthsToUse.reduce((sum, month) => {
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + monthlyCount;
     }, 0);
@@ -1102,8 +1107,9 @@
   }
 
   function calculateTotalEmployeeMealValueLocal(row, year, months) {
+    const monthsToUse = months || monthsList.value;
     const employeeMealBase = getEmployeeBenefitsValue(row, 'employee_meal');
-    const totalCount = months.reduce((sum, month) => {
+    const totalCount = monthsToUse.reduce((sum, month) => {
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + monthlyCount;
     }, 0);
@@ -1112,8 +1118,9 @@
   }
 
   function calculateTotalTransportValueLocal(row, year, months) {
+    const monthsToUse = months || monthsList.value;
     const transportBase = getEmployeeBenefitsValue(row, 'transport');
-    const totalCount = months.reduce((sum, month) => {
+    const totalCount = monthsToUse.reduce((sum, month) => {
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + monthlyCount;
     }, 0);
@@ -1122,8 +1129,9 @@
   }
 
   function calculateTotalTelephoneValueLocal(row, year, months) {
+    const monthsToUse = months || monthsList.value;
     const telephoneBase = getEmployeeBenefitsValue(row, 'telephone');
-    const totalCount = months.reduce((sum, month) => {
+    const totalCount = monthsToUse.reduce((sum, month) => {
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + monthlyCount;
     }, 0);
@@ -1132,8 +1140,9 @@
   }
 
   function calculateTotalAirTicketValueLocal(row, year, months) {
+    const monthsToUse = months || monthsList.value;
     const airTicketBase = getEmployeeBenefitsValue(row, 'air_ticket');
-    const totalCount = months.reduce((sum, month) => {
+    const totalCount = monthsToUse.reduce((sum, month) => {
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + monthlyCount;
     }, 0);
@@ -1142,8 +1151,9 @@
   }
 
   function calculateTotalBenefitsOtherValueLocal(row, year, months) {
+    const monthsToUse = months || monthsList.value;
     const benefitsOtherBase = getEmployeeBenefitsValue(row, 'benefits_other');
-    const totalCount = months.reduce((sum, month) => {
+    const totalCount = monthsToUse.reduce((sum, month) => {
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + monthlyCount;
     }, 0);
@@ -1223,7 +1233,7 @@
   }
 
   function calculateSubTotalManagementMedicalTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const medicalBase = getEmployeeBenefitsValue(row, 'medical');
@@ -1237,7 +1247,7 @@
   }
 
   function calculateSubTotalManagementUniformsTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const uniformsBase = getEmployeeBenefitsValue(row, 'uniforms');
@@ -1251,7 +1261,7 @@
   }
 
   function calculateSubTotalManagementEmployeeMealTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const employeeMealBase = getEmployeeBenefitsValue(row, 'employee_meal');
@@ -1265,7 +1275,7 @@
   }
 
   function calculateSubTotalManagementTransportTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const transportBase = getEmployeeBenefitsValue(row, 'transport');
@@ -1279,7 +1289,7 @@
   }
 
   function calculateSubTotalManagementTelephoneTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const telephoneBase = getEmployeeBenefitsValue(row, 'telephone');
@@ -1293,7 +1303,7 @@
   }
 
   function calculateSubTotalManagementAirTicketTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const airTicketBase = getEmployeeBenefitsValue(row, 'air_ticket');
@@ -1307,7 +1317,7 @@
   }
 
   function calculateSubTotalManagementBenefitsOtherTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const benefitsOtherBase = getEmployeeBenefitsValue(row, 'benefits_other');
@@ -1392,7 +1402,7 @@
   }
 
   function calculateSubTotalNonManagementMedicalTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const medicalBase = getEmployeeBenefitsValue(row, 'medical');
@@ -1406,7 +1416,7 @@
   }
 
   function calculateSubTotalNonManagementUniformsTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const uniformsBase = getEmployeeBenefitsValue(row, 'uniforms');
@@ -1420,7 +1430,7 @@
   }
 
   function calculateSubTotalNonManagementEmployeeMealTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const employeeMealBase = getEmployeeBenefitsValue(row, 'employee_meal');
@@ -1434,7 +1444,7 @@
   }
 
   function calculateSubTotalNonManagementTransportTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const transportBase = getEmployeeBenefitsValue(row, 'transport');
@@ -1448,7 +1458,7 @@
   }
 
   function calculateSubTotalNonManagementTelephoneTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const telephoneBase = getEmployeeBenefitsValue(row, 'telephone');
@@ -1462,7 +1472,7 @@
   }
 
   function calculateSubTotalNonManagementAirTicketTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const airTicketBase = getEmployeeBenefitsValue(row, 'air_ticket');
@@ -1476,7 +1486,7 @@
   }
 
   function calculateSubTotalNonManagementBenefitsOtherTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const benefitsOtherBase = getEmployeeBenefitsValue(row, 'benefits_other');
@@ -1561,7 +1571,7 @@
   }
 
   function calculateLocationTotalMedicalTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const medicalBase = getEmployeeBenefitsValue(row, 'medical');
@@ -1575,7 +1585,7 @@
   }
 
   function calculateLocationTotalUniformsTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const uniformsBase = getEmployeeBenefitsValue(row, 'uniforms');
@@ -1589,7 +1599,7 @@
   }
 
   function calculateLocationTotalEmployeeMealTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const employeeMealBase = getEmployeeBenefitsValue(row, 'employee_meal');
@@ -1603,7 +1613,7 @@
   }
 
   function calculateLocationTotalTransportTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const transportBase = getEmployeeBenefitsValue(row, 'transport');
@@ -1617,7 +1627,7 @@
   }
 
   function calculateLocationTotalTelephoneTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const telephoneBase = getEmployeeBenefitsValue(row, 'telephone');
@@ -1631,7 +1641,7 @@
   }
 
   function calculateLocationTotalAirTicketTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const airTicketBase = getEmployeeBenefitsValue(row, 'air_ticket');
@@ -1645,7 +1655,7 @@
   }
 
   function calculateLocationTotalBenefitsOtherTotalLocal(category, location, year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const rows = props.payrollRows.filter(row => row.category === category && row.departmentLocation === location);
     const totalValue = rows.reduce((sum, row) => {
       const benefitsOtherBase = getEmployeeBenefitsValue(row, 'benefits_other');
@@ -1669,7 +1679,7 @@
   }
 
   function calculateHotelTotalMedicalTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const medicalBase = getEmployeeBenefitsValue(row, 'medical');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
@@ -1691,7 +1701,7 @@
   }
 
   function calculateHotelTotalUniformsTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const uniformsBase = getEmployeeBenefitsValue(row, 'uniforms');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
@@ -1713,7 +1723,7 @@
   }
 
   function calculateHotelTotalEmployeeMealTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const employeeMealBase = getEmployeeBenefitsValue(row, 'employee_meal');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
@@ -1735,7 +1745,7 @@
   }
 
   function calculateHotelTotalTransportTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const transportBase = getEmployeeBenefitsValue(row, 'transport');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
@@ -1757,7 +1767,7 @@
   }
 
   function calculateHotelTotalTelephoneTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const telephoneBase = getEmployeeBenefitsValue(row, 'telephone');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
@@ -1779,7 +1789,7 @@
   }
 
   function calculateHotelTotalAirTicketTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const airTicketBase = getEmployeeBenefitsValue(row, 'air_ticket');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
@@ -1801,7 +1811,7 @@
   }
 
   function calculateHotelTotalBenefitsOtherTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const benefitsOtherBase = getEmployeeBenefitsValue(row, 'benefits_other');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
@@ -1826,7 +1836,7 @@
   }
 
   function calculateEmployeeRoomRatioMedicalTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const medicalBase = getEmployeeBenefitsValue(row, 'medical');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
@@ -1852,7 +1862,7 @@
   }
 
   function calculateEmployeeRoomRatioUniformsTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const uniformsBase = getEmployeeBenefitsValue(row, 'uniforms');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
@@ -1878,7 +1888,7 @@
   }
 
   function calculateEmployeeRoomRatioEmployeeMealTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const employeeMealBase = getEmployeeBenefitsValue(row, 'employee_meal');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
@@ -1904,7 +1914,7 @@
   }
 
   function calculateEmployeeRoomRatioTransportTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const transportBase = getEmployeeBenefitsValue(row, 'transport');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
@@ -1930,7 +1940,7 @@
   }
 
   function calculateEmployeeRoomRatioTelephoneTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const telephoneBase = getEmployeeBenefitsValue(row, 'telephone');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
@@ -1956,7 +1966,7 @@
   }
 
   function calculateEmployeeRoomRatioAirTicketTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const airTicketBase = getEmployeeBenefitsValue(row, 'air_ticket');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
@@ -1982,7 +1992,7 @@
   }
 
   function calculateEmployeeRoomRatioBenefitsOtherTotalLocal(year, months) {
-    const monthsToUse = months || props.months;
+    const monthsToUse = months || monthsList.value;
     const totalValue = props.payrollRows.reduce((sum, row) => {
       const benefitsOtherBase = getEmployeeBenefitsValue(row, 'benefits_other');
       const totalCount = monthsToUse.reduce((monthSum, month) => {
