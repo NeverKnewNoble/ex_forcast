@@ -31,25 +31,25 @@
                 </div>
               </th>
               <!-- Vacation Column -->
-              <th colspan="13" class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm">
+              <th v-if="hasVacationData" colspan="13" class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm">
                 <div class="flex items-center justify-center gap-1">
                   <span class="font-semibold">Vacation</span>
                 </div>
               </th>
               <!-- Relocation Column -->
-              <th colspan="13" class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm">
+              <th v-if="hasRelocationData" colspan="13" class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm">
                 <div class="flex items-center justify-center gap-1">
                   <span class="font-semibold">Relocation</span>
                 </div>
               </th>
               <!-- Severence & Indemnity Column -->
-              <th colspan="13" class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm">
+              <th v-if="hasSeverenceIndemnityData" colspan="13" class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm">
                 <div class="flex items-center justify-center gap-1">
                   <span class="font-semibold">Severence & Indemnity</span>
                 </div>
               </th>
               <!-- Other Column -->
-              <th colspan="13" class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm">
+              <th v-if="hasOtherData" colspan="13" class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm">
                 <div class="flex items-center justify-center gap-1">
                   <span class="font-semibold">Other</span>
                 </div>
@@ -57,53 +57,61 @@
             </tr>
             <tr class="bg-yellow-500/90 text-xs">
               <!-- Vacation Monthly Sub-columns -->
-              <th 
-                v-for="month in months" 
-                :key="'vacation-' + month"
-                class="px-2 py-1 text-center border border-yellow-300 min-w-[80px] font-medium"
-              >
-                {{ month }}
-              </th>
-              <!-- Vacation Total Sub-column -->
-              <th class="px-2 py-1 text-center border border-yellow-300 min-w-[100px] font-semibold">
-                Total
-              </th>
+              <template v-if="hasVacationData">
+                <th 
+                  v-for="month in months" 
+                  :key="'vacation-' + month"
+                  class="px-2 py-1 text-center border border-yellow-300 min-w-[80px] font-medium"
+                >
+                  {{ month }}
+                </th>
+                <!-- Vacation Total Sub-column -->
+                <th class="px-2 py-1 text-center border border-yellow-300 min-w-[100px] font-semibold">
+                  Total
+                </th>
+              </template>
               <!-- Relocation Monthly Sub-columns -->
-              <th 
-                v-for="month in months" 
-                :key="'relocation-' + month"
-                class="px-2 py-1 text-center border border-yellow-300 min-w-[80px] font-medium"
-              >
-                {{ month }}
-              </th>
-              <!-- Relocation Total Sub-column -->
-              <th class="px-2 py-1 text-center border border-yellow-300 min-w-[100px] font-semibold">
-                Total
-              </th>
+              <template v-if="hasRelocationData">
+                <th 
+                  v-for="month in months" 
+                  :key="'relocation-' + month"
+                  class="px-2 py-1 text-center border border-yellow-300 min-w-[80px] font-medium"
+                >
+                  {{ month }}
+                </th>
+                <!-- Relocation Total Sub-column -->
+                <th class="px-2 py-1 text-center border border-yellow-300 min-w-[100px] font-semibold">
+                  Total
+                </th>
+              </template>
               <!-- Severence & Indemnity Monthly Sub-columns -->
-              <th 
-                v-for="month in months" 
-                :key="'severence-indemnity-' + month"
-                class="px-2 py-1 text-center border border-yellow-300 min-w-[80px] font-medium"
-              >
-                {{ month }}
-              </th>
-              <!-- Severence & Indemnity Total Sub-column -->
-              <th class="px-2 py-1 text-center border border-yellow-300 min-w-[100px] font-semibold">
-                Total
-              </th>
+              <template v-if="hasSeverenceIndemnityData">
+                <th 
+                  v-for="month in months" 
+                  :key="'severence-indemnity-' + month"
+                  class="px-2 py-1 text-center border border-yellow-300 min-w-[80px] font-medium"
+                >
+                  {{ month }}
+                </th>
+                <!-- Severence & Indemnity Total Sub-column -->
+                <th class="px-2 py-1 text-center border border-yellow-300 min-w-[100px] font-semibold">
+                  Total
+                </th>
+              </template>
               <!-- Other Monthly Sub-columns -->
-              <th 
-                v-for="month in months" 
-                :key="'other-' + month"
-                class="px-2 py-1 text-center border border-yellow-300 min-w-[80px] font-medium"
-              >
-                {{ month }}
-              </th>
-              <!-- Other Total Sub-column -->
-              <th class="px-2 py-1 text-center border border-yellow-300 min-w-[100px] font-semibold">
-                Total
-              </th>
+              <template v-if="hasOtherData">
+                <th 
+                  v-for="month in months" 
+                  :key="'other-' + month"
+                  class="px-2 py-1 text-center border border-yellow-300 min-w-[80px] font-medium"
+                >
+                  {{ month }}
+                </th>
+                <!-- Other Total Sub-column -->
+                <th class="px-2 py-1 text-center border border-yellow-300 min-w-[100px] font-semibold">
+                  Total
+                </th>
+              </template>
             </tr>
           </thead>
           <tbody class="text-gray-700 bg-white text-sm">
@@ -111,7 +119,7 @@
             <template v-for="category in getUniqueCategories()" :key="category">
               <tr class="bg-yellow-100 border-b-2 border-yellow-300">
                 <td 
-                  :colspan="4 + 39" 
+                  :colspan="4 + (hasVacationData ? 13 : 0) + (hasRelocationData ? 13 : 0) + (hasSeverenceIndemnityData ? 13 : 0) + (hasOtherData ? 13 : 0)" 
                   class="px-3 py-2 font-bold text-yellow-800 text-left"
                 >
                   {{ category }}
@@ -122,7 +130,7 @@
                 <!-- Department Location Subdivider -->
                 <tr class="bg-yellow-50 border-b border-yellow-200">
                   <td 
-                    :colspan="4 + 39" 
+                    :colspan="4 + (hasVacationData ? 13 : 0) + (hasRelocationData ? 13 : 0) + (hasSeverenceIndemnityData ? 13 : 0) + (hasOtherData ? 13 : 0)" 
                     class="px-3 py-1.5 font-semibold text-yellow-700 text-left text-sm"
                   >
                     {{ location }}
@@ -148,53 +156,61 @@
                       {{ row.count }}
                     </td>
                     <!-- Vacation Monthly Values -->
-                    <td 
-                      v-for="month in months" 
-                      :key="'vacation-value-' + month + '-' + row.id"
-                      class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200"
-                    >
-                      <span class="font-mono text-xs text-yellow-700">{{ calculateMonthlyVacationValueLocal(row, visibleYears[0], month) }}</span>
-                    </td>
-                    <!-- Vacation Total -->
-                    <td class="px-2 py-1 text-right border border-yellow-200 font-semibold bg-yellow-50">
-                      <span class="font-mono text-xs text-yellow-900">{{ calculateTotalVacationValueLocal(row, visibleYears[0], months) }}</span>
-                    </td>
+                    <template v-if="hasVacationData">
+                      <td 
+                        v-for="month in months" 
+                        :key="'vacation-value-' + month + '-' + row.id"
+                        class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200"
+                      >
+                        <span class="font-mono text-xs text-yellow-700">{{ calculateMonthlyVacationValueLocal(row, visibleYears[0], month) }}</span>
+                      </td>
+                      <!-- Vacation Total -->
+                      <td class="px-2 py-1 text-right border border-yellow-200 font-semibold bg-yellow-50">
+                        <span class="font-mono text-xs text-yellow-900">{{ calculateTotalVacationValueLocal(row, visibleYears[0], months) }}</span>
+                      </td>
+                    </template>
                     <!-- Relocation Monthly Values -->
-                    <td 
-                      v-for="month in months" 
-                      :key="'relocation-value-' + month + '-' + row.id"
-                      class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200"
-                    >
-                      <span class="font-mono text-xs text-yellow-700">{{ calculateMonthlyRelocationValueLocal(row, visibleYears[0], month) }}</span>
-                    </td>
-                    <!-- Relocation Total -->
-                    <td class="px-2 py-1 text-right border border-yellow-200 font-semibold bg-yellow-50">
-                      <span class="font-mono text-xs text-yellow-900">{{ calculateTotalRelocationValueLocal(row, visibleYears[0], months) }}</span>
-                    </td>
+                    <template v-if="hasRelocationData">
+                      <td 
+                        v-for="month in months" 
+                        :key="'relocation-value-' + month + '-' + row.id"
+                        class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200"
+                      >
+                        <span class="font-mono text-xs text-yellow-700">{{ calculateMonthlyRelocationValueLocal(row, visibleYears[0], month) }}</span>
+                      </td>
+                      <!-- Relocation Total -->
+                      <td class="px-2 py-1 text-right border border-yellow-200 font-semibold bg-yellow-50">
+                        <span class="font-mono text-xs text-yellow-900">{{ calculateTotalRelocationValueLocal(row, visibleYears[0], months) }}</span>
+                      </td>
+                    </template>
                     <!-- Severence & Indemnity Monthly Values -->
-                    <td 
-                      v-for="month in months" 
-                      :key="'severence-indemnity-value-' + month + '-' + row.id"
-                      class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200"
-                    >
-                      <span class="font-mono text-xs text-yellow-700">{{ calculateMonthlySeverenceIndemnityValueLocal(row, visibleYears[0], month) }}</span>
-                    </td>
-                    <!-- Severence & Indemnity Total -->
-                    <td class="px-2 py-1 text-right border border-yellow-200 font-semibold bg-yellow-50">
-                      <span class="font-mono text-xs text-yellow-900">{{ calculateTotalSeverenceIndemnityValueLocal(row, visibleYears[0], months) }}</span>
-                    </td>
+                    <template v-if="hasSeverenceIndemnityData">
+                      <td 
+                        v-for="month in months" 
+                        :key="'severence-indemnity-value-' + month + '-' + row.id"
+                        class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200"
+                      >
+                        <span class="font-mono text-xs text-yellow-700">{{ calculateMonthlySeverenceIndemnityValueLocal(row, visibleYears[0], month) }}</span>
+                      </td>
+                      <!-- Severence & Indemnity Total -->
+                      <td class="px-2 py-1 text-right border border-yellow-200 font-semibold bg-yellow-50">
+                        <span class="font-mono text-xs text-yellow-900">{{ calculateTotalSeverenceIndemnityValueLocal(row, visibleYears[0], months) }}</span>
+                      </td>
+                    </template>
                     <!-- Other Monthly Values -->
-                    <td 
-                      v-for="month in months" 
-                      :key="'other-value-' + month + '-' + row.id"
-                      class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200"
-                    >
-                      <span class="font-mono text-xs text-yellow-700">{{ calculateMonthlyOtherValueLocal(row, visibleYears[0], month) }}</span>
-                    </td>
-                    <!-- Other Total -->
-                    <td class="px-2 py-1 text-right border border-yellow-200 font-semibold bg-yellow-50">
-                      <span class="font-mono text-xs text-yellow-900">{{ calculateTotalOtherValueLocal(row, visibleYears[0], months) }}</span>
-                    </td>
+                    <template v-if="hasOtherData">
+                      <td 
+                        v-for="month in months" 
+                        :key="'other-value-' + month + '-' + row.id"
+                        class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200"
+                      >
+                        <span class="font-mono text-xs text-yellow-700">{{ calculateMonthlyOtherValueLocal(row, visibleYears[0], month) }}</span>
+                      </td>
+                      <!-- Other Total -->
+                      <td class="px-2 py-1 text-right border border-yellow-200 font-semibold bg-yellow-50">
+                        <span class="font-mono text-xs text-yellow-900">{{ calculateTotalOtherValueLocal(row, visibleYears[0], months) }}</span>
+                      </td>
+                    </template>
                   </tr>
                 </template>
                 
@@ -210,53 +226,61 @@
                     <span class="font-mono text-sm font-semibold text-yellow-900">{{ calculateSubTotalManagementCountLocal(category, location) }}</span>
                   </td>
                   <!-- Vacation Monthly cells for subtotal -->
-                  <td 
-                    v-for="month in months" 
-                    :key="'subtotal-mgmt-vacation-' + month"
-                    class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
-                  >
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementVacationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
-                  </td>
-                  <!-- Vacation Total for subtotal -->
-                  <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementVacationTotalLocal(category, location, visibleYears[0], months) }}</span>
-                  </td>
+                  <template v-if="hasVacationData">
+                    <td 
+                      v-for="month in months" 
+                      :key="'subtotal-mgmt-vacation-' + month"
+                      class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
+                    >
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementVacationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                    </td>
+                    <!-- Vacation Total for subtotal -->
+                    <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementVacationTotalLocal(category, location, visibleYears[0], months) }}</span>
+                    </td>
+                  </template>
                   <!-- Relocation Monthly cells for subtotal -->
-                  <td 
-                    v-for="month in months" 
-                    :key="'subtotal-mgmt-relocation-' + month"
-                    class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
-                  >
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementRelocationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
-                  </td>
-                  <!-- Relocation Total for subtotal -->
-                  <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementRelocationTotalLocal(category, location, visibleYears[0], months) }}</span>
-                  </td>
+                  <template v-if="hasRelocationData">
+                    <td 
+                      v-for="month in months" 
+                      :key="'subtotal-mgmt-relocation-' + month"
+                      class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
+                    >
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementRelocationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                    </td>
+                    <!-- Relocation Total for subtotal -->
+                    <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementRelocationTotalLocal(category, location, visibleYears[0], months) }}</span>
+                    </td>
+                  </template>
                   <!-- Severence & Indemnity Monthly cells for subtotal -->
-                  <td 
-                    v-for="month in months" 
-                    :key="'subtotal-mgmt-severence-indemnity-' + month"
-                    class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
-                  >
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementSeverenceIndemnityMonthlyLocal(category, location, visibleYears[0], month) }}</span>
-                  </td>
-                  <!-- Severence & Indemnity Total for subtotal -->
-                  <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementSeverenceIndemnityTotalLocal(category, location, visibleYears[0], months) }}</span>
-                  </td>
+                  <template v-if="hasSeverenceIndemnityData">
+                    <td 
+                      v-for="month in months" 
+                      :key="'subtotal-mgmt-severence-indemnity-' + month"
+                      class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
+                    >
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementSeverenceIndemnityMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                    </td>
+                    <!-- Severence & Indemnity Total for subtotal -->
+                    <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementSeverenceIndemnityTotalLocal(category, location, visibleYears[0], months) }}</span>
+                    </td>
+                  </template>
                   <!-- Other Monthly cells for subtotal -->
-                  <td 
-                    v-for="month in months" 
-                    :key="'subtotal-mgmt-other-' + month"
-                    class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
-                  >
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementOtherMonthlyLocal(category, location, visibleYears[0], month) }}</span>
-                  </td>
-                  <!-- Other Total for subtotal -->
-                  <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementOtherTotalLocal(category, location, visibleYears[0], months) }}</span>
-                  </td>
+                  <template v-if="hasOtherData">
+                    <td 
+                      v-for="month in months" 
+                      :key="'subtotal-mgmt-other-' + month"
+                      class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
+                    >
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementOtherMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                    </td>
+                    <!-- Other Total for subtotal -->
+                    <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementOtherTotalLocal(category, location, visibleYears[0], months) }}</span>
+                    </td>
+                  </template>
                 </tr>
                 
                 <!-- Sub-Total Non-Management Row -->
@@ -271,53 +295,61 @@
                     <span class="font-mono text-sm font-semibold text-yellow-900">{{ calculateSubTotalNonManagementCountLocal(category, location) }}</span>
                   </td>
                   <!-- Vacation Monthly cells for subtotal -->
-                  <td 
-                    v-for="month in months" 
-                    :key="'subtotal-nonmgmt-vacation-' + month"
-                    class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
-                  >
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementVacationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
-                  </td>
-                  <!-- Vacation Total for subtotal -->
-                  <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementVacationTotalLocal(category, location, visibleYears[0], months) }}</span>
-                  </td>
+                  <template v-if="hasVacationData">
+                    <td 
+                      v-for="month in months" 
+                      :key="'subtotal-nonmgmt-vacation-' + month"
+                      class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
+                    >
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementVacationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                    </td>
+                    <!-- Vacation Total for subtotal -->
+                    <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementVacationTotalLocal(category, location, visibleYears[0], months) }}</span>
+                    </td>
+                  </template>
                   <!-- Relocation Monthly cells for subtotal -->
-                  <td 
-                    v-for="month in months" 
-                    :key="'subtotal-nonmgmt-relocation-' + month"
-                    class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
-                  >
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementRelocationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
-                  </td>
-                  <!-- Relocation Total for subtotal -->
-                  <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementRelocationTotalLocal(category, location, visibleYears[0], months) }}</span>
-                  </td>
+                  <template v-if="hasRelocationData">
+                    <td 
+                      v-for="month in months" 
+                      :key="'subtotal-nonmgmt-relocation-' + month"
+                      class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
+                    >
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementRelocationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                    </td>
+                    <!-- Relocation Total for subtotal -->
+                    <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementRelocationTotalLocal(category, location, visibleYears[0], months) }}</span>
+                    </td>
+                  </template>
                   <!-- Severence & Indemnity Monthly cells for subtotal -->
-                  <td 
-                    v-for="month in months" 
-                    :key="'subtotal-nonmgmt-severence-indemnity-' + month"
-                    class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
-                  >
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementSeverenceIndemnityMonthlyLocal(category, location, visibleYears[0], month) }}</span>
-                  </td>
-                  <!-- Severence & Indemnity Total for subtotal -->
-                  <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementSeverenceIndemnityTotalLocal(category, location, visibleYears[0], months) }}</span>
-                  </td>
+                  <template v-if="hasSeverenceIndemnityData">
+                    <td 
+                      v-for="month in months" 
+                      :key="'subtotal-nonmgmt-severence-indemnity-' + month"
+                      class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
+                    >
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementSeverenceIndemnityMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                    </td>
+                    <!-- Severence & Indemnity Total for subtotal -->
+                    <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementSeverenceIndemnityTotalLocal(category, location, visibleYears[0], months) }}</span>
+                    </td>
+                  </template>
                   <!-- Other Monthly cells for subtotal -->
-                  <td 
-                    v-for="month in months" 
-                    :key="'subtotal-nonmgmt-other-' + month"
-                    class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
-                  >
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementOtherMonthlyLocal(category, location, visibleYears[0], month) }}</span>
-                  </td>
-                  <!-- Other Total for subtotal -->
-                  <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementOtherTotalLocal(category, location, visibleYears[0], months) }}</span>
-                  </td>
+                  <template v-if="hasOtherData">
+                    <td 
+                      v-for="month in months" 
+                      :key="'subtotal-nonmgmt-other-' + month"
+                      class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
+                    >
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementOtherMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                    </td>
+                    <!-- Other Total for subtotal -->
+                    <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementOtherTotalLocal(category, location, visibleYears[0], months) }}</span>
+                    </td>
+                  </template>
                 </tr>
                 
                 <!-- Total Row -->
@@ -332,53 +364,61 @@
                     <span class="font-mono text-sm font-bold text-yellow-900">{{ calculateLocationTotalCountLocal(category, location) }}</span>
                   </td>
                   <!-- Vacation Monthly cells for total -->
-                  <td 
-                    v-for="month in months" 
-                    :key="'total-vacation-' + month"
-                    class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
-                  >
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalVacationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
-                  </td>
-                  <!-- Vacation Total for total -->
-                  <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalVacationTotalLocal(category, location, visibleYears[0], months) }}</span>
-                  </td>
+                  <template v-if="hasVacationData">
+                    <td 
+                      v-for="month in months" 
+                      :key="'total-vacation-' + month"
+                      class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+                    >
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalVacationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                    </td>
+                    <!-- Vacation Total for total -->
+                    <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalVacationTotalLocal(category, location, visibleYears[0], months) }}</span>
+                    </td>
+                  </template>
                   <!-- Relocation Monthly cells for total -->
-                  <td 
-                    v-for="month in months" 
-                    :key="'total-relocation-' + month"
-                    class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
-                  >
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalRelocationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
-                  </td>
-                  <!-- Relocation Total for total -->
-                  <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalRelocationTotalLocal(category, location, visibleYears[0], months) }}</span>
-                  </td>
+                  <template v-if="hasRelocationData">
+                    <td 
+                      v-for="month in months" 
+                      :key="'total-relocation-' + month"
+                      class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+                    >
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalRelocationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                    </td>
+                    <!-- Relocation Total for total -->
+                    <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalRelocationTotalLocal(category, location, visibleYears[0], months) }}</span>
+                    </td>
+                  </template>
                   <!-- Severence & Indemnity Monthly cells for total -->
-                  <td 
-                    v-for="month in months" 
-                    :key="'total-severence-indemnity-' + month"
-                    class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
-                  >
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalSeverenceIndemnityMonthlyLocal(category, location, visibleYears[0], month) }}</span>
-                  </td>
-                  <!-- Severence & Indemnity Total for total -->
-                  <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalSeverenceIndemnityTotalLocal(category, location, visibleYears[0], months) }}</span>
-                  </td>
+                  <template v-if="hasSeverenceIndemnityData">
+                    <td 
+                      v-for="month in months" 
+                      :key="'total-severence-indemnity-' + month"
+                      class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+                    >
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalSeverenceIndemnityMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                    </td>
+                    <!-- Severence & Indemnity Total for total -->
+                    <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalSeverenceIndemnityTotalLocal(category, location, visibleYears[0], months) }}</span>
+                    </td>
+                  </template>
                   <!-- Other Monthly cells for total -->
-                  <td 
-                    v-for="month in months" 
-                    :key="'total-other-' + month"
-                    class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
-                  >
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalOtherMonthlyLocal(category, location, visibleYears[0], month) }}</span>
-                  </td>
-                  <!-- Other Total for total -->
-                  <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalOtherTotalLocal(category, location, visibleYears[0], months) }}</span>
-                  </td>
+                  <template v-if="hasOtherData">
+                    <td 
+                      v-for="month in months" 
+                      :key="'total-other-' + month"
+                      class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+                    >
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalOtherMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                    </td>
+                    <!-- Other Total for total -->
+                    <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalOtherTotalLocal(category, location, visibleYears[0], months) }}</span>
+                    </td>
+                  </template>
                 </tr>
               </template>
             </template>
@@ -399,53 +439,61 @@
                 <span class="font-mono text-sm font-bold text-yellow-900">{{ calculateHotelTotalCountLocal() }}</span>
               </td>
               <!-- Vacation Monthly cells for hotel total -->
-              <td 
-                v-for="month in months" 
-                :key="'hotel-vacation-' + month"
-                class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
-              >
-                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalVacationMonthlyLocal(visibleYears[0], month) }}</span>
-              </td>
-              <!-- Vacation Total for hotel total -->
-              <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalVacationTotalLocal(visibleYears[0], months) }}</span>
-              </td>
+              <template v-if="hasVacationData">
+                <td 
+                  v-for="month in months" 
+                  :key="'hotel-vacation-' + month"
+                  class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+                >
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalVacationMonthlyLocal(visibleYears[0], month) }}</span>
+                </td>
+                <!-- Vacation Total for hotel total -->
+                <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalVacationTotalLocal(visibleYears[0], months) }}</span>
+                </td>
+              </template>
               <!-- Relocation Monthly cells for hotel total -->
-              <td 
-                v-for="month in months" 
-                :key="'hotel-relocation-' + month"
-                class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
-              >
-                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalRelocationMonthlyLocal(visibleYears[0], month) }}</span>
-              </td>
-              <!-- Relocation Total for hotel total -->
-              <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalRelocationTotalLocal(visibleYears[0], months) }}</span>
-              </td>
+              <template v-if="hasRelocationData">
+                <td 
+                  v-for="month in months" 
+                  :key="'hotel-relocation-' + month"
+                  class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+                >
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalRelocationMonthlyLocal(visibleYears[0], month) }}</span>
+                </td>
+                <!-- Relocation Total for hotel total -->
+                <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalRelocationTotalLocal(visibleYears[0], months) }}</span>
+                </td>
+              </template>
               <!-- Severence & Indemnity Monthly cells for hotel total -->
-              <td 
-                v-for="month in months" 
-                :key="'hotel-severence-indemnity-' + month"
-                class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
-              >
-                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalSeverenceIndemnityMonthlyLocal(visibleYears[0], month) }}</span>
-              </td>
-              <!-- Severence & Indemnity Total for hotel total -->
-              <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalSeverenceIndemnityTotalLocal(visibleYears[0], months) }}</span>
-              </td>
+              <template v-if="hasSeverenceIndemnityData">
+                <td 
+                  v-for="month in months" 
+                  :key="'hotel-severence-indemnity-' + month"
+                  class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+                >
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalSeverenceIndemnityMonthlyLocal(visibleYears[0], month) }}</span>
+                </td>
+                <!-- Severence & Indemnity Total for hotel total -->
+                <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalSeverenceIndemnityTotalLocal(visibleYears[0], months) }}</span>
+                </td>
+              </template>
               <!-- Other Monthly cells for hotel total -->
-              <td 
-                v-for="month in months" 
-                :key="'hotel-other-' + month"
-                class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
-              >
-                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalOtherMonthlyLocal(visibleYears[0], month) }}</span>
-              </td>
-              <!-- Other Total for hotel total -->
-              <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalOtherTotalLocal(visibleYears[0], months) }}</span>
-              </td>
+              <template v-if="hasOtherData">
+                <td 
+                  v-for="month in months" 
+                  :key="'hotel-other-' + month"
+                  class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+                >
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalOtherMonthlyLocal(visibleYears[0], month) }}</span>
+                </td>
+                <!-- Other Total for hotel total -->
+                <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalOtherTotalLocal(visibleYears[0], months) }}</span>
+                </td>
+              </template>
             </tr>
             
             <!-- Employee/Room Ratio Row -->
@@ -460,53 +508,61 @@
                 <span class="font-mono text-sm font-bold text-yellow-900">{{ calculateEmployeeRoomRatioLocal() }}</span>
               </td>
               <!-- Vacation Monthly cells for ratio -->
-              <td 
-                v-for="month in months" 
-                :key="'ratio-vacation-' + month"
-                class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
-              >
-                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioVacationMonthlyLocal(visibleYears[0], month) }}</span>
-              </td>
-              <!-- Vacation Total for ratio -->
-              <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioVacationTotalLocal(visibleYears[0], months) }}</span>
-              </td>
+              <template v-if="hasVacationData">
+                <td 
+                  v-for="month in months" 
+                  :key="'ratio-vacation-' + month"
+                  class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+                >
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioVacationMonthlyLocal(visibleYears[0], month) }}</span>
+                </td>
+                <!-- Vacation Total for ratio -->
+                <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioVacationTotalLocal(visibleYears[0], months) }}</span>
+                </td>
+              </template>
               <!-- Relocation Monthly cells for ratio -->
-              <td 
-                v-for="month in months" 
-                :key="'ratio-relocation-' + month"
-                class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
-              >
-                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioRelocationMonthlyLocal(visibleYears[0], month) }}</span>
-              </td>
-              <!-- Relocation Total for ratio -->
-              <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioRelocationTotalLocal(visibleYears[0], months) }}</span>
-              </td>
+              <template v-if="hasRelocationData">
+                <td 
+                  v-for="month in months" 
+                  :key="'ratio-relocation-' + month"
+                  class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+                >
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioRelocationMonthlyLocal(visibleYears[0], month) }}</span>
+                </td>
+                <!-- Relocation Total for ratio -->
+                <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioRelocationTotalLocal(visibleYears[0], months) }}</span>
+                </td>
+              </template>
               <!-- Severence & Indemnity Monthly cells for ratio -->
-              <td 
-                v-for="month in months" 
-                :key="'ratio-severence-indemnity-' + month"
-                class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
-              >
-                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioSeverenceIndemnityMonthlyLocal(visibleYears[0], month) }}</span>
-              </td>
-              <!-- Severence & Indemnity Total for ratio -->
-              <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioSeverenceIndemnityTotalLocal(visibleYears[0], months) }}</span>
-              </td>
+              <template v-if="hasSeverenceIndemnityData">
+                <td 
+                  v-for="month in months" 
+                  :key="'ratio-severence-indemnity-' + month"
+                  class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+                >
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioSeverenceIndemnityMonthlyLocal(visibleYears[0], month) }}</span>
+                </td>
+                <!-- Severence & Indemnity Total for ratio -->
+                <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioSeverenceIndemnityTotalLocal(visibleYears[0], months) }}</span>
+                </td>
+              </template>
               <!-- Other Monthly cells for ratio -->
-              <td 
-                v-for="month in months" 
-                :key="'ratio-other-' + month"
-                class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
-              >
-                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioOtherMonthlyLocal(visibleYears[0], month) }}</span>
-              </td>
-              <!-- Other Total for ratio -->
-              <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioOtherTotalLocal(visibleYears[0], months) }}</span>
-              </td>
+              <template v-if="hasOtherData">
+                <td 
+                  v-for="month in months" 
+                  :key="'ratio-other-' + month"
+                  class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+                >
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioOtherMonthlyLocal(visibleYears[0], month) }}</span>
+                </td>
+                <!-- Other Total for ratio -->
+                <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                  <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioOtherTotalLocal(visibleYears[0], months) }}</span>
+                </td>
+              </template>
             </tr>
           </tbody>
         </table>
@@ -518,7 +574,7 @@
 <script setup>
 import { FolderOpen, CheckCircle, BarChart3, Building2, Users } from 'lucide-vue-next';
 import { getPayrollRowsForLocation } from '@/components/utility/payroll/payroll_data_utils.js';
-import { watch } from 'vue';
+import { watch, computed } from 'vue';
 // Import the standardized calculation functions from payroll utility
 import {
   calculateSubTotalManagementCount,
@@ -744,6 +800,35 @@ function getSupplementaryPayValue(row, field) {
   
   return value;
 }
+
+// Computed properties to check for data presence in each column
+const hasVacationData = computed(() => {
+  return props.payrollRows.some(row => {
+    const value = getSupplementaryPayValue(row, 'vacation');
+    return value && value > 0;
+  });
+});
+
+const hasRelocationData = computed(() => {
+  return props.payrollRows.some(row => {
+    const value = getSupplementaryPayValue(row, 'relocation');
+    return value && value > 0;
+  });
+});
+
+const hasSeverenceIndemnityData = computed(() => {
+  return props.payrollRows.some(row => {
+    const value = getSupplementaryPayValue(row, 'severence_indemnity');
+    return value && value > 0;
+  });
+});
+
+const hasOtherData = computed(() => {
+  return props.payrollRows.some(row => {
+    const value = getSupplementaryPayValue(row, 'other');
+    return value && value > 0;
+  });
+});
 
 // Updated calculation functions to use the new helper
 function calculateMonthlyVacationValueLocal(row, year, month) {
