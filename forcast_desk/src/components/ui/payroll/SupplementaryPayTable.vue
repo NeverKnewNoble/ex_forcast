@@ -566,13 +566,13 @@ const props = defineProps({
 
 // Debug props
 watch(() => props, (newProps) => {
-  console.log('SupplementaryPayTable props updated:', {
-    payrollRowsLength: newProps.payrollRows?.length,
-    payrollData: newProps.payrollData,
-    payrollRelatedData: newProps.payrollRelatedData,
-    visibleYears: newProps.visibleYears,
-    months: newProps.months
-  });
+  // console.log('SupplementaryPayTable props updated:', {
+  //   payrollRowsLength: newProps.payrollRows?.length,
+  //   payrollData: newProps.payrollData,
+  //   payrollRelatedData: newProps.payrollRelatedData,
+  //   visibleYears: newProps.visibleYears,
+  //   months: newProps.months
+  // });
 }, { deep: true, immediate: true });
 
 // Helper function to format money
@@ -642,30 +642,30 @@ function calculateEmployeeRoomRatioLocal() {
 
 // Helper function to get monthly count value (similar to Payroll_Related.vue)
 function getMonthlyCountValueLocal(rowId, year, month) {
-  console.log('Getting monthly count for:', { rowId, year, month, payrollData: props.payrollData });
+  // console.log('Getting monthly count for:', { rowId, year, month, payrollData: props.payrollData }); 
   
   // Defensive check for payrollData - handle both ref and direct object
   const payrollDataValue = props.payrollData?.value || props.payrollData;
   if (!payrollDataValue) {
-    console.log('No payrollData available');
+    // console.log('No payrollData available');
     return 0;
   }
   
   const row = props.payrollRows.find(r => r.id === rowId);
   if (!row) {
-    console.log('No row found for ID:', rowId);
+    // console.log('No row found for ID:', rowId);
     return 0;
   }
   
-  console.log('Found row:', row);
+  // console.log('Found row:', row);
   
   // Check if there's an override for this specific month
   const countData = payrollDataValue[year]?.[rowId]?.['count'];
-  console.log('Count data for year/month:', countData);
+  // console.log('Count data for year/month:', countData);
   
   if (countData && typeof countData === 'object' && countData !== null && !Array.isArray(countData)) {
     const overrideValue = countData[month];
-    console.log('Override value for month', month, ':', overrideValue);
+    // console.log('Override value for month', month, ':', overrideValue);
     if (overrideValue !== undefined && overrideValue !== null) {
       return overrideValue;
     }
@@ -673,19 +673,19 @@ function getMonthlyCountValueLocal(rowId, year, month) {
   
   // If no override exists, return the main count value (getter behavior)
   const mainCount = row.count || 0;
-  console.log('Using main count value:', mainCount);
+  // console.log('Using main count value:', mainCount);
   return mainCount;
 }
 
 // Helper function to get supplementary pay values from payroll related data
 function getSupplementaryPayValue(row, field) {
   if (!props.visibleYears || props.visibleYears.length === 0) {
-    console.log('No visible years available');
+    // console.log('No visible years available');
     return 0;
   }
   
   const year = props.visibleYears[0];
-  console.log('Getting supplementary pay value for:', { rowId: row.id, field, year, payrollRelatedData: props.payrollRelatedData });
+  // console.log('Getting supplementary pay value for:', { rowId: row.id, field, year, payrollRelatedData: props.payrollRelatedData });
   
   // Handle different data structures for payrollRelatedData
   let payrollRelatedDataValue = props.payrollRelatedData;
@@ -704,11 +704,11 @@ function getSupplementaryPayValue(row, field) {
   }
   
   if (!yearData) {
-    console.log('No year data found for year:', year);
+    // console.log('No year data found for year:', year);
     return 0;
   }
   
-  console.log('Year data found:', yearData);
+  // console.log('Year data found:', yearData);
   
   // Map field names to the expected format
   const fieldMappings = {
@@ -737,10 +737,10 @@ function getSupplementaryPayValue(row, field) {
     supplementaryPayData = yearData[row.id];
   }
   
-  console.log('Supplementary pay data for row:', row.id, supplementaryPayData);
+  // console.log('Supplementary pay data for row:', row.id, supplementaryPayData);
   
   const value = supplementaryPayData?.[mappedField] || 0;
-  console.log('Final value for field', field, ':', value);
+  // console.log('Final value for field', field, ':', value);
   
   return value;
 }
@@ -750,7 +750,7 @@ function calculateMonthlyVacationValueLocal(row, year, month) {
   const vacationBase = getSupplementaryPayValue(row, 'vacation');
   const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
   const monthlyValue = vacationBase * monthlyCount;
-  console.log('Vacation calculation:', { rowId: row.id, vacationBase, monthlyCount, monthlyValue });
+  // console.log('Vacation calculation:', { rowId: row.id, vacationBase, monthlyCount, monthlyValue });
   return formatMoney(monthlyValue);
 }
 
@@ -758,7 +758,7 @@ function calculateMonthlyRelocationValueLocal(row, year, month) {
   const relocationBase = getSupplementaryPayValue(row, 'relocation');
   const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
   const monthlyValue = relocationBase * monthlyCount;
-  console.log('Relocation calculation:', { rowId: row.id, relocationBase, monthlyCount, monthlyValue });
+  // console.log('Relocation calculation:', { rowId: row.id, relocationBase, monthlyCount, monthlyValue });
   return formatMoney(monthlyValue);
 }
 
@@ -766,7 +766,7 @@ function calculateMonthlySeverenceIndemnityValueLocal(row, year, month) {
   const severenceBase = getSupplementaryPayValue(row, 'severence_indemnity');
   const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
   const monthlyValue = severenceBase * monthlyCount;
-  console.log('Severence calculation:', { rowId: row.id, severenceBase, monthlyCount, monthlyValue });
+  // console.log('Severence calculation:', { rowId: row.id, severenceBase, monthlyCount, monthlyValue });
   return formatMoney(monthlyValue);
 }
 
@@ -774,7 +774,7 @@ function calculateMonthlyOtherValueLocal(row, year, month) {
   const otherBase = getSupplementaryPayValue(row, 'other');
   const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
   const monthlyValue = otherBase * monthlyCount;
-  console.log('Other calculation:', { rowId: row.id, otherBase, monthlyCount, monthlyValue });
+  // console.log('Other calculation:', { rowId: row.id, otherBase, monthlyCount, monthlyValue });
   return formatMoney(monthlyValue);
 }
 
