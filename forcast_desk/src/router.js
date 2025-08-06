@@ -58,6 +58,11 @@ const routes = [
     path: '/payroll_related',
     component: () => import('@/pages/payroll/Payroll_Related.vue'),
   },
+  {
+    name: 'Bonus',
+    path: '/bonus',
+    component: () => import('@/pages/payroll/Bonus.vue'),
+  },
 
 ]
 
