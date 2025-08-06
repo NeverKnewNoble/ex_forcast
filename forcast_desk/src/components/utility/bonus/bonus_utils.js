@@ -108,7 +108,7 @@ export function getBonusTotal(row, year, months, getPayrollCellValueLocal) {
  * @returns {string} - Formatted bonus value
  */
 export function calculateSubTotalManagementBonus(rows, category, location, month, year, getPayrollCellValueLocal) {
-    const managementRows = rows.filter(row => row.position_type === 'Management');
+    const managementRows = rows.filter(row => row.position === 'Manager');
     let total = 0;
     
     managementRows.forEach(row => {
@@ -132,7 +132,7 @@ export function calculateSubTotalManagementBonus(rows, category, location, month
  * @returns {string} - Formatted total bonus value
  */
 export function calculateSubTotalManagementBonusTotal(rows, category, location, year, months, getPayrollCellValueLocal) {
-    const managementRows = rows.filter(row => row.position_type === 'Management');
+    const managementRows = rows.filter(row => row.position === 'Manager');
     let total = 0;
     
     managementRows.forEach(row => {
@@ -159,7 +159,7 @@ export function calculateSubTotalManagementBonusTotal(rows, category, location, 
  * @returns {string} - Formatted bonus value
  */
 export function calculateSubTotalNonManagementBonus(rows, category, location, month, year, getPayrollCellValueLocal) {
-    const nonManagementRows = rows.filter(row => row.position_type !== 'Management');
+    const nonManagementRows = rows.filter(row => row.position !== 'Manager');
     let total = 0;
     
     nonManagementRows.forEach(row => {
@@ -183,7 +183,7 @@ export function calculateSubTotalNonManagementBonus(rows, category, location, mo
  * @returns {string} - Formatted total bonus value
  */
 export function calculateSubTotalNonManagementBonusTotal(rows, category, location, year, months, getPayrollCellValueLocal) {
-    const nonManagementRows = rows.filter(row => row.position_type !== 'Management');
+    const nonManagementRows = rows.filter(row => row.position !== 'Manager');
     let total = 0;
     
     nonManagementRows.forEach(row => {

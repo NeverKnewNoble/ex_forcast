@@ -962,6 +962,29 @@
     handleBonusPercentageBlur as handleBonusPercentageBlurUtil
   } from '@/components/utility/bonus/bonus_utils.js';
   
+  // Import bonus calculations
+  import {
+    calculateSubTotalManagementBonusPercentage,
+    calculateSubTotalNonManagementBonusPercentage,
+    calculateLocationTotalBonusPercentage,
+    safeCalculateHotelTotalBonusPercentage,
+    calculateEmployeeRoomRatioBonusPercentage,
+    safeCalculateHotelTotalBonus,
+    safeCalculateHotelTotalBonusTotal,
+    safeCalculateEmployeeRoomRatioBonus,
+    safeCalculateEmployeeRoomRatioBonusTotal
+  } from '@/components/utility/bonus/bonus_calculations.js';
+  
+  // Import bonus calculation functions from bonus_utils
+  import {
+    calculateSubTotalManagementBonus,
+    calculateSubTotalManagementBonusTotal,
+    calculateSubTotalNonManagementBonus,
+    calculateSubTotalNonManagementBonusTotal,
+    calculateLocationTotalBonus,
+    calculateLocationTotalBonusTotal
+  } from '@/components/utility/bonus/bonus_utils.js';
+  
   // ************ Reactive state ****************
   const years = ref([]);
   const displayMode = ref("monthly");
@@ -1594,22 +1617,13 @@
   }
   
   
-  // Bonus-related functions
+  // Bonus-related functions - simplified wrappers
   function getBonusPercentage(row) {
-    // Get bonus percentage for a row
-    const year = visibleYears.value[0];
-    // console.log('getBonusPercentage called for row:', row.id, 'year:', year, 'bonusData:', bonusData.value);
-    // console.log('Available bonus data keys:', Object.keys(bonusData.value[year] || {}));
-    // console.log('All payroll row IDs:', payrollRows.value.map(r => r.id));
-    const result = getBonusPercentageUtil(row, year);
-    // console.log('getBonusPercentage result:', result);
-    return result;
+    return getBonusPercentageUtil(row, visibleYears.value[0]);
   }
   
   function getBonusValue(row, month) {
-    // Get bonus value for a specific month
-    const year = visibleYears.value[0];
-    return getBonusValueUtil(row, month, year, getPayrollCellValueLocal);
+    return getBonusValueUtil(row, month, visibleYears.value[0], getPayrollCellValueLocal);
   }
   
   function handleBonusPercentageInput(row, event, isSaved, visibleYears) {
@@ -1651,364 +1665,76 @@
     addBonusChange(row.id, 'bonus_percentage', year, value);
   }
   
-//   function getBonusValue(row, month) {
-//     // Get bonus value for a specific month
-//     const year = visibleYears.value[0];
-//     const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '') / 100;
-//     const countValue = getPayrollCellValueLocal(row.id, 'count', year, month);
-//     const salary = row.salary || 0;
-    
-//     const bonusValue = (countValue || 0) * salary * bonusPercentage;
-//     return formatMoney(bonusValue);
-//   }
-  
   function getBonusTotal(row) {
-    // Calculate total bonus for all months
-    const year = visibleYears.value[0];
-    return getBonusTotalUtil(row, year, months, getPayrollCellValueLocal);
+    return getBonusTotalUtil(row, visibleYears.value[0], months, getPayrollCellValueLocal);
   }
   
 
   
-  // Bonus calculation functions for subtotals and totals
+  // Bonus calculation functions for subtotals and totals - using imported functions
   function calculateSubTotalManagementBonusLocal(rows, category, location, month) {
-    const managementRows = rows.filter(row => 
-      row.category === category && 
-      row.departmentLocation === location && 
-      row.position === 'Manager'
-    );
-    let total = 0;
-    managementRows.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '') / 100;
-      const countValue = getPayrollCellValueLocal(row.id, 'count', visibleYears.value[0], month);
-      const salary = row.salary || 0;
-      total += (countValue || 0) * salary * bonusPercentage;
-    });
-    return formatMoney(total);
+    return calculateSubTotalManagementBonus(rows, category, location, month, visibleYears.value[0], getPayrollCellValueLocal);
   }
   
   function calculateSubTotalManagementBonusTotalLocal(rows, category, location) {
-    const managementRows = rows.filter(row => 
-      row.category === category && 
-      row.departmentLocation === location && 
-      row.position === 'Manager'
-    );
-    let total = 0;
-    managementRows.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '') / 100;
-      const salary = row.salary || 0;
-        months.forEach(month => {
-        const countValue = getPayrollCellValueLocal(row.id, 'count', visibleYears.value[0], month);
-        total += (countValue || 0) * salary * bonusPercentage;
-        });
-    });
-    return formatMoney(total);
+    return calculateSubTotalManagementBonusTotal(rows, category, location, visibleYears.value[0], months, getPayrollCellValueLocal);
   }
   
   function calculateSubTotalNonManagementBonusLocal(rows, category, location, month) {
-    const nonManagementRows = rows.filter(row => 
-      row.category === category && 
-      row.departmentLocation === location && 
-      row.position !== 'Manager'
-    );
-    let total = 0;
-    nonManagementRows.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '') / 100;
-      const countValue = getPayrollCellValueLocal(row.id, 'count', visibleYears.value[0], month);
-      const salary = row.salary || 0;
-      total += (countValue || 0) * salary * bonusPercentage;
-    });
-    return formatMoney(total);
+    return calculateSubTotalNonManagementBonus(rows, category, location, month, visibleYears.value[0], getPayrollCellValueLocal);
   }
   
   function calculateSubTotalNonManagementBonusTotalLocal(rows, category, location) {
-    const nonManagementRows = rows.filter(row => 
-      row.category === category && 
-      row.departmentLocation === location && 
-      row.position !== 'Manager'
-    );
-    let total = 0;
-    nonManagementRows.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '') / 100;
-      const salary = row.salary || 0;
-        months.forEach(month => {
-        const countValue = getPayrollCellValueLocal(row.id, 'count', visibleYears.value[0], month);
-        total += (countValue || 0) * salary * bonusPercentage;
-        });
-    });
-    return formatMoney(total);
+    return calculateSubTotalNonManagementBonusTotal(rows, category, location, visibleYears.value[0], months, getPayrollCellValueLocal);
   }
   
   function calculateLocationTotalBonusLocal(rows, category, location, month) {
-    const locationRows = rows.filter(row => 
-      row.category === category && 
-      row.departmentLocation === location
-    );
-    let total = 0;
-    locationRows.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '') / 100;
-      const countValue = getPayrollCellValueLocal(row.id, 'count', visibleYears.value[0], month);
-      const salary = row.salary || 0;
-      total += (countValue || 0) * salary * bonusPercentage;
-    });
-    return formatMoney(total);
+    return calculateLocationTotalBonus(rows, category, location, month, visibleYears.value[0], getPayrollCellValueLocal);
   }
   
   function calculateLocationTotalBonusTotalLocal(rows, category, location) {
-    const locationRows = rows.filter(row => 
-      row.category === category && 
-      row.departmentLocation === location
-    );
-    let total = 0;
-    locationRows.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '') / 100;
-      const salary = row.salary || 0;
-        months.forEach(month => {
-        const countValue = getPayrollCellValueLocal(row.id, 'count', visibleYears.value[0], month);
-        total += (countValue || 0) * salary * bonusPercentage;
-        });
-    });
-    return formatMoney(total);
+    return calculateLocationTotalBonusTotal(rows, category, location, visibleYears.value[0], months, getPayrollCellValueLocal);
   }
   
   function safeCalculateHotelTotalBonusLocal(month) {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    let total = 0;
-    payrollRows.value.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '') / 100;
-      const countValue = getPayrollCellValueLocal(row.id, 'count', visibleYears.value[0], month);
-      const salary = row.salary || 0;
-      total += (countValue || 0) * salary * bonusPercentage;
-    });
-    return formatMoney(total);
+    return safeCalculateHotelTotalBonus(payrollRows.value, month, visibleYears.value[0], getPayrollCellValueLocal);
   }
   
   function safeCalculateHotelTotalBonusTotalLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    let total = 0;
-    payrollRows.value.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '') / 100;
-      const salary = row.salary || 0;
-        months.forEach(month => {
-        const countValue = getPayrollCellValueLocal(row.id, 'count', visibleYears.value[0], month);
-        total += (countValue || 0) * salary * bonusPercentage;
-        });
-    });
-    return formatMoney(total);
+    return safeCalculateHotelTotalBonusTotal(payrollRows.value, visibleYears.value[0], months, getPayrollCellValueLocal);
   }
   
   function calculateEmployeeRoomRatioBonusLocal(payrollRows, totalRooms, month) {
-    if (!payrollRows || !Array.isArray(payrollRows) || payrollRows.length === 0 || !totalRooms) {
-      return formatMoney(0);
-    }
-    let total = 0;
-    payrollRows.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '') / 100;
-      const countValue = getPayrollCellValueLocal(row.id, 'count', visibleYears.value[0], month);
-      const salary = row.salary || 0;
-      total += (countValue || 0) * salary * bonusPercentage;
-    });
-    return formatMoney(total / totalRooms);
+    return safeCalculateEmployeeRoomRatioBonus(payrollRows, totalRooms, month, visibleYears.value[0], getPayrollCellValueLocal);
   }
   
   function calculateEmployeeRoomRatioBonusTotalLocal(payrollRows, totalRooms) {
-    if (!payrollRows || !Array.isArray(payrollRows) || payrollRows.length === 0 || !totalRooms) {
-      return formatMoney(0);
-    }
-    let total = 0;
-    payrollRows.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '') / 100;
-      const salary = row.salary || 0;
-        months.forEach(month => {
-        const countValue = getPayrollCellValueLocal(row.id, 'count', visibleYears.value[0], month);
-        total += (countValue || 0) * salary * bonusPercentage;
-        });
-    });
-    return formatMoney(total / totalRooms);
+    return safeCalculateEmployeeRoomRatioBonusTotal(payrollRows, totalRooms, visibleYears.value[0], months, getPayrollCellValueLocal);
   }
   
-  // Bonus percentage calculation functions
+  // Bonus percentage calculation functions - using imported functions
   function calculateSubTotalManagementBonusPercentageLocal(rows, category, location) {
-    const managementRows = rows.filter(row => 
-      row.category === category && 
-      row.departmentLocation === location && 
-      row.position === 'Manager'
-    );
-    if (managementRows.length === 0) return '0.00';
-    
-    let totalPercentage = 0;
-    managementRows.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '');
-      totalPercentage += parseFloat(bonusPercentage) || 0;
-    });
-    return formatPercentage(totalPercentage / managementRows.length);
+    return calculateSubTotalManagementBonusPercentage(rows, category, location, visibleYears.value[0]);
   }
   
   function calculateSubTotalNonManagementBonusPercentageLocal(rows, category, location) {
-    const nonManagementRows = rows.filter(row => 
-      row.category === category && 
-      row.departmentLocation === location && 
-      row.position !== 'Manager'
-    );
-    if (nonManagementRows.length === 0) return '0.00';
-    
-    let totalPercentage = 0;
-    nonManagementRows.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '');
-      totalPercentage += parseFloat(bonusPercentage) || 0;
-    });
-    return formatPercentage(totalPercentage / nonManagementRows.length);
+    return calculateSubTotalNonManagementBonusPercentage(rows, category, location, visibleYears.value[0]);
   }
   
   function calculateLocationTotalBonusPercentageLocal(rows, category, location) {
-    const locationRows = rows.filter(row => 
-      row.category === category && 
-      row.departmentLocation === location
-    );
-    if (locationRows.length === 0) return '0.00';
-    
-    let totalPercentage = 0;
-    locationRows.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '');
-      totalPercentage += parseFloat(bonusPercentage) || 0;
-    });
-    return formatPercentage(totalPercentage / locationRows.length);
+    return calculateLocationTotalBonusPercentage(rows, category, location, visibleYears.value[0]);
   }
   
   function safeCalculateHotelTotalBonusPercentageLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return '0.00';
-    }
-    
-    let totalPercentage = 0;
-    let validRows = 0;
-    payrollRows.value.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '');
-      const percentage = parseFloat(bonusPercentage) || 0;
-      if (percentage > 0) {
-        totalPercentage += percentage;
-        validRows++;
-      }
-    });
-    
-    return validRows > 0 ? formatPercentage(totalPercentage / validRows) : '0.00';
+    return safeCalculateHotelTotalBonusPercentage(payrollRows.value, visibleYears.value[0]);
   }
   
   function calculateEmployeeRoomRatioBonusPercentageLocal(payrollRows, totalRooms) {
-    if (!payrollRows || !Array.isArray(payrollRows) || payrollRows.length === 0 || !totalRooms) {
-      return '0.00';
-    }
-    
-    let totalPercentage = 0;
-    let validRows = 0;
-    payrollRows.forEach(row => {
-      const bonusPercentage = getBonusPercentage(row).replace(/[^\d.-]/g, '');
-      const percentage = parseFloat(bonusPercentage) || 0;
-      if (percentage > 0) {
-        totalPercentage += percentage;
-        validRows++;
-      }
-    });
-    
-    return validRows > 0 ? formatPercentage(totalPercentage / validRows) : '0.00';
+    return calculateEmployeeRoomRatioBonusPercentage(payrollRows, totalRooms, visibleYears.value[0]);
   }
   
   // Safe wrapper methods for hotel total calculations (keeping for compatibility)
-  function safeCalculateHotelTotalTaxPercentageLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      console.warn('safeCalculateHotelTotalTaxPercentageLocal called with empty or undefined payrollRows');
-      return '0.00';
-    }
-    return calculateHotelTotalTaxPercentageLocal(payrollRows.value);
-  }
-  
-  function safeCalculateHotelTotalTaxTotalLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    return calculateHotelTotalTaxTotalLocal(payrollRows.value);
-  }
-  
-  function safeCalculateHotelTotalVacationLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    return calculateHotelTotalVacationLocal(payrollRows.value);
-  }
-  
-  function safeCalculateHotelTotalRelocationLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    return calculateHotelTotalRelocationLocal(payrollRows.value);
-  }
-  
-  function safeCalculateHotelTotalSeverenceIndemnityLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    return calculateHotelTotalSeverenceIndemnityLocal(payrollRows.value);
-  }
-  
-  function safeCalculateHotelTotalOtherLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    return calculateHotelTotalOtherLocal(payrollRows.value);
-  }
-  
-  function safeCalculateHotelTotalMedicalLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    return calculateHotelTotalMedicalLocal(payrollRows.value);
-  }
-  
-  function safeCalculateHotelTotalUniformsLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    return calculateHotelTotalUniformsLocal(payrollRows.value);
-  }
-  
-  function safeCalculateHotelTotalEmployeeMealLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    return calculateHotelTotalEmployeeMealLocal(payrollRows.value);
-  }
-  
-  function safeCalculateHotelTotalTransportLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    return calculateHotelTotalTransportLocal(payrollRows.value);
-  }
-  
-  function safeCalculateHotelTotalTelephoneLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    return calculateHotelTotalTelephoneLocal(payrollRows.value);
-  }
-  
-  function safeCalculateHotelTotalAirTicketLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    return calculateHotelTotalAirTicketLocal(payrollRows.value);
-  }
-  
-  function safeCalculateHotelTotalBenefitsOtherLocal() {
-    if (!payrollRows.value || !Array.isArray(payrollRows.value) || payrollRows.value.length === 0) {
-      return formatMoney(0);
-    }
-    return calculateHotelTotalBenefitsOtherLocal(payrollRows.value);
-  }
+  // These functions are already imported from payroll_related utilities
   </script>
   
   

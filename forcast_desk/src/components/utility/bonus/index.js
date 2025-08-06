@@ -39,3 +39,16 @@ export {
   calculateEmployeeRoomRatioBonus,
   calculateEmployeeRoomRatioBonusTotal
 } from './bonus_utils.js';
+
+// Export bonus calculations
+export {
+  calculateSubTotalManagementBonusPercentage,
+  calculateSubTotalNonManagementBonusPercentage,
+  calculateLocationTotalBonusPercentage,
+  safeCalculateHotelTotalBonusPercentage,
+  calculateEmployeeRoomRatioBonusPercentage,
+  safeCalculateHotelTotalBonus,
+  safeCalculateHotelTotalBonusTotal,
+  safeCalculateEmployeeRoomRatioBonus,
+  safeCalculateEmployeeRoomRatioBonusTotal
+} from './bonus_calculations.js';
