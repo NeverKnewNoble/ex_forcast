@@ -184,7 +184,7 @@ const menuItems = [
     children: [
       { text: "Payroll Data", route: "/payroll_data", icon: HandCoins },
       { text: "Payroll Related", route: "/payroll_related", icon: Ellipsis },
-      { text: "Bonus", route: "/", icon: Ellipsis }
+      { text: "Bonus", route: "/bonus", icon: Ellipsis }
     ]
   },
   { text: "Receipts & Payments", route: "/", icon: ReceiptText },
