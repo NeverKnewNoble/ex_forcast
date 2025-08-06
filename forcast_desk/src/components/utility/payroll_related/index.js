@@ -161,7 +161,31 @@ export {
   calculateEmployeeRoomRatioTransportLocal,
   calculateEmployeeRoomRatioTelephoneLocal,
   calculateEmployeeRoomRatioAirTicketLocal,
-  calculateEmployeeRoomRatioBenefitsOtherLocal
+  calculateEmployeeRoomRatioBenefitsOtherLocal,
+  // New monthly calculation functions for supplementary pay
+  calculateMonthlyVacationValue,
+  calculateMonthlyRelocationValue,
+  calculateMonthlySeverenceIndemnityValue,
+  calculateMonthlyOtherValue,
+  calculateTotalVacationValue,
+  calculateTotalRelocationValue,
+  calculateTotalSeverenceIndemnityValue,
+  calculateTotalOtherValue,
+  // New monthly calculation functions for employee benefits
+  calculateMonthlyMedicalValue,
+  calculateMonthlyUniformsValue,
+  calculateMonthlyEmployeeMealValue,
+  calculateMonthlyTransportValue,
+  calculateMonthlyTelephoneValue,
+  calculateMonthlyAirTicketValue,
+  calculateMonthlyBenefitsOtherValue,
+  calculateTotalMedicalValue,
+  calculateTotalUniformsValue,
+  calculateTotalEmployeeMealValue,
+  calculateTotalTransportValue,
+  calculateTotalTelephoneValue,
+  calculateTotalAirTicketValue,
+  calculateTotalBenefitsOtherValue
 } from './calculation_handlers.js';
 
 // Export utility handlers
