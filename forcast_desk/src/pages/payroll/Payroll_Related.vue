@@ -649,7 +649,7 @@
                               <td 
                                 class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalManagementTaxPercentageLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}%</span>
+                                <span class="font-mono text-xs text-green-900"></span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
@@ -745,7 +745,7 @@
                               <td 
                                 class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
                               >
-                                <span class="font-mono text-xs text-green-900">{{ calculateSubTotalNonManagementTaxPercentageLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}%</span>
+                                <span class="font-mono text-xs text-green-900"></span>
                               </td>
                               <td 
                                 class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
@@ -841,7 +841,7 @@
                               <td 
                                 class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
                               >
-                                <span class="font-mono text-xs text-green-900">{{ calculateLocationTotalTaxPercentageLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}%</span>
+                                <span class="font-mono text-xs text-green-900"></span>
                               </td>
                               <td 
                                 class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
@@ -940,10 +940,10 @@
                           </template>
                           
                           <!-- Payroll Taxes cells for hotel total -->
-                          <td 
+                                                    <td 
                             class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
                           >
-                                                            <span class="font-mono text-xs text-green-900">{{ safeCalculateHotelTotalTaxPercentageLocal() }}%</span>
+                            <span class="font-mono text-xs text-green-900"></span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
@@ -1037,10 +1037,10 @@
                           </template>
                           
                           <!-- Payroll Taxes cells for ratio -->
-                          <td 
+                                                    <td 
                             class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
                           >
-                                                            <span class="font-mono text-xs text-green-900">{{ calculateEmployeeRoomRatioTaxPercentageLocal(payrollRows, totalRooms) }}%</span>
+                            <span class="font-mono text-xs text-green-900"></span>
                           </td>
                           <td 
                             class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
