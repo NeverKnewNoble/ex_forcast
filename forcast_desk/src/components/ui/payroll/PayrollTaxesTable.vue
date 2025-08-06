@@ -100,11 +100,11 @@
                       :key="'nssf-value-' + month + '-' + row.id"
                       class="px-2 py-1 text-right border border-green-200 hover:bg-green-50 outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
                     >
-                      <span class="font-mono text-xs text-green-700">0.00</span>
+                      <span class="font-mono text-xs text-green-700">{{ calculateNSSFMonthlyValue(row, month) }}</span>
                     </td>
                     <!-- NSSF Total -->
                     <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-50">
-                      <span class="font-mono text-xs text-green-900">0.00</span>
+                      <span class="font-mono text-xs text-green-900">{{ calculateNSSFTotalValue(row) }}</span>
                     </td>
                   </tr>
                 </template>
@@ -126,11 +126,11 @@
                     :key="'subtotal-mgmt-nssf-' + month"
                     class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
                   >
-                    <span class="font-mono text-xs text-green-900">0.00</span>
+                    <span class="font-mono text-xs text-green-900">{{ calculateSubTotalManagementNSSFMonthly(category, location, month) }}</span>
                   </td>
                   <!-- NSSF Total for subtotal -->
                   <td class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold">
-                    <span class="font-mono text-xs text-green-900">0.00</span>
+                    <span class="font-mono text-xs text-green-900">{{ calculateSubTotalManagementNSSFTotal(category, location) }}</span>
                   </td>
                 </tr>
                 
@@ -151,11 +151,11 @@
                     :key="'subtotal-nonmgmt-nssf-' + month"
                     class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
                   >
-                    <span class="font-mono text-xs text-green-900">0.00</span>
+                    <span class="font-mono text-xs text-green-900">{{ calculateSubTotalNonManagementNSSFMonthly(category, location, month) }}</span>
                   </td>
                   <!-- NSSF Total for subtotal -->
                   <td class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold">
-                    <span class="font-mono text-xs text-green-900">0.00</span>
+                    <span class="font-mono text-xs text-green-900">{{ calculateSubTotalNonManagementNSSFTotal(category, location) }}</span>
                   </td>
                 </tr>
                 
@@ -176,11 +176,11 @@
                     :key="'total-nssf-' + month"
                     class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
                   >
-                    <span class="font-mono text-xs text-green-900">0.00</span>
+                    <span class="font-mono text-xs text-green-900">{{ calculateLocationTotalNSSFMonthly(category, location, month) }}</span>
                   </td>
                   <!-- NSSF Total for total -->
                   <td class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold">
-                    <span class="font-mono text-xs text-green-900">0.00</span>
+                    <span class="font-mono text-xs text-green-900">{{ calculateLocationTotalNSSFTotal(category, location) }}</span>
                   </td>
                 </tr>
               </template>
@@ -207,11 +207,11 @@
                 :key="'hotel-nssf-' + month"
                 class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
               >
-                <span class="font-mono text-xs text-green-900">0.00</span>
+                <span class="font-mono text-xs text-green-900">{{ calculateHotelTotalNSSFMonthly(month) }}</span>
               </td>
               <!-- NSSF Total for hotel total -->
               <td class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold">
-                <span class="font-mono text-xs text-green-900">0.00</span>
+                <span class="font-mono text-xs text-green-900">{{ calculateHotelTotalNSSFTotal() }}</span>
               </td>
             </tr>
             
@@ -232,11 +232,11 @@
                 :key="'ratio-nssf-' + month"
                 class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
               >
-                <span class="font-mono text-xs text-green-900">0.00</span>
+                <span class="font-mono text-xs text-green-900">{{ calculateEmployeeRoomRatioNSSFMonthly(month) }}</span>
               </td>
               <!-- NSSF Total for ratio -->
               <td class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold">
-                <span class="font-mono text-xs text-green-900">0.00</span>
+                <span class="font-mono text-xs text-green-900">{{ calculateEmployeeRoomRatioNSSFTotal() }}</span>
               </td>
             </tr>
           </tbody>
@@ -248,6 +248,7 @@
 
 <script setup>
 import { FolderOpen, CheckCircle, BarChart3, Building2, Users } from 'lucide-vue-next';
+import { ref, computed, watch } from 'vue';
 import { getPayrollRowsForLocation } from '@/components/utility/payroll/payroll_data_utils.js';
 // Import the standardized calculation functions from payroll utility
 import {
@@ -293,6 +294,32 @@ const props = defineProps({
     default: () => {}
   }
 });
+
+// Debug reactive data
+// const debugData = computed(() => {
+//   console.log('PayrollTaxesTable Debug Data:', {
+//     payrollRows: props.payrollRows?.length,
+//     payrollData: Object.keys(props.payrollData || {}),
+//     visibleYears: props.visibleYears,
+//     payrollRelatedData: Object.keys(props.payrollRelatedData || {}),
+//     samplePayrollRow: props.payrollRows?.[0],
+//     samplePayrollData: props.payrollData?.[props.visibleYears?.[0]],
+//     sampleRelatedData: props.payrollRelatedData?.[props.visibleYears?.[0]],
+//     globalPayrollRelatedData: window.__payrollRelatedData,
+//     globalCurrentVisibleYears: window.__currentVisibleYears
+//   });
+//   return true;
+// });
+
+// Watch for data changes
+watch(() => [props.payrollRows, props.payrollData, props.payrollRelatedData, props.visibleYears], () => {
+  // console.log('PayrollTaxesTable Data Changed:', {
+  //   payrollRowsLength: props.payrollRows?.length,
+  //   payrollDataKeys: Object.keys(props.payrollData || {}),
+  //   relatedDataKeys: Object.keys(props.payrollRelatedData || {}),
+  //   visibleYears: props.visibleYears
+  // });
+}, { deep: true, immediate: true });
 
 // Helper function to format money
 function formatMoney(value) {
@@ -363,6 +390,239 @@ function calculateEmployeeRoomRatioLocal() {
   const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
   return calculateEmployeeRoomRatio(props.payrollRows, totalRooms);
 }
+
+// NSSF Calculation Functions - Made more reactive
+function getTaxTotalForRow(row) {
+  // Get the tax total from the Payroll_Related.vue data
+  // This should match the calculation used in Payroll_Related.vue
+  if (!props.visibleYears || props.visibleYears.length === 0) {
+    // console.log('getTaxTotalForRow: Missing visibleYears', { visibleYears: props.visibleYears });
+    return 0;
+  }
+  
+  const year = props.visibleYears[0];
+  const taxPercentage = getTaxPercentageForRow(row);
+  const salary = row.salary || 0;
+  const count = row.count || 0;
+  
+  // Calculate tax total: (salary * count * tax percentage) / 100
+  const taxTotal = (salary * count * taxPercentage) / 100;
+  // console.log('getTaxTotalForRow:', { rowId: row.id, salary, count, taxPercentage, taxTotal });
+  return taxTotal;
+}
+
+function getTaxPercentageForRow(row) {
+  // Get tax percentage from global payroll related data
+  if (!props.visibleYears || props.visibleYears.length === 0) {
+    return 0;
+  }
+  
+  const year = props.visibleYears[0];
+  const rowId = row.id;
+  
+  // console.log('getTaxPercentageForRow:', { rowId, year });
+  
+  // Try to get from global payroll related data
+  if (window.__payrollRelatedData && window.__payrollRelatedData[year]) {
+    const yearData = window.__payrollRelatedData[year];
+    const taxPercentage = yearData.payroll_taxes?.[rowId]?.tax_percentage;
+    
+    // console.log('Found tax percentage from global data:', { rowId, taxPercentage, yearData });
+    
+    if (taxPercentage !== undefined && taxPercentage !== null) {
+      return parseFloat(taxPercentage);
+    }
+  }
+  
+  // Try to get from props.payrollRelatedData
+  if (props.payrollRelatedData && props.payrollRelatedData[year]) {
+    const yearData = props.payrollRelatedData[year];
+    const taxPercentage = yearData.payroll_taxes?.[rowId]?.tax_percentage;
+    
+    // console.log('Found tax percentage from props:', { rowId, taxPercentage });
+    
+    if (taxPercentage !== undefined && taxPercentage !== null) {
+      return parseFloat(taxPercentage);
+    }
+  }
+  
+  // Default tax percentage if not found
+  // console.log('No tax percentage found for row:', rowId);
+  return 0;
+}
+
+function getMonthlyCountForRow(row, month) {
+  // Get monthly count from payroll data
+  if (!props.visibleYears || props.visibleYears.length === 0) {
+    return 0;
+  }
+  
+  const year = props.visibleYears[0];
+  const rowId = row.id;
+  
+  // console.log('getMonthlyCountForRow:', { rowId, year, month });
+  
+  // Try to get monthly count from payroll data
+  if (props.payrollData && props.payrollData[year] && props.payrollData[year][rowId]) {
+    const rowData = props.payrollData[year][rowId];
+    
+    // Check if count data exists
+    if (rowData.count && rowData.count[month] !== undefined) {
+      const monthlyCount = rowData.count[month];
+      // console.log('Found monthly count from payrollData:', { rowId, month, monthlyCount });
+      return parseFloat(monthlyCount);
+    }
+  }
+  
+  // If no monthly count found, use the main count
+  // console.log('No monthly count found, using main count:', { rowId, month, mainCount: row.count });
+  return row.count || 0;
+}
+
+function calculateNSSFMonthlyValue(row, month) {
+  // NSSF Monthly Value = Tax Total × Monthly Count for that month
+  const taxTotal = getTaxTotalForRow(row);
+  const monthlyCount = getMonthlyCountForRow(row, month);
+  
+  const nssfValue = taxTotal * monthlyCount;
+  // console.log('calculateNSSFMonthlyValue:', { rowId: row.id, month, taxTotal, monthlyCount, nssfValue });
+  return formatMoney(nssfValue);
+}
+
+function calculateNSSFTotalValue(row) {
+  // Calculate total NSSF for the year by summing all monthly values
+  let totalNSSF = 0;
+  
+  props.months.forEach(month => {
+    const taxTotal = getTaxTotalForRow(row);
+    const monthlyCount = getMonthlyCountForRow(row, month);
+    totalNSSF += taxTotal * monthlyCount;
+  });
+  
+  // console.log('calculateNSSFTotalValue:', { rowId: row.id, totalNSSF });
+  return formatMoney(totalNSSF);
+}
+
+// NSSF Calculation Functions for Summary Rows
+function calculateSubTotalManagementNSSFMonthly(category, location, month) {
+  const managementRows = getPayrollRowsForLocation(props.payrollRows, category, location).filter(row => 
+    row.position === 'Manager'
+  );
+  
+  let totalNSSF = 0;
+  managementRows.forEach(row => {
+    const taxTotal = getTaxTotalForRow(row);
+    const monthlyCount = getMonthlyCountForRow(row, month);
+    totalNSSF += taxTotal * monthlyCount;
+  });
+  
+  return formatMoney(totalNSSF);
+}
+
+function calculateSubTotalManagementNSSFTotal(category, location) {
+  let totalNSSF = 0;
+  
+  props.months.forEach(month => {
+    totalNSSF += parseFloat(calculateSubTotalManagementNSSFMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
+  });
+  
+  return formatMoney(totalNSSF);
+}
+
+function calculateSubTotalNonManagementNSSFMonthly(category, location, month) {
+  const nonManagementRows = getPayrollRowsForLocation(props.payrollRows, category, location).filter(row => 
+    row.position !== 'Manager'
+  );
+  
+  let totalNSSF = 0;
+  nonManagementRows.forEach(row => {
+    const taxTotal = getTaxTotalForRow(row);
+    const monthlyCount = getMonthlyCountForRow(row, month);
+    totalNSSF += taxTotal * monthlyCount;
+  });
+  
+  return formatMoney(totalNSSF);
+}
+
+function calculateSubTotalNonManagementNSSFTotal(category, location) {
+  let totalNSSF = 0;
+  
+  props.months.forEach(month => {
+    totalNSSF += parseFloat(calculateSubTotalNonManagementNSSFMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
+  });
+  
+  return formatMoney(totalNSSF);
+}
+
+function calculateLocationTotalNSSFMonthly(category, location, month) {
+  const locationRows = getPayrollRowsForLocation(props.payrollRows, category, location);
+  
+  let totalNSSF = 0;
+  locationRows.forEach(row => {
+    const taxTotal = getTaxTotalForRow(row);
+    const monthlyCount = getMonthlyCountForRow(row, month);
+    totalNSSF += taxTotal * monthlyCount;
+  });
+  
+  return formatMoney(totalNSSF);
+}
+
+function calculateLocationTotalNSSFTotal(category, location) {
+  let totalNSSF = 0;
+  
+  props.months.forEach(month => {
+    totalNSSF += parseFloat(calculateLocationTotalNSSFMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
+  });
+  
+  return formatMoney(totalNSSF);
+}
+
+function calculateHotelTotalNSSFMonthly(month) {
+  let totalNSSF = 0;
+  
+  props.payrollRows.forEach(row => {
+    const taxTotal = getTaxTotalForRow(row);
+    const monthlyCount = getMonthlyCountForRow(row, month);
+    totalNSSF += taxTotal * monthlyCount;
+  });
+  
+  return formatMoney(totalNSSF);
+}
+
+function calculateHotelTotalNSSFTotal() {
+  let totalNSSF = 0;
+  
+  props.months.forEach(month => {
+    totalNSSF += parseFloat(calculateHotelTotalNSSFMonthly(month).replace(/[^0-9.-]/g, '')) || 0;
+  });
+  
+  return formatMoney(totalNSSF);
+}
+
+function calculateEmployeeRoomRatioNSSFMonthly(month) {
+  const hotelTotalNSSF = parseFloat(calculateHotelTotalNSSFMonthly(month).replace(/[^0-9.-]/g, '')) || 0;
+  const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
+  
+  if (totalRooms > 0) {
+    return formatMoney(hotelTotalNSSF / totalRooms);
+  }
+  
+  return formatMoney(0);
+}
+
+function calculateEmployeeRoomRatioNSSFTotal() {
+  const hotelTotalNSSF = parseFloat(calculateHotelTotalNSSFTotal().replace(/[^0-9.-]/g, '')) || 0;
+  const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
+  
+  if (totalRooms > 0) {
+    return formatMoney(hotelTotalNSSF / totalRooms);
+  }
+  
+  return formatMoney(0);
+}
+
+// Force reactivity by accessing debugData
+// debugData.value;
 </script>
 
 <style scoped>

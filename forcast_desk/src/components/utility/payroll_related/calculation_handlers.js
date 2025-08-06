@@ -1266,3 +1266,370 @@ export function calculateEmployeeRoomRatioBenefitsOtherLocal(rows, totalRooms = 
   const numericValue = parseFloat(hotelTotal.replace(/[^0-9.-]/g, '')) || 0;
   return totalRooms > 0 ? formatMoney(numericValue / totalRooms) : formatMoney(0);
 } 
+
+//? Supplementary Pay Monthly Calculation Functions
+
+/**
+ *! Calculate monthly vacation value for a specific row and month
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {string} month - Month
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Monthly vacation value formatted as currency
+ */
+export function calculateMonthlyVacationValue(row, year, month, getMonthlyCountValue) {
+  const vacationBase = getVacation(row) || 0;
+  const monthlyCount = getMonthlyCountValue(row.id, year, month);
+  const monthlyValue = vacationBase * monthlyCount;
+  return formatMoney(monthlyValue);
+}
+
+/**
+ *! Calculate monthly relocation value for a specific row and month
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {string} month - Month
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Monthly relocation value formatted as currency
+ */
+export function calculateMonthlyRelocationValue(row, year, month, getMonthlyCountValue) {
+  const relocationBase = getRelocation(row) || 0;
+  const monthlyCount = getMonthlyCountValue(row.id, year, month);
+  const monthlyValue = relocationBase * monthlyCount;
+  return formatMoney(monthlyValue);
+}
+
+/**
+ *! Calculate monthly severence & indemnity value for a specific row and month
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {string} month - Month
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Monthly severence & indemnity value formatted as currency
+ */
+export function calculateMonthlySeverenceIndemnityValue(row, year, month, getMonthlyCountValue) {
+  const severenceBase = getSeverenceIndemnity(row) || 0;
+  const monthlyCount = getMonthlyCountValue(row.id, year, month);
+  const monthlyValue = severenceBase * monthlyCount;
+  return formatMoney(monthlyValue);
+}
+
+/**
+ *! Calculate monthly other value for a specific row and month
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {string} month - Month
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Monthly other value formatted as currency
+ */
+export function calculateMonthlyOtherValue(row, year, month, getMonthlyCountValue) {
+  const otherBase = getOther(row) || 0;
+  const monthlyCount = getMonthlyCountValue(row.id, year, month);
+  const monthlyValue = otherBase * monthlyCount;
+  return formatMoney(monthlyValue);
+}
+
+/**
+ *! Calculate total vacation value for a specific row across all months
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {Array} months - Array of months
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Total vacation value formatted as currency
+ */
+export function calculateTotalVacationValue(row, year, months, getMonthlyCountValue) {
+  const vacationBase = getVacation(row) || 0;
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValue(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = vacationBase * totalCount;
+  return formatMoney(totalValue);
+}
+
+/**
+ *! Calculate total relocation value for a specific row across all months
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {Array} months - Array of months
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Total relocation value formatted as currency
+ */
+export function calculateTotalRelocationValue(row, year, months, getMonthlyCountValue) {
+  const relocationBase = getRelocation(row) || 0;
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValue(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = relocationBase * totalCount;
+  return formatMoney(totalValue);
+}
+
+/**
+ *! Calculate total severence & indemnity value for a specific row across all months
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {Array} months - Array of months
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Total severence & indemnity value formatted as currency
+ */
+export function calculateTotalSeverenceIndemnityValue(row, year, months, getMonthlyCountValue) {
+  const severenceBase = getSeverenceIndemnity(row) || 0;
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValue(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = severenceBase * totalCount;
+  return formatMoney(totalValue);
+}
+
+/**
+ *! Calculate total other value for a specific row across all months
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {Array} months - Array of months
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Total other value formatted as currency
+ */
+export function calculateTotalOtherValue(row, year, months, getMonthlyCountValue) {
+  const otherBase = getOther(row) || 0;
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValue(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = otherBase * totalCount;
+  return formatMoney(totalValue);
+} 
+
+//? Employee Benefits Monthly Calculation Functions
+
+/**
+ *! Calculate monthly medical value for a specific row and month
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {string} month - Month
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Monthly medical value formatted as currency
+ */
+export function calculateMonthlyMedicalValue(row, year, month, getMonthlyCountValue) {
+  const medicalBase = getMedical(row) || 0;
+  const monthlyCount = getMonthlyCountValue(row.id, year, month);
+  const monthlyValue = medicalBase * monthlyCount;
+  return formatMoney(monthlyValue);
+}
+
+/**
+ *! Calculate monthly uniforms value for a specific row and month
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {string} month - Month
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Monthly uniforms value formatted as currency
+ */
+export function calculateMonthlyUniformsValue(row, year, month, getMonthlyCountValue) {
+  const uniformsBase = getUniforms(row) || 0;
+  const monthlyCount = getMonthlyCountValue(row.id, year, month);
+  const monthlyValue = uniformsBase * monthlyCount;
+  return formatMoney(monthlyValue);
+}
+
+/**
+ *! Calculate monthly employee meal value for a specific row and month
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {string} month - Month
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Monthly employee meal value formatted as currency
+ */
+export function calculateMonthlyEmployeeMealValue(row, year, month, getMonthlyCountValue) {
+  const employeeMealBase = getEmployeeMeal(row) || 0;
+  const monthlyCount = getMonthlyCountValue(row.id, year, month);
+  const monthlyValue = employeeMealBase * monthlyCount;
+  return formatMoney(monthlyValue);
+}
+
+/**
+ *! Calculate monthly transport value for a specific row and month
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {string} month - Month
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Monthly transport value formatted as currency
+ */
+export function calculateMonthlyTransportValue(row, year, month, getMonthlyCountValue) {
+  const transportBase = getTransport(row) || 0;
+  const monthlyCount = getMonthlyCountValue(row.id, year, month);
+  const monthlyValue = transportBase * monthlyCount;
+  return formatMoney(monthlyValue);
+}
+
+/**
+ *! Calculate monthly telephone value for a specific row and month
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {string} month - Month
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Monthly telephone value formatted as currency
+ */
+export function calculateMonthlyTelephoneValue(row, year, month, getMonthlyCountValue) {
+  const telephoneBase = getTelephone(row) || 0;
+  const monthlyCount = getMonthlyCountValue(row.id, year, month);
+  const monthlyValue = telephoneBase * monthlyCount;
+  return formatMoney(monthlyValue);
+}
+
+/**
+ *! Calculate monthly air ticket value for a specific row and month
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {string} month - Month
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Monthly air ticket value formatted as currency
+ */
+export function calculateMonthlyAirTicketValue(row, year, month, getMonthlyCountValue) {
+  const airTicketBase = getAirTicket(row) || 0;
+  const monthlyCount = getMonthlyCountValue(row.id, year, month);
+  const monthlyValue = airTicketBase * monthlyCount;
+  return formatMoney(monthlyValue);
+}
+
+/**
+ *! Calculate monthly benefits other value for a specific row and month
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {string} month - Month
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Monthly benefits other value formatted as currency
+ */
+export function calculateMonthlyBenefitsOtherValue(row, year, month, getMonthlyCountValue) {
+  const benefitsOtherBase = getBenefitsOther(row) || 0;
+  const monthlyCount = getMonthlyCountValue(row.id, year, month);
+  const monthlyValue = benefitsOtherBase * monthlyCount;
+  return formatMoney(monthlyValue);
+}
+
+/**
+ *! Calculate total medical value for a specific row across all months
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {Array} months - Array of months
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Total medical value formatted as currency
+ */
+export function calculateTotalMedicalValue(row, year, months, getMonthlyCountValue) {
+  const medicalBase = getMedical(row) || 0;
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValue(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = medicalBase * totalCount;
+  return formatMoney(totalValue);
+}
+
+/**
+ *! Calculate total uniforms value for a specific row across all months
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {Array} months - Array of months
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Total uniforms value formatted as currency
+ */
+export function calculateTotalUniformsValue(row, year, months, getMonthlyCountValue) {
+  const uniformsBase = getUniforms(row) || 0;
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValue(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = uniformsBase * totalCount;
+  return formatMoney(totalValue);
+}
+
+/**
+ *! Calculate total employee meal value for a specific row across all months
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {Array} months - Array of months
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Total employee meal value formatted as currency
+ */
+export function calculateTotalEmployeeMealValue(row, year, months, getMonthlyCountValue) {
+  const employeeMealBase = getEmployeeMeal(row) || 0;
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValue(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = employeeMealBase * totalCount;
+  return formatMoney(totalValue);
+}
+
+/**
+ *! Calculate total transport value for a specific row across all months
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {Array} months - Array of months
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Total transport value formatted as currency
+ */
+export function calculateTotalTransportValue(row, year, months, getMonthlyCountValue) {
+  const transportBase = getTransport(row) || 0;
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValue(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = transportBase * totalCount;
+  return formatMoney(totalValue);
+}
+
+/**
+ *! Calculate total telephone value for a specific row across all months
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {Array} months - Array of months
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Total telephone value formatted as currency
+ */
+export function calculateTotalTelephoneValue(row, year, months, getMonthlyCountValue) {
+  const telephoneBase = getTelephone(row) || 0;
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValue(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = telephoneBase * totalCount;
+  return formatMoney(totalValue);
+}
+
+/**
+ *! Calculate total air ticket value for a specific row across all months
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {Array} months - Array of months
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Total air ticket value formatted as currency
+ */
+export function calculateTotalAirTicketValue(row, year, months, getMonthlyCountValue) {
+  const airTicketBase = getAirTicket(row) || 0;
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValue(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = airTicketBase * totalCount;
+  return formatMoney(totalValue);
+}
+
+/**
+ *! Calculate total benefits other value for a specific row across all months
+ * @param {Object} row - Payroll row object
+ * @param {string} year - Year
+ * @param {Array} months - Array of months
+ * @param {Function} getMonthlyCountValue - Function to get monthly count value
+ * @returns {string} - Total benefits other value formatted as currency
+ */
+export function calculateTotalBenefitsOtherValue(row, year, months, getMonthlyCountValue) {
+  const benefitsOtherBase = getBenefitsOther(row) || 0;
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValue(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = benefitsOtherBase * totalCount;
+  return formatMoney(totalValue);
+} 

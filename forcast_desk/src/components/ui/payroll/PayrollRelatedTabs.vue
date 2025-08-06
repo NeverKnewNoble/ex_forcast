@@ -62,6 +62,26 @@
           />
       </div>
 
+      <!-- Employee Benefits Tab -->
+      <div v-if="activeTab === 'employee-benefits'" class="space-y-4">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+            <Heart class="w-4 h-4 text-blue-600" />
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800">Employee Benefits</h3>
+        </div>
+            <EmployeeBenefitsTable 
+            :payroll-rows="payrollRows" 
+            :payroll-data="payrollData"
+            :visible-years="visibleYears"
+            :months="months"
+            :payroll-related-data="payrollRelatedData"
+            :add-payroll-related-change="addPayrollRelatedChange"
+            :get-payroll-related-value="getPayrollRelatedValue"
+            :set-payroll-related-value="setPayrollRelatedValue"
+          />
+      </div>
+
       <!-- Total Tab -->
       <div v-if="activeTab === 'total'" class="space-y-4">
         <div class="flex items-center gap-2 mb-4">
@@ -87,9 +107,10 @@
 
 <script setup>
 import { ref } from 'vue';
-import { Shield, Gift, BarChart3 } from 'lucide-vue-next';
+import { Shield, Gift, BarChart3, Heart } from 'lucide-vue-next';
 import PayrollTaxesTable from './PayrollTaxesTable.vue';
 import SupplementaryPayTable from './SupplementaryPayTable.vue';
+import EmployeeBenefitsTable from './EmployeeBenefitsTable.vue';
 import TotalTable from './TotalTable.vue';
 
 // Props
@@ -142,6 +163,11 @@ const tabs = [
     id: 'supplementary-pay',
     name: 'Supplementary Pay',
     icon: Gift
+  },
+  {
+    id: 'employee-benefits',
+    name: 'Employee Benefits',
+    icon: Heart
   },
   {
     id: 'total',

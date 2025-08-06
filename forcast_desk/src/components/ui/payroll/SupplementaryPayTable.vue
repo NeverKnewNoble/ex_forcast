@@ -30,59 +30,77 @@
                   Count
                 </div>
               </th>
-              <!-- Medical Column -->
+              <!-- Vacation Column -->
               <th colspan="13" class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm">
                 <div class="flex items-center justify-center gap-1">
-                  <span class="font-semibold">Medical</span>
+                  <span class="font-semibold">Vacation</span>
                 </div>
               </th>
-              <!-- Employee Meal Column -->
+              <!-- Relocation Column -->
               <th colspan="13" class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm">
                 <div class="flex items-center justify-center gap-1">
-                  <span class="font-semibold">Employee Meal</span>
+                  <span class="font-semibold">Relocation</span>
                 </div>
               </th>
-              <!-- Transport Column -->
+              <!-- Severence & Indemnity Column -->
               <th colspan="13" class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm">
                 <div class="flex items-center justify-center gap-1">
-                  <span class="font-semibold">Transport</span>
+                  <span class="font-semibold">Severence & Indemnity</span>
+                </div>
+              </th>
+              <!-- Other Column -->
+              <th colspan="13" class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm">
+                <div class="flex items-center justify-center gap-1">
+                  <span class="font-semibold">Other</span>
                 </div>
               </th>
             </tr>
             <tr class="bg-yellow-500/90 text-xs">
-              <!-- Medical Monthly Sub-columns -->
+              <!-- Vacation Monthly Sub-columns -->
               <th 
                 v-for="month in months" 
-                :key="'medical-' + month"
+                :key="'vacation-' + month"
                 class="px-2 py-1 text-center border border-yellow-300 min-w-[80px] font-medium"
               >
                 {{ month }}
               </th>
-              <!-- Medical Total Sub-column -->
+              <!-- Vacation Total Sub-column -->
               <th class="px-2 py-1 text-center border border-yellow-300 min-w-[100px] font-semibold">
                 Total
               </th>
-              <!-- Employee Meal Monthly Sub-columns -->
+              <!-- Relocation Monthly Sub-columns -->
               <th 
                 v-for="month in months" 
-                :key="'meal-' + month"
+                :key="'relocation-' + month"
                 class="px-2 py-1 text-center border border-yellow-300 min-w-[80px] font-medium"
               >
                 {{ month }}
               </th>
-              <!-- Employee Meal Total Sub-column -->
+              <!-- Relocation Total Sub-column -->
               <th class="px-2 py-1 text-center border border-yellow-300 min-w-[100px] font-semibold">
                 Total
               </th>
-              <!-- Transport Monthly Sub-columns -->
+              <!-- Severence & Indemnity Monthly Sub-columns -->
               <th 
                 v-for="month in months" 
-                :key="'transport-' + month"
+                :key="'severence-indemnity-' + month"
                 class="px-2 py-1 text-center border border-yellow-300 min-w-[80px] font-medium"
               >
                 {{ month }}
               </th>
-              <!-- Transport Total Sub-column -->
+              <!-- Severence & Indemnity Total Sub-column -->
+              <th class="px-2 py-1 text-center border border-yellow-300 min-w-[100px] font-semibold">
+                Total
+              </th>
+              <!-- Other Monthly Sub-columns -->
+              <th 
+                v-for="month in months" 
+                :key="'other-' + month"
+                class="px-2 py-1 text-center border border-yellow-300 min-w-[80px] font-medium"
+              >
+                {{ month }}
+              </th>
+              <!-- Other Total Sub-column -->
               <th class="px-2 py-1 text-center border border-yellow-300 min-w-[100px] font-semibold">
                 Total
               </th>
@@ -129,41 +147,53 @@
                     <td class="px-3 py-2 text-right border-r border-yellow-200 font-mono text-sm">
                       {{ row.count }}
                     </td>
-                    <!-- Medical Monthly Values -->
+                    <!-- Vacation Monthly Values -->
                     <td 
                       v-for="month in months" 
-                      :key="'medical-value-' + month + '-' + row.id"
+                      :key="'vacation-value-' + month + '-' + row.id"
                       class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200"
                     >
-                      <span class="font-mono text-xs text-yellow-700">0.00</span>
+                      <span class="font-mono text-xs text-yellow-700">{{ calculateMonthlyVacationValueLocal(row, visibleYears[0], month) }}</span>
                     </td>
-                    <!-- Medical Total -->
+                    <!-- Vacation Total -->
                     <td class="px-2 py-1 text-right border border-yellow-200 font-semibold bg-yellow-50">
-                      <span class="font-mono text-xs text-yellow-900">0.00</span>
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateTotalVacationValueLocal(row, visibleYears[0], months) }}</span>
                     </td>
-                    <!-- Employee Meal Monthly Values -->
+                    <!-- Relocation Monthly Values -->
                     <td 
                       v-for="month in months" 
-                      :key="'meal-value-' + month + '-' + row.id"
+                      :key="'relocation-value-' + month + '-' + row.id"
                       class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200"
                     >
-                      <span class="font-mono text-xs text-yellow-700">0.00</span>
+                      <span class="font-mono text-xs text-yellow-700">{{ calculateMonthlyRelocationValueLocal(row, visibleYears[0], month) }}</span>
                     </td>
-                    <!-- Employee Meal Total -->
+                    <!-- Relocation Total -->
                     <td class="px-2 py-1 text-right border border-yellow-200 font-semibold bg-yellow-50">
-                      <span class="font-mono text-xs text-yellow-900">0.00</span>
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateTotalRelocationValueLocal(row, visibleYears[0], months) }}</span>
                     </td>
-                    <!-- Transport Monthly Values -->
+                    <!-- Severence & Indemnity Monthly Values -->
                     <td 
                       v-for="month in months" 
-                      :key="'transport-value-' + month + '-' + row.id"
+                      :key="'severence-indemnity-value-' + month + '-' + row.id"
                       class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200"
                     >
-                      <span class="font-mono text-xs text-yellow-700">0.00</span>
+                      <span class="font-mono text-xs text-yellow-700">{{ calculateMonthlySeverenceIndemnityValueLocal(row, visibleYears[0], month) }}</span>
                     </td>
-                    <!-- Transport Total -->
+                    <!-- Severence & Indemnity Total -->
                     <td class="px-2 py-1 text-right border border-yellow-200 font-semibold bg-yellow-50">
-                      <span class="font-mono text-xs text-yellow-900">0.00</span>
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateTotalSeverenceIndemnityValueLocal(row, visibleYears[0], months) }}</span>
+                    </td>
+                    <!-- Other Monthly Values -->
+                    <td 
+                      v-for="month in months" 
+                      :key="'other-value-' + month + '-' + row.id"
+                      class="px-2 py-1 text-right border border-yellow-200 hover:bg-yellow-50 outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200"
+                    >
+                      <span class="font-mono text-xs text-yellow-700">{{ calculateMonthlyOtherValueLocal(row, visibleYears[0], month) }}</span>
+                    </td>
+                    <!-- Other Total -->
+                    <td class="px-2 py-1 text-right border border-yellow-200 font-semibold bg-yellow-50">
+                      <span class="font-mono text-xs text-yellow-900">{{ calculateTotalOtherValueLocal(row, visibleYears[0], months) }}</span>
                     </td>
                   </tr>
                 </template>
@@ -179,41 +209,53 @@
                   <td class="px-3 py-2.5 text-right border-r border-yellow-300">
                     <span class="font-mono text-sm font-semibold text-yellow-900">{{ calculateSubTotalManagementCountLocal(category, location) }}</span>
                   </td>
-                  <!-- Medical Monthly cells for subtotal -->
+                  <!-- Vacation Monthly cells for subtotal -->
                   <td 
                     v-for="month in months" 
-                    :key="'subtotal-mgmt-medical-' + month"
+                    :key="'subtotal-mgmt-vacation-' + month"
                     class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                   >
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementVacationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
                   </td>
-                  <!-- Medical Total for subtotal -->
+                  <!-- Vacation Total for subtotal -->
                   <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementVacationTotalLocal(category, location, visibleYears[0], months) }}</span>
                   </td>
-                  <!-- Employee Meal Monthly cells for subtotal -->
+                  <!-- Relocation Monthly cells for subtotal -->
                   <td 
                     v-for="month in months" 
-                    :key="'subtotal-mgmt-meal-' + month"
+                    :key="'subtotal-mgmt-relocation-' + month"
                     class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                   >
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementRelocationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
                   </td>
-                  <!-- Employee Meal Total for subtotal -->
+                  <!-- Relocation Total for subtotal -->
                   <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementRelocationTotalLocal(category, location, visibleYears[0], months) }}</span>
                   </td>
-                  <!-- Transport Monthly cells for subtotal -->
+                  <!-- Severence & Indemnity Monthly cells for subtotal -->
                   <td 
                     v-for="month in months" 
-                    :key="'subtotal-mgmt-transport-' + month"
+                    :key="'subtotal-mgmt-severence-indemnity-' + month"
                     class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                   >
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementSeverenceIndemnityMonthlyLocal(category, location, visibleYears[0], month) }}</span>
                   </td>
-                  <!-- Transport Total for subtotal -->
+                  <!-- Severence & Indemnity Total for subtotal -->
                   <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementSeverenceIndemnityTotalLocal(category, location, visibleYears[0], months) }}</span>
+                  </td>
+                  <!-- Other Monthly cells for subtotal -->
+                  <td 
+                    v-for="month in months" 
+                    :key="'subtotal-mgmt-other-' + month"
+                    class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
+                  >
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementOtherMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                  </td>
+                  <!-- Other Total for subtotal -->
+                  <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalManagementOtherTotalLocal(category, location, visibleYears[0], months) }}</span>
                   </td>
                 </tr>
                 
@@ -228,41 +270,53 @@
                   <td class="px-3 py-2.5 text-right border-r border-yellow-300">
                     <span class="font-mono text-sm font-semibold text-yellow-900">{{ calculateSubTotalNonManagementCountLocal(category, location) }}</span>
                   </td>
-                  <!-- Medical Monthly cells for subtotal -->
+                  <!-- Vacation Monthly cells for subtotal -->
                   <td 
                     v-for="month in months" 
-                    :key="'subtotal-nonmgmt-medical-' + month"
+                    :key="'subtotal-nonmgmt-vacation-' + month"
                     class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                   >
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementVacationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
                   </td>
-                  <!-- Medical Total for subtotal -->
+                  <!-- Vacation Total for subtotal -->
                   <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementVacationTotalLocal(category, location, visibleYears[0], months) }}</span>
                   </td>
-                  <!-- Employee Meal Monthly cells for subtotal -->
+                  <!-- Relocation Monthly cells for subtotal -->
                   <td 
                     v-for="month in months" 
-                    :key="'subtotal-nonmgmt-meal-' + month"
+                    :key="'subtotal-nonmgmt-relocation-' + month"
                     class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                   >
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementRelocationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
                   </td>
-                  <!-- Employee Meal Total for subtotal -->
+                  <!-- Relocation Total for subtotal -->
                   <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementRelocationTotalLocal(category, location, visibleYears[0], months) }}</span>
                   </td>
-                  <!-- Transport Monthly cells for subtotal -->
+                  <!-- Severence & Indemnity Monthly cells for subtotal -->
                   <td 
                     v-for="month in months" 
-                    :key="'subtotal-nonmgmt-transport-' + month"
+                    :key="'subtotal-nonmgmt-severence-indemnity-' + month"
                     class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
                   >
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementSeverenceIndemnityMonthlyLocal(category, location, visibleYears[0], month) }}</span>
                   </td>
-                  <!-- Transport Total for subtotal -->
+                  <!-- Severence & Indemnity Total for subtotal -->
                   <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementSeverenceIndemnityTotalLocal(category, location, visibleYears[0], months) }}</span>
+                  </td>
+                  <!-- Other Monthly cells for subtotal -->
+                  <td 
+                    v-for="month in months" 
+                    :key="'subtotal-nonmgmt-other-' + month"
+                    class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold"
+                  >
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementOtherMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                  </td>
+                  <!-- Other Total for subtotal -->
+                  <td class="px-2 py-1.5 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-semibold">
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateSubTotalNonManagementOtherTotalLocal(category, location, visibleYears[0], months) }}</span>
                   </td>
                 </tr>
                 
@@ -277,41 +331,53 @@
                   <td class="px-3 py-3 text-right border-r border-yellow-300">
                     <span class="font-mono text-sm font-bold text-yellow-900">{{ calculateLocationTotalCountLocal(category, location) }}</span>
                   </td>
-                  <!-- Medical Monthly cells for total -->
+                  <!-- Vacation Monthly cells for total -->
                   <td 
                     v-for="month in months" 
-                    :key="'total-medical-' + month"
+                    :key="'total-vacation-' + month"
                     class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                   >
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalVacationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
                   </td>
-                  <!-- Medical Total for total -->
+                  <!-- Vacation Total for total -->
                   <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalVacationTotalLocal(category, location, visibleYears[0], months) }}</span>
                   </td>
-                  <!-- Employee Meal Monthly cells for total -->
+                  <!-- Relocation Monthly cells for total -->
                   <td 
                     v-for="month in months" 
-                    :key="'total-meal-' + month"
+                    :key="'total-relocation-' + month"
                     class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                   >
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalRelocationMonthlyLocal(category, location, visibleYears[0], month) }}</span>
                   </td>
-                  <!-- Employee Meal Total for total -->
+                  <!-- Relocation Total for total -->
                   <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalRelocationTotalLocal(category, location, visibleYears[0], months) }}</span>
                   </td>
-                  <!-- Transport Monthly cells for total -->
+                  <!-- Severence & Indemnity Monthly cells for total -->
                   <td 
                     v-for="month in months" 
-                    :key="'total-transport-' + month"
+                    :key="'total-severence-indemnity-' + month"
                     class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
                   >
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalSeverenceIndemnityMonthlyLocal(category, location, visibleYears[0], month) }}</span>
                   </td>
-                  <!-- Transport Total for total -->
+                  <!-- Severence & Indemnity Total for total -->
                   <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                    <span class="font-mono text-xs text-yellow-900">0.00</span>
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalSeverenceIndemnityTotalLocal(category, location, visibleYears[0], months) }}</span>
+                  </td>
+                  <!-- Other Monthly cells for total -->
+                  <td 
+                    v-for="month in months" 
+                    :key="'total-other-' + month"
+                    class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+                  >
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalOtherMonthlyLocal(category, location, visibleYears[0], month) }}</span>
+                  </td>
+                  <!-- Other Total for total -->
+                  <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                    <span class="font-mono text-xs text-yellow-900">{{ calculateLocationTotalOtherTotalLocal(category, location, visibleYears[0], months) }}</span>
                   </td>
                 </tr>
               </template>
@@ -332,41 +398,53 @@
               <td class="px-3 py-3 text-right border-r border-yellow-300">
                 <span class="font-mono text-sm font-bold text-yellow-900">{{ calculateHotelTotalCountLocal() }}</span>
               </td>
-              <!-- Medical Monthly cells for hotel total -->
+              <!-- Vacation Monthly cells for hotel total -->
               <td 
                 v-for="month in months" 
-                :key="'hotel-medical-' + month"
+                :key="'hotel-vacation-' + month"
                 class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
               >
-                <span class="font-mono text-xs text-yellow-900">0.00</span>
+                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalVacationMonthlyLocal(visibleYears[0], month) }}</span>
               </td>
-              <!-- Medical Total for hotel total -->
+              <!-- Vacation Total for hotel total -->
               <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">0.00</span>
+                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalVacationTotalLocal(visibleYears[0], months) }}</span>
               </td>
-              <!-- Employee Meal Monthly cells for hotel total -->
+              <!-- Relocation Monthly cells for hotel total -->
               <td 
                 v-for="month in months" 
-                :key="'hotel-meal-' + month"
+                :key="'hotel-relocation-' + month"
                 class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
               >
-                <span class="font-mono text-xs text-yellow-900">0.00</span>
+                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalRelocationMonthlyLocal(visibleYears[0], month) }}</span>
               </td>
-              <!-- Employee Meal Total for hotel total -->
+              <!-- Relocation Total for hotel total -->
               <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">0.00</span>
+                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalRelocationTotalLocal(visibleYears[0], months) }}</span>
               </td>
-              <!-- Transport Monthly cells for hotel total -->
+              <!-- Severence & Indemnity Monthly cells for hotel total -->
               <td 
                 v-for="month in months" 
-                :key="'hotel-transport-' + month"
+                :key="'hotel-severence-indemnity-' + month"
                 class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
               >
-                <span class="font-mono text-xs text-yellow-900">0.00</span>
+                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalSeverenceIndemnityMonthlyLocal(visibleYears[0], month) }}</span>
               </td>
-              <!-- Transport Total for hotel total -->
+              <!-- Severence & Indemnity Total for hotel total -->
               <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">0.00</span>
+                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalSeverenceIndemnityTotalLocal(visibleYears[0], months) }}</span>
+              </td>
+              <!-- Other Monthly cells for hotel total -->
+              <td 
+                v-for="month in months" 
+                :key="'hotel-other-' + month"
+                class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+              >
+                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalOtherMonthlyLocal(visibleYears[0], month) }}</span>
+              </td>
+              <!-- Other Total for hotel total -->
+              <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                <span class="font-mono text-xs text-yellow-900">{{ calculateHotelTotalOtherTotalLocal(visibleYears[0], months) }}</span>
               </td>
             </tr>
             
@@ -381,41 +459,53 @@
               <td class="px-3 py-3 text-right border-r border-yellow-300">
                 <span class="font-mono text-sm font-bold text-yellow-900">{{ calculateEmployeeRoomRatioLocal() }}</span>
               </td>
-              <!-- Medical Monthly cells for ratio -->
+              <!-- Vacation Monthly cells for ratio -->
               <td 
                 v-for="month in months" 
-                :key="'ratio-medical-' + month"
+                :key="'ratio-vacation-' + month"
                 class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
               >
-                <span class="font-mono text-xs text-yellow-900">0.00</span>
+                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioVacationMonthlyLocal(visibleYears[0], month) }}</span>
               </td>
-              <!-- Medical Total for ratio -->
+              <!-- Vacation Total for ratio -->
               <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">0.00</span>
+                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioVacationTotalLocal(visibleYears[0], months) }}</span>
               </td>
-              <!-- Employee Meal Monthly cells for ratio -->
+              <!-- Relocation Monthly cells for ratio -->
               <td 
                 v-for="month in months" 
-                :key="'ratio-meal-' + month"
+                :key="'ratio-relocation-' + month"
                 class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
               >
-                <span class="font-mono text-xs text-yellow-900">0.00</span>
+                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioRelocationMonthlyLocal(visibleYears[0], month) }}</span>
               </td>
-              <!-- Employee Meal Total for ratio -->
+              <!-- Relocation Total for ratio -->
               <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">0.00</span>
+                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioRelocationTotalLocal(visibleYears[0], months) }}</span>
               </td>
-              <!-- Transport Monthly cells for ratio -->
+              <!-- Severence & Indemnity Monthly cells for ratio -->
               <td 
                 v-for="month in months" 
-                :key="'ratio-transport-' + month"
+                :key="'ratio-severence-indemnity-' + month"
                 class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
               >
-                <span class="font-mono text-xs text-yellow-900">0.00</span>
+                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioSeverenceIndemnityMonthlyLocal(visibleYears[0], month) }}</span>
               </td>
-              <!-- Transport Total for ratio -->
+              <!-- Severence & Indemnity Total for ratio -->
               <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
-                <span class="font-mono text-xs text-yellow-900">0.00</span>
+                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioSeverenceIndemnityTotalLocal(visibleYears[0], months) }}</span>
+              </td>
+              <!-- Other Monthly cells for ratio -->
+              <td 
+                v-for="month in months" 
+                :key="'ratio-other-' + month"
+                class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold"
+              >
+                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioOtherMonthlyLocal(visibleYears[0], month) }}</span>
+              </td>
+              <!-- Other Total for ratio -->
+              <td class="px-2 py-2 text-right border border-yellow-300 bg-gradient-to-r from-yellow-100 to-yellow-200 font-bold">
+                <span class="font-mono text-xs text-yellow-900">{{ calculateEmployeeRoomRatioOtherTotalLocal(visibleYears[0], months) }}</span>
               </td>
             </tr>
           </tbody>
@@ -428,6 +518,7 @@
 <script setup>
 import { FolderOpen, CheckCircle, BarChart3, Building2, Users } from 'lucide-vue-next';
 import { getPayrollRowsForLocation } from '@/components/utility/payroll/payroll_data_utils.js';
+import { watch } from 'vue';
 // Import the standardized calculation functions from payroll utility
 import {
   calculateSubTotalManagementCount,
@@ -437,6 +528,18 @@ import {
   calculateEmployeeRoomRatio
 } from '@/components/utility/payroll/payroll_calculations.js';
 
+// Import the new monthly calculation functions for supplementary pay
+import {
+  calculateMonthlyVacationValue,
+  calculateMonthlyRelocationValue,
+  calculateMonthlySeverenceIndemnityValue,
+  calculateMonthlyOtherValue,
+  calculateTotalVacationValue,
+  calculateTotalRelocationValue,
+  calculateTotalSeverenceIndemnityValue,
+  calculateTotalOtherValue
+} from '@/components/utility/payroll_related/calculation_handlers.js';
+
 // Props
 const props = defineProps({
   payrollRows: {
@@ -444,6 +547,10 @@ const props = defineProps({
     default: () => []
   },
   payrollData: {
+    type: Object,
+    default: () => ({})
+  },
+  payrollRelatedData: {
     type: Object,
     default: () => ({})
   },
@@ -456,6 +563,17 @@ const props = defineProps({
     default: () => ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
   }
 });
+
+// Debug props
+watch(() => props, (newProps) => {
+  console.log('SupplementaryPayTable props updated:', {
+    payrollRowsLength: newProps.payrollRows?.length,
+    payrollData: newProps.payrollData,
+    payrollRelatedData: newProps.payrollRelatedData,
+    visibleYears: newProps.visibleYears,
+    months: newProps.months
+  });
+}, { deep: true, immediate: true });
 
 // Helper function to format money
 function formatMoney(value) {
@@ -520,6 +638,707 @@ function calculateEmployeeRoomRatioLocal() {
   
   const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
   return calculateEmployeeRoomRatio(props.payrollRows, totalRooms);
+}
+
+// Helper function to get monthly count value (similar to Payroll_Related.vue)
+function getMonthlyCountValueLocal(rowId, year, month) {
+  console.log('Getting monthly count for:', { rowId, year, month, payrollData: props.payrollData });
+  
+  // Defensive check for payrollData - handle both ref and direct object
+  const payrollDataValue = props.payrollData?.value || props.payrollData;
+  if (!payrollDataValue) {
+    console.log('No payrollData available');
+    return 0;
+  }
+  
+  const row = props.payrollRows.find(r => r.id === rowId);
+  if (!row) {
+    console.log('No row found for ID:', rowId);
+    return 0;
+  }
+  
+  console.log('Found row:', row);
+  
+  // Check if there's an override for this specific month
+  const countData = payrollDataValue[year]?.[rowId]?.['count'];
+  console.log('Count data for year/month:', countData);
+  
+  if (countData && typeof countData === 'object' && countData !== null && !Array.isArray(countData)) {
+    const overrideValue = countData[month];
+    console.log('Override value for month', month, ':', overrideValue);
+    if (overrideValue !== undefined && overrideValue !== null) {
+      return overrideValue;
+    }
+  }
+  
+  // If no override exists, return the main count value (getter behavior)
+  const mainCount = row.count || 0;
+  console.log('Using main count value:', mainCount);
+  return mainCount;
+}
+
+// Helper function to get supplementary pay values from payroll related data
+function getSupplementaryPayValue(row, field) {
+  if (!props.visibleYears || props.visibleYears.length === 0) {
+    console.log('No visible years available');
+    return 0;
+  }
+  
+  const year = props.visibleYears[0];
+  console.log('Getting supplementary pay value for:', { rowId: row.id, field, year, payrollRelatedData: props.payrollRelatedData });
+  
+  // Handle different data structures for payrollRelatedData
+  let payrollRelatedDataValue = props.payrollRelatedData;
+  
+  // If it's a ref, get the value
+  if (payrollRelatedDataValue?.value) {
+    payrollRelatedDataValue = payrollRelatedDataValue.value;
+  }
+  
+  // Try different data structures
+  let yearData = payrollRelatedDataValue?.[year];
+  
+  if (!yearData) {
+    // Try alternative structure
+    yearData = payrollRelatedDataValue?.relatedData?.[year];
+  }
+  
+  if (!yearData) {
+    console.log('No year data found for year:', year);
+    return 0;
+  }
+  
+  console.log('Year data found:', yearData);
+  
+  // Map field names to the expected format
+  const fieldMappings = {
+    'vacation': 'vacation',
+    'relocation': 'relocation', 
+    'severence_indemnity': 'severence_indemnity',
+    'other': 'other'
+  };
+  
+  const mappedField = fieldMappings[field];
+  if (!mappedField) {
+    console.log('No mapping found for field:', field);
+    return 0;
+  }
+  
+  // Try different data structures for supplementary pay
+  let supplementaryPayData = yearData.supplementary_pay?.[row.id];
+  
+  if (!supplementaryPayData) {
+    // Try alternative structure
+    supplementaryPayData = yearData[row.id]?.supplementary_pay;
+  }
+  
+  if (!supplementaryPayData) {
+    // Try direct access
+    supplementaryPayData = yearData[row.id];
+  }
+  
+  console.log('Supplementary pay data for row:', row.id, supplementaryPayData);
+  
+  const value = supplementaryPayData?.[mappedField] || 0;
+  console.log('Final value for field', field, ':', value);
+  
+  return value;
+}
+
+// Updated calculation functions to use the new helper
+function calculateMonthlyVacationValueLocal(row, year, month) {
+  const vacationBase = getSupplementaryPayValue(row, 'vacation');
+  const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
+  const monthlyValue = vacationBase * monthlyCount;
+  console.log('Vacation calculation:', { rowId: row.id, vacationBase, monthlyCount, monthlyValue });
+  return formatMoney(monthlyValue);
+}
+
+function calculateMonthlyRelocationValueLocal(row, year, month) {
+  const relocationBase = getSupplementaryPayValue(row, 'relocation');
+  const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
+  const monthlyValue = relocationBase * monthlyCount;
+  console.log('Relocation calculation:', { rowId: row.id, relocationBase, monthlyCount, monthlyValue });
+  return formatMoney(monthlyValue);
+}
+
+function calculateMonthlySeverenceIndemnityValueLocal(row, year, month) {
+  const severenceBase = getSupplementaryPayValue(row, 'severence_indemnity');
+  const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
+  const monthlyValue = severenceBase * monthlyCount;
+  console.log('Severence calculation:', { rowId: row.id, severenceBase, monthlyCount, monthlyValue });
+  return formatMoney(monthlyValue);
+}
+
+function calculateMonthlyOtherValueLocal(row, year, month) {
+  const otherBase = getSupplementaryPayValue(row, 'other');
+  const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
+  const monthlyValue = otherBase * monthlyCount;
+  console.log('Other calculation:', { rowId: row.id, otherBase, monthlyCount, monthlyValue });
+  return formatMoney(monthlyValue);
+}
+
+function calculateTotalVacationValueLocal(row, year, months) {
+  const vacationBase = getSupplementaryPayValue(row, 'vacation');
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = vacationBase * totalCount;
+  return formatMoney(totalValue);
+}
+
+function calculateTotalRelocationValueLocal(row, year, months) {
+  const relocationBase = getSupplementaryPayValue(row, 'relocation');
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = relocationBase * totalCount;
+  return formatMoney(totalValue);
+}
+
+function calculateTotalSeverenceIndemnityValueLocal(row, year, months) {
+  const severenceBase = getSupplementaryPayValue(row, 'severence_indemnity');
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = severenceBase * totalCount;
+  return formatMoney(totalValue);
+}
+
+function calculateTotalOtherValueLocal(row, year, months) {
+  const otherBase = getSupplementaryPayValue(row, 'other');
+  const totalCount = months.reduce((sum, month) => {
+    const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
+    return sum + monthlyCount;
+  }, 0);
+  const totalValue = otherBase * totalCount;
+  return formatMoney(totalValue);
+}
+
+// Subtotal calculation functions for supplementary pay
+function calculateSubTotalManagementVacationMonthlyLocal(category, location, year, month) {
+  const managementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isManagementPosition(row.position)
+  );
+  
+  const totalValue = managementRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyVacationValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalManagementVacationTotalLocal(category, location, year, months) {
+  const managementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isManagementPosition(row.position)
+  );
+  
+  const totalValue = managementRows.reduce((sum, row) => {
+    const totalValue = calculateTotalVacationValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalManagementRelocationMonthlyLocal(category, location, year, month) {
+  const managementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isManagementPosition(row.position)
+  );
+  
+  const totalValue = managementRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyRelocationValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalManagementRelocationTotalLocal(category, location, year, months) {
+  const managementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isManagementPosition(row.position)
+  );
+  
+  const totalValue = managementRows.reduce((sum, row) => {
+    const totalValue = calculateTotalRelocationValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalManagementSeverenceIndemnityMonthlyLocal(category, location, year, month) {
+  const managementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isManagementPosition(row.position)
+  );
+  
+  const totalValue = managementRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlySeverenceIndemnityValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalManagementSeverenceIndemnityTotalLocal(category, location, year, months) {
+  const managementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isManagementPosition(row.position)
+  );
+  
+  const totalValue = managementRows.reduce((sum, row) => {
+    const totalValue = calculateTotalSeverenceIndemnityValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalManagementOtherMonthlyLocal(category, location, year, month) {
+  const managementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isManagementPosition(row.position)
+  );
+  
+  const totalValue = managementRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyOtherValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalManagementOtherTotalLocal(category, location, year, months) {
+  const managementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isManagementPosition(row.position)
+  );
+  
+  const totalValue = managementRows.reduce((sum, row) => {
+    const totalValue = calculateTotalOtherValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+// Non-management subtotal calculation functions
+function calculateSubTotalNonManagementVacationMonthlyLocal(category, location, year, month) {
+  const nonManagementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isNonManagementPosition(row.position)
+  );
+  
+  const totalValue = nonManagementRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyVacationValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalNonManagementVacationTotalLocal(category, location, year, months) {
+  const nonManagementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isNonManagementPosition(row.position)
+  );
+  
+  const totalValue = nonManagementRows.reduce((sum, row) => {
+    const totalValue = calculateTotalVacationValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalNonManagementRelocationMonthlyLocal(category, location, year, month) {
+  const nonManagementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isNonManagementPosition(row.position)
+  );
+  
+  const totalValue = nonManagementRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyRelocationValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalNonManagementRelocationTotalLocal(category, location, year, months) {
+  const nonManagementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isNonManagementPosition(row.position)
+  );
+  
+  const totalValue = nonManagementRows.reduce((sum, row) => {
+    const totalValue = calculateTotalRelocationValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalNonManagementSeverenceIndemnityMonthlyLocal(category, location, year, month) {
+  const nonManagementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isNonManagementPosition(row.position)
+  );
+  
+  const totalValue = nonManagementRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlySeverenceIndemnityValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalNonManagementSeverenceIndemnityTotalLocal(category, location, year, months) {
+  const nonManagementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isNonManagementPosition(row.position)
+  );
+  
+  const totalValue = nonManagementRows.reduce((sum, row) => {
+    const totalValue = calculateTotalSeverenceIndemnityValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalNonManagementOtherMonthlyLocal(category, location, year, month) {
+  const nonManagementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isNonManagementPosition(row.position)
+  );
+  
+  const totalValue = nonManagementRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyOtherValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalNonManagementOtherTotalLocal(category, location, year, months) {
+  const nonManagementRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location && 
+    isNonManagementPosition(row.position)
+  );
+  
+  const totalValue = nonManagementRows.reduce((sum, row) => {
+    const totalValue = calculateTotalOtherValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+// Location total calculation functions
+function calculateLocationTotalVacationMonthlyLocal(category, location, year, month) {
+  const locationRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location
+  );
+  
+  const totalValue = locationRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyVacationValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateLocationTotalVacationTotalLocal(category, location, year, months) {
+  const locationRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location
+  );
+  
+  const totalValue = locationRows.reduce((sum, row) => {
+    const totalValue = calculateTotalVacationValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateLocationTotalRelocationMonthlyLocal(category, location, year, month) {
+  const locationRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location
+  );
+  
+  const totalValue = locationRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyRelocationValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateLocationTotalRelocationTotalLocal(category, location, year, months) {
+  const locationRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location
+  );
+  
+  const totalValue = locationRows.reduce((sum, row) => {
+    const totalValue = calculateTotalRelocationValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateLocationTotalSeverenceIndemnityMonthlyLocal(category, location, year, month) {
+  const locationRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location
+  );
+  
+  const totalValue = locationRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlySeverenceIndemnityValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateLocationTotalSeverenceIndemnityTotalLocal(category, location, year, months) {
+  const locationRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location
+  );
+  
+  const totalValue = locationRows.reduce((sum, row) => {
+    const totalValue = calculateTotalSeverenceIndemnityValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateLocationTotalOtherMonthlyLocal(category, location, year, month) {
+  const locationRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location
+  );
+  
+  const totalValue = locationRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyOtherValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateLocationTotalOtherTotalLocal(category, location, year, months) {
+  const locationRows = props.payrollRows.filter(row => 
+    row.category === category && 
+    row.departmentLocation === location
+  );
+  
+  const totalValue = locationRows.reduce((sum, row) => {
+    const totalValue = calculateTotalOtherValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+// Hotel total calculation functions
+function calculateHotelTotalVacationMonthlyLocal(year, month) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyVacationValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateHotelTotalVacationTotalLocal(year, months) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const totalValue = calculateTotalVacationValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateHotelTotalRelocationMonthlyLocal(year, month) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyRelocationValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateHotelTotalRelocationTotalLocal(year, months) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const totalValue = calculateTotalRelocationValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateHotelTotalSeverenceIndemnityMonthlyLocal(year, month) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlySeverenceIndemnityValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateHotelTotalSeverenceIndemnityTotalLocal(year, months) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const totalValue = calculateTotalSeverenceIndemnityValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateHotelTotalOtherMonthlyLocal(year, month) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyOtherValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+function calculateHotelTotalOtherTotalLocal(year, months) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const totalValue = calculateTotalOtherValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  return formatMoney(totalValue);
+}
+
+// Employee/Room ratio calculation functions
+function calculateEmployeeRoomRatioVacationMonthlyLocal(year, month) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyVacationValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
+  return totalRooms > 0 ? formatMoney(totalValue / totalRooms) : formatMoney(0);
+}
+
+function calculateEmployeeRoomRatioVacationTotalLocal(year, months) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const totalValue = calculateTotalVacationValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
+  return totalRooms > 0 ? formatMoney(totalValue / totalRooms) : formatMoney(0);
+}
+
+function calculateEmployeeRoomRatioRelocationMonthlyLocal(year, month) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyRelocationValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
+  return totalRooms > 0 ? formatMoney(totalValue / totalRooms) : formatMoney(0);
+}
+
+function calculateEmployeeRoomRatioRelocationTotalLocal(year, months) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const totalValue = calculateTotalRelocationValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
+  return totalRooms > 0 ? formatMoney(totalValue / totalRooms) : formatMoney(0);
+}
+
+function calculateEmployeeRoomRatioSeverenceIndemnityMonthlyLocal(year, month) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlySeverenceIndemnityValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
+  return totalRooms > 0 ? formatMoney(totalValue / totalRooms) : formatMoney(0);
+}
+
+function calculateEmployeeRoomRatioSeverenceIndemnityTotalLocal(year, months) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const totalValue = calculateTotalSeverenceIndemnityValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
+  return totalRooms > 0 ? formatMoney(totalValue / totalRooms) : formatMoney(0);
+}
+
+function calculateEmployeeRoomRatioOtherMonthlyLocal(year, month) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const monthlyValue = calculateMonthlyOtherValue(row, year, month, getMonthlyCountValueLocal);
+    return sum + parseFloat(monthlyValue) || 0;
+  }, 0);
+  
+  const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
+  return totalRooms > 0 ? formatMoney(totalValue / totalRooms) : formatMoney(0);
+}
+
+function calculateEmployeeRoomRatioOtherTotalLocal(year, months) {
+  const totalValue = props.payrollRows.reduce((sum, row) => {
+    const totalValue = calculateTotalOtherValue(row, year, months, getMonthlyCountValueLocal);
+    return sum + parseFloat(totalValue) || 0;
+  }, 0);
+  
+  const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
+  return totalRooms > 0 ? formatMoney(totalValue / totalRooms) : formatMoney(0);
+}
+
+// Helper functions to check position types
+function isManagementPosition(position) {
+  if (!position) return false;
+  const lowerPosition = position.toLowerCase();
+  return (lowerPosition.includes('manager') && !lowerPosition.includes('non-manager')) ||
+         lowerPosition.includes('director') ||
+         lowerPosition.includes('supervisor');
+}
+
+function isNonManagementPosition(position) {
+  if (!position) return true; // Default to non-management if no position
+  return !isManagementPosition(position);
 }
 </script>
 
