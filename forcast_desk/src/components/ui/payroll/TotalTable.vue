@@ -101,11 +101,11 @@
                       :key="'total-value-' + month + '-' + row.id"
                       class="px-2 py-1 text-right border border-blue-200 hover:bg-blue-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                     >
-                      <span class="font-mono text-xs text-blue-700">0.00</span>
+                      <span class="font-mono text-xs text-blue-700">{{ calculateTotalMonthlyValue(row, month) }}</span>
                     </td>
                     <!-- Total -->
                     <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
-                      <span class="font-mono text-xs text-blue-900">0.00</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateTotalValue(row) }}</span>
                     </td>
                   </tr>
                 </template>
@@ -127,11 +127,11 @@
                     :key="'subtotal-mgmt-total-' + month"
                     class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                   >
-                    <span class="font-mono text-xs text-blue-900">0.00</span>
+                    <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementTotalMonthly(category, location, month) }}</span>
                   </td>
                   <!-- Total for subtotal -->
                   <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                    <span class="font-mono text-xs text-blue-900">0.00</span>
+                    <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementTotal(category, location) }}</span>
                   </td>
                 </tr>
                 
@@ -152,11 +152,11 @@
                     :key="'subtotal-nonmgmt-total-' + month"
                     class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold"
                   >
-                    <span class="font-mono text-xs text-blue-900">0.00</span>
+                    <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementTotalMonthly(category, location, month) }}</span>
                   </td>
                   <!-- Total for subtotal -->
                   <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                    <span class="font-mono text-xs text-blue-900">0.00</span>
+                    <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalNonManagementTotal(category, location) }}</span>
                   </td>
                 </tr>
                 
@@ -177,11 +177,11 @@
                     :key="'total-total-' + month"
                     class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
                   >
-                    <span class="font-mono text-xs text-blue-900">0.00</span>
+                    <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalTotalMonthly(category, location, month) }}</span>
                   </td>
                   <!-- Total for total -->
                   <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                    <span class="font-mono text-xs text-blue-900">0.00</span>
+                    <span class="font-mono text-xs text-blue-900">{{ calculateLocationTotalTotal(category, location) }}</span>
                   </td>
                 </tr>
               </template>
@@ -208,11 +208,11 @@
                 :key="'hotel-total-' + month"
                 class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
               >
-                <span class="font-mono text-xs text-blue-900">0.00</span>
+                <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalTotalMonthly(month) }}</span>
               </td>
               <!-- Total for hotel total -->
               <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                <span class="font-mono text-xs text-blue-900">0.00</span>
+                <span class="font-mono text-xs text-blue-900">{{ calculateHotelTotalTotal() }}</span>
               </td>
             </tr>
             
@@ -233,11 +233,11 @@
                 :key="'ratio-total-' + month"
                 class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold"
               >
-                <span class="font-mono text-xs text-blue-900">0.00</span>
+                <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioTotalMonthly(month) }}</span>
               </td>
               <!-- Total for ratio -->
               <td class="px-2 py-2 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-bold">
-                <span class="font-mono text-xs text-blue-900">0.00</span>
+                <span class="font-mono text-xs text-blue-900">{{ calculateEmployeeRoomRatioTotal() }}</span>
               </td>
             </tr>
           </tbody>
@@ -276,6 +276,10 @@ const props = defineProps({
   months: {
     type: Array,
     default: () => ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+  },
+  payrollRelatedData: {
+    type: Object,
+    default: () => ({})
   }
 });
 
@@ -310,6 +314,283 @@ function getUniqueLocationsForCategory(category) {
     }
   });
   return Array.from(locations).sort();
+}
+
+// Helper function to get monthly count for a row
+function getMonthlyCountForRow(row, month) {
+  if (!props.visibleYears || props.visibleYears.length === 0) {
+    return row.count || 0;
+  }
+  
+  const year = props.visibleYears[0];
+  const rowId = row.id;
+  
+  // Try to get monthly count from payroll data
+  if (props.payrollData && props.payrollData[year] && props.payrollData[year][rowId]) {
+    const rowData = props.payrollData[year][rowId];
+    
+    // Check if count data exists
+    if (rowData.count && rowData.count[month] !== undefined) {
+      return parseFloat(rowData.count[month]);
+    }
+  }
+  
+  // If no monthly count found, use the main count
+  return row.count || 0;
+}
+
+// Helper function to get tax percentage for a row
+function getTaxPercentageForRow(row) {
+  if (!props.visibleYears || props.visibleYears.length === 0) {
+    return 0;
+  }
+  
+  const year = props.visibleYears[0];
+  const rowId = row.id;
+  
+  // Try to get from global payroll related data
+  if (window.__payrollRelatedData && window.__payrollRelatedData[year]) {
+    const yearData = window.__payrollRelatedData[year];
+    const taxPercentage = yearData.payroll_taxes?.[rowId]?.tax_percentage;
+    
+    if (taxPercentage !== undefined && taxPercentage !== null) {
+      return parseFloat(taxPercentage);
+    }
+  }
+  
+  // Try to get from props.payrollRelatedData
+  if (props.payrollRelatedData && props.payrollRelatedData[year]) {
+    const yearData = props.payrollRelatedData[year];
+    const taxPercentage = yearData.payroll_taxes?.[rowId]?.tax_percentage;
+    
+    if (taxPercentage !== undefined && taxPercentage !== null) {
+      return parseFloat(taxPercentage);
+    }
+  }
+  
+  return 0;
+}
+
+// Helper function to get supplementary pay values for a row
+function getSupplementaryPayForRow(row, type) {
+  if (!props.visibleYears || props.visibleYears.length === 0) {
+    return 0;
+  }
+  
+  const year = props.visibleYears[0];
+  const rowId = row.id;
+  
+  // Try to get from global payroll related data
+  if (window.__payrollRelatedData && window.__payrollRelatedData[year]) {
+    const yearData = window.__payrollRelatedData[year];
+    const value = yearData.supplementary_pay?.[rowId]?.[type];
+    
+    if (value !== undefined && value !== null) {
+      return parseFloat(value);
+    }
+  }
+  
+  // Try to get from props.payrollRelatedData
+  if (props.payrollRelatedData && props.payrollRelatedData[year]) {
+    const yearData = props.payrollRelatedData[year];
+    const value = yearData.supplementary_pay?.[rowId]?.[type];
+    
+    if (value !== undefined && value !== null) {
+      return parseFloat(value);
+    }
+  }
+  
+  return 0;
+}
+
+// Helper function to get employee benefits values for a row
+function getEmployeeBenefitsForRow(row, type) {
+  if (!props.visibleYears || props.visibleYears.length === 0) {
+    return 0;
+  }
+  
+  const year = props.visibleYears[0];
+  const rowId = row.id;
+  
+  // Try to get from global payroll related data
+  if (window.__payrollRelatedData && window.__payrollRelatedData[year]) {
+    const yearData = window.__payrollRelatedData[year];
+    const value = yearData.employee_benefits?.[rowId]?.[type];
+    
+    if (value !== undefined && value !== null) {
+      return parseFloat(value);
+    }
+  }
+  
+  // Try to get from props.payrollRelatedData
+  if (props.payrollRelatedData && props.payrollRelatedData[year]) {
+    const yearData = props.payrollRelatedData[year];
+    const value = yearData.employee_benefits?.[rowId]?.[type];
+    
+    if (value !== undefined && value !== null) {
+      return parseFloat(value);
+    }
+  }
+  
+  return 0;
+}
+
+// Calculate total monthly value for a row (sum of all tables)
+function calculateTotalMonthlyValue(row, month) {
+  const monthlyCount = getMonthlyCountForRow(row, month);
+  
+  // Calculate Payroll Taxes (NSSF)
+  const taxPercentage = getTaxPercentageForRow(row);
+  const salary = row.salary || 0;
+  const taxTotal = (salary * taxPercentage) / 100;
+  const nssfValue = taxTotal * monthlyCount;
+  
+  // Calculate Supplementary Pay
+  const vacationValue = getSupplementaryPayForRow(row, 'vacation') * monthlyCount;
+  const relocationValue = getSupplementaryPayForRow(row, 'relocation') * monthlyCount;
+  const severenceValue = getSupplementaryPayForRow(row, 'severence_indemnity') * monthlyCount;
+  const otherSupplementaryValue = getSupplementaryPayForRow(row, 'other') * monthlyCount;
+  
+  // Calculate Employee Benefits
+  const medicalValue = getEmployeeBenefitsForRow(row, 'medical') * monthlyCount;
+  const uniformsValue = getEmployeeBenefitsForRow(row, 'uniforms') * monthlyCount;
+  const employeeMealValue = getEmployeeBenefitsForRow(row, 'employee_meal') * monthlyCount;
+  const transportValue = getEmployeeBenefitsForRow(row, 'transport') * monthlyCount;
+  const telephoneValue = getEmployeeBenefitsForRow(row, 'telephone') * monthlyCount;
+  const airTicketValue = getEmployeeBenefitsForRow(row, 'air_ticket') * monthlyCount;
+  const otherBenefitsValue = getEmployeeBenefitsForRow(row, 'other') * monthlyCount;
+  
+  // Sum all values
+  const totalValue = nssfValue + vacationValue + relocationValue + severenceValue + otherSupplementaryValue + 
+                    medicalValue + uniformsValue + employeeMealValue + transportValue + telephoneValue + airTicketValue + otherBenefitsValue;
+  
+  return formatMoney(totalValue);
+}
+
+// Calculate total value for a row (sum of all months)
+function calculateTotalValue(row) {
+  let totalValue = 0;
+  
+  props.months.forEach(month => {
+    const monthlyValue = parseFloat(calculateTotalMonthlyValue(row, month).replace(/[^0-9.-]/g, '')) || 0;
+    totalValue += monthlyValue;
+  });
+  
+  return formatMoney(totalValue);
+}
+
+// Calculation functions for summary rows
+function calculateSubTotalManagementTotalMonthly(category, location, month) {
+  const managementRows = getPayrollRowsForLocation(props.payrollRows, category, location).filter(row => 
+    row.position === 'Manager'
+  );
+  
+  let totalValue = 0;
+  managementRows.forEach(row => {
+    const monthlyValue = parseFloat(calculateTotalMonthlyValue(row, month).replace(/[^0-9.-]/g, '')) || 0;
+    totalValue += monthlyValue;
+  });
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalManagementTotal(category, location) {
+  let totalValue = 0;
+  
+  props.months.forEach(month => {
+    totalValue += parseFloat(calculateSubTotalManagementTotalMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
+  });
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalNonManagementTotalMonthly(category, location, month) {
+  const nonManagementRows = getPayrollRowsForLocation(props.payrollRows, category, location).filter(row => 
+    row.position !== 'Manager'
+  );
+  
+  let totalValue = 0;
+  nonManagementRows.forEach(row => {
+    const monthlyValue = parseFloat(calculateTotalMonthlyValue(row, month).replace(/[^0-9.-]/g, '')) || 0;
+    totalValue += monthlyValue;
+  });
+  
+  return formatMoney(totalValue);
+}
+
+function calculateSubTotalNonManagementTotal(category, location) {
+  let totalValue = 0;
+  
+  props.months.forEach(month => {
+    totalValue += parseFloat(calculateSubTotalNonManagementTotalMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
+  });
+  
+  return formatMoney(totalValue);
+}
+
+function calculateLocationTotalTotalMonthly(category, location, month) {
+  const locationRows = getPayrollRowsForLocation(props.payrollRows, category, location);
+  
+  let totalValue = 0;
+  locationRows.forEach(row => {
+    const monthlyValue = parseFloat(calculateTotalMonthlyValue(row, month).replace(/[^0-9.-]/g, '')) || 0;
+    totalValue += monthlyValue;
+  });
+  
+  return formatMoney(totalValue);
+}
+
+function calculateLocationTotalTotal(category, location) {
+  let totalValue = 0;
+  
+  props.months.forEach(month => {
+    totalValue += parseFloat(calculateLocationTotalTotalMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
+  });
+  
+  return formatMoney(totalValue);
+}
+
+function calculateHotelTotalTotalMonthly(month) {
+  let totalValue = 0;
+  
+  props.payrollRows.forEach(row => {
+    const monthlyValue = parseFloat(calculateTotalMonthlyValue(row, month).replace(/[^0-9.-]/g, '')) || 0;
+    totalValue += monthlyValue;
+  });
+  
+  return formatMoney(totalValue);
+}
+
+function calculateHotelTotalTotal() {
+  let totalValue = 0;
+  
+  props.months.forEach(month => {
+    totalValue += parseFloat(calculateHotelTotalTotalMonthly(month).replace(/[^0-9.-]/g, '')) || 0;
+  });
+  
+  return formatMoney(totalValue);
+}
+
+function calculateEmployeeRoomRatioTotalMonthly(month) {
+  const hotelTotalValue = parseFloat(calculateHotelTotalTotalMonthly(month).replace(/[^0-9.-]/g, '')) || 0;
+  const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
+  
+  if (totalRooms > 0) {
+    return formatMoney(hotelTotalValue / totalRooms);
+  }
+  
+  return formatMoney(0);
+}
+
+function calculateEmployeeRoomRatioTotal() {
+  const hotelTotalValue = parseFloat(calculateHotelTotalTotal().replace(/[^0-9.-]/g, '')) || 0;
+  const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
+  
+  if (totalRooms > 0) {
+    return formatMoney(hotelTotalValue / totalRooms);
+  }
+  
+  return formatMoney(0);
 }
 
 // Local wrapper functions for calculations - using the same functions as Payroll_Related.vue
