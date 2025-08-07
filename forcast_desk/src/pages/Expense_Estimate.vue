@@ -34,18 +34,14 @@
                   v-if="!isSaved"
                   class="flex items-center gap-2 text-sm font-medium text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-200"
                 >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                  </svg>
+                  <AlertTriangle class="w-4 h-4 text-red-600" />
                   Unsaved
                 </div>
                 <div
                   v-else
                   class="flex items-center gap-2 text-sm font-medium text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200"
                 >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
+                  <Check class="w-4 h-4 text-green-600" />
                   All Saved
                 </div>
               </div>
@@ -56,25 +52,19 @@
                 @click="saveChangesWrapper"
                 class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-                </svg>
+                <Save class="w-4 h-4" />
                 Save
               </button>
               <button
                 v-if="isSaving"
                 class="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg cursor-not-allowed"
               >
-                <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
+                <Loader2 class="w-4 h-4 animate-spin" />
                 Saving...
               </button>
             </div>
             <span v-if="saveError" class="mt-2 text-xs text-red-500 flex items-center gap-1">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
+              <AlertCircle class="w-3 h-3" />
               {{ saveError }}
             </span>
           </div>
@@ -82,18 +72,14 @@
           <!-- Action Buttons Section -->
           <div class="mb-8">
             <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
+              <Plus class="w-4 h-4 text-violet-600" />
               Quick Actions
             </h3>
             <button 
               @click="showAddExpenseModal = true" 
               class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-xl hover:from-violet-600 hover:to-violet-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 font-medium"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
+              <Plus class="w-4 h-4" />
               Add New Expense
             </button>
             
@@ -112,9 +98,7 @@
           <div class="flex-1">
             <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
               <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
-                </svg>
+                <Filter class="w-5 h-5 text-violet-600" />
                 Year Range Filter
               </h3>
               
@@ -122,9 +106,7 @@
                 <div class="grid grid-cols-2 gap-3">
                   <div>
                     <label class="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
-                      <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                      </svg>
+                      <Calendar class="w-3 h-3 text-gray-500" />
                       From Year
                     </label>
                     <select 
@@ -138,9 +120,7 @@
 
                   <div>
                     <label class="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
-                      <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                      </svg>
+                      <Calendar class="w-3 h-3 text-gray-500" />
                       To Year
                     </label>
                                           <select 
@@ -158,19 +138,14 @@
                     @click="clearYearSelection" 
                     class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 text-sm font-medium"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
+                    <X class="w-4 h-4" />
                     Clear
                   </button>
                   <button 
                     @click="showAdvanced = true" 
                     class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
+                    <Settings class="w-4 h-4" />
                     Advanced
                   </button>
                 </div>
@@ -445,7 +420,7 @@
       <div class="bg-white rounded-2xl shadow-2xl border border-violet-200 w-[95%] max-w-lg p-0 overflow-hidden">
         <!-- Modal Header -->
         <div class="flex items-center gap-3 px-8 py-6 bg-gradient-to-r from-violet-600 to-violet-700">
-          <Settings class="w-6 h-6 text-white" />
+          <Settings class="w-4 h-4 text-white" />
           <h2 class="text-xl font-bold text-white">Advanced Display Mode Settings</h2>
         </div>
 
@@ -453,7 +428,7 @@
         <div class="p-8 pt-6">
           <!-- Message when no years selected -->
           <div v-if="!visibleYears.length" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-3">
-            <AlertTriangle class="w-6 h-6 text-yellow-600" />
+            <AlertTriangle class="w-4 h-4 text-yellow-600" />
             <span class="text-yellow-800 font-medium">Please select both \"From Year\" and \"To Year\" to configure advanced settings.</span>
           </div>
 
@@ -464,7 +439,7 @@
               class="flex justify-between items-center border-b pb-2"
             >
               <span class="font-medium text-gray-700 flex items-center gap-2">
-                <Calendar class="w-4 h-4 text-violet-600" />
+                <Calendar class="w-3 h-3 text-violet-600" />
                 {{ year }}
               </span>
               <select
@@ -521,7 +496,7 @@
             @click="cancelAddExpense"
             class="text-violet-100 hover:text-white transition-colors p-2 rounded-full hover:bg-violet-600"
           >
-            <X class="w-6 h-6" />
+            <X class="w-4 h-4" />
           </button>
         </div>
 
@@ -756,7 +731,7 @@ import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
-import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign } from 'lucide-vue-next';
+import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign, Loader2, AlertCircle } from 'lucide-vue-next';
 import alertService from "@/components/ui/ui_utility/alertService.js";
 
 import {

@@ -47,6 +47,8 @@ export async function loadDepartmentOptions() {
       departmentOptions.value = [
         { value: 'ROOMS', label: 'ROOMS' },
         { value: 'FOOD & BEVERAGE', label: 'FOOD & BEVERAGE' },
+        { value: 'BANQUET', label: 'BANQUET' },
+        { value: 'OOD', label: 'OOD' },
         { value: 'SALES & MARKETING', label: 'SALES & MARKETING' },
         { value: 'ADMINISTRATION', label: 'ADMINISTRATION' }
       ];
