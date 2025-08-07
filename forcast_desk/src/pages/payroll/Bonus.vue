@@ -34,14 +34,14 @@
                       v-if="hasUnsavedChanges"
                       class="flex items-center gap-2 text-sm font-medium text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-200"
                     >
-                      <AlertTriangle class="w-4 h-4" />
+                      <AlertTriangle class="w-4 h-4 text-red-600" />
                       Unsaved
                     </div>
                     <div
                       v-else
                       class="flex items-center gap-2 text-sm font-medium text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200"
                     >
-                      <Check class="w-4 h-4" />
+                      <Check class="w-4 h-4 text-green-600" />
                       All Saved
                     </div>
                   </div>

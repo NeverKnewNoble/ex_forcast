@@ -63,6 +63,11 @@ const routes = [
     path: '/bonus',
     component: () => import('@/pages/payroll/Bonus.vue'),
   },
+  {
+    name: 'Receipts & Payments',
+    path: '/receipts_payments',
+    component: () => import('@/pages/Receipts_Payments.vue'),
+  },
 
 ]
 

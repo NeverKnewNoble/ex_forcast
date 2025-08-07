@@ -118,8 +118,9 @@
                         From Year
                       </label>
                       <select 
+                        disabled
                         v-model="fromYear" 
-                        class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                        class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-gray-100 text-sm"
                       >
                         <option value="">Select Year</option>
                         <option v-for="year in years" :key="'from-' + year" :value="year">{{ year }}</option>
@@ -134,8 +135,9 @@
                         To Year
                       </label>
                       <select 
+                        disabled
                         v-model="toYear" 
-                        class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                        class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-gray-100 text-sm"
                       >
                         <option value="">Select Year</option>
                         <option v-for="year in filteredToYears" :key="'to-' + year" :value="year">{{ year }}</option>

@@ -187,7 +187,7 @@ const menuItems = [
       { text: "Bonus", route: "/bonus", icon: Ellipsis }
     ]
   },
-  { text: "Receipts & Payments", route: "/", icon: ReceiptText },
+  { text: "Receipts & Payments", route: "/receipts_payments", icon: ReceiptText },
   { text: "Reports", route: "/", icon: Plus },
 ]
 
