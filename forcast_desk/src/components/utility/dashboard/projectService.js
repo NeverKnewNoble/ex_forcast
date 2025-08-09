@@ -43,7 +43,7 @@ export const fetchProjects = async () => {
 /**
  * Create a new project
  */
-export const createProject = async (projectName, projectDescription) => {
+export const createProject = async (projectName, projectDescription, departments = null, departmentDetails = null) => {
   isLoading.value = true
   error.value = null
   
@@ -51,6 +51,16 @@ export const createProject = async (projectName, projectDescription) => {
     const formData = new FormData()
     formData.append('project_name', projectName)
     formData.append('project_description', projectDescription)
+    
+    // Add departments if provided
+    if (departments) {
+      formData.append('departments', JSON.stringify(departments))
+    }
+    
+    // Add department details if provided
+    if (departmentDetails) {
+      formData.append('department_details', JSON.stringify(departmentDetails))
+    }
     
     const result = await makeFormDataRequest(`${API_BASE}.create_project`, formData)
     

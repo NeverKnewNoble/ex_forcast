@@ -123,11 +123,11 @@ export function calculateMarketSegmentTotal(data, segment, year, field, getColum
       total += parseFloat(value) || 0;
     }
   } else {
-    // Fallback to individual months for backward compatibility
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
+      // Fallback to individual months for backward compatibility
+  const months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
     
     for (const month of months) {
       const value = data?.[year]?.[segment.market_segment]?.[month]?.[field] ?? 0;

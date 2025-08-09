@@ -38,8 +38,8 @@ export async function loadDepartmentOptions() {
     
     if (data.message && data.message.success) {
       departmentOptions.value = data.message.departments.map(dept => ({
-        value: dept.name,
-        label: dept.department_name || dept.name
+        value: dept.department_name,
+        label: dept.department_name
       }));
     } else {
       console.error('Failed to load departments:', data.message?.error || 'Unknown error');
@@ -64,6 +64,58 @@ export async function loadDepartmentOptions() {
       { value: 'ADMINISTRATION', label: 'ADMINISTRATION' }
     ];
     console.log('Using fallback department options due to error');
+  }
+}
+
+//! ************ Project Department Options (Filtered) ****************
+export async function loadProjectDepartmentOptions() {
+  try {
+    const response = await fetch('/api/method/ex_forcast.api.department_list.get_department_list');
+    const data = await response.json();
+    
+    if (data.message && data.message.success) {
+      // Filter out "All departments" and group departments
+      const filteredDepartments = data.message.departments.filter(dept => {
+        const deptName = dept.department_name;
+        
+        // Exclude "All departments" option
+        if (deptName.toLowerCase().includes('all')) {
+          return false;
+        }
+        
+        // Exclude group departments (you can add more specific criteria here)
+        if (deptName.toLowerCase().includes('group')) {
+          return false;
+        }
+        
+        return true;
+      });
+      
+      return filteredDepartments.map(dept => ({
+        value: dept.department_name,
+        label: dept.department_name
+      }));
+    } else {
+      console.error('Failed to load departments:', data.message?.error || 'Unknown error');
+      // Fallback to sample departments if API fails
+      return [
+        { value: 'ROOMS', label: 'ROOMS' },
+        { value: 'FOOD & BEVERAGE', label: 'FOOD & BEVERAGE' },
+        { value: 'BANQUET', label: 'BANQUET' },
+        { value: 'OOD', label: 'OOD' },
+        { value: 'SALES & MARKETING', label: 'SALES & MARKETING' },
+        { value: 'ADMINISTRATION', label: 'ADMINISTRATION' }
+      ];
+    }
+  } catch (error) {
+    console.error('Error loading project departments:', error);
+    // Fallback to sample departments if API fails
+    return [
+      { value: 'ROOMS', label: 'ROOMS' },
+      { value: 'FOOD & BEVERAGE', label: 'FOOD & BEVERAGE' },
+      { value: 'SALES & MARKETING', label: 'SALES & MARKETING' },
+      { value: 'ADMINISTRATION', label: 'ADMINISTRATION' }
+    ];
   }
 }
 
@@ -554,6 +606,35 @@ export async function createDesignation(designationName) {
     }
   } catch (error) {
     alertService.error(error.message || 'Failed to create designation');
+    throw error;
+  }
+}
+
+
+//! ************ Create new restaurant ****************
+export async function createRestaurant(restaurantName, project = null) {
+  try {
+    const response = await fetch('/api/method/ex_forcast.api.create_restaurant.create_restaurant', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        cover_name: restaurantName,
+        project: project
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.message && data.message.status === 'success') {
+      alertService.success(`Restaurant "${restaurantName}" created successfully`);
+      return data.message.docname;
+    } else {
+      throw new Error(data.message?.message || 'Failed to create restaurant');
+    }
+  } catch (error) {
+    alertService.error(error.message || 'Failed to create restaurant');
     throw error;
   }
 }

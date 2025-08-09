@@ -23,6 +23,6 @@ export function getMonthOptions() {
 // Months array for select fields
 export const months = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", 
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
   "Jan-Mar", "Apr-Jun", "Jul-Sep", "Oct-Dec"
 ]; 

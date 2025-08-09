@@ -1,0 +1,82 @@
+[
+ {
+  "category": "Rooms Expenses",
+  "docstatus": 0,
+  "doctype": "Expense Category",
+  "modified": "2025-07-25 19:09:12.600236",
+  "module": "Ex Forcast",
+  "name": "Rooms Expenses"
+ },
+ {
+  "category": "Food & Beverage Expenses",
+  "docstatus": 0,
+  "doctype": "Expense Category",
+  "modified": "2025-07-25 19:09:24.788266",
+  "module": "Ex Forcast",
+  "name": "Food & Beverage Expenses"
+ },
+ {
+  "category": "Health Club - Spa",
+  "docstatus": 0,
+  "doctype": "Expense Category",
+  "modified": "2025-07-25 19:10:23.032232",
+  "module": "Ex Forcast",
+  "name": "Health Club - Spa"
+ },
+ {
+  "category": "Administrative & General",
+  "docstatus": 0,
+  "doctype": "Expense Category",
+  "modified": "2025-07-25 19:10:47.511784",
+  "module": "Ex Forcast",
+  "name": "Administrative & General"
+ },
+ {
+  "category": "Information & Telecommunication Systems",
+  "docstatus": 0,
+  "doctype": "Expense Category",
+  "modified": "2025-07-25 19:11:01.902709",
+  "module": "Ex Forcast",
+  "name": "Information & Telecommunication Systems"
+ },
+ {
+  "category": "Sales & Marketing",
+  "docstatus": 0,
+  "doctype": "Expense Category",
+  "modified": "2025-07-25 19:11:14.510022",
+  "module": "Ex Forcast",
+  "name": "Sales & Marketing"
+ },
+ {
+  "category": "Property Operation & Management",
+  "docstatus": 0,
+  "doctype": "Expense Category",
+  "modified": "2025-07-25 19:11:26.047684",
+  "module": "Ex Forcast",
+  "name": "Property Operation & Management"
+ },
+ {
+  "category": "Utilities",
+  "docstatus": 0,
+  "doctype": "Expense Category",
+  "modified": "2025-07-25 19:11:40.653799",
+  "module": "Ex Forcast",
+  "name": "Utilities"
+ },
+ {
+  "category": "House Laundry",
+  "docstatus": 0,
+  "doctype": "Expense Category",
+  "modified": "2025-07-25 19:11:53.572200",
+  "module": "Ex Forcast",
+  "name": "House Laundry"
+ },
+ {
+  "category": "Miscellaneous",
+  "docstatus": 0,
+  "doctype": "Expense Category",
+  "modified": "2025-07-25 19:14:59.010409",
+  "module": "Ex Forcast",
+  "name": "Miscellaneous"
+ }
+]

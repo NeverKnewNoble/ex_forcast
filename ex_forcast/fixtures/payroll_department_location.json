@@ -1,0 +1,26 @@
+[
+ {
+  "department_location": "Front Office",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-08 01:19:15.314971",
+  "module": "Ex Forcast",
+  "name": "Front Office"
+ },
+ {
+  "department_location": "Housekeeping & Laundry",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-08 01:19:52.230538",
+  "module": "Ex Forcast",
+  "name": "Housekeeping & Laundry"
+ },
+ {
+  "department_location": "Revenue / Reservation",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-08 01:20:45.760409",
+  "module": "Ex Forcast",
+  "name": "Revenue / Reservation"
+ }
+]
