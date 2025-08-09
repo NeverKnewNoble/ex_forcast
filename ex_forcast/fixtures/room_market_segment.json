@@ -110,15 +110,6 @@
  {
   "docstatus": 0,
   "doctype": "Room Market Segment",
-  "market_segment": "Groups Corporate",
-  "modified": "2025-07-01 13:10:22.582560",
-  "module": "Ex Forcast",
-  "name": "Groups Corporate",
-  "segment_category": "GROUP ROOMS REVENUE"
- },
- {
-  "docstatus": 0,
-  "doctype": "Room Market Segment",
   "market_segment": "Groups Government",
   "modified": "2025-07-01 13:11:04.158314",
   "module": "Ex Forcast",
@@ -132,15 +123,6 @@
   "modified": "2025-07-01 13:11:35.172088",
   "module": "Ex Forcast",
   "name": "Groups Association / Conventions / Events",
-  "segment_category": "GROUP ROOMS REVENUE"
- },
- {
-  "docstatus": 0,
-  "doctype": "Room Market Segment",
-  "market_segment": "Groups Sports",
-  "modified": "2025-07-01 13:11:52.241949",
-  "module": "Ex Forcast",
-  "name": "Groups Sports",
   "segment_category": "GROUP ROOMS REVENUE"
  },
  {
@@ -218,15 +200,6 @@
  {
   "docstatus": 0,
   "doctype": "Room Market Segment",
-  "market_segment": "OTA Retail",
-  "modified": "2025-07-01 13:01:32.847906",
-  "module": "Ex Forcast",
-  "name": "OTA Retail",
-  "segment_category": "RETAIL"
- },
- {
-  "docstatus": 0,
-  "doctype": "Room Market Segment",
   "market_segment": "Direct Retail",
   "modified": "2025-07-01 13:01:09.596635",
   "module": "Ex Forcast",
@@ -241,5 +214,32 @@
   "module": "Ex Forcast",
   "name": "Global Promotion",
   "segment_category": "DISCOUNT"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Groups Corporate",
+  "modified": "2025-07-01 13:10:22.582560",
+  "module": "Ex Forcast",
+  "name": "Groups Corporate",
+  "segment_category": "GROUP ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Groups Sports",
+  "modified": "2025-07-01 13:11:52.241949",
+  "module": "Ex Forcast",
+  "name": "Groups Sports",
+  "segment_category": "GROUP ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "OTA Retail",
+  "modified": "2025-07-01 13:01:32.847906",
+  "module": "Ex Forcast",
+  "name": "OTA Retail",
+  "segment_category": "RETAIL"
  }
 ]
