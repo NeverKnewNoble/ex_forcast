@@ -6,7 +6,8 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "department_location"
+  "department_location",
+  "module"
  ],
  "fields": [
   {
@@ -14,12 +15,18 @@
    "fieldtype": "Data",
    "label": "Department Location",
    "unique": 1
+  },
+  {
+   "fieldname": "module",
+   "fieldtype": "Link",
+   "label": "Module",
+   "options": "Module Def"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-29 09:39:26.595771",
+ "modified": "2025-08-08 01:18:50.080945",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Payroll Department Location",

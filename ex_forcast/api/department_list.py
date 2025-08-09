@@ -1,13 +1,13 @@
 import frappe
 from frappe import _
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_department_list():
     """Get list of departments for payroll modal"""
     try:
         departments = frappe.get_all(
             "Department",
-            fields=["name", "department_name"],
+            fields=["department_name"],
             order_by="department_name"
         )
         
@@ -22,7 +22,7 @@ def get_department_list():
             "error": str(e)
         }
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def create_department(department_name):
     """Create a new department"""
     try:
