@@ -5,11 +5,11 @@ export const showAddExpenseModal = ref(false)
 export const addExpenseForm = ref({
   year: "",
   month: "",
-  rows: [{ expense: "", amount: 0, amountDisplay: "", category: "", costType: "" }],
+  rows: [{ department: "", department_location: "", expense: "", amount: 0, amountDisplay: "", category: "", costType: "" }],
 })
 
 export function addExpenseRow() {
-  addExpenseForm.value.rows.push({ expense: "", amount: 0, amountDisplay: "", category: "", costType: "" })
+  addExpenseForm.value.rows.push({ department: "", department_location: "", expense: "", amount: 0, amountDisplay: "", category: "", costType: "" })
 }
 
 export function removeExpenseRow(index) {
@@ -22,7 +22,7 @@ export function resetExpenseForm() {
   addExpenseForm.value = {
     year: "",
     month: "",
-    rows: [{ expense: "", amount: 0, amountDisplay: "", category: "", costType: "" }],
+    rows: [{ department: "", department_location: "", expense: "", amount: 0, amountDisplay: "", category: "", costType: "" }],
   }
 }
 

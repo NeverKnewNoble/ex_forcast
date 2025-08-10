@@ -135,6 +135,8 @@ import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
 import logoURL from '@/assets/images/icon_logo.png'
 import logoURL2 from '@/assets/images/ex_forest_logo.png'
 import { session } from '@/data/session' 
+import { selectedProject } from '@/components/utility/dashboard/projectService.js'
+import { getProjectDepartments } from '@/components/utility/dashboard/projectService.js'
 
 // Lucide icons
 import { 
@@ -225,6 +227,26 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
+
+
+// Project departments state
+const projectDepartments = ref([])
+
+//? Load departments when selected project changes
+watch(selectedProject, async (project) => {
+  try {
+    if (project && project.project_name) {
+      projectDepartments.value = await getProjectDepartments(project.project_name)
+    } else {
+      projectDepartments.value = []
+    }
+  } catch (e) {
+    projectDepartments.value = []
+  }
+}, { immediate: true })
+
+
+
 const filteredMenuItems = computed(() => {
   // Recursively filter children if needed
   function filterItems(items) {
@@ -234,7 +256,27 @@ const filteredMenuItems = computed(() => {
           return null;
         }
         if (item.children) {
-          const filteredChildren = filterItems(item.children)
+          // If this is Revenue group, conditionally include children based on project departments
+          let childrenToFilter = item.children
+          if (item.text === 'Revenue') {
+            const depts = projectDepartments.value || []
+            childrenToFilter = item.children.filter(child => {
+              if (child.text.includes('Room Revenue')) {
+                return depts.includes('Rooms')
+              }
+              if (child.text.includes("F&B Revenue") || child.text.includes('F&B')) {
+                return depts.includes('Food And Beverage')
+              }
+              if (child.text.includes('Banquet')) {
+                return depts.includes('Banquet')
+              }
+              if (child.text.includes('OOD')) {
+                return depts.includes('Other Operating Departments')
+              }
+              return true
+            })
+          }
+          const filteredChildren = filterItems(childrenToFilter)
           if (filteredChildren.length > 0) {
             return { ...item, children: filteredChildren }
           } else {

@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { session } from './data/session'
 import { userResource } from '@/data/user'
+import { selectedProject, getStoredSelectedProject } from '@/components/utility/dashboard/projectService.js'
+import { getProjectDepartments } from '@/components/utility/dashboard/projectService.js'
 
 const routes = [
   {
@@ -32,21 +34,25 @@ const routes = [
     name: 'Room_Revenue',
     path: '/room_revenue_assumptions',
     component: () => import('@/pages/Room_Revenue.vue'),
+    meta: { requiresDepartment: 'Rooms' }
   },
   {
     name: 'F&B_Revenue_Assumptions',
     path: '/f&b_revenue_assumptions',
     component: () => import('@/pages/F&B_Revenue_Assumpt.vue'),
+    meta: { requiresDepartment: 'Food And Beverage' }
   },
   {
     name: 'Banquet_Revenue',
     path: '/banquet_revenue',
     component: () => import('@/pages/Banquet_Revenue.vue'),
+    meta: { requiresDepartment: 'Banquet' }
   },
   {
     name: 'OOD_Data',
     path: '/ood_data_input',
     component: () => import('@/pages/OOD_Data.vue'),
+    meta: { requiresDepartment: 'Other Operating Departments' }
   },
   {
     name: 'Payroll_Data',
@@ -94,19 +100,25 @@ router.beforeEach(async (to, from, next) => {
   } else if (isLoggedIn && to.name === 'Login') {
     // If logged in and trying to go to login, redirect to home
     next({ name: 'Home' })
-  } else if (to.name === 'Room_Revenue') {
-    // Check if hospitality experience is enabled for room revenue assumptions
-    const hospitalityExperience = localStorage.getItem('hospitalityExperience')
-    const isHospitalityEnabled = hospitalityExperience === null ? true : hospitalityExperience === 'true'
-    
-    if (!isHospitalityEnabled) {
-      // Redirect to home if hospitality experience is disabled
-      next({ name: 'Home' })
-    } else {
-      // Proceed to room revenue page
-      next()
-    }
   } else {
+    // Enforce department-based access if route requires a department
+    const requiredDept = to.meta?.requiresDepartment
+    if (requiredDept) {
+      try {
+        // Determine current project
+        const project = selectedProject?.value || getStoredSelectedProject()
+        if (!project || !project.project_name) {
+          return next({ name: 'Home' })
+        }
+        const departments = await getProjectDepartments(project.project_name)
+        if (Array.isArray(departments) && departments.includes(requiredDept)) {
+          return next()
+        }
+        return next({ name: 'Home' })
+      } catch (e) {
+        return next({ name: 'Home' })
+      }
+    }
     // Proceed to route
     next()
   }

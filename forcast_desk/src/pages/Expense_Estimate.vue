@@ -538,36 +538,12 @@
             </button>
             
             <div v-show="showQuickActions" class="mt-3 space-y-4 p-4 bg-white border border-violet-200 rounded-lg shadow-sm">
-              <!-- Add Expense Category UI -->
-              <div>
-                <div class="flex items-center gap-3 mb-2">
-                  <FolderOpen class="w-5 h-5 text-violet-600" />
-                  <span class="text-md font-semibold text-gray-700">Create New Expense Category</span>
-                </div>
-                <div class="flex gap-2 items-center">
-                  <input
-                    v-model="newCategoryName"
-                    type="text"
-                    placeholder="Enter new category name"
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
-                    @keyup.enter="createExpenseCategory"
-                  />
-                  <button
-                    :disabled="creatingCategory || !newCategoryName.trim()"
-                    @click="createExpenseCategory"
-                    class="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-all font-medium flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    <Plus class="w-4 h-4" />
-                    Add
-                  </button>
-                </div>
-              </div>
 
-              <!-- Add Account UI -->
+              <!-- Add Expense UI -->
               <div>
                 <div class="flex items-center gap-3 mb-2">
                   <Receipt class="w-5 h-5 text-violet-600" />
-                  <span class="text-md font-semibold text-gray-700">Create New Account</span>
+                  <span class="text-md font-semibold text-gray-700">Create New Expense</span>
                 </div>
                 <div class="grid grid-cols-4 gap-3">
                   <input
@@ -617,8 +593,10 @@
               <table class="w-full">
                 <thead class="bg-gradient-to-r from-violet-600 to-violet-700 text-white sticky top-0">
                   <tr>
+                    <th class="text-left px-6 py-4 font-semibold"><Building2 class="w-4 h-4 inline mr-1" /> Department</th>
+                    <th class="text-left px-6 py-4 font-semibold"><FolderOpen class="w-4 h-4 inline mr-1" /> Department Location</th>
                     <th class="text-left px-6 py-4 font-semibold"><Receipt class="w-4 h-4 inline mr-1" /> Expense Name</th>
-                    <th v-if="hospitalityExperience" class="text-left px-6 py-4 font-semibold"><FolderOpen class="w-4 h-4 inline mr-1" /> Category</th>
+                    
                     <th class="text-left px-6 py-4 font-semibold"><Tag class="w-4 h-4 inline mr-1" /> Cost Type</th>
                     <th class="text-left px-6 py-4 font-semibold"><DollarSign class="w-4 h-4 inline mr-1" /> Amount</th>
                     <th class="w-16"></th>
@@ -632,6 +610,28 @@
                   >
                     <td class="px-2 py-4">
                       <select
+                        v-model="row.department"
+                        class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+                      >
+                        <option disabled value="">Select Department</option>
+                        <option v-for="dept in modalDepartments" :key="dept" :value="dept">
+                          {{ dept }}
+                        </option>
+                      </select>
+                    </td>
+                    <td class="px-2 py-4">
+                      <select
+                        v-model="row.department_location"
+                        class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+                      >
+                        <option disabled value="">Select Department Location</option>
+                        <option v-for="loc in modalDepartmentLocations" :key="loc" :value="loc">
+                          {{ loc }}
+                        </option>
+                      </select>
+                    </td>
+                    <td class="px-2 py-4">
+                      <select
                         v-model="row.expense"
                         class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
                       >
@@ -641,17 +641,7 @@
                         </option>
                       </select>
                     </td>
-                    <td v-if="hospitalityExperience" class="px-2 py-4">
-                      <select
-                        v-model="row.category"
-                        class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
-                      >
-                        <option disabled value="">Select Category</option>
-                        <option v-for="option in categoryOptions" :key="option.value" :value="option.value">
-                          {{ option.label }}
-                        </option>
-                      </select>
-                    </td>
+                    
                     <td class="px-2 py-4">
                       <select
                         v-model="row.costType"
@@ -731,7 +721,7 @@ import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
-import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign, Loader2, AlertCircle } from 'lucide-vue-next';
+import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign, Loader2, AlertCircle, Building2 } from 'lucide-vue-next';
 import alertService from "@/components/ui/ui_utility/alertService.js";
 
 import {
@@ -786,7 +776,8 @@ import {
 } from "@/components/utility/expense_assumption/expense_estimate_utils.js";
 import { saveChanges } from "@/components/utility/expense_assumption/save_changes.js";
 import { submitAddExpense } from "@/components/utility/expense_assumption/submit_add_expense.js";
-import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
+import { selectedProject, initializeProjectService, getProjectDepartments } from '@/components/utility/dashboard/projectService.js';
+import { loadDepartmentLocationOptions } from '@/components/utility/payroll/payroll_data_service.js';
 import NoProjectSelectedState from '@/components/ui/expense/NoProjectSelectedState.vue';
 import NoDataState from '@/components/ui/expense/NoDataState.vue';
 import ErrorState from '@/components/ui/expense/ErrorState.vue';
@@ -829,6 +820,8 @@ const groupAccounts = ref([]);
 const showQuickActions = ref(false);
 const categoryCreateError = ref("");
 const categoryCreateSuccess = ref("");
+const modalDepartments = ref([]);
+const modalDepartmentLocations = ref([]);
 
 // Pinia store for year settings
 const yearSettingsStore = useYearSettingsStore();
@@ -953,6 +946,25 @@ watch(selectedProject, async (newProject, oldProject) => {
       
       // console.log("Expense data loaded for project:", newProject.project_name);
       alertService.success(`Switched to project: ${newProject.project_name}`);
+
+      // Refresh modal departments for new project
+      try {
+        modalDepartments.value = await getProjectDepartments(newProject.project_name);
+      } catch (e) {
+        modalDepartments.value = [];
+      }
+      // Refresh department locations too
+      try {
+        const respLoc = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list');
+        const jsonLoc = await respLoc.json();
+        if (jsonLoc.message && jsonLoc.message.success) {
+          modalDepartmentLocations.value = (jsonLoc.message.locations || []).map(l => l.department_location || l.name);
+        } else {
+          modalDepartmentLocations.value = [];
+        }
+      } catch (e) {
+        modalDepartmentLocations.value = [];
+      }
     } catch (error) {
       console.error("Error loading project data:", error);
       alertService.error("Failed to load project data. Please try again.");
@@ -1008,6 +1020,28 @@ onMounted(async () => {
     const result = await response.json();
     if (result.data && result.data.group_accounts) {
       groupAccounts.value = result.data.group_accounts;
+    }
+    // Load project departments for modal
+    if (selectedProject && selectedProject.value && selectedProject.value.project_name) {
+      try {
+        modalDepartments.value = await getProjectDepartments(selectedProject.value.project_name);
+      } catch (e) {
+        modalDepartments.value = [];
+      }
+    }
+    // Load department locations (global list used elsewhere; reuse here)
+    try {
+      await loadDepartmentLocationOptions();
+      // read from payroll service reactive ref via dynamic import not needed since function populates its own ref; we replicate by fetching API directly here
+      const respLoc = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list');
+      const jsonLoc = await respLoc.json();
+      if (jsonLoc.message && jsonLoc.message.success) {
+        modalDepartmentLocations.value = (jsonLoc.message.locations || []).map(l => l.department_location || l.name);
+      } else {
+        modalDepartmentLocations.value = [];
+      }
+    } catch (e) {
+      modalDepartmentLocations.value = [];
     }
     
     isSaved.value = true;
