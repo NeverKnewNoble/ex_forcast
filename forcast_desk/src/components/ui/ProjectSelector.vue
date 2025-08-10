@@ -441,11 +441,11 @@
           <div class="relative">
             <!-- Animated checkmark -->
             <div class="w-20 h-20 mx-auto mb-4 relative">
-              <div class="w-full h-full rounded-full bg-gradient-to-r from-green-400 to-green-500 flex items-center justify-center animate-pulse">
+              <div class="w-full h-full rounded-full bg-gradient-to-r from-violet-400 to-purple-500 flex items-center justify-center animate-pulse">
                 <Check class="w-10 h-10 text-white" />
               </div>
               <!-- Ripple effect -->
-              <div class="absolute inset-0 rounded-full bg-gradient-to-r from-green-400 to-green-500 animate-ping opacity-75"></div>
+              <div class="absolute inset-0 rounded-full bg-gradient-to-r from-violet-400 to-purple-500 animate-ping opacity-75"></div>
             </div>
           </div>
           
@@ -506,7 +506,7 @@
               type="button"
               @click="handleCreateProject"
               :disabled="isLoading"
-              class="px-6 py-2 bg-gradient-to-r from-green-500 to-green-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              class="px-6 py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               <div v-if="isLoading" class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
               <span>{{ isLoading ? 'Creating...' : 'Create Project' }}</span>
@@ -937,7 +937,7 @@ const handleCreateProject = async () => {
     closeCreateModal()
     
     // Show success message
-    alertService.success(`Project "${createdProject.project_name}" created successfully with ${selectedDepartments.value.length} department(s)!`)
+    alertService.success('Project created successfully!')
   } catch (err) {
     // Error is already handled in the service
   }

@@ -108,6 +108,28 @@ export const getProjectByName = async (projectName) => {
 }
 
 /**
+ * Get departments for a project
+ */
+export const getProjectDepartments = async (projectName) => {
+  try {
+    const formData = new FormData()
+    formData.append('project_name', projectName)
+
+    const result = await makeFormDataRequest(`${API_BASE}.get_project_departments`, formData)
+
+    const apiResponse = result.message || result
+
+    if (apiResponse && apiResponse.status === 'success') {
+      return Array.isArray(apiResponse.data) ? apiResponse.data : []
+    } else {
+      throw new Error(apiResponse?.message || 'Failed to fetch project departments')
+    }
+  } catch (err) {
+    throw err
+  }
+}
+
+/**
  * Set the selected project
  */
 export const setSelectedProject = (project) => {

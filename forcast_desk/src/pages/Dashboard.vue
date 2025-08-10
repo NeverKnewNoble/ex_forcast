@@ -65,7 +65,7 @@
           <!-- No project selected state -->
           <div 
             v-else 
-            class="relative overflow-hidden rounded-2xl p-8 bg-gradient-to-r from-blue-500 via-blue-400 to-blue-200 shadow-2xl border border-white"
+            class="relative overflow-hidden rounded-2xl p-8 bg-gradient-to-r from-violet-500 via-violet-500 to-purple-400 shadow-2xl "
           >
             <div class="relative z-10 text-center">
               <div class="mb-4">

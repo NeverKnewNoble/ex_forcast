@@ -276,3 +276,31 @@ def get_project_by_name(project_name):
             "status": "error",
             "message": f"Failed to fetch project: {str(e)}"
         } 
+    
+
+# ? Get project departments by project name
+@frappe.whitelist(allow_guest=True)
+def get_project_departments(project_name):
+    """Get all department names for a specific project"""
+    try:
+        project = frappe.get_doc("Forecast Project", {"project_name": project_name})
+        # Each child row has field `depatment` which links to Department docname. Resolve to human-friendly `department_name`.
+        department_names = []
+        for row in project.departments or []:
+            dept_docname = getattr(row, "depatment", None)
+            if not dept_docname:
+                continue
+            dept_name = frappe.db.get_value("Department", dept_docname, "department_name") or dept_docname
+            department_names.append(dept_name)
+
+        return {
+            "status": "success",
+            "data": department_names,
+            "message": f"Found {len(department_names)} departments for project '{project_name}'"
+        }
+    except Exception as e:
+        frappe.log_error(f"Error fetching project departments: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Failed to fetch project departments: {str(e)}"
+        }
