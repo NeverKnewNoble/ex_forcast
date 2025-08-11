@@ -271,26 +271,28 @@
   
                       <!-- Enhanced Table Body -->
                       <tbody class="text-gray-700 bg-white text-sm">
-                        <!-- ROOMS REVENUE Section -->
-                        <tr class="bg-gradient-to-r from-violet-50 to-violet-100 border-b-2 border-violet-300">
-                          <td colspan="2" class="px-3 py-3 font-bold text-violet-900 border-r border-violet-300">
+                        <!-- Dynamic Department Sections -->
+                        <template v-for="(department, deptIndex) in departments" :key="'dept-' + deptIndex">
+                          <!-- Department Header -->
+                          <tr class="bg-gradient-to-r from-violet-600 to-violet-700 border-y-2 border-white">
+                            <td colspan="2" class="px-3 py-3 font-extrabold text-white border-r border-violet-800">
                             <div class="flex items-center gap-2">
-                              ROOMS REVENUE
+                              {{ department }}
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-header-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-header-cell-' + year + '-' + label"
-                                class="px-1 py-1 text-center border border-violet-200 bg-violet-50"
-                              ></td>
-                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-50"></td>
-                            </template>
-                            <template v-else>
-                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-50"></td>
-                            </template>
-                          </template>
+                              <template v-for="year in visibleYears" :key="'dept-header-' + deptIndex + '-' + year">
+                                <template v-if="!isYearCollapsed(year)">
+                                  <td
+                                    v-for="label in getColumnLabelsForYearLocal(year)"
+                                    :key="'dept-header-cell-' + deptIndex + '-' + year + '-' + label"
+                                    class="px-1 py-1 text-center border border-violet-500 bg-violet-600/30 text-white/90"
+                                  ></td>
+                                  <td class="px-1 py-1 text-center border border-violet-500 bg-violet-600/30"></td>
+                                </template>
+                                <template v-else>
+                                  <td class="px-1 py-1 text-center border border-violet-500 bg-violet-600/30"></td>
+                                </template>
+                              </template>
                         </tr>
   
                         <!-- Revenue Sub-section -->
@@ -300,11 +302,11 @@
                               Revenue
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-revenue-subheader-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-revenue-subheader-' + deptIndex + '-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-revenue-subheader-cell-' + year + '-' + label"
+                                :key="'dept-revenue-subheader-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-1 py-1 text-center border border-violet-200 bg-violet-100"
                               ></td>
                               <td class="px-1 py-1 text-center border border-violet-200 bg-violet-100"></td>
@@ -315,18 +317,18 @@
                           </template>
                         </tr>
   
-                        <!-- Total monthly Rooms Revenue -->
+                        <!-- Total monthly Department Revenue -->
                         <tr class="bg-violet-50 border-b border-violet-200">
                           <td colspan="2" class="px-3 py-2 font-medium border-r border-violet-200">
                             <div class="flex items-center gap-1">
-                              Total monthly Rooms Revenue
+                              Total monthly {{ department }} Revenue
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-revenue-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-revenue-' + deptIndex + '-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-revenue-cell-' + year + '-' + label"
+                                :key="'dept-revenue-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -343,23 +345,23 @@
                           </template>
                         </tr>
   
-                        <!-- Collection - 80% in the month of Revenue (Rooms) -->
+                        <!-- Collection - 80% in the month of Revenue -->
                         <tr class="bg-violet-50 border-b border-violet-200">
                           <td class="px-3 py-2 font-medium border-r border-violet-200">
                             <div class="flex items-center gap-1">
-                              Collection- {{ collectionPercentages.rooms.month.toFixed(0) }}% in the month of Revenue
+                              Collection- 80% in the month of Revenue
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('rooms', 'month', $event)" @focus="handleCollectionPercentageFocus({ type: 'rooms', period: 'month', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'rooms', period: 'month', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('dept-' + deptIndex, 'month', $event)" @focus="handleCollectionPercentageFocus({ type: 'dept-' + deptIndex, period: 'month', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'dept-' + deptIndex, period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ collectionPercentages.rooms.month.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">0.00%</span>
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-collection-80-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-collection-80-' + deptIndex + '-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-collection-80-cell-' + year + '-' + label"
+                                :key="'dept-collection-80-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -376,24 +378,24 @@
                           </template>
                         </tr>
   
-                        <!-- Collection - 15% in the month following Revenue (Rooms) -->
+                        <!-- Collection - 15% in the month following Revenue -->
                         <tr class="bg-violet-50 border-b border-violet-200">
                           <td class="px-3 py-2 font-medium border-r border-violet-200">
                             <div class="flex items-center gap-1">
-                              Collection- {{ collectionPercentages.rooms.following.toFixed(0) }}% in the month following Revenue
+                              Collection- 15% in the month following Revenue
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('rooms', 'following', $event)" @focus="handleCollectionPercentageFocus({ type: 'rooms', period: 'following', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'rooms', period: 'following', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('dept-' + deptIndex, 'following', $event)" @focus="handleCollectionPercentageFocus({ type: 'dept-' + deptIndex, period: 'following', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'dept-' + deptIndex, period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ collectionPercentages.rooms.following.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">0.00%</span>
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-collection-15-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-collection-15-' + deptIndex + '-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-collection-15-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
+                                :key="'dept-collection-15-cell-' + deptIndex + '-' + year + '-' + label"
+                                class="px-2 py-1 text-right border border-violet-200 bg-violet-100"
                               >
                                 <span class="font-mono text-xs">0.00</span>
                               </td>
@@ -409,23 +411,23 @@
                           </template>
                         </tr>
   
-                        <!-- Collection - 5% in the Second month following Revenue (Rooms) -->
+                        <!-- Collection - 5% in the Second month following Revenue -->
                         <tr class="bg-violet-50 border-b border-violet-200">
                           <td class="px-3 py-2 font-medium border-r border-violet-200">
                             <div class="flex items-center gap-1">
-                              Collection- {{ collectionPercentages.rooms.second.toFixed(0) }}% in the Second month following Revenue
+                              Collection- 5% in the Second month following Revenue
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('rooms', 'second', $event)" @focus="handleCollectionPercentageFocus({ type: 'rooms', period: 'second', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'rooms', period: 'second', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('dept-' + deptIndex, 'second', $event)" @focus="handleCollectionPercentageFocus({ type: 'dept-' + deptIndex, period: 'second', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'dept-' + deptIndex, period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ collectionPercentages.rooms.second.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">0.00%</span>
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-collection-5-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-collection-5-' + deptIndex + '-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-collection-5-cell-' + year + '-' + label"
+                                :key="'dept-collection-5-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -442,18 +444,18 @@
                           </template>
                         </tr>
   
-                        <!-- Cash Inflow (Rooms) -->
+                        <!-- Cash Inflow -->
                         <tr class="bg-gradient-to-r from-violet-100 to-violet-200 border-b-2 border-violet-400">
                           <td colspan="2" class="px-3 py-2 font-bold border-r border-violet-300 text-violet-900 text-right">
                             <div class="flex items-center gap-1 justify-end">
                               Cash Inflow
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-cash-inflow-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-cash-inflow-' + deptIndex + '-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-cash-inflow-cell-' + year + '-' + label"
+                                :key="'dept-cash-inflow-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -470,18 +472,18 @@
                           </template>
                         </tr>
   
-                        <!-- Accounts Receivables (Rooms) -->
+                        <!-- Department Accounts Receivables -->
                         <tr class="bg-gradient-to-r from-violet-100 to-violet-200 border-b-2 border-violet-400">
                           <td colspan="2" class="px-3 py-2 font-bold border-r border-violet-300 text-violet-900 text-right">
                             <div class="flex items-center gap-1 justify-end">
-                              Accounts Receivables
+                              {{ department }} Accounts Receivables
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-accounts-receivables-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-accounts-receivables-' + deptIndex + '-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-accounts-receivables-cell-' + year + '-' + label"
+                                :key="'dept-accounts-receivables-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -505,11 +507,11 @@
                               Payments
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-payments-subheader-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-payments-subheader-' + deptIndex + '-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-payments-subheader-cell-' + year + '-' + label"
+                                :key="'dept-payments-subheader-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-1 py-1 text-center border border-red-200 bg-red-100"
                               ></td>
                               <td class="px-1 py-1 text-center border border-red-200 bg-red-100"></td>
@@ -527,11 +529,11 @@
                               Net Salary & Wages
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-salary-wages-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-salary-wages-' + deptIndex + '-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-salary-wages-cell-' + year + '-' + label"
+                                :key="'dept-salary-wages-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -548,23 +550,23 @@
                           </template>
                         </tr>
   
-                        <!-- Payment - 80% in the month of Payroll run (Salary & Wages) -->
+                        <!-- Payment - 80% in the month of Payroll run -->
                         <tr class="bg-red-50 border-b border-red-200">
                           <td class="px-3 py-2 font-medium border-r border-red-200">
                             <div class="flex items-center gap-1">
-                              Payment- {{ paymentPercentages.rooms.salary.month.toFixed(0) }}% in the month of Payroll run
+                              Payment- 80% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('rooms', 'salary', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: 'rooms', category: 'salary', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'rooms', category: 'salary', period: 'month', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('dept-' + deptIndex, 'salary', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: 'dept-' + deptIndex, category: 'salary', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'dept-' + deptIndex, category: 'salary', period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages.rooms.salary.month.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">0.00%</span>
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-salary-payment-80-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-salary-payment-80-' + deptIndex + '-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-salary-payment-80-cell-' + year + '-' + label"
+                                :key="'dept-salary-payment-80-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -585,19 +587,19 @@
                         <tr class="bg-red-50 border-b border-red-200">
                           <td class="px-3 py-2 font-medium border-r border-red-200">
                             <div class="flex items-center gap-1">
-                              Payment- {{ paymentPercentages.rooms.salary.following.toFixed(0) }}% in the month of Payroll run
+                             Payment- {{ paymentPercentages[getDeptKey(department)].salary.following.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('rooms', 'salary', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: 'rooms', category: 'salary', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'rooms', category: 'salary', period: 'following', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'salary', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'salary', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'salary', period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
                               <span class="font-mono text-xs">{{ paymentPercentages.rooms.salary.following.toFixed(2) }}%</span>
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-salary-payment-15-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-salary-payment-15-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-salary-payment-15-cell-' + year + '-' + label"
+                                :key="'dept-' + deptIndex + '-salary-payment-15-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -618,19 +620,19 @@
                         <tr class="bg-red-50 border-b border-red-200">
                           <td class="px-3 py-2 font-medium border-r border-red-200">
                             <div class="flex items-center gap-1">
-                              Payment- {{ paymentPercentages.rooms.salary.second.toFixed(0) }}% in the month of Payroll run
+                             Payment- {{ paymentPercentages[getDeptKey(department)].salary.second.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('rooms', 'salary', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: 'rooms', category: 'salary', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'rooms', category: 'salary', period: 'second', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'salary', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'salary', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'salary', period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
                               <span class="font-mono text-xs">{{ paymentPercentages.rooms.salary.second.toFixed(2) }}%</span>
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-salary-payment-5-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-salary-payment-5-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-salary-payment-5-cell-' + year + '-' + label"
+                                :key="'dept-' + deptIndex + '-salary-payment-5-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -654,11 +656,11 @@
                               Cash Outflow
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-salary-cash-outflow-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-salary-cash-outflow-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-salary-cash-outflow-cell-' + year + '-' + label"
+                                :key="'dept-' + deptIndex + '-salary-cash-outflow-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -675,18 +677,18 @@
                           </template>
                         </tr>
   
-                        <!-- Rooms Net Salaries & Wages Payables -->
+                        <!-- {{ department }} Net Salaries & Wages Payables -->
                         <tr class="bg-gradient-to-r from-red-100 to-red-200 border-b-2 border-red-400">
                           <td colspan="2" class="px-3 py-2 font-bold border-r border-red-300 text-red-900 text-right">
                             <div class="flex items-center gap-1 justify-end">
-                              Rooms Net Salaries & Wages Payables
+                              {{ department }} Net Salaries & Wages Payables
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-salary-payables-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-salary-payables-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-salary-payables-cell-' + year + '-' + label"
+                                :key="'dept-' + deptIndex + '-salary-payables-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -710,11 +712,11 @@
                               Bonus
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-bonus-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-bonus-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-bonus-cell-' + year + '-' + label"
+                                :key="'dept-' + deptIndex + '-bonus-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -735,19 +737,19 @@
                         <tr class="bg-red-50 border-b border-red-200">
                           <td class="px-3 py-2 font-medium border-r border-red-200">
                             <div class="flex items-center gap-1">
-                              Payment- {{ paymentPercentages.rooms.bonus.month.toFixed(0) }}% in the month of Payroll run
+                             Payment- {{ paymentPercentages[getDeptKey(department)].bonus.month.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('rooms', 'bonus', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: 'rooms', category: 'bonus', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'rooms', category: 'bonus', period: 'month', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'bonus', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'bonus', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'bonus', period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
                               <span class="font-mono text-xs">{{ paymentPercentages.rooms.bonus.month.toFixed(2) }}%</span>
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-bonus-payment-80-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-bonus-payment-80-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-bonus-payment-80-cell-' + year + '-' + label"
+                                :key="'dept-' + deptIndex + '-bonus-payment-80-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -768,19 +770,19 @@
                         <tr class="bg-red-50 border-b border-red-200">
                           <td class="px-3 py-2 font-medium border-r border-red-200">
                             <div class="flex items-center gap-1">
-                              Payment- {{ paymentPercentages.rooms.bonus.following.toFixed(0) }}% in the month of Payroll run
+                             Payment- {{ paymentPercentages[getDeptKey(department)].bonus.following.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('rooms', 'bonus', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: 'rooms', category: 'bonus', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'rooms', category: 'bonus', period: 'following', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'bonus', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'bonus', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'bonus', period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
                               <span class="font-mono text-xs">{{ paymentPercentages.rooms.bonus.following.toFixed(2) }}%</span>
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-bonus-payment-15-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-bonus-payment-15-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-bonus-payment-15-cell-' + year + '-' + label"
+                                :key="'dept-' + deptIndex + '-bonus-payment-15-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -801,19 +803,19 @@
                         <tr class="bg-red-50 border-b border-red-200">
                           <td class="px-3 py-2 font-medium border-r border-red-200">
                             <div class="flex items-center gap-1">
-                              Payment- {{ paymentPercentages.rooms.bonus.second.toFixed(0) }}% in the month of Payroll run
+                             Payment- {{ paymentPercentages[getDeptKey(department)].bonus.second.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('rooms', 'bonus', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: 'rooms', category: 'bonus', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'rooms', category: 'bonus', period: 'second', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'bonus', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'bonus', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'bonus', period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
                               <span class="font-mono text-xs">{{ paymentPercentages.rooms.bonus.second.toFixed(2) }}%</span>
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'rooms-bonus-payment-5-' + year">
+                          <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-bonus-payment-5-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'rooms-bonus-payment-5-cell-' + year + '-' + label"
+                                :key="'dept-' + deptIndex + '-bonus-payment-5-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
                                 <span class="font-mono text-xs">0.00</span>
@@ -858,11 +860,11 @@
                           </template>
                         </tr>
   
-                        <!-- Rooms Bonus Payables -->
+                        <!-- {{ department }} Bonus Payables -->
                         <tr class="bg-gradient-to-r from-red-100 to-red-200 border-b-2 border-red-400">
                           <td colspan="2" class="px-3 py-2 font-bold border-r border-red-300 text-red-900 text-right">
                             <div class="flex items-center gap-1 justify-end">
-                              Rooms Bonus Payables
+                              {{ department }} Bonus Payables
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-bonus-payables-' + year">
@@ -918,10 +920,10 @@
                         <tr class="bg-red-50 border-b border-red-200">
                           <td class="px-3 py-2 font-medium border-r border-red-200">
                             <div class="flex items-center gap-1">
-                              Payment- {{ paymentPercentages.rooms.payroll.month.toFixed(0) }}% in the month of Payroll run
+                             Payment- {{ paymentPercentages[getDeptKey(department)].payroll.month.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('rooms', 'payroll', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: 'rooms', category: 'payroll', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'rooms', category: 'payroll', period: 'month', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'payroll', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'payroll', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'payroll', period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
                               <span class="font-mono text-xs">{{ paymentPercentages.rooms.payroll.month.toFixed(2) }}%</span>
                             </div>
@@ -951,10 +953,10 @@
                         <tr class="bg-red-50 border-b border-red-200">
                           <td class="px-3 py-2 font-medium border-r border-red-200">
                             <div class="flex items-center gap-1">
-                              Payment- {{ paymentPercentages.rooms.payroll.following.toFixed(0) }}% in the month of Payroll run
+                             Payment- {{ paymentPercentages[getDeptKey(department)].payroll.following.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('rooms', 'payroll', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: 'rooms', category: 'payroll', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'rooms', category: 'payroll', period: 'following', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'payroll', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'payroll', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'payroll', period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
                               <span class="font-mono text-xs">{{ paymentPercentages.rooms.payroll.following.toFixed(2) }}%</span>
                             </div>
@@ -984,10 +986,10 @@
                         <tr class="bg-red-50 border-b border-red-200">
                           <td class="px-3 py-2 font-medium border-r border-red-200">
                             <div class="flex items-center gap-1">
-                              Payment- {{ paymentPercentages.rooms.payroll.second.toFixed(0) }}% in the month of Payroll run
+                             Payment- {{ paymentPercentages[getDeptKey(department)].payroll.second.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('rooms', 'payroll', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: 'rooms', category: 'payroll', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'rooms', category: 'payroll', period: 'second', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'payroll', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'payroll', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'payroll', period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
                               <span class="font-mono text-xs">{{ paymentPercentages.rooms.payroll.second.toFixed(2) }}%</span>
                             </div>
@@ -1041,11 +1043,11 @@
                           </template>
                         </tr>
   
-                        <!-- Rooms Payroll Related Payables -->
+                        <!-- {{ department }} Payroll Related Payables -->
                         <tr class="bg-gradient-to-r from-red-100 to-red-200 border-b-2 border-red-400">
                           <td colspan="2" class="px-3 py-2 font-bold border-r border-red-300 text-red-900 text-right">
                             <div class="flex items-center gap-1 justify-end">
-                              Rooms Payroll Related Payables
+                              {{ department }} Payroll Related Payables
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-payroll-payables-' + year">
@@ -1101,10 +1103,10 @@
                         <tr class="bg-red-50 border-b border-red-200">
                           <td class="px-3 py-2 font-medium border-r border-red-200">
                             <div class="flex items-center gap-1">
-                              Payment- {{ paymentPercentages.rooms.expenses.month.toFixed(0) }}% in the month of Payroll run
+                             Payment- {{ paymentPercentages[getDeptKey(department)].expenses.month.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('rooms', 'expenses', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: 'rooms', category: 'expenses', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'rooms', category: 'expenses', period: 'month', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'expenses', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'expenses', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'expenses', period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
                               <span class="font-mono text-xs">{{ paymentPercentages.rooms.expenses.month.toFixed(2) }}%</span>
                             </div>
@@ -1134,10 +1136,10 @@
                         <tr class="bg-red-50 border-b border-red-200">
                           <td class="px-3 py-2 font-medium border-r border-red-200">
                             <div class="flex items-center gap-1">
-                              Payment- {{ paymentPercentages.rooms.expenses.following.toFixed(0) }}% in the month of Payroll run
+                             Payment- {{ paymentPercentages[getDeptKey(department)].expenses.following.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('rooms', 'expenses', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: 'rooms', category: 'expenses', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'rooms', category: 'expenses', period: 'following', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'expenses', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'expenses', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'expenses', period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
                               <span class="font-mono text-xs">{{ paymentPercentages.rooms.expenses.following.toFixed(2) }}%</span>
                             </div>
@@ -1167,10 +1169,10 @@
                         <tr class="bg-red-50 border-b border-red-200">
                           <td class="px-3 py-2 font-medium border-r border-red-200">
                             <div class="flex items-center gap-1">
-                              Payment- {{ paymentPercentages.rooms.expenses.second.toFixed(0) }}% in the month of Payroll run
+                             Payment- {{ paymentPercentages[getDeptKey(department)].expenses.second.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('rooms', 'expenses', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: 'rooms', category: 'expenses', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'rooms', category: 'expenses', period: 'second', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'expenses', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'expenses', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'expenses', period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
                               <span class="font-mono text-xs">{{ paymentPercentages.rooms.expenses.second.toFixed(2) }}%</span>
                             </div>
@@ -1224,11 +1226,11 @@
                           </template>
                         </tr>
   
-                        <!-- Rooms Expenses Payables -->
+                        <!-- {{ department }} Expenses Payables -->
                         <tr class="bg-gradient-to-r from-red-100 to-red-200 border-b-2 border-red-400">
                           <td colspan="2" class="px-3 py-2 font-bold border-r border-red-300 text-red-900 text-right">
                             <div class="flex items-center gap-1 justify-end">
-                              Rooms Expenses Payables
+                              {{ department }} Expenses Payables
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-expenses-payables-' + year">
@@ -1251,416 +1253,20 @@
                             </template>
                           </template>
                         </tr>
+                            </template>
   
-                        <!-- F & B REVENUE Section -->
-                        <tr class="bg-gradient-to-r from-violet-50 to-violet-100 border-b-2 border-violet-300">
-                          <td colspan="2" class="px-3 py-3 font-bold text-violet-900 border-r border-violet-300">
-                            <div class="flex items-center gap-2">
-                              F & B REVENUE
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'fnb-header-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'fnb-header-cell-' + year + '-' + label"
-                                class="px-1 py-1 text-center border border-violet-200 bg-violet-50"
-                              ></td>
-                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-50"></td>
-                            </template>
-                            <template v-else>
-                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-50"></td>
-                            </template>
-                          </template>
-                        </tr>
+
   
-                        <!-- Total monthly F&B Revenue -->
-                        <tr class="bg-violet-50 border-b border-violet-200">
-                          <td colspan="2" class="px-3 py-2 font-medium border-r border-violet-200">
-                            <div class="flex items-center gap-1">
-                              Total monthly F&B Revenue
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'fnb-revenue-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'fnb-revenue-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
-                              >
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                            <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                          </template>
-                        </tr>
+
   
-                        <!-- Collection - 80% in the month of Revenue (F&B) -->
-                        <tr class="bg-violet-50 border-b border-violet-200">
-                          <td class="px-3 py-2 font-medium border-r border-violet-200">
-                            <div class="flex items-center gap-1">
-                              Collection- {{ collectionPercentages.fnb.month.toFixed(0) }}% in the month of Revenue
-                            </div>
-                          </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('fnb', 'month', $event)" @focus="handleCollectionPercentageFocus({ type: 'fnb', period: 'month', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'fnb', period: 'month', event: $event })">
-                            <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ collectionPercentages.fnb.month.toFixed(2) }}%</span>
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'fnb-collection-80-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'fnb-collection-80-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
-                              >
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                            <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                          </template>
-                        </tr>
+
   
-                        <!-- Collection - 15% in the month following Revenue (F&B) -->
-                        <tr class="bg-violet-50 border-b border-violet-200">
-                          <td class="px-3 py-2 font-medium border-r border-violet-200">
-                            <div class="flex items-center gap-1">
-                              Collection- {{ collectionPercentages.fnb.following.toFixed(0) }}% in the month following Revenue
-                            </div>
-                          </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('fnb', 'following', $event)" @focus="handleCollectionPercentageFocus({ type: 'fnb', period: 'following', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'fnb', period: 'following', event: $event })">
-                            <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ collectionPercentages.fnb.following.toFixed(2) }}%</span>
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'fnb-collection-15-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'fnb-collection-15-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
-                              >
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                            <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                          </template>
-                        </tr>
+
   
-                        <!-- Collection - 5% in the Second month following Revenue (F&B) -->
-                        <tr class="bg-violet-50 border-b border-violet-200">
-                          <td class="px-3 py-2 font-medium border-r border-violet-200">
-                            <div class="flex items-center gap-1">
-                              Collection- {{ collectionPercentages.fnb.second.toFixed(0) }}% in the Second month following Revenue
-                            </div>
-                          </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('fnb', 'second', $event)" @focus="handleCollectionPercentageFocus({ type: 'fnb', period: 'second', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'fnb', period: 'second', event: $event })">
-                            <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ collectionPercentages.fnb.second.toFixed(2) }}%</span>
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'fnb-collection-5-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'fnb-collection-5-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
-                              >
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                            <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                          </template>
-                        </tr>
+
   
-                        <!-- Cash Inflow (F&B) -->
-                        <tr class="bg-gradient-to-r from-violet-100 to-violet-200 border-b-2 border-violet-400">
-                          <td colspan="2" class="px-3 py-2 font-bold border-r border-violet-300 text-violet-900 text-right">
-                            <div class="flex items-center gap-1 justify-end">
-                              Cash Inflow
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'fnb-cash-inflow-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'fnb-cash-inflow-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900"
-                              >
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                              <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                            </template>
-                            <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                            </template>
-                          </template>
-                        </tr>
+
   
-                        <!-- Accounts Receivables (F&B) -->
-                        <tr class="bg-gradient-to-r from-violet-100 to-violet-200 border-b-2 border-violet-400">
-                          <td colspan="2" class="px-3 py-2 font-bold border-r border-violet-300 text-violet-900 text-right">
-                            <div class="flex items-center gap-1 justify-end">
-                              Accounts Receivables
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'fnb-accounts-receivables-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'fnb-accounts-receivables-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900"
-                              >
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                              <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                            </template>
-                            <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                            </template>
-                          </template>
-                        </tr>
-  
-                        <!-- OOD REVENUE Section -->
-                        <tr class="bg-gradient-to-r from-violet-50 to-violet-100 border-b-2 border-violet-300">
-                          <td colspan="2" class="px-3 py-3 font-bold text-violet-900 border-r border-violet-300">
-                            <div class="flex items-center gap-2">
-                              OOD REVENUE
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'ood-header-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'ood-header-cell-' + year + '-' + label"
-                                class="px-1 py-1 text-center border border-violet-200 bg-violet-50"
-                              ></td>
-                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-50"></td>
-                            </template>
-                            <template v-else>
-                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-50"></td>
-                            </template>
-                          </template>
-                        </tr>
-  
-                        <!-- Total monthly OOD Revenue -->
-                        <tr class="bg-violet-50 border-b border-violet-200">
-                          <td colspan="2" class="px-3 py-2 font-medium border-r border-violet-200">
-                            <div class="flex items-center gap-1">
-                              Total monthly OOD Revenue
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'ood-revenue-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'ood-revenue-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
-                              >
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                            <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                          </template>
-                        </tr>
-  
-                        <!-- Collection - 80% in the month of Revenue (OOD) -->
-                        <tr class="bg-violet-50 border-b border-violet-200">
-                          <td class="px-3 py-2 font-medium border-r border-violet-200">
-                            <div class="flex items-center gap-1">
-                              Collection- {{ collectionPercentages.ood.month.toFixed(0) }}% in the month of Revenue
-                            </div>
-                          </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('ood', 'month', $event)" @focus="handleCollectionPercentageFocus({ type: 'ood', period: 'month', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'ood', period: 'month', event: $event })">
-                            <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ collectionPercentages.ood.month.toFixed(2) }}%</span>
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'ood-collection-80-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'ood-collection-80-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
-                              >
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                            <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                          </template>
-                        </tr>
-  
-                        <!-- Collection - 15% in the month following Revenue (OOD) -->
-                        <tr class="bg-violet-50 border-b border-violet-200">
-                          <td class="px-3 py-2 font-medium border-r border-violet-200">
-                            <div class="flex items-center gap-1">
-                              Collection- {{ collectionPercentages.ood.following.toFixed(0) }}% in the month following Revenue
-                            </div>
-                          </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('ood', 'following', $event)" @focus="handleCollectionPercentageFocus({ type: 'ood', period: 'following', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'ood', period: 'following', event: $event })">
-                            <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ collectionPercentages.ood.following.toFixed(2) }}%</span>
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'ood-collection-15-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'ood-collection-15-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
-                              >
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                            <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                          </template>
-                        </tr>
-  
-                        <!-- Collection - 5% in the Second month following Revenue (OOD) -->
-                        <tr class="bg-violet-50 border-b border-violet-200">
-                          <td class="px-3 py-2 font-medium border-r border-violet-200">
-                            <div class="flex items-center gap-1">
-                              Collection- {{ collectionPercentages.ood.second.toFixed(0) }}% in the Second month following Revenue
-                            </div>
-                          </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('ood', 'second', $event)" @focus="handleCollectionPercentageFocus({ type: 'ood', period: 'second', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'ood', period: 'second', event: $event })">
-                            <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ collectionPercentages.ood.second.toFixed(2) }}%</span>
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'ood-collection-5-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'ood-collection-5-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
-                              >
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                            <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
-                              </td>
-                            </template>
-                          </template>
-                        </tr>
-  
-                        <!-- Cash Inflow (OOD) -->
-                        <tr class="bg-gradient-to-r from-violet-100 to-violet-200 border-b-2 border-violet-400">
-                          <td colspan="2" class="px-3 py-2 font-bold border-r border-violet-300 text-violet-900 text-right">
-                            <div class="flex items-center gap-1 justify-end">
-                              Cash Inflow
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'ood-cash-inflow-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'ood-cash-inflow-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900"
-                              >
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                              <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                            </template>
-                            <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                            </template>
-                          </template>
-                        </tr>
-  
-                        <!-- Accounts Receivables (OOD) -->
-                        <tr class="bg-gradient-to-r from-violet-100 to-violet-200 border-b-2 border-violet-400">
-                          <td colspan="2" class="px-3 py-2 font-bold border-r border-violet-300 text-violet-900 text-right">
-                            <div class="flex items-center gap-1 justify-end">
-                              Accounts Receivables
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'ood-accounts-receivables-' + year">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'ood-accounts-receivables-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900"
-                              >
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                              <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                            </template>
-                            <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">0.00</span>
-                              </td>
-                            </template>
-                          </template>
-                        </tr>
   
                 
                       </tbody>
@@ -1824,7 +1430,7 @@
     calculateCategoryMonthTotal
   } from "@/components/utility/expense_assumption/expense_estimate_utils.js";
   
-  import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
+  import { selectedProject, initializeProjectService, getProjectDepartments } from '@/components/utility/dashboard/projectService.js';
   
   // ============================================================================
   // REACTIVE STATE
@@ -1844,23 +1450,24 @@
   const showUnsavedWarning = ref(false);
   const pendingNavigation = ref(null);
   const sidebarCollapsed = ref(false);
+  const departments = ref([]); // Add departments state
   
   // Collection percentages for each revenue type
   const collectionPercentages = ref({
     rooms: {
-      month: 80.00,
-      following: 15.00,
-      second: 5.00
+      month: 0.00,
+      following: 0.00,
+      second: 0.00
     },
     fnb: {
-      month: 80.00,
-      following: 15.00,
-      second: 5.00
+      month: 0.00,
+      following: 0.00,
+      second: 0.00
     },
     ood: {
-      month: 80.00,
-      following: 15.00,
-      second: 5.00
+      month: 0.00,
+      following: 0.00,
+      second: 0.00
     }
   });
   
@@ -1868,71 +1475,110 @@
   const paymentPercentages = ref({
     rooms: {
       salary: {
-        month: 80.00,
-        following: 15.00,
-        second: 5.00
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       },
       bonus: {
-        month: 80.00,
-        following: 15.00,
-        second: 5.00
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       },
       payroll: {
-        month: 80.00,
-        following: 15.00,
-        second: 5.00
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       },
       expenses: {
-        month: 80.00,
-        following: 15.00,
-        second: 5.00
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       }
     },
     fnb: {
       salary: {
-        month: 80.00,
-        following: 15.00,
-        second: 5.00
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       },
       bonus: {
-        month: 80.00,
-        following: 15.00,
-        second: 5.00
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       },
       payroll: {
-        month: 80.00,
-        following: 15.00,
-        second: 5.00
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       },
       expenses: {
-        month: 80.00,
-        following: 15.00,
-        second: 5.00
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       }
     },
     ood: {
       salary: {
-        month: 80.00,
-        following: 15.00,
-        second: 5.00
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       },
       bonus: {
-        month: 80.00,
-        following: 15.00,
-        second: 5.00
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       },
       payroll: {
-        month: 80.00,
-        following: 15.00,
-        second: 5.00
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       },
       expenses: {
-        month: 80.00,
-        following: 15.00,
-        second: 5.00
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       }
     }
   });
+
+  // =========================================================================
+  // DEPARTMENT NORMALIZATION AND DEFAULTS
+  // =========================================================================
+  function normalizeDepartmentKey(rawName) {
+    if (!rawName || typeof rawName !== 'string') return 'rooms';
+    const name = rawName.trim().toLowerCase();
+    if (name === 'rooms') return 'rooms';
+    if (name === 'food and beverage' || name === 'f & b' || name === 'f&b') return 'fnb';
+    if (name === 'other operating departments' || name === 'ood') return 'ood';
+    // Generic slug: keep spaces to allow bracket access in template; ensure stable key
+    return name;
+  }
+
+  function ensureDefaultsForKey(key) {
+    if (!collectionPercentages.value[key]) {
+      collectionPercentages.value[key] = { month: 80.0, following: 15.0, second: 5.0 };
+    }
+    if (!paymentPercentages.value[key]) {
+      // Try to derive from known defaults based on semantic grouping
+      let base;
+      if (key === 'rooms') base = paymentPercentages.value.rooms;
+      else if (key === 'fnb') base = paymentPercentages.value.fnb;
+      else if (key === 'ood') base = paymentPercentages.value.ood;
+      else {
+        // Use rooms as a sensible default template
+        base = paymentPercentages.value.rooms;
+      }
+      paymentPercentages.value[key] = cloneDeep(base);
+    }
+  }
+
+  function ensureDepartmentConfigs(deptList) {
+    if (!Array.isArray(deptList)) return;
+    deptList.forEach((dept) => {
+      const key = normalizeDepartmentKey(dept);
+      ensureDefaultsForKey(key);
+    });
+  }
   
   // ============================================================================
   // PINIA STORE
@@ -1971,6 +1617,9 @@
     // This is specific to the Receipts_Payments page only
     return [...baseLabels, 'ex1', 'ex2'];
   };
+
+  // Expose a helper to normalize department key for template use
+  const getDeptKey = (dept) => normalizeDepartmentKey(dept);
   
   // ============================================================================
   // WATCHERS
@@ -1993,6 +1642,9 @@
         expenseData.value = {};
         allExpensesData.value = [];
         expenses.value = [];
+        
+        // Load departments for the new project
+        await loadDepartments();
         
         // Reset any unsaved changes
         changedCells.value = [];
@@ -2038,6 +1690,11 @@
       expenses.value = [];
       
       isSaved.value = true;
+      
+      // Load departments if a project is selected
+      if (selectedProject.value) {
+        await loadDepartments();
+      }
       
       // Check if we should show refresh success alert
       if (localStorage.getItem('showRefreshSuccess') === 'true') {
@@ -2270,6 +1927,33 @@
     } else {
       // Reset to previous value if invalid
       event.target.textContent = paymentPercentages.value[type][category][period] + '%';
+    }
+  }
+  
+  // ============================================================================
+  // DEPARTMENT LOADING
+  // ============================================================================
+  async function loadDepartments() {
+    try {
+      if (selectedProject.value) {
+        const response = await getProjectDepartments(selectedProject.value.name);
+        // Extract department names from the API response structure
+        if (response && response.data && response.data.data) {
+          departments.value = response.data.data;
+          ensureDepartmentConfigs(departments.value);
+        } else if (Array.isArray(response)) {
+          // Fallback for direct array response
+          departments.value = response;
+          ensureDepartmentConfigs(departments.value);
+        } else {
+          departments.value = [];
+        }
+      } else {
+        departments.value = [];
+      }
+    } catch (error) {
+      console.error("Error loading departments:", error);
+      departments.value = [];
     }
   }
   </script>

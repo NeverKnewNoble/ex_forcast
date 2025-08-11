@@ -24,10 +24,10 @@ export async function createExpenseDocument({ year, month, expenses }) {
 
   // Transform the expenses array to match the Expense Items table structure
   const expenseItems = expenses.map(expense => ({
+    department: expense.department,
+    department_location: expense.department_location,
     expense_name: expense.expense, 
     amount: expense.amount,
-    // Add hospitality category if available
-    ...(expense.category && { hospitality_category: expense.category }),
     // Add cost type if available
     ...(expense.costType && { cost_type: expense.costType }),
   }))

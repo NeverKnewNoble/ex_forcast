@@ -43,6 +43,7 @@ export {
   getFilteredExpenses,
   getExpensesGroupedByCategory,
   getAllExpensesGroupedByCategory,
+  getExpensesGroupedByDepartmentAndLocation,
   getExpenseDetails,
   getExpenseDetailsFromAllExpenses,
   getAmountForExpense,

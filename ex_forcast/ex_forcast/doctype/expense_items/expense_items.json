@@ -7,10 +7,11 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_vsnl",
+  "department",
+  "department_location",
   "expense_name",
   "code",
   "root_type",
-  "hospitality_category",
   "cost_type",
   "amount"
  ],
@@ -39,7 +40,6 @@
    "fetch_from": "expense_name.root_type",
    "fieldname": "root_type",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "Root Type",
    "read_only": 1
   },
@@ -56,17 +56,22 @@
    "options": "\nRooms Expenses\nFood & Beverage Expenses\nSPA\nAdministrative & General\nInformation & Telecommunication Systems\nSales & Marketing\nProperty Operation & management\nUtilities\nHouse Laundry\nMisc."
   },
   {
-   "fieldname": "hospitality_category",
-   "fieldtype": "Link",
+   "fieldname": "department",
+   "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Hospitality Category",
-   "options": "Expense Category"
+   "label": "Department"
+  },
+  {
+   "fieldname": "department_location",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Department Location"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-25 19:12:55.302806",
+ "modified": "2025-08-10 22:38:08.897655",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Expense Items",

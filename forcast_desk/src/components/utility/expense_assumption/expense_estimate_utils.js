@@ -169,3 +169,32 @@ export function handleCellFocus({ year, label, expense, event }) {
   selection.removeAllRanges();
   selection.addRange(range);
 }
+
+// Calculate total for a department in a specific month and year
+export function calculateDepartmentMonthTotal(expenseData, departmentGroup, year, label, displayMode) {
+  let total = 0;
+  for (const locationGroup of departmentGroup.locations) {
+    for (const expense of locationGroup.expenses) {
+      const rawAmount = getAmountForExpense(expenseData, expense, year, label, displayMode);
+      const amt = parseFloat(rawAmount.toString().replace(/,/g, ''));
+      if (!isNaN(amt)) total += amt;
+    }
+  }
+  return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// Calculate total for a department in a specific year
+export function calculateDepartmentTotal(expenseData, departmentGroup, year, displayMode) {
+  const months = getColumnLabels(displayMode);
+  let total = 0;
+  for (const locationGroup of departmentGroup.locations) {
+    for (const expense of locationGroup.expenses) {
+      for (const month of months) {
+        const rawAmount = getAmountForExpense(expenseData, expense, year, month, displayMode);
+        const amt = parseFloat(rawAmount.toString().replace(/,/g, ''));
+        if (!isNaN(amt)) total += amt;
+      }
+    }
+  }
+  return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}

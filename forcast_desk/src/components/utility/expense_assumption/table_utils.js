@@ -209,3 +209,81 @@ export function calculateTotalForExpense(expenseData, expense, year, displayMode
   }
   return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 } 
+
+// New function to group expenses by department and department location
+export function getExpensesGroupedByDepartmentAndLocation(expenseData, visibleYears) {
+  const departmentMap = new Map()
+  
+  visibleYears.forEach(year => {
+    const yearData = expenseData[year] || {}
+    for (const month in yearData) {
+      yearData[month].forEach(entry => {
+        const department = entry.department || 'Other'
+        const location = entry['department_location'] || 'Other'
+        
+        if (!departmentMap.has(department)) {
+          departmentMap.set(department, new Map())
+        }
+        
+        const locationMap = departmentMap.get(department)
+        if (!locationMap.has(location)) {
+          locationMap.set(location, new Set())
+        }
+        
+        locationMap.get(location).add(entry.expense)
+      })
+    }
+  })
+  
+  // Convert to array format with department, location, and expenses
+  const groupedExpenses = []
+  
+  for (const [department, locationMap] of departmentMap) {
+    const departmentGroup = {
+      department,
+      locations: []
+    }
+    
+    for (const [location, expenses] of locationMap) {
+      departmentGroup.locations.push({
+        location,
+        expenses: [...expenses].sort()
+      })
+    }
+    
+    // Sort locations alphabetically
+    departmentGroup.locations.sort((a, b) => a.location.localeCompare(b.location))
+    groupedExpenses.push(departmentGroup)
+  }
+  
+  // Sort departments alphabetically
+  groupedExpenses.sort((a, b) => a.department.localeCompare(b.department))
+  
+  return groupedExpenses
+}
+
+// New function to get expense details including department and location
+export function getExpenseDetailsWithDepartment(expenseData, expense, visibleYears) {
+  for (const year of visibleYears) {
+    const yearData = expenseData[year] || {}
+    for (const month in yearData) {
+      const entry = yearData[month].find(e => e.expense === expense)
+      if (entry) {
+        return {
+          code: entry.code || '',
+          costType: entry['cost_type'] || '',
+          rootType: entry['root type'] || '',
+          department: entry.department || '',
+          departmentLocation: entry['department_location'] || ''
+        }
+      }
+    }
+  }
+  return { 
+    code: '', 
+    costType: '', 
+    rootType: '', 
+    department: '', 
+    departmentLocation: '' 
+  }
+} 
