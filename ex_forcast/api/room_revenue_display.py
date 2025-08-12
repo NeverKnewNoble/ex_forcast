@@ -229,10 +229,14 @@ def upsert_room_revenue_items(changes, project=None):
                 frappe.logger().warning(f"Skipping invalid room package change: {change}")
                 continue
 
-            # Find the room package by package_name
+            # Find the room package by package_name scoped to project when provided
+            filters = {"package_name": room_type}
+            if project:
+                filters["project"] = project
+
             room_package = frappe.db.get_value(
                 "Room Packages",
-                {"package_name": room_type},
+                filters,
                 "name"
             )
 
@@ -243,11 +247,12 @@ def upsert_room_revenue_items(changes, project=None):
                 room_package_doc.save()
                 results.append({"action": "updated", "name": room_package_doc.name, "type": "room_package"})
             else:
-                # Create new room package
+                # Create new room package, attach to project when provided
                 room_package_doc = frappe.get_doc({
                     "doctype": "Room Packages",
                     "package_name": room_type,
-                    "number_of_rooms": new_value
+                    "number_of_rooms": new_value,
+                    "project": project
                 })
                 room_package_doc.insert()
                 results.append({"action": "created", "name": room_package_doc.name, "type": "room_package"})

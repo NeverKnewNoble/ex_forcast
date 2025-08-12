@@ -331,15 +331,15 @@
                                 :key="'dept-revenue-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getDepartmentMonthlyRevenue(department, year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
+                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getDepartmentYearTotal(department, year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
+                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getDepartmentYearTotal(department, year)) }}</span>
                               </td>
                             </template>
                           </template>
@@ -1431,6 +1431,7 @@
   } from "@/components/utility/expense_assumption/expense_estimate_utils.js";
   
   import { selectedProject, initializeProjectService, getProjectDepartments } from '@/components/utility/dashboard/projectService.js';
+  import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
   
   // ============================================================================
   // REACTIVE STATE
@@ -1451,6 +1452,7 @@
   const pendingNavigation = ref(null);
   const sidebarCollapsed = ref(false);
   const departments = ref([]); // Add departments state
+  const calculationCache = useCalculationCache();
   
   // Collection percentages for each revenue type
   const collectionPercentages = ref({
@@ -1622,6 +1624,120 @@
 
   // Expose a helper to normalize department key for template use
   const getDeptKey = (dept) => normalizeDepartmentKey(dept);
+
+  
+  // =========================================================================
+  // ROOMS REVENUE LOOKUP FROM PINIA CALCULATION CACHE
+  // =========================================================================
+  function getProjectName() {
+    return selectedProject.value?.project_name || 'default';
+  }
+
+  function isMarketSegmentationEnabled() {
+    try {
+      return localStorage.getItem('marketSegmentation') === 'true';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function getNumber(value) {
+    const num = Number(value);
+    return isNaN(num) ? 0 : num;
+  }
+
+  function formatMoney(value) {
+    return getNumber(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function getRoomMonthlyRevenueFromCache(year, label) {
+    const project = getProjectName();
+    if (isMarketSegmentationEnabled()) {
+      // Use Market Segmentation cached totals (including Service Charge)
+      return calculationCache.getValue(project, 'Market Segmentation', 'Total Rooms Revenue Including SC', year, label);
+    }
+    // Use Room Revenue Assumptions page cached monthly total
+    return calculationCache.getValue(project, 'Room Revenue Assumptions', 'Total Room Revenue', year, label);
+  }
+
+  function getRoomYearTotalFromCache(year) {
+    const project = getProjectName();
+    if (isMarketSegmentationEnabled()) {
+      // Prefer yearly cached total, else sum months
+      const cached = calculationCache.getValue(project, 'Market Segmentation', 'Total Rooms Revenue Including SC Year', year, 'ALL');
+      if (cached > 0) return cached;
+      // Sum monthly values as fallback
+      return (getColumnLabelsForYearLocal(year) || []).reduce((sum, label) => sum + getNumber(getRoomMonthlyRevenueFromCache(year, label)), 0);
+    }
+    const cached = calculationCache.getValue(project, 'Room Revenue Assumptions', 'Total Room Revenue Year', year, 'ALL');
+    if (cached > 0) return cached;
+    return (getColumnLabelsForYearLocal(year) || []).reduce((sum, label) => sum + getNumber(getRoomMonthlyRevenueFromCache(year, label)), 0);
+  }
+
+  function getFnbMonthlyRevenueFromCache(year, label) {
+    const project = getProjectName();
+    return calculationCache.getValue(project, 'F&B Revenue Assumptions', 'Total F&B Revenue', year, label);
+  }
+
+  function getFnbYearTotalFromCache(year) {
+    // Sum monthly cached values for the year
+    return (getColumnLabelsForYearLocal(year) || []).reduce((sum, label) => sum + getNumber(getFnbMonthlyRevenueFromCache(year, label)), 0);
+  }
+
+  function getBanquetMonthlyRevenueFromCache(year, label) {
+    const project = getProjectName();
+    return calculationCache.getValue(project, 'Banquet Revenue Assumptions', 'Net Amount', year, label);
+  }
+
+  function getBanquetYearTotalFromCache(year) {
+    return (getColumnLabelsForYearLocal(year) || []).reduce((sum, label) => sum + getNumber(getBanquetMonthlyRevenueFromCache(year, label)), 0);
+  }
+
+  function getOODMonthlyRevenueFromCache(year, label) {
+    const project = getProjectName();
+    const laundry = calculationCache.getValue(project, 'OOD Revenue Assumptions', 'Total Laundry Revenue', year, label);
+    const health = calculationCache.getValue(project, 'OOD Revenue Assumptions', 'Total Health Club Rev Including SC', year, label);
+    return getNumber(laundry) + getNumber(health);
+  }
+
+  function getOODYearTotalFromCache(year) {
+    return (getColumnLabelsForYearLocal(year) || []).reduce((sum, label) => sum + getNumber(getOODMonthlyRevenueFromCache(year, label)), 0);
+  }
+
+  function getDepartmentMonthlyRevenue(department, year, label) {
+    const key = normalizeDepartmentKey(department);
+    if (key === 'rooms') {
+      return getRoomMonthlyRevenueFromCache(year, label);
+    }
+    if (key === 'fnb') {
+      return getFnbMonthlyRevenueFromCache(year, label);
+    }
+    if (key === 'other operating departments' || key === 'banquet' || key === 'banquets') {
+      return getBanquetMonthlyRevenueFromCache(year, label);
+    }
+    if (key === 'ood' || key === 'other operating departments') {
+      return getOODMonthlyRevenueFromCache(year, label);
+    }
+    // TODO: Wire other departments to their respective caches
+    return 0;
+  }
+
+  function getDepartmentYearTotal(department, year) {
+    const key = normalizeDepartmentKey(department);
+    if (key === 'rooms') {
+      return getRoomYearTotalFromCache(year);
+    }
+    if (key === 'fnb') {
+      return getFnbYearTotalFromCache(year);
+    }
+    if (key === 'other operating departments' || key === 'banquet' || key === 'banquets') {
+      return getBanquetYearTotalFromCache(year);
+    }
+    if (key === 'ood' || key === 'other operating departments') {
+      return getOODYearTotalFromCache(year);
+    }
+    return 0;
+  }
   
   // ============================================================================
   // WATCHERS

@@ -917,7 +917,11 @@
         }
         break;
       case 'net_amount':
-        value = calcNetAmount(row, allFieldCodes); break;
+        value = calcNetAmount(row, allFieldCodes);
+        if (context.projectName && context.calculationCache && context.year && context.label) {
+          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Net Amount', context.year, context.label, value);
+        }
+        break;
       case 'amount_per_event':
         value = calcAmountPerEvent(row); break;
       case 'amount_per_pax':

@@ -103,12 +103,27 @@ export function handleOODCellEdit({ year, label, field, event, originalOODData, 
   if (!isComponentReady.value) return;
 
   // Support both input fields and contenteditable
-  const newValue = (typeof event.target.value === 'string') ? event.target.value.trim() : event.target.textContent.trim();
-  const originalValue = event.target.dataset.originalValue || '0';
+  const rawNew = (typeof event.target.value === 'string') ? event.target.value.trim() : event.target.textContent.trim();
+  const rawOrig = (event.target.dataset.originalValue ?? '').toString();
+
+  // Some OOD fields (e.g., *_base) are string selects. Compare as strings.
+  const isBaseField = typeof field === 'string' && field.endsWith('_base');
+  if (isBaseField) {
+    if (rawNew !== rawOrig) {
+      const idx = changedCells.value.findIndex(cell => cell.year === year && cell.label === label && cell.field === field);
+      if (idx >= 0) {
+        changedCells.value[idx].newValue = rawNew;
+      } else {
+        changedCells.value.push({ year, label, field, newValue: rawNew });
+      }
+      isSaved.value = false;
+    }
+    return;
+  }
 
   // Convert to numbers for comparison
-  const newNum = newValue === '' ? 0 : Number(newValue.replace(/[^\d.-]/g, ''));
-  const originalNum = originalValue === '' ? 0 : Number(originalValue.replace(/[^\d.-]/g, ''));
+  const newNum = rawNew === '' ? 0 : Number(rawNew.replace(/[^\d.-]/g, ''));
+  const originalNum = rawOrig === '' ? 0 : Number(rawOrig.replace(/[^\d.-]/g, ''));
 
   if (newNum !== originalNum) {
     // Check if this change is already tracked

@@ -1524,6 +1524,47 @@ const getColumnLabelsForYearLocal = (year) => {
   return getColumnLabels(advancedModes.value[year] || displayMode.value);
 };
 
+// Calculation cache instance to publish totals for other pages
+const calculationCache = useCalculationCache();
+
+function getProjectName() {
+  return selectedProject.value?.project_name || 'default';
+}
+
+function parseCurrencyToNumber(value) {
+  if (typeof value === 'number') return value;
+  if (typeof value !== 'string') return 0;
+  const cleaned = value.replace(/,/g, '');
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? 0 : num;
+}
+
+function updateRoomRevenueCache() {
+  try {
+    const project = getProjectName();
+    if (!visibleYears.value.length) return;
+    for (const year of visibleYears.value) {
+      const labels = getColumnLabelsForYearLocal(year);
+      // Monthly totals
+      for (const label of labels) {
+        const formatted = calculateMonthlyTotal(roomData.value, year, label, advancedModes.value[year] || displayMode.value, 'revenue', roomPackages.value);
+        const numeric = parseCurrencyToNumber(formatted);
+        if (numeric > 0) {
+          calculationCache.setValue(project, 'Room Revenue Assumptions', 'Total Room Revenue', year, label, numeric);
+        }
+      }
+      // Year total
+      const yearFormatted = calculateGrandTotal(roomData.value, year, advancedModes.value[year] || displayMode.value, 'revenue', roomPackages.value);
+      const yearNumeric = parseCurrencyToNumber(yearFormatted);
+      if (yearNumeric > 0) {
+        calculationCache.setValue(project, 'Room Revenue Assumptions', 'Total Room Revenue Year', year, 'ALL', yearNumeric);
+      }
+    }
+  } catch (e) {
+    // silent fail to avoid UI disruption
+  }
+}
+
 // Watch for changes in visible years to initialize advanced modes
 watch(visibleYears, () => {
   visibleYears.value.forEach(year => {
@@ -1606,6 +1647,8 @@ onMounted(async () => {
     updateRoomTypes(roomPackages.value);
     isSaved.value = true;
     // ... keep VAT, breakfast, exchange, service charge, roomTypeCounts logic ...
+    // Publish current totals into calculation cache for cross-page usage
+    updateRoomRevenueCache();
     
     // Check if we should show refresh success alert
     if (localStorage.getItem('showRefreshSuccess') === 'true') {
@@ -1676,6 +1719,8 @@ async function reloadDataForProject(newProject) {
     
     // Load project-specific settings after data reload
     loadProjectSettings();
+    // Update cache after reloading data
+    updateRoomRevenueCache();
     
     // console.log('Data reloaded successfully for project:', newProject.project_name);
   } catch (error) {
@@ -1701,6 +1746,8 @@ function handleRoomCellEditWrapper({ year, label, roomType, field, event }) {
     roomData,
     isSaved
   });
+  // Update cache after cell edit
+  updateRoomRevenueCache();
 }
 
 // Wrapper function for room count editing
@@ -1713,6 +1760,8 @@ function handleRoomCountEditWrapper({ roomType, event }) {
     roomData,
     isSaved
   });
+  // Update cache after count edit
+  updateRoomRevenueCache();
 }
 
 // Wrapper functions for modal form handling
@@ -1742,6 +1791,7 @@ const submitAddRoomRevenueWrapper = async () => {
         // Reload data to show the newly created room revenue
         roomData.value = await getRoomRevenueList();
         originalRoomData.value = cloneDeep(roomData.value);
+        updateRoomRevenueCache();
         
         // Show success message
         alertService.success("Room revenue assumption created successfully!");
@@ -1757,6 +1807,8 @@ const submitAddRoomRevenueWrapper = async () => {
 // Wrapper function for saveChanges
 const saveChangesWrapper = async () => {
   await saveRoomChanges(changedCells, isSaving, saveError, roomData, originalRoomData, isSaved);
+  // Update cache after saving
+  updateRoomRevenueCache();
   
   // Also save market segment changes if any
   if (marketSegmentationTablesRef.value && marketSegmentationTablesRef.value.marketSegmentChanges) {
@@ -1794,6 +1846,8 @@ watch(isSaved, (newValue) => {
     // Remove beforeunload event listener when changes are saved
     window.removeEventListener('beforeunload', handleBeforeUnload);
   }
+  // Recompute cache when save state toggles (often after apply)
+  updateRoomRevenueCache();
 });
 
 // Handle beforeunload event to show warning
@@ -1908,7 +1962,7 @@ async function refreshRoomPackages() {
   try {
     const response = await getRoomPackagesList(selectedProject.value?.project_name);
     if (response && response.success) {
-      roomPackages.value = response.data.data.room_packages || [];
+      roomPackages.value = response.data.room_packages || [];
       roomPackagesOptions.value = roomPackages.value.map(room_package => ({
         label: room_package.package_name,
         value: room_package.package_name
