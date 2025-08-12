@@ -1,0 +1,725 @@
+[
+ {
+  "default_expenses": [
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Cleaning Supplies",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Per Available Room",
+    "expense": "Cluster Services",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Commissions",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Commissions and Fees - Group",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Complimentary Services & Gifts",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Contract Services",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Corporate Office Reimbursables",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Decorations",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Dues & Subscriptions",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Entertainment In House",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Equipment Rental",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Guest Relocation",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Guest Supplies",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Guest Transportation",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Laundry & Dry Cleaning",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Licenses & Permits",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Linen",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Miscellaneous",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Complimentary In-Room/Media Entertainment",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Operating Supplies",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Postage & Overnight Delivery Charges",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Printing & Stationery",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Reservations",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Royalty Fees",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Music",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Training",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Travel - Meal & Entertainment",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Travel - Other",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Uniform Laundry",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Uniforms Costs",
+    "parent": "Rooms",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   }
+  ],
+  "department": "Rooms",
+  "docstatus": 0,
+  "doctype": "Default Expenses",
+  "modified": "2025-08-11 12:11:43.943620",
+  "module": "Ex Forcast",
+  "name": "Rooms"
+ },
+ {
+  "default_expenses": [
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Cost of Food sales",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Cost of Beverage sales",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Audiovisual cost",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Miscellaneous Cost",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Banquet Expenses",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "China Replacement",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Cleaning Supplies",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Cluster Services",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Commissions",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Complimentary Services & Gifts",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Contract Services",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Corporate Office Reimbursables",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Decoration",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Dishwashing supplies",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Dues & Subscriptions",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Entertainment - Inhouse",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Equipment Rental",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Flatware Replacement",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Glassware Replacement",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Ice",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Kitchen Fuel",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Kitchen Small wares",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Laundry & Dry Cleaning",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Licenses & Permits",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Linen Replacement",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Management Fees",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Menus",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Miscellaneous",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Music & Entertainment",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Operating Supplies",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Paper & Plastics",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Postage & Overnight Delivery Charges",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Printing & Stationery",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Reservations",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Royalty Fees",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Training",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Travel - Meals & Entertainment",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Travel - Other",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Uniform Costs",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Uniform Laundry ",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Utensils",
+    "parent": "Food And Beverage",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   }
+  ],
+  "department": "Food And Beverage",
+  "docstatus": 0,
+  "doctype": "Default Expenses",
+  "modified": "2025-08-11 12:49:29.334498",
+  "module": "Ex Forcast",
+  "name": "Food And Beverage"
+ },
+ {
+  "default_expenses": [
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Ambience",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Athletic Supplies",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Cleaning Supplies",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Complimentary Services & Gifts",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Contract Services",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Corporate Office Reimbursables",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Decoration",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Dues & Subscriptions",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Equipment Rental",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Health and Beauty Products",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Laundry and Dry Cleaning",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Licenses & Permits",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Linen Replacement",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Glassware Replacement",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Miscellaneous",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Operating Supplies",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Printing & Stationery",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Professional Fees",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Telecommunications",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Training",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Travel - Meals & Entertainment",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Travel - Other",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Uniforms Laundry",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Uniforms Replacement",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Cable Satellite TV",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Laundry Supplies",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Uniform Costs",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   },
+   {
+    "cost_type": "Fixed Amount",
+    "expense": "Other",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_expenses",
+    "parenttype": "Default Expenses"
+   }
+  ],
+  "department": "Other Operating Departments",
+  "docstatus": 0,
+  "doctype": "Default Expenses",
+  "modified": "2025-08-11 19:21:05.931282",
+  "module": "Ex Forcast",
+  "name": "Other Operating Departments"
+ }
+]

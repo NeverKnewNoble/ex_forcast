@@ -30,6 +30,8 @@ export async function createExpenseDocument({ year, month, expenses }) {
     amount: expense.amount,
     // Add cost type if available
     ...(expense.costType && { cost_type: expense.costType }),
+    // Add flag to indicate this is not a default expense (expenses from modal are always regular)
+    is_default_expense: false,
   }))
 
   const doc = {

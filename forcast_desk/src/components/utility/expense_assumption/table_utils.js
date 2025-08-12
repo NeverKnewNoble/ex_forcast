@@ -211,29 +211,63 @@ export function calculateTotalForExpense(expenseData, expense, year, displayMode
 } 
 
 // New function to group expenses by department and department location
-export function getExpensesGroupedByDepartmentAndLocation(expenseData, visibleYears) {
+export function getExpensesGroupedByDepartmentAndLocation(expenseData, visibleYears, defaultExpenses = []) {
   const departmentMap = new Map()
   
-  visibleYears.forEach(year => {
-    const yearData = expenseData[year] || {}
-    for (const month in yearData) {
-      yearData[month].forEach(entry => {
-        const department = entry.department || 'Other'
-        const location = entry['department_location'] || 'Other'
-        
-        if (!departmentMap.has(department)) {
-          departmentMap.set(department, new Map())
-        }
-        
-        const locationMap = departmentMap.get(department)
-        if (!locationMap.has(location)) {
-          locationMap.set(location, new Set())
-        }
-        
-        locationMap.get(location).add(entry.expense)
-      })
+  // First, add default expenses to the map
+  defaultExpenses.forEach(defaultExpense => {
+    const department = defaultExpense.department || 'Other'
+    const location = defaultExpense.department_location || 'Default'
+    
+    if (!departmentMap.has(department)) {
+      departmentMap.set(department, new Map())
     }
+    
+    const locationMap = departmentMap.get(department)
+    if (!locationMap.has(location)) {
+      locationMap.set(location, new Set())
+    }
+    
+    // Add default expense with a flag to identify it
+    locationMap.get(location).add({
+      expense: defaultExpense.expense,
+      isDefault: true,
+      costType: defaultExpense.cost_type,
+      code: defaultExpense.code || '',
+      rootType: defaultExpense.root_type || ''
+    })
   })
+  
+  // Then, add existing expense data from Expense Assumptions (only if visibleYears has data)
+  if (visibleYears && visibleYears.length > 0) {
+    visibleYears.forEach(year => {
+      const yearData = expenseData[year] || {}
+      for (const month in yearData) {
+        yearData[month].forEach(entry => {
+          const department = entry.department || 'Other'
+          const location = entry['department_location'] || 'Other'
+          
+          if (!departmentMap.has(department)) {
+            departmentMap.set(department, new Map())
+          }
+          
+          const locationMap = departmentMap.get(department)
+          if (!locationMap.has(location)) {
+            locationMap.set(location, new Set())
+          }
+          
+          // Add existing expense with a flag to identify it
+          locationMap.get(location).add({
+            expense: entry.expense,
+            isDefault: false,
+            costType: entry['cost_type'] || '',
+            code: entry.code || '',
+            rootType: entry['root type'] || ''
+          })
+        })
+      }
+    })
+  }
   
   // Convert to array format with department, location, and expenses
   const groupedExpenses = []
@@ -244,15 +278,30 @@ export function getExpensesGroupedByDepartmentAndLocation(expenseData, visibleYe
       locations: []
     }
     
-    for (const [location, expenses] of locationMap) {
+    for (const [location, expensesSet] of locationMap) {
+      // Convert Set to Array and sort by default status (defaults first) then alphabetically
+      const expensesArray = Array.from(expensesSet).sort((a, b) => {
+        // Default expenses come first
+        if (a.isDefault && !b.isDefault) return -1
+        if (!a.isDefault && b.isDefault) return 1
+        // Then sort alphabetically by expense name
+        return a.expense.localeCompare(b.expense)
+      })
+      
       departmentGroup.locations.push({
         location,
-        expenses: [...expenses].sort()
+        expenses: expensesArray.map(item => item.expense), // Extract just the expense names for display
+        expenseDetails: expensesArray // Keep full details for calculations
       })
     }
     
-    // Sort locations alphabetically
-    departmentGroup.locations.sort((a, b) => a.location.localeCompare(b.location))
+    // Sort locations: Default comes first, then alphabetically
+    departmentGroup.locations.sort((a, b) => {
+      if (a.location === 'Default') return -1
+      if (b.location === 'Default') return 1
+      return a.location.localeCompare(b.location)
+    })
+    
     groupedExpenses.push(departmentGroup)
   }
   
@@ -286,4 +335,23 @@ export function getExpenseDetailsWithDepartment(expenseData, expense, visibleYea
     department: '', 
     departmentLocation: '' 
   }
+}
+
+// New function to get expense details that can handle both default and existing expenses
+export function getExpenseDetailsWithDefaults(expenseData, expense, visibleYears, defaultExpenses = []) {
+  // First check if it's a default expense
+  const defaultExpense = defaultExpenses.find(de => de.expense === expense)
+  if (defaultExpense) {
+    return {
+      code: defaultExpense.code || '',
+      costType: defaultExpense.cost_type || '',
+      rootType: defaultExpense.root_type || '',
+      department: defaultExpense.department || '',
+      departmentLocation: defaultExpense.department_location || 'Default',
+      isDefault: true
+    }
+  }
+  
+  // If not found in defaults, check existing expense data
+  return getExpenseDetailsWithDepartment(expenseData, expense, visibleYears)
 } 

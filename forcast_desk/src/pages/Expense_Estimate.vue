@@ -158,6 +158,8 @@
 
         <!-- Right Side - Table Area -->
         <div class="flex-1 p-4">
+
+          
           <!-- No Project Selected State -->
           <div v-if="expenseData.status === 'no_project_selected'">
             <NoProjectSelectedState />
@@ -174,7 +176,7 @@
           </div>
 
           <!-- Table Header with Stats -->
-          <template v-else-if="visibleYears.length && hasDataForSelectedYears">
+          <template v-else-if="(visibleYears.length && hasDataForSelectedYears) || defaultExpenses.length > 0">
             <div class="mb-4">
               <div class="flex items-center gap-2">
                 <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
@@ -211,7 +213,7 @@
                           </div>
                         </th>
                         <th
-                          v-for="year in visibleYears"
+                          v-for="year in (visibleYears.length > 0 ? visibleYears : ['Default'])"
                           :key="'header-' + year"
                           :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
                           class="px-2 py-2 text-center border-x-2 border-white cursor-pointer select-none hover:bg-violet-700 transition-all duration-200 group text-sm"
@@ -219,7 +221,7 @@
                           title="Click to collapse/expand"
                         >
                           <div class="flex items-center justify-center gap-1">
-                            <span class="font-semibold">{{ year }}</span>
+                            <span class="font-semibold">{{ year === 'Default' ? 'Default' : year }}</span>
                             <ChevronDown 
                               v-if="!isYearCollapsed(year)" 
                               class="w-3 h-3 transition-transform group-hover:scale-110" 
@@ -232,7 +234,7 @@
                         </th>
                       </tr>
                       <tr class="bg-violet-500/90 text-xs">
-                        <template v-for="year in visibleYears" :key="'months-' + year">
+                        <template v-for="year in (visibleYears.length > 0 ? visibleYears : ['Default'])" :key="'months-' + year">
                           <template v-if="!isYearCollapsed(year)">
                             <th
                               v-for="label in getColumnLabelsForYearLocal(year)"
@@ -271,7 +273,7 @@
                               {{ departmentGroup.department }}
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'department-header-' + year">
+                          <template v-for="year in (visibleYears.length > 0 ? visibleYears : ['Default'])" :key="'department-header-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
@@ -296,7 +298,7 @@
                                 {{ locationGroup.location }}
                               </div>
                             </td>
-                            <template v-for="year in visibleYears" :key="'location-header-' + year">
+                            <template v-for="year in (visibleYears.length > 0 ? visibleYears : ['Default'])" :key="'location-header-' + year">
                               <template v-if="!isYearCollapsed(year)">
                                 <td
                                   v-for="label in getColumnLabelsForYearLocal(year)"
@@ -324,10 +326,7 @@
                               </div>
                             </td>
                             <td class="px-3 py-2 font-medium border-r border-violet-200">
-                              <div class="flex items-center gap-1">
-                                <Receipt class="w-3 h-3 text-violet-500" />
-                                {{ expense }}
-                              </div>
+                              {{ expense }}
                             </td>
                             <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-600">
                               <div class="flex items-center gap-1">
@@ -335,7 +334,7 @@
                                 {{ getExpenseDetailsLocal(expense).costType }}
                               </div>
                             </td>
-                            <template v-for="year in visibleYears" :key="'row-' + year + '-' + expense">
+                            <template v-for="year in (visibleYears.length > 0 ? visibleYears : ['Default'])" :key="'row-' + year + '-' + expense">
                               <template v-if="!isYearCollapsed(year)">
                                 <td
                                   v-for="label in getColumnLabelsForYearLocal(year)"
@@ -346,18 +345,20 @@
                                   @focus="handleCellFocus({ year, label, expense, event: $event })"
                                   @blur="handleCellEditWrapper({ year, label, expense, event: $event })"
                                 >
-                                  <span class="font-mono text-xs">{{ getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode) }}</span>
+                                  <span class="font-mono text-xs">
+                                    {{ year === 'Default' ? '0.00' : getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode) }}
+                                  </span>
                                 </td>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
                                   <span class="font-mono text-xs text-violet-700">
-                                    {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
+                                    {{ year === 'Default' ? '0.00' : calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
                                   </span>
                                 </td>
                               </template>
                               <template v-else>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
                                   <span class="font-mono text-xs text-violet-700">
-                                    {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
+                                    {{ year === 'Default' ? '0.00' : calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
                                   </span>
                                 </td>
                               </template>
@@ -373,7 +374,7 @@
                               Department Total
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'department-total-' + year">
+                          <template v-for="year in (visibleYears.length > 0 ? visibleYears : ['Default'])" :key="'department-total-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
@@ -381,19 +382,19 @@
                                 class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900"
                               >
                                 <span class="font-mono text-xs">
-                                  {{ calculateDepartmentMonthTotal(expenseData, departmentGroup, year, label, advancedModes[year] || displayMode) }}
+                                  {{ year === 'Default' ? '0.00' : calculateDepartmentMonthTotal(expenseData, departmentGroup, year, label, advancedModes[year] || displayMode) }}
                                 </span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900">
                                 <span class="font-mono text-xs">
-                                  {{ calculateDepartmentTotal(expenseData, departmentGroup, year, advancedModes[year] || displayMode) }}
+                                  {{ year === 'Default' ? '0.00' : calculateDepartmentTotal(expenseData, departmentGroup, year, advancedModes[year] || displayMode) }}
                                 </span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900">
                                 <span class="font-mono text-xs">
-                                  {{ calculateDepartmentTotal(expenseData, departmentGroup, year, advancedModes[year] || displayMode) }}
+                                  {{ year === 'Default' ? '0.00' : calculateDepartmentTotal(expenseData, departmentGroup, year, advancedModes[year] || displayMode) }}
                                 </span>
                               </td>
                             </template>
@@ -408,7 +409,7 @@
           </template>
 
           <!-- No Data for Selected Years State -->
-          <template v-else-if="visibleYears.length && !hasDataForSelectedYears">
+          <template v-else-if="visibleYears.length && !hasDataForSelectedYears && defaultExpenses.length === 0">
             <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
               <div class="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mb-4">
                 <Receipt class="w-8 h-8 text-blue-600" />
@@ -428,7 +429,7 @@
           </template>
 
           <!-- Enhanced No Years Selected State -->
-          <template v-else>
+          <template v-else-if="defaultExpenses.length === 0">
             <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
           </template>
         </div>
@@ -764,6 +765,7 @@ import {
   // Data loading and API services
   loadYearOptions,
   loadExpenseData,
+  loadDefaultExpensesForProject,
   loadAllExpensesAndCategories,
   extractAllExpenses,
   
@@ -776,6 +778,7 @@ import {
   getExpensesGroupedByDepartmentAndLocation,
   getExpenseDetails,
   getExpenseDetailsFromAllExpenses,
+  getExpenseDetailsWithDefaults,
   getAmountForExpense,
   calculateTotalForExpense,
   
@@ -817,6 +820,7 @@ const displayMode = ref("monthly");
 const expenses = ref([]);
 const expenseData = ref({});
 const allExpensesData = ref([]); // New: All expenses from Expense Assumptions doctype
+const defaultExpenses = ref([]); // New: Default expenses for project departments
 const showAdvanced = ref(false);
 const tempAdvancedModes = ref({});
 const expenseOptions = ref([]);
@@ -868,13 +872,19 @@ const filteredToYears = computed(() => {
 
 
 const groupedExpenses = computed(() => {
-  // Use the new department and location grouping
-  return getExpensesGroupedByDepartmentAndLocation(expenseData.value, visibleYears.value);
+  // Use the new department and location grouping with default expenses
+  const result = getExpensesGroupedByDepartmentAndLocation(expenseData.value, visibleYears.value, defaultExpenses.value);
+  return result;
 });
 
 // Check if there's data for the selected years
 const hasDataForSelectedYears = computed(() => {
-  // If no years are selected, return false
+  // If we have default expenses, always return true to show them
+  if (defaultExpenses.value.length > 0) {
+    return true;
+  }
+  
+  // If no years are selected, return false (unless we have default expenses)
   if (!visibleYears.value.length) {
     return false;
   }
@@ -901,6 +911,10 @@ const hasDataForSelectedYears = computed(() => {
 
 // Computed property to get column labels for a specific year
 const getColumnLabelsForYearLocal = (year) => {
+  // Handle the default case when no years are selected
+  if (year === 'Default') {
+    return ['Default']; // Return a single column for default expenses
+  }
   return getColumnLabels(advancedModes.value[year] || displayMode.value);
 };
 
@@ -909,7 +923,8 @@ const getExpenseDetailsLocal = (expense) => {
   if (allExpensesData.value.length > 0) {
     return getExpenseDetailsFromAllExpenses(allExpensesData.value, expense);
   }
-  return getExpenseDetails(expenseData.value, expense, visibleYears.value);
+  // Use the new function that can handle both default and existing expenses
+  return getExpenseDetailsWithDefaults(expenseData.value, expense, visibleYears.value, defaultExpenses.value);
 };
 
 // Watch for changes in visible years to initialize advanced modes
@@ -949,6 +964,12 @@ watch(selectedProject, async (newProject, oldProject) => {
       const allExpensesResult = await loadAllExpensesAndCategories();
       if (allExpensesResult.status === 'success') {
         allExpensesData.value = allExpensesResult.expenses;
+      }
+      
+      // Reload default expenses for the new project
+      const defaultExpensesResult = await loadDefaultExpensesForProject();
+      if (defaultExpensesResult.status === 'success') {
+        defaultExpenses.value = defaultExpensesResult.defaultExpenses;
       }
       
       // Reload expense data for the new project (for cell values)
@@ -993,7 +1014,31 @@ watch(selectedProject, async (newProject, oldProject) => {
       alertService.error("Failed to load project data. Please try again.");
     }
   }
-});
+}, { immediate: true }); // Add immediate: true to run on component creation
+
+// Additional watcher to ensure default expenses are loaded when project is actually selected
+watch(() => selectedProject.value?.project_name, async (newProjectName, oldProjectName) => {
+  if (newProjectName && newProjectName !== oldProjectName) {
+    try {
+      // console.log('Project name changed, loading default expenses for:', newProjectName);
+      // console.log('Full selectedProject object:', selectedProject.value);
+      // console.log('Project name field:', selectedProject.value?.project_name);
+      // console.log('Project name field:', selectedProject.value?.name);
+      
+      // Load default expenses for the newly selected project
+      const defaultExpensesResult = await loadDefaultExpensesForProject();
+      // console.log('Default expenses result:', defaultExpensesResult);
+      if (defaultExpensesResult.status === 'success') {
+        defaultExpenses.value = defaultExpensesResult.defaultExpenses;
+        // console.log('Set defaultExpenses to:', defaultExpenses.value);
+      } else {
+        // console.log('Failed to load default expenses:', defaultExpensesResult.message);
+      }
+    } catch (error) {
+      console.error("Error loading default expenses for project:", error);
+    }
+  }
+}, { immediate: true });
 
 // When opening the modal, copy the current settings
 watch(showAdvanced, (val) => {
@@ -1021,6 +1066,14 @@ onMounted(async () => {
     const allExpensesResult = await loadAllExpensesAndCategories();
     if (allExpensesResult.status === 'success') {
       allExpensesData.value = allExpensesResult.expenses;
+    }
+    
+    // Load default expenses for project departments ONLY if a project is selected
+    if (selectedProject.value) {
+      const defaultExpensesResult = await loadDefaultExpensesForProject();
+      if (defaultExpensesResult.status === 'success') {
+        defaultExpenses.value = defaultExpensesResult.defaultExpenses;
+      }
     }
     
     // Load expense data for the selected years (for cell values)
@@ -1074,6 +1127,16 @@ onMounted(async () => {
       localStorage.removeItem('showRefreshSuccess');
       alertService.success("Page refreshed successfully");
     }
+    
+    // Manual trigger: If project is already selected, load default expenses
+    if (selectedProject.value?.project_name) {
+      // console.log('Manual trigger: Loading default expenses for existing project:', selectedProject.value.project_name);
+      const defaultExpensesResult = await loadDefaultExpensesForProject();
+      if (defaultExpensesResult.status === 'success') {
+        defaultExpenses.value = defaultExpensesResult.defaultExpenses;
+        // console.log('Manual trigger: Set defaultExpenses to:', defaultExpenses.value);
+      }
+    }
   } catch (err) {
     console.error("Error loading data:", err);
   }
@@ -1121,6 +1184,12 @@ const submitAddExpenseWrapper = async () => {
         allExpensesData.value = allExpensesResult.expenses;
       }
       
+      // Reload default expenses
+      const defaultExpensesResult = await loadDefaultExpensesForProject();
+      if (defaultExpensesResult.status === 'success') {
+        defaultExpenses.value = defaultExpensesResult.defaultExpenses;
+      }
+      
       // Reload expense data to show newly added expenses
       expenseData.value = await loadExpenseData();
       if (!expenseData.value.status) {
@@ -1133,7 +1202,7 @@ const submitAddExpenseWrapper = async () => {
 
 // Wrapper function for saveChanges
 const saveChangesWrapper = async () => {
-  await saveChanges(changedCells, isSaving, saveError, expenseData, originalExpenseData, isSaved, loadExpenseData);
+  await saveChanges(changedCells, isSaving, saveError, expenseData, originalExpenseData, isSaved, loadExpenseData, defaultExpenses.value);
 };
 
 

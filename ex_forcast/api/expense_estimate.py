@@ -11,13 +11,14 @@ def estimate_display(project=None):
                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
         # SQL query to get raw expense rows with project filter
+        # Updated to handle both expense_name and default_expense fields
         query = """
             SELECT 
                 parent.year,
                 parent.month,
                 child.department,
                 child.department_location,
-                child.expense_name,
+                COALESCE(child.expense_name, child.default_expense) as expense,
                 child.code,
                 child.root_type,
                 child.cost_type,
@@ -28,11 +29,14 @@ def estimate_display(project=None):
                 `tabExpense Items` AS child
             ON 
                 child.parent = parent.name
+            WHERE 
+                (child.expense_name IS NOT NULL AND child.expense_name != '') 
+                OR (child.default_expense IS NOT NULL AND child.default_expense != '')
         """
         
         # Add project filter if provided
         if project:
-            query += " WHERE parent.project = %s"
+            query += " AND parent.project = %s"
             query += " ORDER BY CAST(parent.year AS UNSIGNED) ASC, FIELD(parent.month, {month_order})".format(
                 month_order="'" + "', '".join(month_order) + "'"
             )
@@ -50,7 +54,7 @@ def estimate_display(project=None):
             grouped_data[row['year']][row['month']].append({
                 "department": row.get('department'),
                 "department_location": row.get('department_location'),
-                "expense": row['expense_name'],
+                "expense": row['expense'],
                 "code": row['code'],
                 "root type": row['root_type'],
                 "cost_type": row['cost_type'],
@@ -74,9 +78,10 @@ def get_all_expense_assumptions(project=None):
     """
     try:
         # SQL query to get all unique expenses and their details
+        # Updated to handle both expense_name and default_expense fields
         query = """
             SELECT DISTINCT
-                child.expense_name,
+                COALESCE(child.expense_name, child.default_expense) as expense_name,
                 child.code,
                 child.root_type,
                 child.cost_type
@@ -86,11 +91,14 @@ def get_all_expense_assumptions(project=None):
                 `tabExpense Items` AS child
             ON 
                 child.parent = parent.name
+            WHERE 
+                (child.expense_name IS NOT NULL AND child.expense_name != '') 
+                OR (child.default_expense IS NOT NULL AND child.default_expense != '')
         """
         
         # Add project filter if provided
         if project:
-            query += " WHERE parent.project = %s"
+            query += " AND parent.project = %s"
             raw_results = frappe.db.sql(query, (project,), as_dict=True)
         else:
             raw_results = frappe.db.sql(query, as_dict=True)
@@ -135,6 +143,7 @@ def upsert_expense_items(changes, project=None):
       - expense (expense_name: Link Account)
       - amount
       - (optionally: cost_type)
+      - (optionally: is_default_expense) - flag to indicate if this is a default expense
     project: Project name to filter/create documents for
     """
     try:
@@ -151,6 +160,11 @@ def upsert_expense_items(changes, project=None):
             expense_name = change.get("expense")
             amount = change.get("amount")
             cost_type = change.get("cost_type") or change.get("costType")
+            is_default_expense = change.get("is_default_expense", False)
+            
+            # Debug logging
+            print(f"Processing change: year={year}, month={month}, expense={expense_name}, is_default={is_default_expense}")
+            print(f"Department: {department}, Location: {department_location}, Cost Type: {cost_type}")
 
             # Find or create parent document with project filter
             parent = frappe.db.get_value(
@@ -170,16 +184,49 @@ def upsert_expense_items(changes, project=None):
                 parent = parent_doc.name
 
             # Check if child exists based on department+location+expense_name
-            child = frappe.db.get_value(
-                "Expense Items",
-                {
-                    "parent": parent,
-                    "expense_name": expense_name,
-                    "department": department,
-                    "department_location": department_location,
-                },
-                "name"
-            )
+            # For default expenses, we need to search differently
+            if is_default_expense:
+                child = frappe.db.get_value(
+                    "Expense Items",
+                    {
+                        "parent": parent,
+                        "default_expense": expense_name,
+                        "department": department,
+                        "department_location": department_location,
+                    },
+                    "name"
+                )
+                # If not found with exact match, try to find by expense name only
+                if not child:
+                    child = frappe.db.get_value(
+                        "Expense Items",
+                        {
+                            "parent": parent,
+                            "default_expense": expense_name,
+                        },
+                        "name"
+                    )
+            else:
+                child = frappe.db.get_value(
+                    "Expense Items",
+                    {
+                        "parent": parent,
+                        "expense_name": expense_name,
+                        "department": department,
+                        "department_location": department_location,
+                    },
+                    "name"
+                )
+                # If not found with exact match, try to find by expense name only
+                if not child:
+                    child = frappe.db.get_value(
+                        "Expense Items",
+                        {
+                            "parent": parent,
+                            "expense_name": expense_name,
+                        },
+                        "name"
+                    )
 
             if child:
                 # Update amount only
@@ -191,18 +238,32 @@ def upsert_expense_items(changes, project=None):
                 child_doc.amount = amount
                 if cost_type is not None:
                     child_doc.cost_type = cost_type
+                # Handle default expense field
+                if is_default_expense:
+                    child_doc.default_expense = expense_name
+                    child_doc.expense_name = None  # Clear expense_name for default expenses
+                else:
+                    child_doc.expense_name = expense_name
+                    child_doc.default_expense = None  # Clear default_expense for regular expenses
                 child_doc.save()
                 results.append({"action": "updated", "name": child_doc.name})
             else:
                 # Create new child with all fields
                 parent_doc = frappe.get_doc("Expense Assumptions", parent)
-                new_child = parent_doc.append("expense_items", {
+                new_child_data = {
                     "department": department,
                     "department_location": department_location,
-                    "expense_name": expense_name,
                     "amount": amount,
                     "cost_type": cost_type
-                })
+                }
+                
+                # Set the appropriate field based on whether it's a default expense
+                if is_default_expense:
+                    new_child_data["default_expense"] = expense_name
+                else:
+                    new_child_data["expense_name"] = expense_name
+                
+                new_child = parent_doc.append("expense_items", new_child_data)
                 parent_doc.save()
                 results.append({"action": "created", "name": new_child.name})
 

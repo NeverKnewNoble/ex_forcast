@@ -26,25 +26,35 @@ def create_document(year, month, expenses, project=None):
                 # try to parse amountDisplay
                 try:
                     amount = float(str(item.get("amountDisplay")).replace(",", ""))
-                except Exception:
-                    amount = 0
-
-            doc.append("expense_items", {
+                except (ValueError, TypeError):
+                    amount = 0.0
+            
+            # Check if this is a default expense (you may need to implement logic to determine this)
+            # For now, we'll assume all expenses from the modal are regular expenses
+            is_default_expense = item.get("is_default_expense", False)
+            
+            # Create expense item data
+            expense_item_data = {
                 "department": department,
                 "department_location": department_location,
-                "expense_name": expense_name,
-                "cost_type": cost_type,
-                "amount": amount or 0,
-            })
+                "amount": amount,
+                "cost_type": cost_type
+            }
+            
+            # Set the appropriate field based on whether it's a default expense
+            if is_default_expense:
+                expense_item_data["default_expense"] = expense_name
+            else:
+                expense_item_data["expense_name"] = expense_name
+            
+            doc.append("expense_items", expense_item_data)
 
         doc.insert()
-        frappe.db.commit()
-        
-        return {"status": "success", "docname": doc.name}
+        return {"success": True, "name": doc.name}
 
     except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "create_document failed")
-        return {"status": "error", "message": str(e)}
+        frappe.log_error(frappe.get_traceback(), "create_expense_document failed")
+        return {"success": False, "error": str(e)}
 
 
 #  http://127.0.0.1:8000/api/v2/method/ex_forcast.api.create_expense.create_document

@@ -269,6 +269,7 @@ fixtures = [
             {"doctype": "Room Market Segment", "filters": [["module" , "in" , ("Ex Forcast" )]]},
             {"doctype": "Expense Category", "filters": [["module" , "in" , ("Ex Forcast" )]]},
             {"doctype": "Payroll Department Location", "filters": [["module" , "in" , ("Ex Forcast" )]]},
+            {"doctype": "Default Expenses", "filters": [["module" , "in" , ("Ex Forcast" )]]},
 ]
 
 

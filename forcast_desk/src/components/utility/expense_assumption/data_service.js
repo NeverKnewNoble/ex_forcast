@@ -54,6 +54,63 @@ export async function loadExpenseData() {
   }
 }
 
+// New function to load default expenses for project departments
+export async function loadDefaultExpensesForProject() {
+  try {
+    // Get the currently selected project
+    const currentProject = selectedProject.value
+    
+    // console.log('loadDefaultExpensesForProject - currentProject:', currentProject);
+    // console.log('loadDefaultExpensesForProject - currentProject.project_name:', currentProject?.project_name);
+    // console.log('loadDefaultExpensesForProject - currentProject.name:', currentProject?.name);
+    
+    if (!currentProject) {
+      return { 
+        status: 'no_project_selected',
+        message: 'No project selected'
+      };
+    }
+
+    // Use project_name if available, otherwise use name
+    const projectName = currentProject.project_name || currentProject.name;
+    // console.log('loadDefaultExpensesForProject - using projectName:', projectName);
+
+    // Load default expenses for the project's selected departments
+    const response = await fetch(`/api/v2/method/ex_forcast.api.default_expenses.get_default_expenses_for_project?project_name=${encodeURIComponent(projectName)}`);
+    const result = await response.json();
+    
+    // console.log('loadDefaultExpensesForProject - API response:', result);
+    
+    // Extract the actual data from the wrapped response
+    const data = result.data || result;
+    // console.log('loadDefaultExpensesForProject - extracted data:', data);
+    
+    if (data.success) {
+      return {
+        status: 'success',
+        defaultExpenses: data.default_expenses || [],
+        selectedDepartments: data.selected_departments || [],
+        message: data.message
+      };
+    } else {
+      return {
+        status: 'error',
+        message: data.error || 'Failed to load default expenses',
+        defaultExpenses: [],
+        selectedDepartments: []
+      };
+    }
+  } catch (error) {
+    console.error("Error loading default expenses:", error);
+    return { 
+      status: 'error',
+      message: 'Failed to load default expenses',
+      defaultExpenses: [],
+      selectedDepartments: []
+    };
+  }
+}
+
 // New function to load all expenses and categories from Expense Assumptions doctype
 export async function loadAllExpensesAndCategories() {
   try {
