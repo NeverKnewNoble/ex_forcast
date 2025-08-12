@@ -349,12 +349,12 @@
                         <tr class="bg-violet-50 border-b border-violet-200">
                           <td class="px-3 py-2 font-medium border-r border-violet-200">
                             <div class="flex items-center gap-1">
-                              Collection- 80% in the month of Revenue
+                              Collection- {{ collectionPercentages[getDeptKey(department)].month.toFixed(0) }}% in the month of Revenue
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('dept-' + deptIndex, 'month', $event)" @focus="handleCollectionPercentageFocus({ type: 'dept-' + deptIndex, period: 'month', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'dept-' + deptIndex, period: 'month', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage(getDeptKey(department), 'month', $event)" @focus="handleCollectionPercentageFocus({ type: getDeptKey(department), period: 'month', event: $event })" @blur="handleCollectionPercentageEdit({ type: getDeptKey(department), period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">0.00%</span>
+                              <span class="font-mono text-xs">{{ collectionPercentages[getDeptKey(department)].month.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-collection-80-' + deptIndex + '-' + year">
@@ -382,12 +382,12 @@
                         <tr class="bg-violet-50 border-b border-violet-200">
                           <td class="px-3 py-2 font-medium border-r border-violet-200">
                             <div class="flex items-center gap-1">
-                              Collection- 15% in the month following Revenue
+                              Collection- {{ collectionPercentages[getDeptKey(department)].following.toFixed(0) }}% in the month following Revenue
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('dept-' + deptIndex, 'following', $event)" @focus="handleCollectionPercentageFocus({ type: 'dept-' + deptIndex, period: 'following', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'dept-' + deptIndex, period: 'following', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage(getDeptKey(department), 'following', $event)" @focus="handleCollectionPercentageFocus({ type: getDeptKey(department), period: 'following', event: $event })" @blur="handleCollectionPercentageEdit({ type: getDeptKey(department), period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">0.00%</span>
+                              <span class="font-mono text-xs">{{ collectionPercentages[getDeptKey(department)].following.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-collection-15-' + deptIndex + '-' + year">
@@ -415,12 +415,12 @@
                         <tr class="bg-violet-50 border-b border-violet-200">
                           <td class="px-3 py-2 font-medium border-r border-violet-200">
                             <div class="flex items-center gap-1">
-                              Collection- 5% in the Second month following Revenue
+                              Collection- {{ collectionPercentages[getDeptKey(department)].second.toFixed(0) }}% in the Second month following Revenue
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage('dept-' + deptIndex, 'second', $event)" @focus="handleCollectionPercentageFocus({ type: 'dept-' + deptIndex, period: 'second', event: $event })" @blur="handleCollectionPercentageEdit({ type: 'dept-' + deptIndex, period: 'second', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updateCollectionPercentage(getDeptKey(department), 'second', $event)" @focus="handleCollectionPercentageFocus({ type: getDeptKey(department), period: 'second', event: $event })" @blur="handleCollectionPercentageEdit({ type: getDeptKey(department), period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">0.00%</span>
+                              <span class="font-mono text-xs">{{ collectionPercentages[getDeptKey(department)].second.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-collection-5-' + deptIndex + '-' + year">
@@ -554,10 +554,10 @@
                         <tr class="bg-red-50 border-b border-red-200">
                           <td class="px-3 py-2 font-medium border-r border-red-200">
                             <div class="flex items-center gap-1">
-                              Payment- 80% in the month of Payroll run
+                             Payment- {{ paymentPercentages[getDeptKey(department)].salary.month.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage('dept-' + deptIndex, 'salary', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: 'dept-' + deptIndex, category: 'salary', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: 'dept-' + deptIndex, category: 'salary', period: 'month', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(getDeptKey(department), 'salary', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'salary', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'salary', period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
                               <span class="font-mono text-xs">0.00%</span>
                             </div>
@@ -590,9 +590,9 @@
                              Payment- {{ paymentPercentages[getDeptKey(department)].salary.following.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'salary', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'salary', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'salary', period: 'following', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(getDeptKey(department), 'salary', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'salary', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'salary', period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages.rooms.salary.following.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].salary.following.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-salary-payment-15-' + year">
@@ -623,9 +623,9 @@
                              Payment- {{ paymentPercentages[getDeptKey(department)].salary.second.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'salary', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'salary', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'salary', period: 'second', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(getDeptKey(department), 'salary', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'salary', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'salary', period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages.rooms.salary.second.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].salary.second.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-salary-payment-5-' + year">
@@ -740,9 +740,9 @@
                              Payment- {{ paymentPercentages[getDeptKey(department)].bonus.month.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'bonus', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'bonus', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'bonus', period: 'month', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(getDeptKey(department), 'bonus', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'bonus', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'bonus', period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages.rooms.bonus.month.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].bonus.month.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-bonus-payment-80-' + year">
@@ -773,9 +773,9 @@
                              Payment- {{ paymentPercentages[getDeptKey(department)].bonus.following.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'bonus', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'bonus', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'bonus', period: 'following', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(getDeptKey(department), 'bonus', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'bonus', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'bonus', period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages.rooms.bonus.following.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].bonus.following.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-bonus-payment-15-' + year">
@@ -806,9 +806,9 @@
                              Payment- {{ paymentPercentages[getDeptKey(department)].bonus.second.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'bonus', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'bonus', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'bonus', period: 'second', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(getDeptKey(department), 'bonus', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'bonus', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'bonus', period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages.rooms.bonus.second.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].bonus.second.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-bonus-payment-5-' + year">
@@ -923,9 +923,9 @@
                              Payment- {{ paymentPercentages[getDeptKey(department)].payroll.month.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'payroll', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'payroll', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'payroll', period: 'month', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(getDeptKey(department), 'payroll', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'payroll', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'payroll', period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages.rooms.payroll.month.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].payroll.month.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-payroll-payment-80-' + year">
@@ -956,9 +956,9 @@
                              Payment- {{ paymentPercentages[getDeptKey(department)].payroll.following.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'payroll', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'payroll', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'payroll', period: 'following', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(getDeptKey(department), 'payroll', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'payroll', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'payroll', period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages.rooms.payroll.following.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].payroll.following.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-payroll-payment-15-' + year">
@@ -989,9 +989,9 @@
                              Payment- {{ paymentPercentages[getDeptKey(department)].payroll.second.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'payroll', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'payroll', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'payroll', period: 'second', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(getDeptKey(department), 'payroll', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'payroll', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'payroll', period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages.rooms.payroll.second.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].payroll.second.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-payroll-payment-5-' + year">
@@ -1106,9 +1106,9 @@
                              Payment- {{ paymentPercentages[getDeptKey(department)].expenses.month.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'expenses', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'expenses', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'expenses', period: 'month', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(getDeptKey(department), 'expenses', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'expenses', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'expenses', period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages.rooms.expenses.month.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].expenses.month.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-expenses-payment-80-' + year">
@@ -1139,9 +1139,9 @@
                              Payment- {{ paymentPercentages[getDeptKey(department)].expenses.following.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'expenses', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'expenses', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'expenses', period: 'following', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(getDeptKey(department), 'expenses', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'expenses', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'expenses', period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages.rooms.expenses.following.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].expenses.following.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-expenses-payment-15-' + year">
@@ -1172,9 +1172,9 @@
                              Payment- {{ paymentPercentages[getDeptKey(department)].expenses.second.toFixed(0) }}% in the month of Payroll run
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(department.toLowerCase(), 'expenses', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: department.toLowerCase(), category: 'expenses', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: department.toLowerCase(), category: 'expenses', period: 'second', event: $event })">
+                          <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @input="updatePaymentPercentage(getDeptKey(department), 'expenses', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'expenses', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'expenses', period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages.rooms.expenses.second.toFixed(2) }}%</span>
+                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].expenses.second.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-expenses-payment-5-' + year">
@@ -1556,7 +1556,9 @@
 
   function ensureDefaultsForKey(key) {
     if (!collectionPercentages.value[key]) {
-      collectionPercentages.value[key] = { month: 80.0, following: 15.0, second: 5.0 };
+      // Default new departments to current Rooms baseline (which starts at 0.00s)
+      const baseCollection = collectionPercentages.value.rooms || { month: 0.0, following: 0.0, second: 0.0 };
+      collectionPercentages.value[key] = cloneDeep(baseCollection);
     }
     if (!paymentPercentages.value[key]) {
       // Try to derive from known defaults based on semantic grouping
@@ -1875,10 +1877,38 @@
   // ============================================================================
   // COLLECTION PERCENTAGE HANDLERS
   // ============================================================================
+  function setEditableCellText(event, text) {
+    // Keep DOM structure; update inner span content only
+    const td = event.currentTarget?.closest?.('td[contenteditable="true"]') || event.currentTarget || event.target;
+    if (td && td.querySelector) {
+      const span = td.querySelector('span');
+      if (span) {
+        span.textContent = text;
+      }
+    }
+  }
+
+  function getCollectionSumAfter(deptKey, period, newValue) {
+    const current = collectionPercentages.value[deptKey] || { month: 0, following: 0, second: 0 };
+    const monthVal = period === 'month' ? newValue : Number(current.month) || 0;
+    const followingVal = period === 'following' ? newValue : Number(current.following) || 0;
+    const secondVal = period === 'second' ? newValue : Number(current.second) || 0;
+    return monthVal + followingVal + secondVal;
+  }
+
   function updateCollectionPercentage(type, period, event) {
     const value = parseFloat(event.target.textContent.replace('%', ''));
+    const deptKey = normalizeDepartmentKey(type);
+    ensureDefaultsForKey(deptKey);
     if (!isNaN(value) && value >= 0 && value <= 100) {
-      collectionPercentages.value[type][period] = value;
+      const total = getCollectionSumAfter(deptKey, period, value);
+      if (total > 100) {
+        const prev = Number(collectionPercentages.value[deptKey][period]) || 0;
+        setEditableCellText(event, prev.toFixed(2) + '%');
+        alertService.error(`Collection percentages cannot exceed 100%. Current total would be ${total.toFixed(2)}%.`);
+        return;
+      }
+      collectionPercentages.value[deptKey][period] = value;
       isSaved.value = false;
     }
   }
@@ -1891,23 +1921,49 @@
   function handleCollectionPercentageEdit({ type, period, event }) {
     // Handle edit completion for collection percentage
     const value = parseFloat(event.target.textContent.replace('%', ''));
+    const deptKey = normalizeDepartmentKey(type);
+    ensureDefaultsForKey(deptKey);
     if (!isNaN(value) && value >= 0 && value <= 100) {
-      collectionPercentages.value[type][period] = value;
+      const total = getCollectionSumAfter(deptKey, period, value);
+      if (total > 100) {
+        const prev = Number(collectionPercentages.value[deptKey][period]) || 0;
+        setEditableCellText(event, prev.toFixed(2) + '%');
+        alertService.error(`Collection percentages cannot exceed 100%. Current total would be ${total.toFixed(2)}%.`);
+        return;
+      }
+      collectionPercentages.value[deptKey][period] = value;
       isSaved.value = false;
-      console.log('Collection percentage updated:', type, period, value);
+      console.log('Collection percentage updated:', deptKey, period, value);
     } else {
       // Reset to previous value if invalid
-      event.target.textContent = collectionPercentages.value[type][period] + '%';
+      setEditableCellText(event, (Number(collectionPercentages.value[deptKey][period]) || 0).toFixed(2) + '%');
     }
   }
   
   // ============================================================================
   // PAYMENT PERCENTAGE HANDLERS
   // ============================================================================
+  function getPaymentSumAfter(deptKey, category, period, newValue) {
+    const currentCategory = (paymentPercentages.value[deptKey] && paymentPercentages.value[deptKey][category]) || { month: 0, following: 0, second: 0 };
+    const monthVal = period === 'month' ? newValue : Number(currentCategory.month) || 0;
+    const followingVal = period === 'following' ? newValue : Number(currentCategory.following) || 0;
+    const secondVal = period === 'second' ? newValue : Number(currentCategory.second) || 0;
+    return monthVal + followingVal + secondVal;
+  }
+
   function updatePaymentPercentage(type, category, period, event) {
     const value = parseFloat(event.target.textContent.replace('%', ''));
+    const deptKey = normalizeDepartmentKey(type);
+    ensureDefaultsForKey(deptKey);
     if (!isNaN(value) && value >= 0 && value <= 100) {
-      paymentPercentages.value[type][category][period] = value;
+      const total = getPaymentSumAfter(deptKey, category, period, value);
+      if (total > 100) {
+        const prev = Number(paymentPercentages.value[deptKey][category][period]) || 0;
+        setEditableCellText(event, prev.toFixed(2) + '%');
+        alertService.error(`Payment percentages for ${category} cannot exceed 100%. Current total would be ${total.toFixed(2)}%.`);
+        return;
+      }
+      paymentPercentages.value[deptKey][category][period] = value;
       isSaved.value = false;
     }
   }
@@ -1920,13 +1976,22 @@
   function handlePaymentPercentageEdit({ type, category, period, event }) {
     // Handle edit completion for payment percentage
     const value = parseFloat(event.target.textContent.replace('%', ''));
+    const deptKey = normalizeDepartmentKey(type);
+    ensureDefaultsForKey(deptKey);
     if (!isNaN(value) && value >= 0 && value <= 100) {
-      paymentPercentages.value[type][category][period] = value;
+      const total = getPaymentSumAfter(deptKey, category, period, value);
+      if (total > 100) {
+        const prev = Number(paymentPercentages.value[deptKey][category][period]) || 0;
+        setEditableCellText(event, prev.toFixed(2) + '%');
+        alertService.error(`Payment percentages for ${category} cannot exceed 100%. Current total would be ${total.toFixed(2)}%.`);
+        return;
+      }
+      paymentPercentages.value[deptKey][category][period] = value;
       isSaved.value = false;
-      console.log('Payment percentage updated:', type, category, period, value);
+      console.log('Payment percentage updated:', deptKey, category, period, value);
     } else {
       // Reset to previous value if invalid
-      event.target.textContent = paymentPercentages.value[type][category][period] + '%';
+      setEditableCellText(event, (Number(paymentPercentages.value[deptKey][category][period]) || 0).toFixed(2) + '%');
     }
   }
   
