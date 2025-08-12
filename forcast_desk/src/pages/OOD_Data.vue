@@ -1,6 +1,6 @@
 <template>
     <div class="flex ">
-      <Sidebar />
+      <Sidebar /> 
   
       <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
         <!-- Main Content Area -->
