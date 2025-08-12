@@ -15,10 +15,11 @@ def estimate_display(project=None):
             SELECT 
                 parent.year,
                 parent.month,
+                child.department,
+                child.department_location,
                 child.expense_name,
                 child.code,
                 child.root_type,
-                child.hospitality_category,
                 child.cost_type,
                 child.amount
             FROM 
@@ -47,10 +48,11 @@ def estimate_display(project=None):
 
         for row in raw_results:
             grouped_data[row['year']][row['month']].append({
+                "department": row.get('department'),
+                "department_location": row.get('department_location'),
                 "expense": row['expense_name'],
                 "code": row['code'],
                 "root type": row['root_type'],
-                "hospitality_category": row['hospitality_category'],
                 "cost_type": row['cost_type'],
                 "amount": row['amount']
             })
@@ -77,7 +79,6 @@ def get_all_expense_assumptions(project=None):
                 child.expense_name,
                 child.code,
                 child.root_type,
-                child.hospitality_category,
                 child.cost_type
             FROM 
                 `tabExpense Assumptions` AS parent
@@ -106,7 +107,6 @@ def get_all_expense_assumptions(project=None):
                     "expense_name": expense_name,
                     "code": row['code'] or '',
                     "root_type": row['root_type'] or '',
-                    "hospitality_category": row['hospitality_category'] or '',
                     "cost_type": row['cost_type'] or ''
                 })
 
@@ -130,10 +130,11 @@ def upsert_expense_items(changes, project=None):
     changes: JSON string or list of dicts, each with:
       - year
       - month
-      - expense (expense_name)
-      - code
+      - department (Link Department)
+      - department_location (Link Payroll Department Location)
+      - expense (expense_name: Link Account)
       - amount
-      - (optionally: category/hospitality_category, cost_type)
+      - (optionally: cost_type)
     project: Project name to filter/create documents for
     """
     try:
@@ -145,10 +146,11 @@ def upsert_expense_items(changes, project=None):
         for change in changes:
             year = change.get("year")
             month = change.get("month")
+            department = change.get("department")
+            department_location = change.get("department_location")
             expense_name = change.get("expense")
             amount = change.get("amount")
-            hospitality_category = change.get("hospitality_category")
-            cost_type = change.get("cost_type")
+            cost_type = change.get("cost_type") or change.get("costType")
 
             # Find or create parent document with project filter
             parent = frappe.db.get_value(
@@ -167,26 +169,38 @@ def upsert_expense_items(changes, project=None):
                 parent_doc.insert()
                 parent = parent_doc.name
 
-            # Check if child exists based on expense_name
+            # Check if child exists based on department+location+expense_name
             child = frappe.db.get_value(
                 "Expense Items",
-                {"parent": parent, "expense_name": expense_name},
+                {
+                    "parent": parent,
+                    "expense_name": expense_name,
+                    "department": department,
+                    "department_location": department_location,
+                },
                 "name"
             )
 
             if child:
                 # Update amount only
                 child_doc = frappe.get_doc("Expense Items", child)
+                if department is not None:
+                    child_doc.department = department
+                if department_location is not None:
+                    child_doc.department_location = department_location
                 child_doc.amount = amount
+                if cost_type is not None:
+                    child_doc.cost_type = cost_type
                 child_doc.save()
-                results.append({"action": "updated_amount_only", "name": child_doc.name})
+                results.append({"action": "updated", "name": child_doc.name})
             else:
                 # Create new child with all fields
                 parent_doc = frappe.get_doc("Expense Assumptions", parent)
                 new_child = parent_doc.append("expense_items", {
+                    "department": department,
+                    "department_location": department_location,
                     "expense_name": expense_name,
                     "amount": amount,
-                    "hospitality_category": hospitality_category,
                     "cost_type": cost_type
                 })
                 parent_doc.save()

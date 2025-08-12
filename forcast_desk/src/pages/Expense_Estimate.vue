@@ -260,114 +260,140 @@
                       </tr>
                     </thead>
 
-                    <!-- Enhanced Table Body -->
+                    <!-- Enhanced Table Body with Department and Location Grouping -->
                     <tbody class="text-gray-700 bg-white text-sm">
-                      <template v-for="categoryGroup in groupedExpenses" :key="'category-' + categoryGroup.category">
-                        <!-- Category Header Row -->
-                        <tr class="bg-gradient-to-r from-violet-50 to-violet-100 border-b border-violet-200">
-                          <td colspan="3" class="px-3 py-2 font-bold text-violet-800 border-r border-violet-300">
-                            <div class="flex items-center gap-1">
-                              <FolderOpen class="w-3 h-3" />
-                              {{ categoryGroup.category }}
+                      <template v-for="departmentGroup in groupedExpenses" :key="'department-' + departmentGroup.department">
+                        <!-- Department Header Row -->
+                        <tr class="bg-gradient-to-r from-violet-600 to-violet-700 border-b-2 border-violet-800">
+                          <td colspan="3" class="px-3 py-3 font-bold text-white border-r border-violet-500">
+                            <div class="flex items-center gap-2">
+                              <Building class="w-4 h-4" />
+                              {{ departmentGroup.department }}
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'category-header-' + year">
+                          <template v-for="year in visibleYears" :key="'department-header-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'category-cell-' + year + '-' + label"
-                                class="px-1 py-1 text-center border border-violet-200 bg-violet-50"
+                                :key="'department-cell-' + year + '-' + label"
+                                class="px-1 py-1 text-center border border-violet-500 bg-violet-600"
                               ></td>
-                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-50"></td>
+                              <td class="px-1 py-1 text-center border border-violet-500 bg-violet-600"></td>
                             </template>
                             <template v-else>
-                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-50"></td>
+                              <td class="px-1 py-1 text-center border border-violet-500 bg-violet-600"></td>
                             </template>
                           </template>
                         </tr>
                         
-                        <!-- Expense Rows for this Category -->
-                        <tr
-                          v-for="expense in categoryGroup.expenses"
-                          :key="'expense-' + expense"
-                          class="even:bg-gray-50 hover:bg-violet-50 transition-all duration-200 border-b border-gray-100"
-                        >
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-600">
-                            <div class="flex items-center gap-1">
-                              <Hash class="w-2 h-2 text-gray-400" />
-                              {{ getExpenseDetailsLocal(expense).code }}
-                            </div>
-                          </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200">
-                            <div class="flex items-center gap-1">
-                              <Receipt class="w-3 h-3 text-violet-500" />
-                              {{ expense }}
-                            </div>
-                          </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-600">
-                            <div class="flex items-center gap-1">
-                              <Tag class="w-2 h-2 text-gray-400" />
-                              {{ getExpenseDetailsLocal(expense).costType }}
-                            </div>
-                          </td>
-                          <template v-for="year in visibleYears" :key="'row-' + year + '-' + expense">
-                            <template v-if="!isYearCollapsed(year)">
-                              <td
-                                v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'cell-' + year + '-' + label"
-                                contenteditable="true"
-                                class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
-                                @input="handleCellInput({ year, label, expense, event: $event })"
-                                @focus="handleCellFocus({ year, label, expense, event: $event })"
-                                @blur="handleCellEditWrapper({ year, label, expense, event: $event })"
-                              >
-                                <span class="font-mono text-xs">{{ getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode) }}</span>
-                              </td>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
-                                <span class="font-mono text-xs text-violet-700">
-                                  {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
-                                </span>
-                              </td>
+                        <!-- Location Groups -->
+                        <template v-for="locationGroup in departmentGroup.locations" :key="'location-' + locationGroup.location">
+                          <!-- Location Header Row -->
+                          <tr class="bg-gradient-to-r from-violet-100 to-violet-200 border-b border-violet-300">
+                            <td colspan="3" class="px-6 py-2 font-semibold text-violet-700 border-r border-violet-300">
+                              <div class="flex items-center gap-2">
+                                <MapPin class="w-3 h-3" />
+                                {{ locationGroup.location }}
+                              </div>
+                            </td>
+                            <template v-for="year in visibleYears" :key="'location-header-' + year">
+                              <template v-if="!isYearCollapsed(year)">
+                                <td
+                                  v-for="label in getColumnLabelsForYearLocal(year)"
+                                  :key="'location-cell-' + year + '-' + label"
+                                  class="px-1 py-1 text-center border border-violet-300 bg-violet-100"
+                                ></td>
+                                <td class="px-1 py-1 text-center border border-violet-300 bg-violet-100"></td>
+                              </template>
+                              <template v-else>
+                                <td class="px-1 py-1 text-center border border-violet-300 bg-violet-100"></td>
+                              </template>
                             </template>
-                            <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
-                                <span class="font-mono text-xs text-violet-700">
-                                  {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
-                                </span>
-                              </td>
+                          </tr>
+                          
+                          <!-- Expense Rows for this Location -->
+                          <tr
+                            v-for="expense in locationGroup.expenses"
+                            :key="'expense-' + expense"
+                            class="even:bg-gray-50 hover:bg-violet-50 transition-all duration-200 border-b border-gray-100"
+                          >
+                            <td class="px-8 py-2 font-medium border-r border-violet-200 text-gray-600">
+                              <div class="flex items-center gap-1">
+                                <Hash class="w-2 h-2 text-gray-400" />
+                                {{ getExpenseDetailsLocal(expense).code }}
+                              </div>
+                            </td>
+                            <td class="px-3 py-2 font-medium border-r border-violet-200">
+                              <div class="flex items-center gap-1">
+                                <Receipt class="w-3 h-3 text-violet-500" />
+                                {{ expense }}
+                              </div>
+                            </td>
+                            <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-600">
+                              <div class="flex items-center gap-1">
+                                <Tag class="w-2 h-2 text-gray-400" />
+                                {{ getExpenseDetailsLocal(expense).costType }}
+                              </div>
+                            </td>
+                            <template v-for="year in visibleYears" :key="'row-' + year + '-' + expense">
+                              <template v-if="!isYearCollapsed(year)">
+                                <td
+                                  v-for="label in getColumnLabelsForYearLocal(year)"
+                                  :key="'cell-' + year + '-' + label"
+                                  contenteditable="true"
+                                  class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
+                                  @input="handleCellInput({ year, label, expense, event: $event })"
+                                  @focus="handleCellFocus({ year, label, expense, event: $event })"
+                                  @blur="handleCellEditWrapper({ year, label, expense, event: $event })"
+                                >
+                                  <span class="font-mono text-xs">{{ getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode) }}</span>
+                                </td>
+                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
+                                  <span class="font-mono text-xs text-violet-700">
+                                    {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
+                                  </span>
+                                </td>
+                              </template>
+                              <template v-else>
+                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
+                                  <span class="font-mono text-xs text-violet-700">
+                                    {{ calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
+                                  </span>
+                                </td>
+                              </template>
                             </template>
-                          </template>
-                        </tr>
+                          </tr>
+                        </template>
                         
-                        <!-- Category Total Row -->
-                        <tr class="bg-gradient-to-r from-violet-100 to-violet-200 border-y-2 border-violet-400">
-                          <td colspan="3" class="px-3 py-2 font-bold text-violet-900 border-r border-violet-300">
+                        <!-- Department Total Row -->
+                        <tr class="bg-gradient-to-r from-violet-200 to-violet-300 border-y-2 border-violet-500">
+                          <td colspan="3" class="px-3 py-2 font-bold text-violet-900 border-r border-violet-400">
                             <div class="flex items-center gap-1">
                               <Calculator class="w-3 h-3" />
-                              Total
+                              Department Total
                             </div>
                           </td>
-                          <template v-for="year in visibleYears" :key="'category-total-' + year">
+                          <template v-for="year in visibleYears" :key="'department-total-' + year">
                             <template v-if="!isYearCollapsed(year)">
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
-                                :key="'category-total-cell-' + year + '-' + label"
-                                class="px-1 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900"
+                                :key="'department-total-cell-' + year + '-' + label"
+                                class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900"
                               >
                                 <span class="font-mono text-xs">
-                                  {{ calculateCategoryMonthTotal(expenseData, categoryGroup.expenses, year, label, advancedModes[year] || displayMode) }}
+                                  {{ calculateDepartmentMonthTotal(expenseData, departmentGroup, year, label, advancedModes[year] || displayMode) }}
                                 </span>
                               </td>
-                              <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
+                              <td class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900">
                                 <span class="font-mono text-xs">
-                                  {{ calculateCategoryTotal(expenseData, categoryGroup.expenses, year, advancedModes[year] || displayMode) }}
+                                  {{ calculateDepartmentTotal(expenseData, departmentGroup, year, advancedModes[year] || displayMode) }}
                                 </span>
                               </td>
                             </template>
                             <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
+                              <td class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900">
                                 <span class="font-mono text-xs">
-                                  {{ calculateCategoryTotal(expenseData, categoryGroup.expenses, year, advancedModes[year] || displayMode) }}
+                                  {{ calculateDepartmentTotal(expenseData, departmentGroup, year, advancedModes[year] || displayMode) }}
                                 </span>
                               </td>
                             </template>
@@ -583,98 +609,96 @@
             </div>
           </div>
 
-          <!-- Input Table -->
+          <!-- Input Cards -->
           <div class="space-y-4">
             <div class="flex items-center gap-3">
               <div class="w-1 h-6 bg-gradient-to-b from-violet-500 to-violet-600 rounded-full"></div>
               <h3 class="text-lg font-semibold text-gray-800">Expense Items</h3>
             </div>
-            <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-              <table class="w-full">
-                <thead class="bg-gradient-to-r from-violet-600 to-violet-700 text-white sticky top-0">
-                  <tr>
-                    <th class="text-left px-6 py-4 font-semibold"><Building2 class="w-4 h-4 inline mr-1" /> Department</th>
-                    <th class="text-left px-6 py-4 font-semibold"><FolderOpen class="w-4 h-4 inline mr-1" /> Department Location</th>
-                    <th class="text-left px-6 py-4 font-semibold"><Receipt class="w-4 h-4 inline mr-1" /> Expense Name</th>
-                    
-                    <th class="text-left px-6 py-4 font-semibold"><Tag class="w-4 h-4 inline mr-1" /> Cost Type</th>
-                    <th class="text-left px-6 py-4 font-semibold"><DollarSign class="w-4 h-4 inline mr-1" /> Amount</th>
-                    <th class="w-16"></th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                  <tr 
-                    v-for="(row, index) in addExpenseForm.rows" 
-                    :key="'expense-row-' + index" 
-                    class="hover:bg-violet-50/50 transition-colors"
+
+            <div class="space-y-4">
+              <div
+                v-for="(row, index) in addExpenseForm.rows"
+                :key="'expense-row-' + index"
+                class="bg-white hover:border-violet-200 rounded-lg p-6 hover:shadow-md border-2 transition-all"
+              >
+                <!-- Row Header -->
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-lg font-semibold text-gray-800">Expense Entry {{ index + 1 }}</h4>
+                  <button
+                    @click="removeExpenseRow(index)"
+                    :disabled="addExpenseForm.rows.length === 1"
+                    class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Remove entry"
                   >
-                    <td class="px-2 py-4">
-                      <select
-                        v-model="row.department"
-                        class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
-                      >
-                        <option disabled value="">Select Department</option>
-                        <option v-for="dept in modalDepartments" :key="dept" :value="dept">
-                          {{ dept }}
-                        </option>
-                      </select>
-                    </td>
-                    <td class="px-2 py-4">
-                      <select
-                        v-model="row.department_location"
-                        class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
-                      >
-                        <option disabled value="">Select Department Location</option>
-                        <option v-for="loc in modalDepartmentLocations" :key="loc" :value="loc">
-                          {{ loc }}
-                        </option>
-                      </select>
-                    </td>
-                    <td class="px-2 py-4">
-                      <select
-                        v-model="row.expense"
-                        class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
-                      >
-                        <option disabled value="">Select expense</option>
-                        <option v-for="option in expenseOptions" :key="option.value" :value="option.value">
-                          {{ option.label }}
-                        </option>
-                      </select>
-                    </td>
-                    
-                    <td class="px-2 py-4">
-                      <select
-                        v-model="row.costType"
-                        class="w-full px-2 mr-20 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
-                      >
-                        <option disabled value="">Select Cost Type</option>
-                        <option v-for="option in costTypeOptions" :key="option.value" :value="option.value">
-                          {{ option.label }}
-                        </option>
-                      </select>
-                    </td>
-                    <td class="px-2 py-4">
-                      <input
-                        type="text"
-                        v-model="row.amountDisplay"
-                        @input="formatAmountInputWrapper(index, $event)"
-                        @blur="cleanAmountValueWrapper(index)"
-                        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-left"
-                        placeholder="0.00"
-                      />
-                    </td>
-                    <td class="px-6 py-4">
-                      <button 
-                        @click="removeExpenseRow(index)"
-                        class="text-red-400 hover:text-red-600 transition-colors p-1 rounded-full hover:bg-red-50"
-                        v-if="addExpenseForm.rows.length > 1"
-                      >
-                        <Trash2 class="w-5 h-5" />
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    <Trash2 class="w-5 h-5" />
+                  </button>
+                </div>
+
+                <!-- Form Fields Grid -->
+                <div class="grid grid-cols-2 rounded-lg p-2 gap-6">
+                  <!-- Department -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
+                    <select
+                      v-model="row.department"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+                    >
+                      <option disabled value="">Select Department</option>
+                      <option v-for="dept in modalDepartments" :key="dept" :value="dept">{{ dept }}</option>
+                    </select>
+                  </div>
+
+                  <!-- Department Location -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Department Location</label>
+                    <select
+                      v-model="row.department_location"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+                    >
+                      <option disabled value="">Select Department Location</option>
+                      <option v-for="loc in modalDepartmentLocations" :key="loc" :value="loc">{{ loc }}</option>
+                    </select>
+                  </div>
+
+                  <!-- Expense Name -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Expense Name</label>
+                    <select
+                      v-model="row.expense"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+                    >
+                      <option disabled value="">Select expense</option>
+                      <option v-for="option in expenseOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+                    </select>
+                  </div>
+
+                  <!-- Cost Type -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Cost Type</label>
+                    <select
+                      v-model="row.costType"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+                    >
+                      <option disabled value="">Select Cost Type</option>
+                      <option v-for="option in costTypeOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+                    </select>
+                  </div>
+
+                  <!-- Amount -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+                    <input
+                      type="text"
+                      v-model="row.amountDisplay"
+                      @input="formatAmountInputWrapper(index, $event)"
+                      @blur="cleanAmountValueWrapper(index)"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-left"
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -721,7 +745,7 @@ import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
-import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign, Loader2, AlertCircle, Building2 } from 'lucide-vue-next';
+import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign, Loader2, AlertCircle, Building2, Save, Filter, Building, MapPin } from 'lucide-vue-next';
 import alertService from "@/components/ui/ui_utility/alertService.js";
 
 import {
@@ -749,6 +773,7 @@ import {
 
   getExpensesGroupedByCategory,
   getAllExpensesGroupedByCategory,
+  getExpensesGroupedByDepartmentAndLocation,
   getExpenseDetails,
   getExpenseDetailsFromAllExpenses,
   getAmountForExpense,
@@ -772,7 +797,9 @@ import {
   handleCellEdit,
   handleCellInput,
   handleCellFocus,
-  calculateCategoryMonthTotal // <-- add this import
+  calculateCategoryMonthTotal,
+  calculateDepartmentMonthTotal,
+  calculateDepartmentTotal
 } from "@/components/utility/expense_assumption/expense_estimate_utils.js";
 import { saveChanges } from "@/components/utility/expense_assumption/save_changes.js";
 import { submitAddExpense } from "@/components/utility/expense_assumption/submit_add_expense.js";
@@ -841,12 +868,8 @@ const filteredToYears = computed(() => {
 
 
 const groupedExpenses = computed(() => {
-  // Use all expenses data to show all expenses, regardless of year data
-  if (allExpensesData.value.length > 0) {
-    return getAllExpensesGroupedByCategory(allExpensesData.value);
-  }
-  // Fallback to the old method if no all expenses data is available
-  return getExpensesGroupedByCategory(expenseData.value, visibleYears.value);
+  // Use the new department and location grouping
+  return getExpensesGroupedByDepartmentAndLocation(expenseData.value, visibleYears.value);
 });
 
 // Check if there's data for the selected years
