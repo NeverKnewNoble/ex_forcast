@@ -477,7 +477,7 @@ export function getNumberOfRoomsForType(roomPackages, roomType, roomData = null)
   }
   
   // Fall back to original room packages data
-  const roomPackage = roomPackages.find(pkg => pkg.name === roomType)
+  const roomPackage = roomPackages.find(pkg => (pkg.package_name || pkg.name) === roomType)
   return roomPackage ? roomPackage.number_of_rooms : 0
 }
 

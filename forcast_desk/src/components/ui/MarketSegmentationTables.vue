@@ -1195,22 +1195,34 @@ function updateMarketSegmentData({ year, label, segment, field, value }) {
 
 // --- Total Revenue Functions (Room Revenue + Service Charge) ---
 function getTotalRevenue(year, label) {
-  // Get Room Revenue (calculated)
+  const project = getProjectName();
+  const cacheKey = 'Total Rooms Revenue Including SC';
+  const cached = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, label);
+  if (cached && cached > 0) {
+    return cached.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
   const roomRevenue = parseFloat(getTotalRoomRevenue(year, label).replace(/,/g, ''));
-  // Get Service Charge from props (monthly value)
   const serviceCharge = parseFloat(getServiceChargeValue(year, label).replace(/,/g, ''));
-  // Calculate Total Revenue = Room Revenue + Service Charge
   const totalRevenue = roomRevenue + serviceCharge;
+  if (totalRevenue > 0) {
+    calculationCache.setValue(project, PAGE_KEY, cacheKey, year, label, totalRevenue);
+  }
   return totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function getTotalRevenueYear(year) {
-  // Get Room Revenue for the year (calculated)
+  const project = getProjectName();
+  const cacheKey = 'Total Rooms Revenue Including SC Year';
+  const cached = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, 'ALL');
+  if (cached && cached > 0) {
+    return cached.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
   const roomRevenue = parseFloat(getTotalRoomRevenueYear(year).replace(/,/g, ''));
-  // Get Service Charge total for the year
   const serviceCharge = parseFloat(getServiceChargeTotal(year).replace(/,/g, ''));
-  // Calculate Total Revenue = Room Revenue + Service Charge
   const totalRevenue = roomRevenue + serviceCharge;
+  if (totalRevenue > 0) {
+    calculationCache.setValue(project, PAGE_KEY, cacheKey, year, 'ALL', totalRevenue);
+  }
   return totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 

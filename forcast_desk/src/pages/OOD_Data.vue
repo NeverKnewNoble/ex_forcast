@@ -26,58 +26,7 @@
               <p class="text-sm text-gray-500">Manage and configure your other operating departments data</p>
             </div>
   
-            <!-- Save Status Section -->
-            <div class="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <div
-                    v-if="!isSaved"
-                    class="flex items-center gap-2 text-sm font-medium text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-200"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                    </svg>
-                    Unsaved
-                  </div>
-                  <div
-                    v-else
-                    class="flex items-center gap-2 text-sm font-medium text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    All Saved
-                  </div>
-                </div>
-                
-                <button
-                  v-if="!isSaving && !isSaved"
-                  :disabled="isSaving"
-                  @click="saveChangesWrapper"
-                  class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-                  </svg>
-                  Save
-                </button>
-                <button
-                  v-if="isSaving"
-                  class="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg cursor-not-allowed"
-                >
-                  <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                  </svg>
-                  Saving...
-                </button>
-              </div>
-              <span v-if="saveError" class="mt-2 text-xs text-red-500 flex items-center gap-1">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                {{ saveError }}
-              </span>
-            </div>
+            <!-- Save Status Section removed as per request -->
 
             <!-- Action Buttons Section -->
             <div class="mb-8">
@@ -190,12 +139,32 @@
             <template v-else-if="visibleYears.length && isComponentReady">
               <!-- Laundry Assumptions Matrix Table -->
               <div class="mb-10">
-                <div class="flex items-center gap-2 mb-4">
+                <div class="flex items-center gap-2 mb-2">
                   <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                     <Table class="w-4 h-4 text-white" />
                   </div>
                   <h2 class="text-lg font-bold text-gray-800">Laundry</h2>
-              </div>
+                </div>
+                <div class="mb-4 flex items-center gap-3">
+                  <button
+                    v-if="!isSavedLaundry && !isSaving"
+                    @click="saveLaundryChanges"
+                    class="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                  >
+                    Save Laundry
+                  </button>
+                  <span v-if="isSaving" class="text-xs inline-flex items-center px-2 py-0.5 rounded-full bg-blue-300 text-blue-900">
+                    Saving...
+                  </span>
+                  <template v-else>
+                    <span v-if="!isSavedLaundry" class="text-xs inline-flex items-center px-2 py-0.5 rounded-full bg-red-300 text-red-900">
+                      Unsaved
+                    </span>
+                    <span v-else class="text-xs inline-flex items-center px-2 py-0.5 rounded-full bg-green-300 text-green-900">
+                      Saved
+                    </span>
+                  </template>
+                </div>
                 <div class="bg-white rounded-lg border border-blue-200 shadow-sm overflow-x-auto md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
                   <table class="min-w-full w-max text-sm border border-blue-300">
                     <thead class="bg-blue-50">
@@ -521,6 +490,26 @@
                           </template>
                         </template>
                       </tr>
+                      <!-- Total Laundry Revenue (Auto: In House + Outside + Other Revenue) -->
+                      <tr>
+                        <td class="px-4 py-2 font-medium text-gray-700 flex justify-between items-end">
+                          <span>Total Laundry Revenue</span>
+                          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            Auto
+                          </span>
+                        </td>
+                        <template v-for="year in visibleYears" :key="'rev-total-' + year">
+                          <template v-if="!isYearCollapsed(year)">
+                            <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'rev-total-' + year + '-' + label"
+                              class="px-2 py-1 text-right text-blue-700 font-mono bg-blue-50 min-w-[110px] border border-blue-300">
+                              {{ formatOODValue('total_laundry_revenue', calculateTotalLaundryRevenue(year, label)) }}
+                            </td>
+                          </template>
+                          <template v-else>
+                            <td class="bg-blue-50 text-center font-semibold text-blue-700 border border-blue-300">-</td>
+                          </template>
+                        </template>
+                      </tr>
                       <tr class="bg-blue-100">
                         <td colspan="100" class="font-semibold bg-blue-700 text-white px-4 py-2 border border-blue-300">COST OF LAUNDRY</td>
                       </tr>
@@ -570,11 +559,31 @@
 
               <!-- Health Club Table -->
               <div class="mb-8">
-                <div class="flex items-center gap-2 mb-4">
+                <div class="flex items-center gap-2 mb-2">
                   <div class="w-6 h-6 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
                     <Table class="w-4 h-4 text-white" />
                   </div>
                   <h2 class="text-lg font-bold text-gray-800">Health Club</h2>
+                </div>
+                <div class="mb-4 flex items-center gap-3">
+                  <button
+                    v-if="!isSavedHealthClub && !isSaving"
+                    @click="saveHealthClubChanges"
+                    class="px-3 py-1.5 text-xs bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+                  >
+                    Save Health Club
+                  </button>
+                  <span v-if="isSaving" class="text-xs inline-flex items-center px-2 py-0.5 rounded-full bg-green-300 text-green-900">
+                    Saving...
+                  </span>
+                  <template v-else>
+                    <span v-if="!isSavedHealthClub" class="text-xs inline-flex items-center px-2 py-0.5 rounded-full bg-red-300 text-red-900">
+                      Unsaved
+                    </span>
+                    <span v-else class="text-xs inline-flex items-center px-2 py-0.5 rounded-full bg-green-300 text-green-900">
+                      Saved
+                    </span>
+                  </template>
                 </div>
                 
                 <div class="bg-white rounded-lg border border-green-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
@@ -1145,6 +1154,8 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
   const showAdvanced = ref(false);
   const tempAdvancedModes = ref({});
   const isSaved = ref(false);
+  const isSavedLaundry = ref(true);
+  const isSavedHealthClub = ref(true);
   const originalLaundryData = ref({});
   const originalHealthClubData = ref({});
   const changedCells = ref([]); // {year, label, field, newValue}
@@ -1154,6 +1165,9 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
   const isComponentReady = ref(false);
   const collapsedYears = ref([]);
   const calculationCache = useCalculationCache();
+  function getProjectName() {
+    return selectedProject.value?.project_name || 'default';
+  }
   // Matrix/grid state for laundry assumptions per year/month
   const laundryAssumptions = reactive({
     // For each assumption, store year -> label -> value
@@ -1209,10 +1223,8 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
     });
   });
 
-  // Watch for changes in data to ensure calculated fields update
-  watch([laundryData, healthClubData], (newData, oldData) => {
-    // console.log('OOD data changed:', newData);
-  }, { deep: true, immediate: true });
+  // Watch for changes in data to ensure calculated fields update (no-op)
+  watch([laundryData, healthClubData], () => {}, { deep: true, immediate: true });
   
   // When opening the modal, copy the current settings
   watch(showAdvanced, (val) => {
@@ -1244,6 +1256,7 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
         Object.assign(laundryData, normalizeLaundryData(laundryResult || {}));
         populateLaundryAssumptionsFromData(laundryData);
         isSaved.value = true;
+        isPopulatingHealthClubData = true;
         Object.assign(healthClubData, normalizeHealthClubData(healthClubResult || {}));
       } else {
         laundryData.value = { status: 'no_project_selected', message: 'No project selected' };
@@ -1252,6 +1265,7 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
       originalLaundryData.value = cloneDeep(laundryData);
       originalHealthClubData.value = cloneDeep(healthClubData);
       isComponentReady.value = true;
+      isPopulatingHealthClubData = false;
       
       // Check if we should show refresh success alert
       if (localStorage.getItem('showRefreshSuccess') === 'true') {
@@ -1275,6 +1289,7 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
         Object.assign(laundryData, normalizeLaundryData(laundryResult || {}));
         populateLaundryAssumptionsFromData(laundryData);
         isSaved.value = true;
+        isPopulatingHealthClubData = true;
         Object.assign(healthClubData, normalizeHealthClubData(healthClubResult || {}));
         originalLaundryData.value = cloneDeep(laundryData);
         originalHealthClubData.value = cloneDeep(healthClubData);
@@ -1285,6 +1300,7 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
         console.error('Error reloading OOD data for new project:', error);
         alertService.error("Failed to load project data. Please try again.");
       }
+      isPopulatingHealthClubData = false;
     } else {
       laundryData.value = { status: 'no_project_selected', message: 'No project selected' };
       healthClubData.value = { status: 'no_project_selected', message: 'No project selected' };
@@ -1351,6 +1367,10 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
       const savePromises = [];
       for (const year in changesByYearMonth) {
         for (const month in changesByYearMonth[year]) {
+          // Skip synthetic Forecast column from being saved as a month document
+          if (month === 'Forecast') {
+            continue;
+          }
           // Gather laundry table data
           const laundry_table = [];
           for (const field of laundryFields) {
@@ -1363,19 +1383,24 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
               });
             }
           }
-          // Gather health club table data
+          // Gather health club table data: merge existing document rows with current edits to avoid clearing values
           const health_club_table = [];
-          if (healthClubData[year] && healthClubData[year][month]) {
-            // console.log('[OOD Save] healthClubData for', year, month, ':', JSON.parse(JSON.stringify(healthClubData[year][month])));
-            for (const row of healthClubData[year][month]) {
-              if (row.section && row.detail && row.amount !== undefined && row.amount !== "") {
-                health_club_table.push({
-                  section: row.section,
-                  detail: row.detail,
-                  amount: row.amount
-                });
-              }
+          const existingRows = new Map();
+          const orig = originalHealthClubData.value?.[year]?.[month] || [];
+          for (const row of orig) {
+            if (row.section && row.detail) {
+              existingRows.set(`${row.section}||${row.detail}`, Number(row.amount) || 0);
             }
+          }
+          const current = healthClubData[year]?.[month] || [];
+          for (const row of current) {
+            if (row.section && row.detail) {
+              existingRows.set(`${row.section}||${row.detail}`, Number(row.amount) || 0);
+            }
+          }
+          for (const [key, amount] of existingRows.entries()) {
+            const [section, detail] = key.split('||');
+            health_club_table.push({ section, detail, amount });
           }
           // Save laundry table if there are changes
           if (laundry_table.length > 0) {
@@ -1414,6 +1439,115 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
       return;
     } catch (err) {
       saveError.value = err.message || "Failed to save changes";
+      alertService.error(saveError.value);
+      isSaving.value = false;
+    }
+  };
+
+  // Save only Laundry changes for currently edited months
+  const saveLaundryChanges = async () => {
+    try {
+      isSaving.value = true;
+      saveError.value = "";
+      const changesByYearMonth = {};
+      for (const cell of changedCells.value) {
+        const { year, label: month } = cell;
+        if (month === 'Forecast') continue;
+        (changesByYearMonth[year] ||= {});
+        changesByYearMonth[year][month] = true;
+      }
+      const laundryFields = [
+        { section: "In House Guest Laundry Revenue", detail: "Percentage", key: "in_house_guest_laundry_percentage" },
+        { section: "In House Guest Laundry Revenue", detail: "Base", key: "in_house_guest_laundry_base" },
+        { section: "In House Guest Laundry Revenue", detail: "Average Amount", key: "in_house_guest_laundry_amount" },
+        { section: "In House Dry Cleaning Revenue", detail: "Percentage", key: "in_house_dry_cleaning_percentage" },
+        { section: "In House Dry Cleaning Revenue", detail: "Base", key: "in_house_dry_cleaning_base" },
+        { section: "In House Dry Cleaning Revenue", detail: "Average Amount", key: "in_house_dry_cleaning_amount" },
+        { section: "Outside Guest Laundry", detail: "Number", key: "outside_guest_laundry_number" },
+        { section: "Outside Guest Laundry", detail: "Base", key: "outside_guest_laundry_base" },
+        { section: "Outside Guest Laundry", detail: "Average Amount", key: "outside_guest_laundry_amount" },
+        { section: "Guest Laundry Cost", detail: "Percentage", key: "guest_laundry_cost_percentage" },
+        { section: "Guest Laundry Cost", detail: "Amount", key: "guest_laundry_cost_amount" },
+        { section: "Revenue", detail: "Other Revenue", key: "revenue_other" },
+        { section: "COST OF LAUNDRY", detail: "Other Laundry Costs", key: "other_laundry_costs" }
+      ];
+      const tasks = [];
+      for (const year in changesByYearMonth) {
+        for (const month in changesByYearMonth[year]) {
+          const laundry_table = [];
+          for (const field of laundryFields) {
+            const value = laundryAssumptions[field.key]?.[year]?.[month];
+            if (value !== undefined && value !== "") {
+              laundry_table.push({ section: field.section, detail: field.detail, amount: value });
+            }
+          }
+          if (laundry_table.length > 0) {
+            tasks.push(saveLaundryTableData(year, month, laundry_table, selectedProject.value?.project_name));
+          }
+        }
+      }
+      if (tasks.length === 0) { isSaving.value = false; return; }
+      await Promise.all(tasks);
+      const laundryResult = await loadLaundryTableData(selectedProject.value?.project_name);
+      Object.assign(laundryData, normalizeLaundryData(laundryResult || {}));
+      populateLaundryAssumptionsFromData(laundryData);
+      originalLaundryData.value = cloneDeep(laundryData);
+      alertService.success('Laundry changes saved');
+      isSavedLaundry.value = true;
+      isSaving.value = false;
+    } catch (e) {
+      saveError.value = e.message || 'Failed to save laundry changes';
+      alertService.error(saveError.value);
+      isSaving.value = false;
+    }
+  };
+
+  // Save only Health Club changes for currently edited months
+  const saveHealthClubChanges = async () => {
+    try {
+      isSaving.value = true;
+      saveError.value = "";
+      const changesByYearMonth = {};
+      for (const cell of changedCells.value) {
+        const { year, label: month } = cell;
+        if (month === 'Forecast') continue;
+        (changesByYearMonth[year] ||= {});
+        changesByYearMonth[year][month] = true;
+      }
+      const tasks = [];
+      for (const year in changesByYearMonth) {
+        for (const month in changesByYearMonth[year]) {
+          const existingRows = new Map();
+          const orig = originalHealthClubData.value?.[year]?.[month] || [];
+          for (const row of orig) {
+            if (row.section && row.detail) existingRows.set(`${row.section}||${row.detail}`, Number(row.amount) || 0);
+          }
+          const current = healthClubData[year]?.[month] || [];
+          for (const row of current) {
+            if (row.section && row.detail) existingRows.set(`${row.section}||${row.detail}`, Number(row.amount) || 0);
+          }
+          const health_club_table = [];
+          for (const [key, amount] of existingRows.entries()) {
+            const [section, detail] = key.split('||');
+            health_club_table.push({ section, detail, amount });
+          }
+          if (health_club_table.length > 0) {
+            tasks.push(saveHealthClubTableData(year, month, health_club_table, selectedProject.value?.project_name));
+          }
+        }
+      }
+      if (tasks.length === 0) { isSaving.value = false; return; }
+      await Promise.all(tasks);
+      const healthClubResult = await loadHealthClubTableData(selectedProject.value?.project_name);
+      isPopulatingHealthClubData = true;
+      Object.assign(healthClubData, normalizeHealthClubData(healthClubResult || {}));
+      originalHealthClubData.value = cloneDeep(healthClubData);
+      alertService.success('Health Club changes saved');
+      isSavedHealthClub.value = true;
+      isSaving.value = false;
+      isPopulatingHealthClubData = false;
+    } catch (e) {
+      saveError.value = e.message || 'Failed to save health club changes';
       alertService.error(saveError.value);
       isSaving.value = false;
     }
@@ -1589,11 +1723,41 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
     );
   };
 
+  // Total Laundry Revenue = In House + Outside + Other Revenue
+  function calculateTotalLaundryRevenue(year, label) {
+    const inHouse = Number(calculateInHouseRevenueReactive(year, label) || 0);
+    const outside = Number(calculateOutsideGuestLaundryRevenue(laundryAssumptions, year, label) || 0);
+    const other = Number(laundryAssumptions.revenue_other?.[year]?.[label] || 0);
+    const total = inHouse + outside + other;
+    // Cache monthly total for Receipts/Payments consumption
+    const project = getProjectName();
+    calculationCache.setValue(project, 'OOD Revenue Assumptions', 'Total Laundry Revenue', year, label, total);
+    return total;
+  }
+  // Ensure Health Club total including SC gets cached reactively
+  function cacheHealthClubIncludingSC(year, label) {
+    const total = Number(calculateTotalHealthClubRevIncludingSC(healthClubData, year, label) || 0);
+    const project = getProjectName();
+    calculationCache.setValue(project, 'OOD Revenue Assumptions', 'Total Health Club Rev Including SC', year, label, total);
+    return total;
+  }
+
+  watch([() => healthClubData, visibleYears], () => {
+    try {
+      if (!visibleYears.value?.length) return;
+      for (const year of visibleYears.value) {
+        for (const label of getColumnLabelsForYearLocal(year)) {
+          cacheHealthClubIncludingSC(year, label);
+        }
+      }
+    } catch {}
+  }, { deep: true });
+ 
   // Watch for changes in laundryAssumptions to mark as unsaved
   watch(laundryAssumptions, () => {
-    if (!isPopulatingLaundryAssumptions && isSaved.value) {
-    isSaved.value = false;
-  }
+    if (!isPopulatingLaundryAssumptions) {
+      isSavedLaundry.value = false;
+    }
   }, { deep: true });
 
   // Helper to get section and detail for a health club field code
@@ -1620,6 +1784,8 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
     } else {
       healthClubData[year][label].push({ field, section, detail, amount });
     }
+    // Mark unsaved only on user edits
+    isSavedHealthClub.value = false;
   }
 
   // Helper to find code for section/detail
@@ -1646,13 +1812,17 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
 
   // Helper to find code for section/detail in laundry fields
   function findLaundryCode(section, detail) {
-    const match = LAUNDRY_FIELDS.find(f => f.label === section && f.detail === detail);
-    // If LAUNDRY_FIELDS does not have 'detail', fallback to label only
-    if (!match) {
-      const fallback = LAUNDRY_FIELDS.find(f => f.label === section);
-      return fallback ? fallback.code : undefined;
-    }
-    return match.code;
+    // Explicit mappings for sections with multiple sub-details
+    if (section === 'In House Guest Laundry Revenue') return 'in_house_guest_laundry';
+    if (section === 'In House Dry Cleaning Revenue') return 'in_house_dry_cleaning';
+    if (section === 'Outside Guest Laundry') return 'outside_guest_laundry';
+    if (section === 'Guest Laundry Cost') return 'guest_laundry_cost';
+    // Special sections that don't directly exist in LAUNDRY_FIELDS
+    if (section === 'Revenue' && detail === 'Other Revenue') return 'revenue_other';
+    if (section === 'COST OF LAUNDRY' && detail === 'Other Laundry Costs') return 'other_laundry_costs';
+    // Fallback by matching section label
+    const fallback = LAUNDRY_FIELDS.find(f => f.label === section);
+    return fallback ? fallback.code : undefined;
   }
 
   // Normalize laundry data after loading
@@ -1707,6 +1877,35 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
                 laundryAssumptions.in_house_dry_cleaning_amount[year][month] = row.amount;
               }
               break;
+            case 'outside_guest_laundry':
+              if (row.detail === 'Number') {
+                if (!laundryAssumptions.outside_guest_laundry_number[year]) laundryAssumptions.outside_guest_laundry_number[year] = {};
+                laundryAssumptions.outside_guest_laundry_number[year][month] = row.amount;
+              } else if (row.detail === 'Base') {
+                if (!laundryAssumptions.outside_guest_laundry_base[year]) laundryAssumptions.outside_guest_laundry_base[year] = {};
+                laundryAssumptions.outside_guest_laundry_base[year][month] = row.base;
+              } else if (row.detail === 'Average Amount') {
+                if (!laundryAssumptions.outside_guest_laundry_amount[year]) laundryAssumptions.outside_guest_laundry_amount[year] = {};
+                laundryAssumptions.outside_guest_laundry_amount[year][month] = row.amount;
+              }
+              break;
+            case 'guest_laundry_cost':
+              if (row.detail === 'Percentage') {
+                if (!laundryAssumptions.guest_laundry_cost_percentage[year]) laundryAssumptions.guest_laundry_cost_percentage[year] = {};
+                laundryAssumptions.guest_laundry_cost_percentage[year][month] = row.amount;
+              } else if (row.detail === 'Amount') {
+                if (!laundryAssumptions.guest_laundry_cost_amount[year]) laundryAssumptions.guest_laundry_cost_amount[year] = {};
+                laundryAssumptions.guest_laundry_cost_amount[year][month] = row.amount;
+              }
+              break;
+            case 'revenue_other':
+              if (!laundryAssumptions.revenue_other[year]) laundryAssumptions.revenue_other[year] = {};
+              laundryAssumptions.revenue_other[year][month] = row.amount;
+              break;
+            case 'other_laundry_costs':
+              if (!laundryAssumptions.other_laundry_costs[year]) laundryAssumptions.other_laundry_costs[year] = {};
+              laundryAssumptions.other_laundry_costs[year][month] = row.amount;
+              break;
             // Add similar mapping for other fields as needed
           }
         }
@@ -1719,6 +1918,7 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
 
   // Add at the top of <script setup>
   let isPopulatingLaundryAssumptions = false;
+  let isPopulatingHealthClubData = false;
 
   </script>
   
