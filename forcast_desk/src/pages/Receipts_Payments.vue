@@ -364,15 +364,15 @@
                                 :key="'dept-collection-80-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'sameMonth')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
+                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'sameMonth')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
+                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'sameMonth')) }}</span>
                               </td>
                             </template>
                           </template>
@@ -397,15 +397,15 @@
                                 :key="'dept-collection-15-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-200 bg-violet-100"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'following')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
+                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'following')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
+                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'following')) }}</span>
                               </td>
                             </template>
                           </template>
@@ -430,10 +430,10 @@
                                 :key="'dept-collection-5-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'second')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
+                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'second')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -458,10 +458,10 @@
                                 :key="'dept-cash-inflow-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'cashInflow')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getCollectionTotal(department, year, 'cashInflow')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -486,10 +486,10 @@
                                 :key="'dept-accounts-receivables-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getARValue(department, year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getARTotal(department, year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -1432,6 +1432,9 @@
   
   import { selectedProject, initializeProjectService, getProjectDepartments } from '@/components/utility/dashboard/projectService.js';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+  // Collections & AR utilities
+  import { computeCollectionsForYear, computeAccountsReceivablesForYear, normalizePercents } from '@/components/utility/receipts/collections.js';
+  import { monthLabels as monthlyBaseLabels, quarterToMonths } from '@/components/utility/expense_assumption/expense_formular.js';
   
   // ============================================================================
   // REACTIVE STATE
@@ -1648,6 +1651,116 @@
 
   function formatMoney(value) {
     return getNumber(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  
+  // ============================================================================
+  // COLLECTIONS AND ACCOUNTS RECEIVABLES HELPERS
+  // ============================================================================
+  const monthlyLabels = monthlyBaseLabels;
+  const lastValidCollectionPercents = ref({}); // fallback while user edits invalid totals
+
+  function buildRevenueByLabel(department, year) {
+    const map = {};
+    monthlyLabels.forEach((lab) => {
+      map[lab] = getNumber(getDepartmentMonthlyRevenue(department, year, lab));
+    });
+    return map;
+  }
+
+  function getDeptPercents(department) {
+    const key = getDeptKey(department);
+    const p = collectionPercentages.value[key] || { month: 0, following: 0, second: 0 };
+    try {
+      const normalized = normalizePercents(p);
+      lastValidCollectionPercents.value[key] = normalized;
+      return normalized;
+    } catch (e) {
+      // While user is typing and sum > 100, fall back to last valid percents (or zeros)
+      return lastValidCollectionPercents.value[key] || { month: 0, following: 0, second: 0 };
+    }
+  }
+
+  function computeCollections(department, year) {
+    const revenue = buildRevenueByLabel(department, year);
+    const perc = getDeptPercents(department);
+    return { out: computeCollectionsForYear(revenue, perc, monthlyLabels), revenue, perc };
+  }
+
+  function getCollectionValue(department, year, label, bucket) {
+    const { out, revenue, perc } = computeCollections(department, year);
+    const mode = advancedModes.value[year] || displayMode.value;
+
+    if (label === 'ex1') {
+      if (bucket === 'sameMonth') return 0;
+      if (bucket === 'following') return getNumber(revenue.Dec) * perc.following;
+      if (bucket === 'second') return getNumber(revenue.Nov) * perc.second;
+      if (bucket === 'cashInflow') return getNumber(out.cashInflow.ex1 || 0);
+    }
+    if (label === 'ex2') {
+      if (bucket === 'sameMonth' || bucket === 'following') return 0;
+      if (bucket === 'second') return getNumber(revenue.Dec) * perc.second;
+      if (bucket === 'cashInflow') return getNumber(out.cashInflow.ex2 || 0);
+    }
+
+    if (mode === 'monthly') {
+      if (bucket === 'sameMonth') return getNumber(out.sameMonth[label] || 0);
+      if (bucket === 'following') return getNumber(out.following[label] || 0);
+      if (bucket === 'second') return getNumber(out.second[label] || 0);
+      if (bucket === 'cashInflow') return getNumber(out.cashInflow[label] || 0);
+      return 0;
+    }
+
+    if (mode === 'quarterly' && quarterToMonths[label]) {
+      const monthsInQuarter = quarterToMonths[label];
+      if (bucket === 'sameMonth') return monthsInQuarter.reduce((s, m) => s + getNumber(out.sameMonth[m] || 0), 0);
+      if (bucket === 'following') return monthsInQuarter.reduce((s, m) => s + getNumber(out.following[m] || 0), 0);
+      if (bucket === 'second') return monthsInQuarter.reduce((s, m) => s + getNumber(out.second[m] || 0), 0);
+      if (bucket === 'cashInflow') return monthsInQuarter.reduce((s, m) => s + getNumber(out.cashInflow[m] || 0), 0);
+    }
+
+    return 0;
+  }
+
+  function getCollectionTotal(department, year, bucket) {
+    const { out } = computeCollections(department, year);
+    if (bucket === 'sameMonth') return getNumber(out.totals.sameMonth || 0);
+    if (bucket === 'following') return getNumber(out.totals.following || 0);
+    if (bucket === 'second') return getNumber(out.totals.second || 0);
+    if (bucket === 'cashInflow') return getNumber(out.totals.cashInflow || 0);
+    return 0;
+  }
+
+  function buildNextYearRevenueByLabel(department, year) {
+    const map = {};
+    monthlyLabels.forEach((lab) => {
+      map[lab] = getNumber(getDepartmentMonthlyRevenue(department, year + 1, lab));
+    });
+    return map;
+  }
+
+  function computeAR(department, year) {
+    const revenueThis = buildRevenueByLabel(department, year);
+    const revenueNext = buildNextYearRevenueByLabel(department, year);
+    const perc = getDeptPercents(department);
+    return computeAccountsReceivablesForYear(revenueThis, perc, monthlyLabels, revenueNext);
+  }
+
+  function getARValue(department, year, label) {
+    const mode = advancedModes.value[year] || displayMode.value;
+    const res = computeAR(department, year);
+    if (label === 'ex1') return getNumber(res.ex1 || 0);
+    if (label === 'ex2') return getNumber(res.ex2 || 0);
+    if (mode === 'monthly') return getNumber(res.ar[label] || 0);
+    if (mode === 'quarterly' && quarterToMonths[label]) {
+      const monthsInQuarter = quarterToMonths[label];
+      return monthsInQuarter.reduce((s, m) => s + getNumber(res.ar[m] || 0), 0);
+    }
+    return 0;
+  }
+
+  function getARTotal(department, year) {
+    const res = computeAR(department, year);
+    return getNumber(res.total || 0);
   }
 
   function getRoomMonthlyRevenueFromCache(year, label) {
@@ -2006,10 +2119,14 @@
 
   function getCollectionSumAfter(deptKey, period, newValue) {
     const current = collectionPercentages.value[deptKey] || { month: 0, following: 0, second: 0 };
-    const monthVal = period === 'month' ? newValue : Number(current.month) || 0;
-    const followingVal = period === 'following' ? newValue : Number(current.following) || 0;
-    const secondVal = period === 'second' ? newValue : Number(current.second) || 0;
-    return monthVal + followingVal + secondVal;
+    const toDec = (x) => {
+      const n = Number(x) || 0;
+      return n > 1 ? n / 100 : n;
+    };
+    const monthVal = toDec(period === 'month' ? newValue : current.month);
+    const followingVal = toDec(period === 'following' ? newValue : current.following);
+    const secondVal = toDec(period === 'second' ? newValue : current.second);
+    return monthVal + followingVal + secondVal; // returns decimal sum (0..1)
   }
 
   function updateCollectionPercentage(type, period, event) {
@@ -2017,13 +2134,7 @@
     const deptKey = normalizeDepartmentKey(type);
     ensureDefaultsForKey(deptKey);
     if (!isNaN(value) && value >= 0 && value <= 100) {
-      const total = getCollectionSumAfter(deptKey, period, value);
-      if (total > 100) {
-        const prev = Number(collectionPercentages.value[deptKey][period]) || 0;
-        setEditableCellText(event, prev.toFixed(2) + '%');
-        alertService.error(`Collection percentages cannot exceed 100%. Current total would be ${total.toFixed(2)}%.`);
-        return;
-      }
+      // During typing, accept value without enforcing sum; final check on blur
       collectionPercentages.value[deptKey][period] = value;
       isSaved.value = false;
     }
@@ -2031,7 +2142,7 @@
   
   function handleCollectionPercentageFocus({ type, period, event }) {
     // Handle focus for collection percentage
-    console.log('Collection percentage focus:', type, period);
+    // console.log('Collection percentage focus:', type, period);
   }
   
   function handleCollectionPercentageEdit({ type, period, event }) {
@@ -2040,11 +2151,11 @@
     const deptKey = normalizeDepartmentKey(type);
     ensureDefaultsForKey(deptKey);
     if (!isNaN(value) && value >= 0 && value <= 100) {
-      const total = getCollectionSumAfter(deptKey, period, value);
-      if (total > 100) {
+      const totalDec = getCollectionSumAfter(deptKey, period, value);
+      if (totalDec > 1) {
         const prev = Number(collectionPercentages.value[deptKey][period]) || 0;
         setEditableCellText(event, prev.toFixed(2) + '%');
-        alertService.error(`Collection percentages cannot exceed 100%. Current total would be ${total.toFixed(2)}%.`);
+        alertService.error(`Collection percentages cannot exceed 100%. Current total would be ${(totalDec * 100).toFixed(2)}%.`);
         return;
       }
       collectionPercentages.value[deptKey][period] = value;
