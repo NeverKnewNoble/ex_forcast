@@ -692,6 +692,7 @@
                     <input
                       type="text"
                       v-model="row.amountDisplay"
+                      @keypress="allowOnlyNumbersFromPayroll"
                       @input="formatAmountInputWrapper(index, $event)"
                       @blur="cleanAmountValueWrapper(index)"
                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-left"
@@ -812,6 +813,7 @@ import NoProjectSelectedState from '@/components/ui/expense/NoProjectSelectedSta
 import NoDataState from '@/components/ui/expense/NoDataState.vue';
 import ErrorState from '@/components/ui/expense/ErrorState.vue';
 import NoYearsSelectedState from '@/components/ui/expense/NoYearsSelectedState.vue';
+import { allowOnlyNumbers as allowOnlyNumbersFromPayroll } from '@/components/utility/payroll/index.js';
 
 
 // Reactive state
