@@ -1,0 +1,640 @@
+[
+ {
+  "default_data": [
+   {
+    "department_location": "Front Office",
+    "designation": "Rooms Director",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Operation Manager",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Front Office Manager",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Night Manager",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Asst Front Office Manager",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Front Office Supervisor",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Front Desk Officer",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "GSA",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Night Supervisor",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Night Auditor",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Concierge",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Bell Captain",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Bell Attendant",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Driver Supervisor",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Driver",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Car Park Attendant",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Airport Representative",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "Telephone Operator",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Front Office",
+    "designation": "GYM Trainer",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Housekeeping & Laundry",
+    "designation": "HK Manager",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Housekeeping & Laundry",
+    "designation": "Assistant HK Manager",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Housekeeping & Laundry",
+    "designation": "Housekeeping Supervisor ",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Housekeeping & Laundry",
+    "designation": "Sr. Room attendant ",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Housekeeping & Laundry",
+    "designation": "Room attendant ",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Housekeeping & Laundry",
+    "designation": "Public Area Supervisor",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Housekeeping & Laundry",
+    "designation": "Sr. Public Area attendant",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Housekeeping & Laundry",
+    "designation": "Public Area attendant",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Housekeeping & Laundry",
+    "designation": "Laundry Manager",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Housekeeping & Laundry",
+    "designation": "Laundry Supervisor ",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Housekeeping & Laundry",
+    "designation": "Linen attendant",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Housekeeping & Laundry",
+    "designation": "Laundry attendant",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Revenue / Reservation",
+    "designation": "Reservation or Revenue Manager",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Revenue / Reservation",
+    "designation": "Reservation Supervisor",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Revenue / Reservation",
+    "designation": "Reservation Officer",
+    "parent": "Rooms",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   }
+  ],
+  "department": "Rooms",
+  "docstatus": 0,
+  "doctype": "Payroll Default Data",
+  "modified": "2025-08-14 15:26:48.796503",
+  "module": "Ex Forcast",
+  "name": "Rooms"
+ },
+ {
+  "default_data": [
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Cluster 'Executive Chef",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Executive Chef",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Ex. Sous Chef ",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Chef De Partie",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Demi Chef De Partie",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Commis 1",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Commis 2",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Commis 3",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Pastry chef",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Pastry Demi Chef",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Cook",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Chef De Partie - Pastry",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "National Food Cook",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Senior  Butchery",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Main Kitchen",
+    "designation": "Sou Chef/Butchery",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Stewarding",
+    "designation": "Stewarding Supervisor",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Stewarding",
+    "designation": "Steward Shift leader",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Stewarding",
+    "designation": "Stewards ",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Food & Beverage Admin",
+    "designation": "F&B Manager ",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Food & Beverage Admin",
+    "designation": "Asst. F&B Manager ",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Food & Beverage Admin",
+    "designation": " F&B Coordinator",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Theme Restaurant",
+    "designation": "F and B supervisor",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Theme Restaurant",
+    "designation": "Waiter",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Theme Restaurant",
+    "designation": "Hostess ",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Room Service ",
+    "designation": "F and B supervisor",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Room Service ",
+    "designation": "Order Taker ",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Room Service ",
+    "designation": "F&B Service / Waiter",
+    "parent": "Food And Beverage",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   }
+  ],
+  "department": "Food And Beverage",
+  "docstatus": 0,
+  "doctype": "Payroll Default Data",
+  "modified": "2025-08-14 15:26:40.363119",
+  "module": "Ex Forcast",
+  "name": "Food And Beverage"
+ },
+ {
+  "default_data": [
+   {
+    "department_location": "Health Club",
+    "designation": "Health Center Manager",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Health Club",
+    "designation": "SPA and Sauna Receptionist",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Health Club",
+    "designation": "Massage Therapist",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Health Club",
+    "designation": "Massage Technician",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Health Club",
+    "designation": "Spa Therapist",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Health Club",
+    "designation": "Esthetician",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Health Club",
+    "designation": "Reflexologist",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Health Club",
+    "designation": "Aromatherapist",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Health Club",
+    "designation": "Spa Attendant ",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Health Club",
+    "designation": "Hair Stylist",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Health Club",
+    "designation": "Life Guard",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Health Club",
+    "designation": "Men Hair Stylist",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Laundry",
+    "designation": "Laundry Manager",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Manager"
+   },
+   {
+    "department_location": "Laundry",
+    "designation": "Laundry Supervisor ",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   },
+   {
+    "department_location": "Laundry",
+    "designation": "Laundry attendant",
+    "parent": "Other Operating Departments",
+    "parentfield": "default_data",
+    "parenttype": "Payroll Default Data",
+    "position": "Non-manager"
+   }
+  ],
+  "department": "Other Operating Departments",
+  "docstatus": 0,
+  "doctype": "Payroll Default Data",
+  "modified": "2025-08-14 15:26:30.467171",
+  "module": "Ex Forcast",
+  "name": "Other Operating Departments"
+ }
+]

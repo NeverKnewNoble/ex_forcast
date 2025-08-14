@@ -83,15 +83,6 @@
  {
   "docstatus": 0,
   "doctype": "Room Market Segment",
-  "market_segment": "Wholesale Dynamic",
-  "modified": "2025-07-01 13:09:16.505916",
-  "module": "Ex Forcast",
-  "name": "Wholesale Dynamic",
-  "segment_category": "WHOLESALE"
- },
- {
-  "docstatus": 0,
-  "doctype": "Room Market Segment",
   "market_segment": "Wholesale Allotment / Static",
   "modified": "2025-07-01 13:09:32.949868",
   "module": "Ex Forcast",
