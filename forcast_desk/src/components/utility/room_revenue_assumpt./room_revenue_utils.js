@@ -276,7 +276,11 @@ export function calculateMonthlyTotal(roomRevenueData, year, label, displayMode,
   let total = 0
   let roomTypeCount = 0
   
-  for (const roomType of ROOM_TYPES) {
+  const roomTypesToUse = (roomPackages && roomPackages.length > 0)
+    ? roomPackages.map(p => p.package_name || p.name)
+    : ROOM_TYPES
+  
+  for (const roomType of roomTypesToUse) {
     const data = getRoomData(roomRevenueData, roomType, year, label, displayMode)
     const numberOfRooms = getNumberOfRoomsForType(roomPackages, roomType, roomRevenueData)
     let value = 0
@@ -339,7 +343,11 @@ export function calculateMonthlyTotal(roomRevenueData, year, label, displayMode,
 export function calculateGrandTotal(roomRevenueData, year, displayMode, calculationType = "revenue", roomPackages = []) {
   let total = 0
   
-  for (const roomType of ROOM_TYPES) {
+  const roomTypesToUse = (roomPackages && roomPackages.length > 0)
+    ? roomPackages.map(p => p.package_name || p.name)
+    : ROOM_TYPES
+  
+  for (const roomType of roomTypesToUse) {
     const months = getColumnLabels(displayMode)
     for (const month of months) {
       const data = getRoomData(roomRevenueData, roomType, year, month, displayMode)
@@ -398,10 +406,14 @@ export function calculateGrandTotal(roomRevenueData, year, displayMode, calculat
 export function calculateTableTotal(roomRevenueData, visibleYears, displayMode, calculationType = "revenue", roomPackages = []) {
   let total = 0
   
+  const roomTypesToUse = (roomPackages && roomPackages.length > 0)
+    ? roomPackages.map(p => p.package_name || p.name)
+    : ROOM_TYPES
+  
   for (const year of visibleYears) {
     const months = getColumnLabels(displayMode)
     for (const month of months) {
-      for (const roomType of ROOM_TYPES) {
+      for (const roomType of roomTypesToUse) {
         const data = getRoomData(roomRevenueData, roomType, year, month, displayMode)
         const numberOfRooms = getNumberOfRoomsForType(roomPackages, roomType, roomRevenueData)
         let value = 0

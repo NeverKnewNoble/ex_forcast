@@ -47,7 +47,7 @@
           class="flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white"
           :class="[
             $route.path === child.route
-              ? 'bg-violet-100 border-r-4 border-violet-400 text-violet-500 font-semibold'
+              ? 'bg-violet-600 border-r-4 border-violet-800 text-white font-semibold'
               : ''
           ]"
         >
@@ -72,7 +72,7 @@
             class="flex items-center space-x-3 px-3 py-2 rounded transition hover:bg-violet-500 hover:text-white text-sm"
             :class="[
               $route.path === child.route
-                ? 'bg-violet-100 text-violet-500 font-semibold'
+                ? 'bg-violet-600 text-white font-semibold'
                 : 'text-gray-700'
             ]"
             @click="expandedMenus[item.text] = false"
@@ -90,7 +90,7 @@
         'flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white',
         { 'justify-center': !is_expanded },
         $route.path === item.route
-          ? 'bg-violet-100 border-r-4 border-violet-400 text-violet-500 font-semibold'
+          ? 'bg-violet-600 border-r-4 border-violet-800 text-white font-semibold'
           : ''
       ]"
     >
@@ -152,7 +152,7 @@ import {
   ChevronUp,
   HandCoins,
   Ellipsis,
-  Plus,
+  BookOpen,
   Building2,
   ReceiptText,
   Sheet,
@@ -190,7 +190,7 @@ const menuItems = [
     ]
   },
   { text: "Receipts & Payments", route: "/receipts_payments", icon: ReceiptText },
-  { text: "Reports", route: "/", icon: Plus },
+  { text: "Reports", route: "/reports", icon: BookOpen },
 ]
 
 const expandedMenus = ref({})

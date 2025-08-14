@@ -22,5 +22,213 @@
   "modified": "2025-08-08 01:20:45.760409",
   "module": "Ex Forcast",
   "name": "Revenue / Reservation"
+ },
+ {
+  "department_location": "Reception Area",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:35:24.102863",
+  "module": "Ex Forcast",
+  "name": "Reception Area"
+ },
+ {
+  "department_location": "Lobby",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:35:40.983545",
+  "module": "Ex Forcast",
+  "name": "Lobby"
+ },
+ {
+  "department_location": "Meeting Room",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:35:52.347743",
+  "module": "Ex Forcast",
+  "name": "Meeting Room"
+ },
+ {
+  "department_location": "Conference Hall",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:36:06.809522",
+  "module": "Ex Forcast",
+  "name": "Conference Hall"
+ },
+ {
+  "department_location": "Break Room / Staff Lounge",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:36:20.030059",
+  "module": "Ex Forcast",
+  "name": "Break Room / Staff Lounge"
+ },
+ {
+  "department_location": "Restrooms",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:36:37.785118",
+  "module": "Ex Forcast",
+  "name": "Restrooms"
+ },
+ {
+  "department_location": "Storage Room",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:36:56.996960",
+  "module": "Ex Forcast",
+  "name": "Storage Room"
+ },
+ {
+  "department_location": "Mail Room",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:37:07.336004",
+  "module": "Ex Forcast",
+  "name": "Mail Room"
+ },
+ {
+  "department_location": "Copy / Print Room",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:37:19.365499",
+  "module": "Ex Forcast",
+  "name": "Copy / Print Room"
+ },
+ {
+  "department_location": "Waiting Area",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:37:32.285948",
+  "module": "Ex Forcast",
+  "name": "Waiting Area"
+ },
+ {
+  "department_location": "Parking Lot",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:37:42.151605",
+  "module": "Ex Forcast",
+  "name": "Parking Lot"
+ },
+ {
+  "department_location": "Security Post",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:37:52.357816",
+  "module": "Ex Forcast",
+  "name": "Security Post"
+ },
+ {
+  "department_location": "Server Room",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:38:02.473166",
+  "module": "Ex Forcast",
+  "name": "Server Room"
+ },
+ {
+  "department_location": "Rooftop Terrace",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:38:14.643854",
+  "module": "Ex Forcast",
+  "name": "Rooftop Terrace"
+ },
+ {
+  "department_location": "Dining Area",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:38:26.187482",
+  "module": "Ex Forcast",
+  "name": "Dining Area"
+ },
+ {
+  "department_location": "Bar Counter",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:38:34.624643",
+  "module": "Ex Forcast",
+  "name": "Bar Counter"
+ },
+ {
+  "department_location": "Kitchen",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:38:43.885759",
+  "module": "Ex Forcast",
+  "name": "Kitchen"
+ },
+ {
+  "department_location": "Cold Room / Walk-in Freezer",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:38:54.513153",
+  "module": "Ex Forcast",
+  "name": "Cold Room / Walk-in Freezer"
+ },
+ {
+  "department_location": "Dry Storage Room",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:39:04.839550",
+  "module": "Ex Forcast",
+  "name": "Dry Storage Room"
+ },
+ {
+  "department_location": "Dishwashing Area",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:39:14.110276",
+  "module": "Ex Forcast",
+  "name": "Dishwashing Area"
+ },
+ {
+  "department_location": "Cashier Counter",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:39:26.474591",
+  "module": "Ex Forcast",
+  "name": "Cashier Counter"
+ },
+ {
+  "department_location": "Outdoor Seating / Patio",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:39:40.325123",
+  "module": "Ex Forcast",
+  "name": "Outdoor Seating / Patio"
+ },
+ {
+  "department_location": "Terrace Seating",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:39:52.402912",
+  "module": "Ex Forcast",
+  "name": "Terrace Seating"
+ },
+ {
+  "department_location": "Delivery Pick-up Zone",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:40:04.565896",
+  "module": "Ex Forcast",
+  "name": "Delivery Pick-up Zone"
+ },
+ {
+  "department_location": "Staff Changing Room",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:40:18.753086",
+  "module": "Ex Forcast",
+  "name": "Staff Changing Room"
+ },
+ {
+  "department_location": "Loading / Receiving Area",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-14 15:40:29.814906",
+  "module": "Ex Forcast",
+  "name": "Loading / Receiving Area"
  }
 ]

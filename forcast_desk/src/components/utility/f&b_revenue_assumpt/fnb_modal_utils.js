@@ -1,5 +1,7 @@
 import { ref, watch } from 'vue';
+import { currentDoubleOccupancyByYear } from './fnb_table_utils.js';
 import alertService from "@/components/ui/ui_utility/alertService.js";
+import { getProjectKey } from '@/components/utility/projectLocalStorage.js';
 
 // Modal state management
 export const showAdvanced = ref(false);
@@ -30,11 +32,31 @@ export function cancelAdvancedSettings() {
 }
 
 // Double Occupancy Modal Functions
-export function applyDoubleOccupancySettings(doubleOccupancyByYear) {
+export function applyDoubleOccupancySettings(doubleOccupancyByYear, projectName = null) {
+  // Update the main double occupancy ref
   doubleOccupancyByYear.value = { ...tempDoubleOccupancyByYear.value };
-  // Save to localStorage for persistence
-  localStorage.setItem('doubleOccupancyByYear', JSON.stringify(doubleOccupancyByYear.value));
+  
+  // Save to project-specific localStorage for persistence
+  if (projectName) {
+    localStorage.setItem(getProjectKey('doubleOccupancyByYear'), JSON.stringify(doubleOccupancyByYear.value));
+  } else {
+    // Fallback to generic key if no project specified
+    localStorage.setItem('doubleOccupancyByYear', JSON.stringify(doubleOccupancyByYear.value));
+  }
+  
+  // Update reactive source so tables update immediately
+  try {
+    currentDoubleOccupancyByYear.value = { ...doubleOccupancyByYear.value };
+  } catch (e) {}
+  
+  alertService.success('Double occupancy updated');
   showDoubleOccupancyModal.value = false;
+  
+  // Set flag to show refresh success alert and trigger page refresh
+  localStorage.setItem('showRefreshSuccess', 'true');
+  setTimeout(() => {
+    window.location.reload();
+  }, 500); // Small delay to ensure the success message is shown
 }
 
 export function cancelDoubleOccupancySettings() {
@@ -42,13 +64,18 @@ export function cancelDoubleOccupancySettings() {
 }
 
 // Default Breakfast Outlet Modal Functions
-export function applyDefaultBreakfastSettings(defaultBreakfastOutlet) {
+export function applyDefaultBreakfastSettings(defaultBreakfastOutlet, projectName = null) {
   // Ensure defaultBreakfastOutlet is a ref object
   if (defaultBreakfastOutlet && typeof defaultBreakfastOutlet === 'object' && 'value' in defaultBreakfastOutlet) {
     defaultBreakfastOutlet.value = tempDefaultBreakfastOutlet.value;
   }
-  // Save to localStorage for persistence
-  localStorage.setItem('defaultBreakfastOutlet', tempDefaultBreakfastOutlet.value);
+  // Save to project-specific localStorage for persistence
+  if (projectName) {
+    localStorage.setItem(getProjectKey('defaultBreakfastOutlet'), tempDefaultBreakfastOutlet.value);
+  } else {
+    // Fallback to generic key if no project specified
+    localStorage.setItem('defaultBreakfastOutlet', tempDefaultBreakfastOutlet.value);
+  }
   showDefaultBreakfastModal.value = false;
   alertService.success('Default breakfast outlet updated successfully!');
   

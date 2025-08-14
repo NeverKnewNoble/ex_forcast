@@ -125,8 +125,9 @@
                             From Year
                           </label>
                           <select 
+                            disabled
                             v-model="fromYear" 
-                            class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                            class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-gray-100 text-sm"
                           >
                             <option value="">Select Year</option>
                             <option v-for="year in years" :key="'from-' + year" :value="year">{{ year }}</option>
@@ -141,8 +142,9 @@
                             To Year
                           </label>
                           <select 
+                            disabled
                             v-model="toYear" 
-                            class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                            class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-gray-100 text-sm"
                           >
                             <option value="">Select Year</option>
                             <option v-for="year in filteredToYears" :key="'to-' + year" :value="year">{{ year }}</option>
@@ -593,10 +595,10 @@
                                 :key="'dept-salary-payment-80-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'salary', year, label, 'sameMonth')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'salary', year, 'sameMonth')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -626,10 +628,10 @@
                                 :key="'dept-' + deptIndex + '-salary-payment-15-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'salary', year, label, 'following')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'salary', year, 'following')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -659,10 +661,10 @@
                                 :key="'dept-' + deptIndex + '-salary-payment-5-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'salary', year, label, 'second')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'salary', year, 'second')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -687,10 +689,10 @@
                                 :key="'dept-' + deptIndex + '-salary-cash-outflow-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'salary', year, label, 'cashOutflow')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentTotal(department, 'salary', year, 'cashOutflow')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -715,10 +717,10 @@
                                 :key="'dept-' + deptIndex + '-salary-payables-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPayablesValue(department, 'salary', year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPayablesTotal(department, 'salary', year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -780,10 +782,10 @@
                                 :key="'dept-' + deptIndex + '-bonus-payment-80-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'bonus', year, label, 'sameMonth')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'bonus', year, 'sameMonth')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -813,10 +815,10 @@
                                 :key="'dept-' + deptIndex + '-bonus-payment-15-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'bonus', year, label, 'following')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'bonus', year, 'following')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -846,10 +848,10 @@
                                 :key="'dept-' + deptIndex + '-bonus-payment-5-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'bonus', year, label, 'second')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'bonus', year, 'second')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -874,10 +876,10 @@
                                 :key="'rooms-bonus-cash-outflow-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'bonus', year, label, 'cashOutflow')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentTotal(department, 'bonus', year, 'cashOutflow')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -902,10 +904,10 @@
                                 :key="'rooms-bonus-payables-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPayablesValue(department, 'bonus', year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPayablesTotal(department, 'bonus', year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -967,10 +969,10 @@
                                 :key="'rooms-payroll-payment-80-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'payroll', year, label, 'sameMonth')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'payroll', year, 'sameMonth')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -1000,10 +1002,10 @@
                                 :key="'rooms-payroll-payment-15-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'payroll', year, label, 'following')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'payroll', year, 'following')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -1033,10 +1035,10 @@
                                 :key="'rooms-payroll-payment-5-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'payroll', year, label, 'second')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'payroll', year, 'second')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -1061,10 +1063,10 @@
                                 :key="'rooms-payroll-cash-outflow-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'payroll', year, label, 'cashOutflow')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentTotal(department, 'payroll', year, 'cashOutflow')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -1089,10 +1091,10 @@
                                 :key="'rooms-payroll-payables-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPayablesValue(department, 'payroll', year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPayablesTotal(department, 'payroll', year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -1154,10 +1156,10 @@
                                 :key="'rooms-expenses-payment-80-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'expenses', year, label, 'sameMonth')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'expenses', year, 'sameMonth')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -1187,10 +1189,10 @@
                                 :key="'rooms-expenses-payment-15-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'expenses', year, label, 'following')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'expenses', year, 'following')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -1220,10 +1222,10 @@
                                 :key="'rooms-expenses-payment-5-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'expenses', year, label, 'second')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'expenses', year, 'second')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -1248,10 +1250,10 @@
                                 :key="'rooms-expenses-cash-outflow-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'expenses', year, label, 'cashOutflow')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPaymentTotal(department, 'expenses', year, 'cashOutflow')) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -1276,10 +1278,10 @@
                                 :key="'rooms-expenses-payables-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPayablesValue(department, 'expenses', year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class="font-mono text-xs">{{ formatMoney(getPayablesTotal(department, 'expenses', year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
@@ -1291,20 +1293,6 @@
                         </tr>
                             </template>
   
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-                
                       </tbody>
                     </table>
                   </div>
@@ -1404,7 +1392,7 @@
   import Sidebar from "@/components/ui/Sidebar.vue";
   import NoProjectSelectedState from '@/components/ui/expense/NoProjectSelectedState.vue';
   import ErrorState from '@/components/ui/expense/ErrorState.vue';
-  import NoYearsSelectedState from '@/components/ui/expense/NoYearsSelectedState.vue';
+  import NoYearsSelectedState from '@/components/ui/receipts/NoYearsSelectedState.vue';
   
   // Icon imports
   import { 
@@ -1470,6 +1458,8 @@
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
   // Collections & AR utilities
   import { computeCollectionsForYear, computeAccountsReceivablesForYear, normalizePercents } from '@/components/utility/receipts/collections.js';
+  import { computePaymentsForYear, computeCategoryPayablesForYear } from '@/components/utility/receipts/payments.js';
+  import { createPaymentHelpers } from '@/components/utility/receipts/payment_ui_helpers.js';
   import { monthLabels as monthlyBaseLabels, quarterToMonths } from '@/components/utility/expense_assumption/expense_formular.js';
   import { allowOnlyNumbers } from '@/components/utility/payroll/index.js';
   import { loadReceiptsPaymentsData, upsertReceiptsPaymentsItems } from '@/components/utility/receipts/index.js';
@@ -1857,6 +1847,25 @@
     const res = computeAR(department, year);
     return getNumber(res.total || 0);
   }
+  
+  // ============================================================================
+  // PAYMENTS HELPERS (moved to utility)
+  // ============================================================================
+  const {
+    getPaymentValue,
+    getPaymentTotal,
+    getPayablesValue,
+    getPayablesTotal,
+  } = createPaymentHelpers({
+    paymentBases,
+    paymentPercentages,
+    getDeptKey,
+    advancedModes,
+    displayMode,
+    monthlyLabels,
+    quarterToMonths,
+    getNumber,
+  });
 
   function getRoomMonthlyRevenueFromCache(year, label) {
     const project = getProjectName();

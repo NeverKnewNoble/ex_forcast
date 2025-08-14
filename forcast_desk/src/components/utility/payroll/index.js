@@ -9,6 +9,7 @@ export {
   departmentOptions,
   departmentLocationOptions,
   designationOptions,
+  defaultPayrollRows,
   months,
   payrollData,
   payrollRows,

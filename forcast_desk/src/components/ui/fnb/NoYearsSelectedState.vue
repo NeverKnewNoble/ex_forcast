@@ -15,11 +15,20 @@
       <ArrowLeft class="w-3 h-3" />
       <span>Use the filters on the left to get started</span>
     </div>
+    <div class="mt-6">
+      <router-link
+        to="/expense_estimate"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-violet-700 text-white hover:from-violet-700 hover:to-violet-800 shadow"
+      >
+        <Calendar class="w-4 h-4" />
+        <span>Set Years in Expense</span>
+      </router-link>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { CircleAlert, ArrowLeft } from 'lucide-vue-next';
+import { CircleAlert, ArrowLeft, Calendar } from 'lucide-vue-next';
 
 // Props
 defineProps({

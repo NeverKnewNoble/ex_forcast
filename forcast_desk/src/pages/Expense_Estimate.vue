@@ -123,7 +123,7 @@
                       <Calendar class="w-3 h-3 text-gray-500" />
                       To Year
                     </label>
-                                          <select 
+                    <select 
                         v-model="toYear" 
                         class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
                       >
@@ -176,13 +176,22 @@
           </div>
 
           <!-- Table Header with Stats -->
-          <template v-else-if="(visibleYears.length && hasDataForSelectedYears) || defaultExpenses.length > 0">
+          <template v-else-if="visibleYears.length && hasDataForSelectedYears">
             <div class="mb-4">
               <div class="flex items-center gap-2">
-                <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
-                  <Table class="w-3 h-3 text-white" />
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
+                    <Table class="w-3 h-3 text-white" />
+                  </div>
+                  <h2 class="text-lg font-bold text-gray-800">Expense Overview</h2>
                 </div>
-                <h2 class="text-lg font-bold text-gray-800">Expense Overview</h2>
+              </div>
+              <div class="mt-2">
+                <button @click="restoreOriginal"
+                  class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm font-medium shadow-sm">
+                  <RotateCcw class="w-4 h-4" />
+                  Restore
+                </button>
               </div>
             </div>
 
@@ -314,8 +323,8 @@
                           </tr>
                           
                           <!-- Expense Rows for this Location -->
-                          <tr
-                            v-for="expense in locationGroup.expenses"
+                           <tr
+                            v-for="expense in getVisibleExpenses(locationGroup.expenses)"
                             :key="'expense-' + expense"
                             class="even:bg-gray-50 hover:bg-violet-50 transition-all duration-200 border-b border-gray-100"
                           >
@@ -325,8 +334,13 @@
                                 {{ getExpenseDetailsLocal(expense).code }}
                               </div>
                             </td>
-                            <td class="px-3 py-2 font-medium border-r border-violet-200">
-                              {{ expense }}
+                             <td class="px-3 py-2 font-medium border-r border-violet-200">
+                              <div class="flex items-center justify-between gap-2">
+                                <span>{{ expense }}</span>
+                                <button @click="deleteExpense(expense)" class="text-red-600 hover:text-red-700" title="Delete expense">
+                                  <X class="w-4 h-4" />
+                                </button>
+                              </div>
                             </td>
                             <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-600">
                               <div class="flex items-center gap-1">
@@ -409,7 +423,7 @@
           </template>
 
           <!-- No Data for Selected Years State -->
-          <template v-else-if="visibleYears.length && !hasDataForSelectedYears && defaultExpenses.length === 0">
+          <template v-else-if="visibleYears.length && !hasDataForSelectedYears">
             <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
               <div class="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mb-4">
                 <Receipt class="w-8 h-8 text-blue-600" />
@@ -427,9 +441,9 @@
               </button>
             </div>
           </template>
-
+          
           <!-- Enhanced No Years Selected State -->
-          <template v-else-if="defaultExpenses.length === 0">
+          <template v-else>
             <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
           </template>
         </div>
@@ -747,7 +761,7 @@ import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
-import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign, Loader2, AlertCircle, Building2, Save, Filter, Building, MapPin } from 'lucide-vue-next';
+import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign, Loader2, AlertCircle, Building2, Save, Filter, Building, MapPin, RotateCcw } from 'lucide-vue-next';
 import alertService from "@/components/ui/ui_utility/alertService.js";
 
 import {
@@ -835,6 +849,7 @@ const categoryOptions = ref([]);
 const costTypeOptions = ref([]);
 const isSaved = ref(false);
 const originalExpenseData = ref({});
+const deletedExpenses = ref(new Set());
 const changedCells = ref([]); // {year, label, expense, newValue}
 const isSaving = ref(false);
 const saveError = ref("");
@@ -878,6 +893,33 @@ const groupedExpenses = computed(() => {
   const result = getExpensesGroupedByDepartmentAndLocation(expenseData.value, visibleYears.value, defaultExpenses.value);
   return result;
 });
+
+function deleteExpense(expense) {
+  const next = new Set(deletedExpenses.value);
+  next.add(expense);
+  deletedExpenses.value = next;
+  isSaved.value = false;
+}
+
+function isExpenseDeleted(expense) {
+  return deletedExpenses.value.has(expense);
+}
+
+function restoreOriginal() {
+  try {
+    if (originalExpenseData.value && Object.keys(originalExpenseData.value).length) {
+      expenseData.value = cloneDeep(originalExpenseData.value);
+    }
+    deletedExpenses.value = new Set();
+    isSaved.value = false;
+    alertService.info('Restored to original');
+  } catch (e) {}
+}
+
+function getVisibleExpenses(expensesArray) {
+  const deleted = deletedExpenses.value;
+  return (expensesArray || []).filter((name) => !deleted.has(name));
+}
 
 // Check if there's data for the selected years
 const hasDataForSelectedYears = computed(() => {

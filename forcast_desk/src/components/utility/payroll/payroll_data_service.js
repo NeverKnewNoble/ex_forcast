@@ -20,6 +20,61 @@ export const addPayrollForm = reactive({
 export const departmentOptions = ref([]);
 export const departmentLocationOptions = ref([]);
 export const designationOptions = ref([]);
+export const defaultPayrollRows = ref([]);
+// Helper: ensure required Department Location and Designation records exist before saving
+async function ensureLocationsAndDesignationsExist(rows) {
+  // Build unique sets from provided rows
+  const neededLocations = new Set();
+  const neededDesignations = new Set();
+  (rows || []).forEach((r) => {
+    if (r && typeof r === 'object') {
+      if (r.departmentLocation && String(r.departmentLocation).trim()) {
+        neededLocations.add(String(r.departmentLocation).trim());
+      }
+      if (r.designation && String(r.designation).trim()) {
+        neededDesignations.add(String(r.designation).trim());
+      }
+    }
+  });
+
+  // Load current options
+  try { await loadDepartmentLocationOptions(); } catch (_) {}
+  try { await loadDesignationOptions(); } catch (_) {}
+
+  const existingLocations = new Set(
+    (departmentLocationOptions.value || []).map(opt => (opt.label || opt.value || '').toString().trim().toLowerCase())
+  );
+  const existingDesignations = new Set(
+    (designationOptions.value || []).map(opt => (opt.label || opt.value || '').toString().trim().toLowerCase())
+  );
+
+  // Create missing department locations
+  for (const loc of neededLocations) {
+    const key = loc.toString().trim().toLowerCase();
+    if (!existingLocations.has(key)) {
+      try {
+        await createDepartmentLocation(loc);
+        existingLocations.add(key);
+      } catch (_) {
+        // ignore; backend will still validate
+      }
+    }
+  }
+
+  // Create missing designations
+  for (const desig of neededDesignations) {
+    const key = desig.toString().trim().toLowerCase();
+    if (!existingDesignations.has(key)) {
+      try {
+        await createDesignation(desig);
+        existingDesignations.add(key);
+      } catch (_) {
+        // ignore; backend will still validate
+      }
+    }
+  }
+}
+
 
 // Payroll data state
 export const payrollData = ref({});
@@ -240,6 +295,20 @@ export async function fetchPayrollData(projectName, fromYear = null, toYear = nu
       
       payrollData.value = transformedResult.payrollData;
       payrollRows.value = transformedResult.payrollRows;
+
+      // Load default payroll rows for project's departments (for UI assistance)
+      try {
+        const respDefaults = await fetch(`/api/v2/method/ex_forcast.api.default_payroll.get_default_payroll_for_project?project_name=${encodeURIComponent(projectName)}`);
+        const jsonDefaults = await respDefaults.json();
+        const dataDefaults = jsonDefaults.data || jsonDefaults;
+        if (dataDefaults && dataDefaults.success) {
+          defaultPayrollRows.value = dataDefaults.default_payroll || [];
+        } else {
+          defaultPayrollRows.value = [];
+        }
+      } catch (_) {
+        defaultPayrollRows.value = [];
+      }
       
       // console.log('Payroll data loaded successfully:', {
       //   totalRows: transformedResult.totalRows,
@@ -304,6 +373,10 @@ export async function savePayrollChanges(changes, projectName) {
 
     // console.log('Changes grouped by row:', Object.keys(changesByRow));
 
+    // Ensure related records exist for rows being changed (locations, designations)
+    const rowsToEnsure = Object.keys(changesByRow).map(rowId => payrollRows.value.find(r => r.id === rowId)).filter(Boolean);
+    await ensureLocationsAndDesignationsExist(rowsToEnsure);
+
     // Transform changes to API format using data constructor
     const apiChanges = Object.keys(changesByRow).map(rowId => {
       const row = payrollRows.value.find(r => r.id === rowId);
@@ -338,6 +411,10 @@ export async function savePayrollChanges(changes, projectName) {
 
       // Use data constructor to transform to API format
       const apiChange = payrollDataConstructor.transformRowToApiFormat(updatedRow, payrollData.value);
+      // Ensure year is present for backend upsert
+      if (!apiChange.year && latestChange && latestChange.year) {
+        apiChange.year = latestChange.year;
+      }
       
       // Add monthly count data if exists
       if (Object.keys(rowChanges.monthly_count).length > 0) {
@@ -480,6 +557,9 @@ export async function submitPayrollData(selectedProject, payrollRows, reloadData
   payrollModalError.value = '';
   
   try {
+    // Ensure related records exist for new rows
+    await ensureLocationsAndDesignationsExist(cleanRows);
+
     // Use data constructor to transform frontend data to API format
     const apiPayload = transformFrontendToApi(cleanRows, {}, selectedProject.project_name);
     

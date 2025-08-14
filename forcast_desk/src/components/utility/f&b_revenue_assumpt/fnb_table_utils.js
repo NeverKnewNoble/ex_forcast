@@ -1,5 +1,9 @@
 // Utility functions for F&B table operations
+import { ref } from 'vue'
 import { getDaysInMonth } from '../room_revenue_assumpt./room_revenue_utils.js'
+
+// Reactive source for Double Occupancy, to avoid relying on localStorage reads
+export const currentDoubleOccupancyByYear = ref({})
 
 // Helper function to create structured row keys
 function createRowKey(restaurantName, section, type, label = null) {
@@ -318,11 +322,11 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
           const days = getDaysInMonth(year, label);
           const roomsAvailable = days * totalRooms;
           
-          // Get double occupancy value
-          const doubleOccupancyByYear = JSON.parse(localStorage.getItem('doubleOccupancyByYear') || '{}');
-          const doubleOccupancyValue = doubleOccupancyByYear[year];
+          // Get double occupancy value (reactive only)
+          const reactiveMap = currentDoubleOccupancyByYear.value || {};
           let doubleOccupancy = 0;
-          if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null) {
+          let doubleOccupancyValue = reactiveMap[year];
+          if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null && doubleOccupancyValue !== '') {
             doubleOccupancy = parseFloat(doubleOccupancyValue);
           }
           
@@ -440,11 +444,11 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
           const days = getDaysInMonth(year, label);
           const roomsAvailable = days * totalRooms;
           
-          // Get double occupancy value
-          const doubleOccupancyByYear = JSON.parse(localStorage.getItem('doubleOccupancyByYear') || '{}');
-          const doubleOccupancyValue = doubleOccupancyByYear[year];
+          // Get double occupancy value (reactive only)
+          const reactiveMap2 = currentDoubleOccupancyByYear.value || {};
           let doubleOccupancy = 0;
-          if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null) {
+          let doubleOccupancyValue = reactiveMap2[year];
+          if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null && doubleOccupancyValue !== '') {
             doubleOccupancy = parseFloat(doubleOccupancyValue);
           }
           
@@ -479,11 +483,11 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
           const days = getDaysInMonth(year, label);
           const roomsAvailable = days * totalRooms;
           
-          // Get double occupancy value
-          const doubleOccupancyByYear = JSON.parse(localStorage.getItem('doubleOccupancyByYear') || '{}');
-          const doubleOccupancyValue = doubleOccupancyByYear[year];
+          // Get double occupancy value (reactive only)
+          const reactiveMap3 = currentDoubleOccupancyByYear.value || {};
           let doubleOccupancy = 0;
-          if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null) {
+          let doubleOccupancyValue = reactiveMap3[year];
+          if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null && doubleOccupancyValue !== '') {
             doubleOccupancy = parseFloat(doubleOccupancyValue);
           }
           
