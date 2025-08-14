@@ -74,6 +74,11 @@ const routes = [
     path: '/receipts_payments',
     component: () => import('@/pages/Receipts_Payments.vue'),
   },
+  {
+    name: 'Reports',
+    path: '/reports',
+    component: () => import('@/pages/Reports.vue'),
+  },
 
 ]
 

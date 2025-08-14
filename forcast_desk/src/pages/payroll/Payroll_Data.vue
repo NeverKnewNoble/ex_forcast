@@ -111,9 +111,10 @@
                         <Calendar class="w-3 h-3 text-gray-500" />
                         From Year
                       </label>
-                      <select 
+                      <select
+                        disabled 
                         v-model="fromYear" 
-                        class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                        class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-gray-100 text-sm"
                       >
                         <option value="">Select Year</option>
                         <option v-for="year in years" :key="'from-' + year" :value="year">{{ year }}</option>
@@ -125,9 +126,10 @@
                         <Calendar class="w-3 h-3 text-gray-500" />
                         To Year
                       </label>
-                      <select 
+                      <select
+                        disabled 
                         v-model="toYear" 
-                        class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                        class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-gray-100 text-sm"
                       >
                         <option value="">Select Year</option>
                         <option v-for="year in filteredToYears" :key="'to-' + year" :value="year">{{ year }}</option>
@@ -422,10 +424,10 @@
                         <tbody class="text-gray-700 bg-white text-sm">
                           <!-- Group by actual categories from data -->
                           <template v-for="category in getUniqueCategoriesLocal()" :key="category">
-                            <tr class="bg-violet-100 border-b-2 border-violet-300">
+                            <tr class="bg-gradient-to-r from-violet-600 to-violet-700 border-b-2 border-violet-800">
                               <td 
                                 :colspan="4 + (visibleYears.length > 0 ? (isYearCollapsed(visibleYears[0]) ? 1 : 25) : 0) + (visibleYears.length > 1 ? visibleYears.length - 1 : 0)" 
-                                class="px-3 py-2 font-bold text-violet-800 text-left"
+                                 class="px-3 py-2 font-bold text-white text-left"
                               >
                                 {{ category }}
                               </td>
@@ -461,12 +463,18 @@
                                     @focus="handleTableSalaryFocus(row, $event)"
                                     @blur="handleTableSalaryBlur(row, $event)"
                                     @keypress="allowOnlyNumbers($event)"
+                                    :contenteditable="!row._isDefault"
                                   >
                                     {{ formatMoney(row.salary) }}
                                   </td>
                                   <!-- Count (Editable, Reactive, row.count) -->
                                   <td
                                     class="px-3 py-2 text-right border-r border-violet-200 font-mono text-sm"
+                                    :contenteditable="row._isDefault"
+                                    @input="row._isDefault && handleTableCountInput(row, $event)"
+                                    @focus="row._isDefault && handleTableCountFocus(row, $event)"
+                                    @blur="row._isDefault && handleTableCountBlur(row, $event)"
+                                    @keypress="row._isDefault && allowOnlyNumbers($event)"
                                   >
                                     {{ row.count }}
                                   </td>
@@ -796,23 +804,7 @@
   
             <!-- Enhanced No Years Selected State -->
             <template v-else-if="selectedProject">
-              <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
-                <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4">
-                  <CircleAlert class="w-8 h-8 text-violet-500" />
-                </div>
-                <h3 class="text-lg text-violet-700 font-semibold mb-2">
-                  {{ fromYear && !toYear ? 'Select "To Year"' : !fromYear && toYear ? 'Select "From Year"' : 'No Years Selected' }}
-                </h3>
-                <p class="text-gray-500 text-center max-w-md leading-relaxed text-sm">
-                  {{ fromYear && !toYear ? 'You have selected a From Year, now please select a To Year to display the expense table.' : 
-                     !fromYear && toYear ? 'You have selected a To Year, now please select a From Year to display the expense table.' :
-                       'Please select both "From Year" and "To Year" in the left panel to display the expense table.' }}
-                </p>
-                <div class="mt-4 flex items-center gap-2 text-xs text-violet-600">
-                  <ArrowLeft class="w-3 h-3" />
-                  <span>Use the filters on the left to get started</span>
-                </div>
-              </div>
+              <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
             </template>
             
             <!-- Fallback for when project is selected but no years -->
@@ -1174,8 +1166,8 @@
                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
                     >
                       <option disabled value="">Select Department</option>
-                      <option v-for="option in departmentOptions" :key="option.value" :value="option.value">
-                        {{ option.label }}
+                      <option v-for="dept in projectDepartments" :key="'proj-dept-' + dept" :value="dept">
+                        {{ dept }}
                       </option>
                     </select>
                   </div>
@@ -1320,6 +1312,7 @@
   import { storeToRefs } from 'pinia';
   import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
   import Sidebar from "@/components/ui/Sidebar.vue";
+  import NoYearsSelectedState from '@/components/ui/payroll/NoYearsSelectedState.vue';
   import { 
     CircleAlert, 
     AlertTriangle, 
@@ -1359,7 +1352,8 @@
     isYearCollapsed
   } from "@/components/utility/expense_assumption/index.js";
   import { cloneDeep } from 'lodash-es';
-  import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
+import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
+import { getProjectDepartments } from '@/components/utility/dashboard/projectService.js';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
   import { getProjectKey } from '@/components/utility/projectLocalStorage.js';  
   import {
@@ -1372,6 +1366,7 @@
     designationOptions,
     payrollData,
     payrollRows,
+    defaultPayrollRows,
     openAddPayrollModal,
     closeAddPayrollModal,
     resetPayrollForm,
@@ -1458,7 +1453,8 @@
   const isSaving = ref(false);
   const saveError = ref("");
   const sidebarCollapsed = ref(false);
-  const isComponentReady = ref(false); // Add a flag to track if component is ready
+const isComponentReady = ref(false); // Add a flag to track if component is ready
+const projectDepartments = ref([]);
 
   // ************ Quick Actions state ****************
   const newDepartmentName = ref('');
@@ -1517,8 +1513,45 @@
 
   // Computed property to check if there's any payroll data
   const hasPayrollDataComputed = computed(() => {
-    return hasPayrollData(payrollRows.value);
+    return hasPayrollData(payrollRows.value) || (defaultPayrollRows.value?.length > 0);
   });
+  // Merge live payroll rows with default payroll rows for display (non-editable defaults)
+  function normalizeDepartmentName(name) {
+    return (name || '').toString().trim().toLowerCase();
+  }
+
+  const payrollRowsSource = computed(() => {
+    const rows = Array.isArray(payrollRows.value) ? [...payrollRows.value] : [];
+    const keySet = new Set(
+      rows.map(r => `${r.department}__${r.departmentLocation}__${r.position}__${r.designation}`)
+    );
+    const selectedSet = new Set((projectDepartments.value || []).map(normalizeDepartmentName));
+
+    if (Array.isArray(defaultPayrollRows.value) && defaultPayrollRows.value.length) {
+      defaultPayrollRows.value.forEach((d) => {
+        const dept = d.department;
+        if (!dept) return;
+        if (selectedSet.size && !selectedSet.has(normalizeDepartmentName(dept))) return; // only for selected depts
+        const key = `${dept}__${d.department_location || ''}__${d.position || ''}__${d.designation || ''}`;
+        if (keySet.has(key)) return; // skip if already present in live data
+
+        const idSafe = key.replace(/\s+/g, '_');
+        rows.push({
+          id: `default_${idSafe}`,
+          department: dept,
+          departmentLocation: d.department_location || 'Default',
+          position: d.position || 'Non-manager',
+          designation: d.designation || '',
+          salary: Number(d.salary) || 0,
+          count: Number(d.count) || 0,
+          category: dept,
+          _isDefault: true
+        });
+      });
+    }
+    return rows;
+  });
+
 
   // Computed property to track monthly count changes for better reactivity
   const monthlyCountTracker = computed(() => {
@@ -1658,6 +1691,15 @@
       await new Promise(resolve => setTimeout(resolve, 100));
       years.value = await loadYearOptions();
 
+      // Load selected project departments for filtering defaults
+      if (selectedProject.value?.project_name) {
+        try {
+          projectDepartments.value = await getProjectDepartments(selectedProject.value.project_name);
+        } catch (e) {
+          projectDepartments.value = [];
+        }
+      }
+
       // Load initial payroll data if project is selected
       if (selectedProject.value) {
         await fetchPayrollData(selectedProject.value.project_name, fromYear.value, toYear.value);
@@ -1694,6 +1736,12 @@
         // Reload Payroll data for the new project
         await fetchPayrollData(newProject.project_name, fromYear.value, toYear.value);
         originalPayrollData.value = cloneDeep(payrollRows.value);
+        // Refresh selected departments
+        try {
+          projectDepartments.value = await getProjectDepartments(newProject.project_name);
+        } catch (e) {
+          projectDepartments.value = [];
+        }
         
         // Reset any unsaved changes
         changedCells.value = [];
@@ -1713,6 +1761,7 @@
       changedCells.value = [];
       isSaved.value = true;
       saveError.value = "";
+      projectDepartments.value = [];
     }
   }, { deep: true });
 
@@ -2121,27 +2170,27 @@
   }
 
   function getUniqueCategoriesLocal() {
-    return getUniqueCategories(payrollRows.value);
+    return getUniqueCategories(payrollRowsSource.value);
   }
 
   function getPayrollRowsForCategoryLocal(category) {
-    return getPayrollRowsForCategory(payrollRows.value, category);
+    return getPayrollRowsForCategory(payrollRowsSource.value, category);
   }
 
   function getUniqueLocationsForCategoryLocal(category) {
-    return getUniqueLocationsForCategory(payrollRows.value, category);
+    return getUniqueLocationsForCategory(payrollRowsSource.value, category);
   }
 
   function getUniquePositionsForLocationLocal(category, location) {
-    return getUniquePositionsForLocation(payrollRows.value, category, location);
+    return getUniquePositionsForLocation(payrollRowsSource.value, category, location);
   }
 
   function getPayrollRowsForPositionLocal(category, location, position) {
-    return getPayrollRowsForPosition(payrollRows.value, category, location, position);
+    return getPayrollRowsForPosition(payrollRowsSource.value, category, location, position);
   }
 
   function getPayrollRowsForLocationLocal(category, location) {
-    return getPayrollRowsForLocation(payrollRows.value, category, location);
+    return getPayrollRowsForLocation(payrollRowsSource.value, category, location);
   }
 
   function formatCurrencyLocal(value) {
@@ -2371,7 +2420,11 @@
       // Remove any commas and formatting
       rawValue = rawValue.replace(/[^0-9.]/g, '');
     }
-    event.target.textContent = rawValue || '';
+    // For default rows, ensure explicit 0 shows when empty
+    if (row._isDefault && (rawValue === undefined || rawValue === null || rawValue === '' || Number.isNaN(rawValue))) {
+      rawValue = 0;
+    }
+    event.target.textContent = (rawValue !== undefined && rawValue !== null && rawValue !== '') ? rawValue : '';
   }
 
   function handleTableSalaryBlur(row, event) {
@@ -2439,7 +2492,11 @@
       // Remove any commas and formatting
       rawValue = rawValue.replace(/[^0-9]/g, '');
     }
-    event.target.textContent = rawValue || '';
+    // For default rows, ensure an explicit 0 shows when empty
+    if (row._isDefault && (rawValue === undefined || rawValue === null || rawValue === '' || Number.isNaN(rawValue))) {
+      rawValue = 0;
+    }
+    event.target.textContent = (rawValue !== undefined && rawValue !== null && rawValue !== '') ? rawValue : '';
   }
 
   function handleTableCountBlur(row, event) {
@@ -2462,6 +2519,33 @@
       event.target.textContent = value;
       // Mark as unsaved
       isSaved.value = false;
+
+      // If this is a default row, promote it to a real working row and add a change entry
+      if (row._isDefault) {
+        // Ensure row is present in live payrollRows so save pipeline can find it
+        const exists = payrollRows.value.find(r => r.id === row.id);
+        if (!exists) {
+          payrollRows.value.push({ ...row });
+        }
+        // Add/replace a base count change so Save button has something to persist
+        if (visibleYears.value.length > 0) {
+          const year = visibleYears.value[0];
+          const changeData = {
+            rowId: row.id,
+            fieldType: 'count',
+            year,
+            month: null,
+            newValue: value,
+            isOverride: false
+          };
+          const existingIdx = changedCells.value.findIndex(
+            c => c.rowId === row.id && c.fieldType === 'count' && c.year === year && (c.month === null || c.month === undefined)
+          );
+          if (existingIdx >= 0) changedCells.value[existingIdx] = changeData; else changedCells.value.push(changeData);
+        }
+        // Persist the count visually on default row to avoid clearing on rerender
+        row.count = value;
+      }
       
       // ✅ FIXED: Trigger reactive update for monthly salary cells only
       // Monthly count cells should NOT be affected by base count changes

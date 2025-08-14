@@ -261,7 +261,7 @@
               :toggle-collapse="toggleCollapse"
               :is-year-collapsed="isYearCollapsed"
               :market-segment-data="marketSegmentData"
-              :room-packages="roomPackages"
+              :room-packages="filteredRoomPackages"
               :room-data="roomData"
               :total-number-of-rooms="totalNumberOfRooms"
               :vat-by-year="vatByYear"
@@ -288,6 +288,13 @@
                       <Table class="w-3 h-3 text-white" />
                     </div>
                     <h2 class="text-lg font-bold text-gray-800">Room Revenue Overview</h2>
+                  </div>
+                  <div class="mt-2">
+                    <button @click="restorePackages"
+                      class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm font-medium shadow-sm">
+                      <RotateCcw class="w-4 h-4" />
+                      Restore
+                    </button>
                   </div>
                 </div>
                 <div class="space-y-8">
@@ -339,8 +346,8 @@
                             </tr>
                           </thead>
                           <tbody class="text-gray-700 bg-white text-sm">
-                            <tr
-                              v-for="roomType in ROOM_TYPES"
+                              <tr
+                              v-for="roomType in visibleRoomTypes"
                               :key="'available-' + roomType"
                               class="even:bg-violet-50 hover:bg-violet-100 transition"
                             >
@@ -364,18 +371,18 @@
                                     :key="'available-cell-' + year + '-' + label + '-' + roomType"
                                     class="px-2 py-2 text-right border border-violet-200 bg-gray-50"
                                   >
-                                    <span class="font-mono text-xs">{{ getAvailableBeds(roomData, roomType, year, label, advancedModes[year] || displayMode, roomPackages) }}</span>
+                                    <span class="font-mono text-xs">{{ getAvailableBeds(roomData, roomType, year, label, advancedModes[year] || displayMode, filteredRoomPackages) }}</span>
                                   </td>
                                   <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
                                     <span class="font-mono text-xs text-violet-700">
-                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'available_beds', roomPackages) }}
+                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
                                     </span>
                                   </td>
                                 </template>
                                 <template v-else>
                                   <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
                                     <span class="font-mono text-xs text-violet-700">
-                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'available_beds', roomPackages) }}
+                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
                                     </span>
                                   </td>
                                 </template>
@@ -393,15 +400,15 @@
                                     :key="'available-total-cell-' + year + '-' + label"
                                     class="px-2 py-2 text-right border border-violet-200 font-bold"
                                   >
-                                    {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'available_beds', roomPackages) }}
+                                    {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
                                   </td>
                                   <td class="px-2 py-2 text-right border border-violet-200 font-bold text-violet-800">
-                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'available_beds', roomPackages) }}
+                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
                                   </td>
                                 </template>
                                 <template v-else>
                                   <td class="px-2 py-2 text-right border border-violet-200 font-bold text-violet-800">
-                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'available_beds', roomPackages) }}
+                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
                                   </td>
                                 </template>
                               </template>
@@ -459,8 +466,8 @@
                             </tr>
                           </thead>
                           <tbody class="text-gray-700 bg-white text-sm">
-                            <tr
-                              v-for="roomType in ROOM_TYPES"
+                              <tr
+                              v-for="roomType in visibleRoomTypes"
                               :key="'occupied-' + roomType"
                               class="even:bg-blue-50 hover:bg-blue-100 transition"
                             >
@@ -489,14 +496,14 @@
                                   </td>
                                   <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50">
                                     <span class="font-mono text-xs text-blue-700">
-                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'occupied_beds') }}
+                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
                                     </span>
                                   </td>
                                 </template>
                                 <template v-else>
                                   <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50">
                                     <span class="font-mono text-xs text-blue-700">
-                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'occupied_beds') }}
+                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
                                     </span>
                                   </td>
                                 </template>
@@ -514,15 +521,15 @@
                                     :key="'occupied-total-cell-' + year + '-' + label"
                                     class="px-2 py-2 text-right border border-blue-200 font-bold"
                                   >
-                                    {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'occupied_beds') }}
+                                    {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
                                   </td>
                                   <td class="px-2 py-2 text-right border border-blue-200 font-bold text-blue-800">
-                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'occupied_beds') }}
+                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
                                   </td>
                                 </template>
                                 <template v-else>
                                   <td class="px-2 py-2 text-right border border-blue-200 font-bold text-blue-800">
-                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'occupied_beds') }}
+                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
                                   </td>
                                 </template>
                               </template>
@@ -580,8 +587,8 @@
                             </tr>
                           </thead>
                           <tbody class="text-gray-700 bg-white text-sm">
-                            <tr
-                              v-for="roomType in ROOM_TYPES"
+                              <tr
+                              v-for="roomType in visibleRoomTypes"
                               :key="'rate-' + roomType"
                               class="even:bg-green-50 hover:bg-green-100 transition"
                             >
@@ -610,14 +617,14 @@
                                   </td>
                                   <td class="px-2 py-2 text-right border border-green-200 font-semibold bg-green-50">
                                     <span class="font-mono text-xs text-green-700">
-                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'rate') }}
+                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
                                     </span>
                                   </td>
                                 </template>
                                 <template v-else>
                                   <td class="px-2 py-2 text-right border border-green-200 font-semibold bg-green-50">
                                     <span class="font-mono text-xs text-green-700">
-                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'rate') }}
+                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
                                     </span>
                                   </td>
                                 </template>
@@ -635,15 +642,15 @@
                                     :key="'rate-total-cell-' + year + '-' + label"
                                     class="px-2 py-2 text-right border border-green-200 font-bold"
                                   >
-                                    {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'rate') }}
+                                    {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
                                   </td>
                                   <td class="px-2 py-2 text-right border border-green-200 font-bold text-green-800">
-                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'rate') }}
+                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
                                   </td>
                                 </template>
                                 <template v-else>
                                   <td class="px-2 py-2 text-right border border-green-200 font-bold text-green-800">
-                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'rate') }}
+                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
                                   </td>
                                 </template>
                               </template>
@@ -701,8 +708,8 @@
                             </tr>
                           </thead>
                           <tbody class="text-gray-700 bg-white text-sm">
-                            <tr
-                              v-for="roomType in ROOM_TYPES"
+                              <tr
+                              v-for="roomType in visibleRoomTypes"
                               :key="'revenue-' + roomType"
                               class="even:bg-orange-50 hover:bg-orange-100 transition"
                             >
@@ -727,14 +734,14 @@
                                   </td>
                                   <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800 bg-orange-50">
                                     <span class="font-mono text-xs">
-                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'revenue', roomPackages) }}
+                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'revenue', filteredRoomPackages) }}
                                     </span>
                                   </td>
                                 </template>
                                 <template v-else>
                                   <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800 bg-orange-50">
                                     <span class="font-mono text-xs">
-                                      {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'revenue', roomPackages) }}
+                                      {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'revenue', filteredRoomPackages) }}
                                     </span>
                                   </td>
                                 </template>
@@ -752,15 +759,15 @@
                                     :key="'revenue-total-cell-' + year + '-' + label"
                                     class="px-2 py-2 text-right border border-orange-200 font-bold"
                                   >
-                                    {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'revenue', roomPackages) }}
+                                    {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'revenue', filteredRoomPackages) }}
                                   </td>
                                   <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800">
-                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'revenue', roomPackages) }}
+                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'revenue', filteredRoomPackages) }}
                                   </td>
                                 </template>
                                 <template v-else>
                                   <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800">
-                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'revenue', roomPackages) }}
+                                    {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'revenue', filteredRoomPackages) }}
                                   </td>
                                 </template>
                               </template>
@@ -888,7 +895,7 @@
                         class="w-full px-3 mr-8 py-2 border border-gray-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
                       >
                         <option disabled value="">Select Room Type</option>
-                        <option v-for="room_package in roomPackagesOptions" :key="room_package.value" :value="room_package.value">
+                        <option v-for="room_package in visibleRoomPackagesOptions" :key="room_package.value" :value="room_package.value">
                           {{ room_package.label }}
                         </option>
                       </select>
@@ -1297,7 +1304,7 @@
           
           <div class="space-y-4 max-h-[60vh] overflow-auto pr-2">
             <div
-              v-for="roomType in ROOM_TYPES"
+              v-for="roomType in visibleRoomTypes"
               :key="'room-count-' + roomType"
               class="flex justify-between items-center border-b pb-4"
             >
@@ -1371,7 +1378,7 @@ import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
-import { CircleAlert, BadgeCent, Coffee, Table, AlertTriangle, BedDouble, Plus, PlusCircle, DollarSign, Calculator, Settings, Calendar, X, Check, Save, Loader2, RefreshCw, ChevronDown, ChevronRight, ArrowLeft, ChevronLeft, FolderOpen, Database, AlertCircle, ArrowRight, Percent } from 'lucide-vue-next';
+import { CircleAlert, BadgeCent, Coffee, Table, AlertTriangle, BedDouble, Plus, PlusCircle, DollarSign, Calculator, Settings, Calendar, X, Check, Save, Loader2, RefreshCw, ChevronDown, ChevronRight, ArrowLeft, ChevronLeft, FolderOpen, Database, AlertCircle, ArrowRight, Percent, RotateCcw } from 'lucide-vue-next';
 import alertService from "@/components/ui/ui_utility/alertService.js";
 
 // Import room revenue utilities
@@ -1509,9 +1516,38 @@ const serviceChargeByYear = ref({});
 const showRoomTypeCountModal = ref(false);
 const roomTypeCounts = ref({});
 
+// Track soft-deleted room packages (for restore)
+const deletedPackages = ref(new Set());
+
+// Visible room types honoring deletion and preserving order (defaults first, then customs)
+const visibleRoomTypes = computed(() => {
+  const names = (roomPackages.value || []).map(p => p.package_name || p.name);
+  const ordered = [];
+  // include default types that exist in current packages first
+  DEFAULT_ROOM_TYPES.forEach(n => {
+    if (names.includes(n)) ordered.push(n);
+  });
+  // then include any custom types
+  names.forEach(n => {
+    if (!ordered.includes(n)) ordered.push(n);
+  });
+  return ordered.filter(n => !deletedPackages.value.has(n));
+});
+
+// Options list filtered to visible packages
+const visibleRoomPackagesOptions = computed(() => {
+  return (roomPackagesOptions.value || []).filter(opt => !deletedPackages.value.has(opt.value));
+});
+
 // Computed properties
 const visibleYears = computed(() => {
   return getVisibleYears(fromYear.value, toYear.value);
+});
+
+// Filtered roomPackages array passed to calculators (preserving structure but limited to visible types)
+const filteredRoomPackages = computed(() => {
+  const set = deletedPackages.value;
+  return (roomPackages.value || []).filter(pkg => !set.has(pkg.package_name || pkg.name));
 });
 
 // Computed property for filtered years in "To Year" dropdown
@@ -1543,18 +1579,18 @@ function updateRoomRevenueCache() {
   try {
     const project = getProjectName();
     if (!visibleYears.value.length) return;
-    for (const year of visibleYears.value) {
+  for (const year of visibleYears.value) {
       const labels = getColumnLabelsForYearLocal(year);
       // Monthly totals
       for (const label of labels) {
-        const formatted = calculateMonthlyTotal(roomData.value, year, label, advancedModes.value[year] || displayMode.value, 'revenue', roomPackages.value);
+        const formatted = calculateMonthlyTotal(roomData.value, year, label, advancedModes.value[year] || displayMode.value, 'revenue', filteredRoomPackages.value);
         const numeric = parseCurrencyToNumber(formatted);
         if (numeric > 0) {
           calculationCache.setValue(project, 'Room Revenue Assumptions', 'Total Room Revenue', year, label, numeric);
         }
       }
       // Year total
-      const yearFormatted = calculateGrandTotal(roomData.value, year, advancedModes.value[year] || displayMode.value, 'revenue', roomPackages.value);
+      const yearFormatted = calculateGrandTotal(roomData.value, year, advancedModes.value[year] || displayMode.value, 'revenue', filteredRoomPackages.value);
       const yearNumeric = parseCurrencyToNumber(yearFormatted);
       if (yearNumeric > 0) {
         calculationCache.setValue(project, 'Room Revenue Assumptions', 'Total Room Revenue Year', year, 'ALL', yearNumeric);
@@ -1639,6 +1675,7 @@ onMounted(async () => {
     originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
     const response = await getRoomPackagesList(selectedProject.value?.project_name);
     roomPackages.value = response.data.data.room_packages || [];
+    deletedPackages.value = new Set();
     roomPackagesOptions.value = roomPackages.value.map(room_package => ({
       label: room_package.package_name,
       value: room_package.package_name
@@ -1932,29 +1969,20 @@ function isDefaultPackage(roomType) {
   return DEFAULT_ROOM_TYPES.includes(roomType);
 }
 
-// Remove a room package from the project
-async function removeRoomPackage(roomType) {
-  if (!selectedProject.value?.project_name) {
-    alertService.error("No project selected");
-    return;
-  }
+// Soft-remove a room package locally with ability to restore
+function removeRoomPackage(roomType) {
+  const next = new Set(deletedPackages.value);
+  next.add(roomType);
+  deletedPackages.value = next;
+  isSaved.value = false;
+  alertService.info(`Removed '${roomType}'. Click Restore to undo before saving.`);
+}
 
-  try {
-    const result = await deleteRoomPackage(roomType, selectedProject.value.project_name);
-    // Check for success in different possible response structures
-    if (result && (result.success || result.message?.success)) {
-      alertService.success(`Package ${roomType} removed successfully`);
-      // Show alert first, then reload after a short delay
-      setTimeout(() => {
-        window.location.href = window.location.href;
-      }, 1500); // 1.5 seconds delay
-      return;
-    } else {
-      alertService.error(result?.error || result?.message?.error || "Failed to remove package");
-    }
-  } catch (error) {
-    alertService.error("Failed to remove package");
-  }
+// Restore all removed packages
+function restorePackages() {
+  deletedPackages.value = new Set();
+  isSaved.value = false;
+  alertService.info('Restored removed packages');
 }
 
 // Refresh room packages list
@@ -1963,6 +1991,8 @@ async function refreshRoomPackages() {
     const response = await getRoomPackagesList(selectedProject.value?.project_name);
     if (response && response.success) {
       roomPackages.value = response.data.room_packages || [];
+      // Reset local deletions when reloading from server
+      deletedPackages.value = new Set();
       roomPackagesOptions.value = roomPackages.value.map(room_package => ({
         label: room_package.package_name,
         value: room_package.package_name

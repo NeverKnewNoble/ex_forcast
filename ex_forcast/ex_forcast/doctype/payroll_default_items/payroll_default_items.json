@@ -1,0 +1,48 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-14 00:13:33.356552",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "department_location",
+  "position",
+  "designation"
+ ],
+ "fields": [
+  {
+   "fieldname": "department_location",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Department Location"
+  },
+  {
+   "fieldname": "position",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Position",
+   "options": "\nManager\nNon-manager"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Designation"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-08-14 00:17:11.853531",
+ "modified_by": "Administrator",
+ "module": "Ex Forcast",
+ "name": "Payroll Default items",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

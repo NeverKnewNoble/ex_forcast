@@ -55,8 +55,16 @@ def payroll_data_display(project=None):
                 # If monthly count data doesn't exist yet, just continue without monthly counts
                 monthly_count = {}
             
+            # Resolve department to human-readable department_name if stored as docname
+            department_value = row['department']
+            try:
+                title = frappe.db.get_value("Department", {"name": department_value}, "department_name")
+                department_value = title or department_value
+            except Exception:
+                pass
+
             grouped_data[row['year']].append({
-                "department": row['department'],
+                "department": department_value,
                 "department_location": row['department_location'],
                 "position": row['position'],
                 "designation": row['designation'],
@@ -95,17 +103,34 @@ def upsert_payroll_data_items(changes, project=None):
 
         results = []
 
+        # Helper: resolve department input (can be Department.name or Department.department_name)
+        def _resolve_department(doc_or_name: str) -> str:
+            if not doc_or_name:
+                return None
+            # First try exact name (docname)
+            dept_name = frappe.db.get_value("Department", {"name": doc_or_name}, "name")
+            if dept_name:
+                return dept_name
+            # Fallback: match by department_name field (human label)
+            dept_name = frappe.db.get_value("Department", {"department_name": doc_or_name}, "name")
+            return dept_name
+
         # Process Payroll data changes
         for change in changes:
             try:
                 year = change.get("year")
-                department = change.get("department")
+                department_input = change.get("department")
                 department_location = change.get("department_location")
                 position = change.get("position")
                 designation = change.get("designation")
                 salary = change.get("salary")
                 amount = change.get("amount")
                 monthly_count = change.get("monthly_count", {})
+
+                # Normalize department to the actual Department docname so Link validation passes
+                department = _resolve_department(department_input)
+                if department_input and not department:
+                    raise Exception(f"Department '{department_input}' not found")
 
                 if not all([year, department, department_location, position, designation]):
                     continue

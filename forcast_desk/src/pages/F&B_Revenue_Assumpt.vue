@@ -262,7 +262,7 @@
           
   
           <!-- Right Side - Content Area -->
-          <div class="flex-1 p-4">
+          <div class="flex-1 p-4" :key="doubleOccStamp">
             <!-- No Project Selected State -->
             <div v-if="fnbData.status === 'no_project_selected'">
               <NoProjectSelectedState />
@@ -732,11 +732,12 @@
                   <input
                     v-model="tempDoubleOccupancyByYear[year]"
                     type="number"
-                    min="0"
+                    min="0.00"
                     step="0.01"
                     class="px-4 py-2 border rounded-md focus:ring-violet-500 focus:border-violet-500 w-24 text-right"
                     placeholder="0.00"
                     @input="handleDoubleOccupancyInput($event, year)"
+                    @keypress="allowOnlyNumbers($event)"
                   />
                 </div>
               </div>
@@ -752,11 +753,11 @@
               <X class="w-4 h-4" />
               Cancel
             </button>
-            <button
-              v-if="visibleYears.length"
-              @click="applyDoubleOccupancySettings(doubleOccupancyByYear)"
-              class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2"
-            >
+                                        <button
+                              v-if="visibleYears.length"
+                              @click="applyDoubleOccupancySettings(doubleOccupancyByYear, selectedProject?.project_name)"
+                              class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2"
+                            >
               <Check class="w-4 h-4" />
               Apply
             </button>
@@ -881,7 +882,7 @@
             </button>
             <button
               v-if="restaurantList.length"
-              @click="applyDefaultBreakfastSettings(defaultBreakfastOutlet)"
+              @click="applyDefaultBreakfastSettings(defaultBreakfastOutlet, selectedProject?.project_name)"
               :disabled="!tempDefaultBreakfastOutlet"
               class="px-4 py-2 rounded-md bg-violet-600 text-white hover:bg-violet-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -1049,6 +1050,7 @@
     handleFnbCellEdit,
     handleFnbCellFocus,
     calculateFnbTotal,
+    currentDoubleOccupancyByYear,
     loadFnbRevenueDataForFrontend,
     saveFnbChanges,
     // Modal utilities
@@ -1123,6 +1125,10 @@
   const sidebarCollapsed = ref(false);
   // Double Occupancy Modal State
   const doubleOccupancyByYear = ref({});
+  // Keep the reactive table source in sync with the page-level state
+  watch(doubleOccupancyByYear, (val) => {
+    try { currentDoubleOccupancyByYear.value = { ...val }; } catch (e) {}
+  }, { deep: true });
   // Default Breakfast Outlet Modal State
   const defaultBreakfastOutlet = ref("");
   const fnbRows = [
@@ -1156,6 +1162,7 @@
   const { setFromYear, setToYear, setAdvancedModes, clearYearSettings, getFilteredToYears } = yearSettingsStore;
   
   // Computed properties
+  const doubleOccStamp = computed(() => JSON.stringify(doubleOccupancyByYear.value));
   const visibleYears = computed(() => {
     return getVisibleYears(fromYear.value, toYear.value);
   });
@@ -1228,6 +1235,31 @@
         restaurantList.value = await getRestaurants(newProject.project_name);
         originalRestaurantList.value = [...restaurantList.value];
         
+        // Load project-specific double occupancy data
+        const savedDoubleOccupancy = localStorage.getItem(getProjectKey('doubleOccupancyByYear'));
+        if (savedDoubleOccupancy) {
+          try {
+            doubleOccupancyByYear.value = JSON.parse(savedDoubleOccupancy);
+            // Seed the reactive source used by table calculations
+            try { currentDoubleOccupancyByYear.value = { ...doubleOccupancyByYear.value }; } catch (e) {}
+          } catch (error) {
+            console.error('Error parsing double occupancy data:', error);
+          }
+        } else {
+          // Clear double occupancy if no data for this project
+          doubleOccupancyByYear.value = {};
+          try { currentDoubleOccupancyByYear.value = {}; } catch (e) {}
+        }
+        
+        // Load project-specific default breakfast outlet
+        const savedDefaultBreakfastOutlet = localStorage.getItem(getProjectKey('defaultBreakfastOutlet'));
+        if (savedDefaultBreakfastOutlet) {
+          defaultBreakfastOutlet.value = savedDefaultBreakfastOutlet;
+        } else {
+          // Clear default breakfast outlet if no data for this project
+          defaultBreakfastOutlet.value = "";
+        }
+        
         // Reset any unsaved changes
         changedCells.value = [];
         isSaved.value = true;
@@ -1244,6 +1276,13 @@
       originalFnbData.value = { status: 'no_project_selected', message: 'No project selected' };
       restaurantList.value = [];
       originalRestaurantList.value = [];
+      
+      // Clear double occupancy data when no project selected
+      doubleOccupancyByYear.value = {};
+      try { currentDoubleOccupancyByYear.value = {}; } catch (e) {}
+      
+      // Clear default breakfast outlet when no project selected
+      defaultBreakfastOutlet.value = "";
     }
   });
   
@@ -1274,6 +1313,18 @@
   
   // Setup modal watchers
   setupModalWatchers(advancedModes, doubleOccupancyByYear, defaultBreakfastOutlet);
+  
+  // Watch for double occupancy modal opening to initialize default values
+  watch(showDoubleOccupancyModal, (val) => {
+    if (val && visibleYears.value.length) {
+      // Ensure all visible years have default values in tempDoubleOccupancyByYear
+      visibleYears.value.forEach(year => {
+        if (tempDoubleOccupancyByYear.value[year] === undefined || tempDoubleOccupancyByYear.value[year] === null || tempDoubleOccupancyByYear.value[year] === '') {
+          tempDoubleOccupancyByYear.value[year] = doubleOccupancyByYear.value[year] || 0.00;
+        }
+      });
+    }
+  });
   
   // On mount, initialize years from localStorage if available
   onMounted(async () => {
@@ -1332,20 +1383,44 @@
       // Fetch market segment data for cross-table reference
       marketSegmentData.value = await getMarketSegmentList();
       
-      // Load double occupancy data from localStorage
-      const savedDoubleOccupancy = localStorage.getItem('doubleOccupancyByYear');
-      if (savedDoubleOccupancy) {
-        try {
-          doubleOccupancyByYear.value = JSON.parse(savedDoubleOccupancy);
-        } catch (error) {
-          console.error('Error parsing double occupancy data:', error);
+      // Load double occupancy data from project-specific localStorage
+      if (selectedProject.value) {
+        const savedDoubleOccupancy = localStorage.getItem(getProjectKey('doubleOccupancyByYear'));
+        if (savedDoubleOccupancy) {
+          try {
+            doubleOccupancyByYear.value = JSON.parse(savedDoubleOccupancy);
+            // Seed the reactive source used by table calculations
+            try { currentDoubleOccupancyByYear.value = { ...doubleOccupancyByYear.value }; } catch (e) {}
+          } catch (error) {
+            console.error('Error parsing double occupancy data:', error);
+          }
+        }
+      } else {
+        // Fallback to generic key if no project selected
+        const savedDoubleOccupancy = localStorage.getItem('doubleOccupancyByYear');
+        if (savedDoubleOccupancy) {
+          try {
+            doubleOccupancyByYear.value = JSON.parse(savedDoubleOccupancy);
+            // Seed the reactive source used by table calculations
+            try { currentDoubleOccupancyByYear.value = { ...doubleOccupancyByYear.value }; } catch (e) {}
+          } catch (error) {
+            console.error('Error parsing double occupancy data:', error);
+          }
         }
       }
       
-      // Load default breakfast outlet from localStorage
-      const savedDefaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
-      if (savedDefaultBreakfastOutlet) {
-        defaultBreakfastOutlet.value = savedDefaultBreakfastOutlet;
+      // Load default breakfast outlet from project-specific localStorage
+      if (selectedProject.value) {
+        const savedDefaultBreakfastOutlet = localStorage.getItem(getProjectKey('defaultBreakfastOutlet'));
+        if (savedDefaultBreakfastOutlet) {
+          defaultBreakfastOutlet.value = savedDefaultBreakfastOutlet;
+        }
+      } else {
+        // Fallback to generic key if no project selected
+        const savedDefaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+        if (savedDefaultBreakfastOutlet) {
+          defaultBreakfastOutlet.value = savedDefaultBreakfastOutlet;
+        }
       }
 
       // ************Prefill calculation cache for Number of guests for all visible years/labels***********************
@@ -1711,17 +1786,11 @@
     
     if (row === "Number of guests") {
       // Calculate: Double occupancy × Number of rooms available
-      // Get double occupancy value
+      // Get double occupancy value (reactive)
       let doubleOccupancy = 0;
       const doubleOccupancyValue = doubleOccupancyByYear.value[year];
       if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null) {
         doubleOccupancy = parseFloat(doubleOccupancyValue);
-      } else {
-        // Fallback to user input if no modal setting
-        const userRaw = fnbData?.["Double occupancy"]?.[year]?.[label];
-        if (userRaw !== undefined && userRaw !== null && userRaw !== "") {
-          doubleOccupancy = parseFloat(userRaw.toString().replace(/,/g, ''));
-        }
       }
       
       // Get number of rooms available
@@ -1753,7 +1822,7 @@
       if (selectedProject.value && selectedProject.value.project_name) {
         calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Number of guests', year, label, numberOfGuests);
       }
-      return numberOfGuests.toFixed(2);
+      return numberOfGuests.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
     
     if (row === "Average Room Rate") {
@@ -1819,7 +1888,7 @@
         if (selectedProject.value && selectedProject.value.project_name) {
           calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Average Room Rate', year, label, adr);
         }
-        return adr.toFixed(2);
+        return adr.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
       
       // If no market segment data available, fall back to user input
@@ -1855,7 +1924,7 @@
       if (selectedProject.value && selectedProject.value.project_name) {
         calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Revenue Per Available Room', year, label, revpar);
       }
-      return revpar.toFixed(2);
+      return revpar.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
     
 
@@ -1871,8 +1940,7 @@
           const days = typeof getDaysInMonth === 'function' ? getDaysInMonth(year, label) : 0;
           const totalRoomsValue = totalRooms?.value || totalRooms || 0; // Handle both ref and direct value
           const roomsAvailable = days * totalRoomsValue;
-          const doubleOccupancyByYear = JSON.parse(localStorage.getItem('doubleOccupancyByYear') || '{}');
-          const doubleOccupancyValue = doubleOccupancyByYear[year];
+          const doubleOccupancyValue = doubleOccupancyByYear.value?.[year];
           let doubleOccupancy = 0;
           if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null) {
             doubleOccupancy = parseFloat(doubleOccupancyValue);
@@ -2284,7 +2352,7 @@
           );
         }
       }
-      return totalGuests.toFixed(2);
+      return totalGuests.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
     
 
@@ -2307,7 +2375,7 @@
       
       if (totalOccupied > 0) {
         const avgRate = totalRevenue / totalOccupied;
-        return avgRate.toFixed(2);
+        return avgRate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
       return '0.00';
     }
@@ -2346,7 +2414,7 @@
       
       if (totalAvailable > 0) {
         const avgRevpar = totalRevenue / totalAvailable;
-        return avgRevpar.toFixed(2);
+        return avgRevpar.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
       return '0.00';
     }

@@ -125,8 +125,9 @@
                             From Year
                           </label>
                           <select 
+                            disabled
                             v-model="fromYear" 
-                            class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                            class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-gray-100 text-sm"
                           >
                             <option value="">Select Year</option>
                             <option v-for="year in years" :key="'from-' + year" :value="year">{{ year }}</option>
@@ -141,8 +142,9 @@
                             To Year
                           </label>
                           <select 
+                            disabled
                             v-model="toYear" 
-                            class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm"
+                            class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-gray-100 text-sm"
                           >
                             <option value="">Select Year</option>
                             <option v-for="year in filteredToYears" :key="'to-' + year" :value="year">{{ year }}</option>
@@ -1291,20 +1293,6 @@
                         </tr>
                             </template>
   
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-                
                       </tbody>
                     </table>
                   </div>
@@ -1404,7 +1392,7 @@
   import Sidebar from "@/components/ui/Sidebar.vue";
   import NoProjectSelectedState from '@/components/ui/expense/NoProjectSelectedState.vue';
   import ErrorState from '@/components/ui/expense/ErrorState.vue';
-  import NoYearsSelectedState from '@/components/ui/expense/NoYearsSelectedState.vue';
+  import NoYearsSelectedState from '@/components/ui/receipts/NoYearsSelectedState.vue';
   
   // Icon imports
   import { 
@@ -1471,6 +1459,7 @@
   // Collections & AR utilities
   import { computeCollectionsForYear, computeAccountsReceivablesForYear, normalizePercents } from '@/components/utility/receipts/collections.js';
   import { computePaymentsForYear, computeCategoryPayablesForYear } from '@/components/utility/receipts/payments.js';
+  import { createPaymentHelpers } from '@/components/utility/receipts/payment_ui_helpers.js';
   import { monthLabels as monthlyBaseLabels, quarterToMonths } from '@/components/utility/expense_assumption/expense_formular.js';
   import { allowOnlyNumbers } from '@/components/utility/payroll/index.js';
   import { loadReceiptsPaymentsData, upsertReceiptsPaymentsItems } from '@/components/utility/receipts/index.js';
@@ -1860,122 +1849,23 @@
   }
   
   // ============================================================================
-  // PAYMENTS (Salary, Bonus, Payroll Related, Expenses)
+  // PAYMENTS HELPERS (moved to utility)
   // ============================================================================
-  function buildPaymentBaseByLabel(department, category, year) {
-    const key = getDeptKey(department);
-    const out = {};
-    monthlyLabels.forEach((lab) => {
-      const val = paymentBases.value?.[key]?.[category]?.[year]?.[lab];
-      out[lab] = getNumber(val || 0);
-    });
-    return out;
-  }
-
-  function buildNextYearPaymentBaseByLabel(department, category, year) {
-    const key = getDeptKey(department);
-    const out = {};
-    monthlyLabels.forEach((lab) => {
-      const val = paymentBases.value?.[key]?.[category]?.[year + 1]?.[lab];
-      out[lab] = getNumber(val || 0);
-    });
-    return out;
-  }
-
-  function getPaymentPercents(department, category) {
-    const key = getDeptKey(department);
-    const p = paymentPercentages.value?.[key]?.[category] || { month: 0, following: 0, second: 0 };
-    return { month: getNumber(p.month), following: getNumber(p.following), second: getNumber(p.second) };
-  }
-
-  function computePayments(department, category, year) {
-    const base = buildPaymentBaseByLabel(department, category, year);
-    const perc = getPaymentPercents(department, category);
-    return computePaymentsForYear(base, perc, monthlyLabels);
-  }
-
-  function getPaymentValue(department, category, year, label, bucket) {
-    const mode = advancedModes.value[year] || displayMode.value;
-    const result = computePayments(department, category, year);
-    if (label === 'ex1') {
-      if (bucket === 'sameMonth') return 0;
-      if (bucket === 'following') {
-        const base = buildPaymentBaseByLabel(department, category, year);
-        const perc = getPaymentPercents(department, category);
-        const pFollow = perc.following > 1 ? perc.following / 100 : perc.following;
-        return getNumber(base.Dec) * pFollow;
-      }
-      if (bucket === 'second') {
-        const base = buildPaymentBaseByLabel(department, category, year);
-        const perc = getPaymentPercents(department, category);
-        const pSecond = perc.second > 1 ? perc.second / 100 : perc.second;
-        return getNumber(base.Nov) * pSecond;
-      }
-      if (bucket === 'cashOutflow') return getNumber(result.cashOutflow.ex1 || 0);
-    }
-    if (label === 'ex2') {
-      if (bucket === 'sameMonth' || bucket === 'following') return 0;
-      if (bucket === 'second') {
-        const base = buildPaymentBaseByLabel(department, category, year);
-        const perc = getPaymentPercents(department, category);
-        const pSecond = perc.second > 1 ? perc.second / 100 : perc.second;
-        return getNumber(base.Dec) * pSecond;
-      }
-      if (bucket === 'cashOutflow') return getNumber(result.cashOutflow.ex2 || 0);
-    }
-
-    if (mode === 'monthly') {
-      if (bucket === 'sameMonth') return getNumber(result.sameMonth[label] || 0);
-      if (bucket === 'following') return getNumber(result.following[label] || 0);
-      if (bucket === 'second') return getNumber(result.second[label] || 0);
-      if (bucket === 'cashOutflow') return getNumber(result.cashOutflow[label] || 0);
-      return 0;
-    }
-
-    if (mode === 'quarterly' && quarterToMonths[label]) {
-      const monthsInQuarter = quarterToMonths[label];
-      if (bucket === 'sameMonth') return monthsInQuarter.reduce((s, m) => s + getNumber(result.sameMonth[m] || 0), 0);
-      if (bucket === 'following') return monthsInQuarter.reduce((s, m) => s + getNumber(result.following[m] || 0), 0);
-      if (bucket === 'second') return monthsInQuarter.reduce((s, m) => s + getNumber(result.second[m] || 0), 0);
-      if (bucket === 'cashOutflow') return monthsInQuarter.reduce((s, m) => s + getNumber(result.cashOutflow[m] || 0), 0);
-    }
-
-    return 0;
-  }
-
-  function getPaymentTotal(department, category, year, bucket) {
-    const result = computePayments(department, category, year);
-    if (bucket === 'sameMonth') return getNumber(result.totals.sameMonth || 0);
-    if (bucket === 'following') return getNumber(result.totals.following || 0);
-    if (bucket === 'second') return getNumber(result.totals.second || 0);
-    if (bucket === 'cashOutflow') return getNumber(result.totals.cashOutflow || 0);
-    return 0;
-  }
-
-  function computePayables(department, category, year) {
-    const base = buildPaymentBaseByLabel(department, category, year);
-    const nextBase = buildNextYearPaymentBaseByLabel(department, category, year);
-    const perc = getPaymentPercents(department, category);
-    return computeCategoryPayablesForYear(base, perc, monthlyLabels, nextBase);
-  }
-
-  function getPayablesValue(department, category, year, label) {
-    const mode = advancedModes.value[year] || displayMode.value;
-    const res = computePayables(department, category, year);
-    if (label === 'ex1') return getNumber(res.ex1 || 0);
-    if (label === 'ex2') return getNumber(res.ex2 || 0);
-    if (mode === 'monthly') return getNumber(res.payables[label] || 0);
-    if (mode === 'quarterly' && quarterToMonths[label]) {
-      const monthsInQuarter = quarterToMonths[label];
-      return monthsInQuarter.reduce((s, m) => s + getNumber(res.payables[m] || 0), 0);
-    }
-    return 0;
-  }
-
-  function getPayablesTotal(department, category, year) {
-    const res = computePayables(department, category, year);
-    return getNumber(res.total || 0);
-  }
+  const {
+    getPaymentValue,
+    getPaymentTotal,
+    getPayablesValue,
+    getPayablesTotal,
+  } = createPaymentHelpers({
+    paymentBases,
+    paymentPercentages,
+    getDeptKey,
+    advancedModes,
+    displayMode,
+    monthlyLabels,
+    quarterToMonths,
+    getNumber,
+  });
 
   function getRoomMonthlyRevenueFromCache(year, label) {
     const project = getProjectName();
