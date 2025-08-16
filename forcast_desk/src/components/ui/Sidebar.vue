@@ -84,7 +84,7 @@
       </div>
     </div>
     <router-link
-      v-else
+      v-else-if="!item.action"
       :to="item.route"
       :class="[
         'flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white',
@@ -97,6 +97,18 @@
       <component :is="item.icon" class="w-6 h-6" />
       <span v-if="is_expanded" class="text-sm">{{ item.text }}</span>
     </router-link>
+    
+    <button
+      v-else
+      @click="handleItemAction(item.action)"
+      :class="[
+        'flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white w-full',
+        { 'justify-center': !is_expanded }
+      ]"
+    >
+      <component :is="item.icon" class="w-6 h-6" />
+      <span v-if="is_expanded" class="text-sm">{{ item.text }}</span>
+    </button>
   </template>
 </div>
 
@@ -157,6 +169,7 @@ import {
   ReceiptText,
   Sheet,
   ChartNoAxesCombined,
+  Settings,
 } from 'lucide-vue-next'
 
 const is_expanded = ref(localStorage.getItem("is_expanded") === "true")
@@ -191,6 +204,7 @@ const menuItems = [
   },
   { text: "Receipts & Payments", route: "/receipts_payments", icon: ReceiptText },
   { text: "Reports", route: "/reports", icon: BookOpen },
+  { text: "Settings", route: "#", icon: Settings, action: "openSettings" },
 ]
 
 const expandedMenus = ref({})
@@ -289,4 +303,14 @@ const filteredMenuItems = computed(() => {
   }
   return filterItems(menuItems)
 })
+
+// Handle item actions
+const handleItemAction = (action) => {
+  if (action === 'openSettings') {
+    emit('open-settings')
+  }
+}
+
+// Define emits
+const emit = defineEmits(['project-changed', 'open-settings'])
 </script>
