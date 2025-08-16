@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <Sidebar />
+    <Sidebar @open-settings="openSettings" />
 
     <div class="flex-1 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 px-6 py-8 relative overflow-hidden">
       <!-- Background decorative elements -->
@@ -151,6 +151,12 @@
         </div>
       </div>
     </div>
+    
+    <!-- Settings Modal -->
+    <SettingsModal 
+      :is-visible="showSettingsModal" 
+      @close="closeSettings" 
+    />
   </div>
 </template>
 
@@ -158,6 +164,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import Sidebar from "@/components/ui/Sidebar.vue"
 import ProjectSelector from "@/components/ui/ProjectSelector.vue"
+import SettingsModal from "@/components/ui/SettingsModal.vue"
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js'
 import { BarChart3, CalendarDays, AlertTriangle, FileText, TrendingUp, TrendingDown, Users, DollarSign } from "lucide-vue-next"
 
@@ -228,6 +235,9 @@ const currentTime = ref('')
 const currentDate = ref('')
 let timeInterval = null
 
+// Settings modal state
+const showSettingsModal = ref(false)
+
 // Initialize project service and time display
 onMounted(async () => {
   await initializeProjectService()
@@ -272,6 +282,15 @@ const handleProjectChange = (project) => {
   // console.log('Project changed to:', project)
   // You can add additional logic here when project changes
   // For example, refresh data based on selected project
+}
+
+// Settings modal handlers
+const openSettings = () => {
+  showSettingsModal.value = true
+}
+
+const closeSettings = () => {
+  showSettingsModal.value = false
 }
 </script>
 

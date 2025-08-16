@@ -1,12 +1,12 @@
 <template>
     <div class="flex">
-      <Sidebar />
+      <Sidebar @open-settings="openSettings" />
   
       <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
         <!-- Main Content Area -->
         <div class="relative p-4">
           <!-- Top Filters and Controls -->
-          <div v-if="visibleYears.length" class="absolute top-4 left-4 z-30 w-[860px] max-w-[95vw] rounded-2xl overflow-hidden backdrop-blur-xl bg-white/80 border border-violet-200/60 shadow-2xl ring-1 ring-violet-300/30">
+          <div v-if="visibleYears.length" class="absolute top-4 left-4 z-30 w-[660px] max-w-[95vw] rounded-2xl overflow-hidden backdrop-blur-xl bg-white/80 border border-violet-200/60 shadow-2xl ring-1 ring-violet-300/30">
             <div class="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-violet-600 to-violet-700 text-white">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center shadow-sm">
@@ -32,12 +32,42 @@
               <div v-show="!sidebarCollapsed" class="px-5 pb-5 bg-white/70">
                 
                 
+                <!-- Report Selection Section -->
+                <div class="mb-4 pt-4">
+                  <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <FileText class="w-4 h-4 text-violet-600" />
+                    {{ selectedReport ? 'Current Report' : 'Select Report' }}
+                  </h3>
+                  <div class="w-full">
+                    <select 
+                      v-model="selectedReport" 
+                      class="w-full px-3 py-2.5 rounded-lg border border-violet-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white text-sm shadow-sm"
+                    >
+                      <option value="">Select a report...</option>
+                      <option value="room-pnl">Room Profit & Loss</option>
+                      <option value="fnb-pnl">Food And Beverage Profit & Loss</option>
+                      <option value="ood-pnl">Other Operating Departments Profit & Loss</option>
+                      <option value="pl-statement">Profit And Loss Statement</option>
+                      <option value="balance-sheet">Balance Sheet</option>
+                      <option value="cashflow">Cashflow</option>
+                      <option value="capex-schedule">Capex Schedule</option>
+                    </select>
+                  </div>
+                  <div v-if="selectedReport" class="mt-2 flex gap-2">
+                    <button 
+                      @click="selectedReport = ''"
+                      class="flex items-center gap-1 px-2 py-1 text-xs text-violet-600 hover:text-violet-700 hover:bg-violet-50 rounded transition-all"
+                    >
+                      <RefreshCw class="w-3 h-3" />
+                      Change Report
+                    </button>
+                  </div>
+                </div>
+
                 <!-- Action Buttons Section -->
                 <div class="mb-4 pt-4">
                   <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
+                    <Plus class="w-4 h-4 text-violet-600" />
                     Quick Actions
                   </h3>              
                   <div class="flex gap-2">
@@ -140,31 +170,31 @@
             </transition>
           </div>
   
-          <!-- Right Side - Table Area -->
+          <!-- Down Side - Table Area -->
           <div class="p-0">
-            <!-- No Project Selected State -->
+          <!-- No Project Selected State -->
             <div v-if="expenseData.status === 'no_project_selected'">
               <NoProjectSelectedState />
             </div>
-  
+
             <!-- Error State -->
             <div v-else-if="expenseData.status === 'error'">
               <ErrorState :message="expenseData.message" @retry="refreshTable" />
             </div>
-  
+
+            <!-- Report Selection State -->
+            <div v-else-if="!selectedReport" class="mt-28">
+              <ReportSelector @report-selected="handleReportSelection" />
+            </div>
+
             <!-- Table Header with Stats -->
             <template v-else-if="visibleYears.length">
               <div class="mb-4">
-                <!-- <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
-                    <Table class="w-3 h-3 text-white" />
-                  </div>
-                  <h2 class="text-lg font-bold text-gray-800">Receipts & Payments Overview</h2>
-                </div> -->
+
               </div>
-  
+
               <!-- Modern Table Container -->
-              <div class="bg-white mt-20 rounded-lg border border-violet-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
+              <div class="bg-white mt-28 rounded-lg border border-violet-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
                 <div class="overflow-x-auto max-w-[100%] md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
                   <div class="min-w-full w-max">
                     <table class="w-full">
@@ -1255,10 +1285,16 @@
                 
                       </tbody>
                     </table>
-                  </div>
-                </div>
-              </div>
-            </template>
+                          </div>
+      </div>
+      
+      <!-- Settings Modal -->
+      <SettingsModal 
+        :is-visible="showSettingsModal" 
+        @close="closeSettings" 
+      />
+    </div>
+  </template>
   
             <!-- Enhanced No Years Selected State -->
             <template v-else>
@@ -1332,6 +1368,12 @@
         </div>
       </div>
     </transition>
+    
+    <!-- Settings Modal -->
+    <SettingsModal 
+      :is-visible="showSettingsModal" 
+      @close="closeSettings" 
+    />
   </template>
     
   
@@ -1350,9 +1392,11 @@
   
   // Component imports
   import Sidebar from "@/components/ui/Sidebar.vue";
-  import NoProjectSelectedState from '@/components/ui/expense/NoProjectSelectedState.vue';
-  import ErrorState from '@/components/ui/expense/ErrorState.vue';
-  import NoYearsSelectedState from '@/components/ui/reports/NoYearsSelectedState.vue';
+import NoProjectSelectedState from '@/components/ui/expense/NoProjectSelectedState.vue';
+import ErrorState from '@/components/ui/expense/ErrorState.vue';
+import NoYearsSelectedState from '@/components/ui/reports/NoYearsSelectedState.vue';
+import ReportSelector from '@/components/ui/reports/ReportSelector.vue';
+import SettingsModal from "@/components/ui/SettingsModal.vue";
   
   // Icon imports
   import { 
@@ -1382,7 +1426,9 @@
     CircleAlert,
     AlertCircle,
     Save,
-    Loader2
+    Loader2,
+    FileText,
+    Plus
   } from 'lucide-vue-next';
   
   // Service imports
@@ -1442,9 +1488,15 @@
   const saveError = ref("");
   const showUnsavedWarning = ref(false);
   const pendingNavigation = ref(null);
-  const sidebarCollapsed = ref(false);
+  const sidebarCollapsed = ref(true);
   const departments = ref([]); // Add departments state
   const calculationCache = useCalculationCache();
+  
+  // Report selection state
+  const selectedReport = ref('');
+  
+  // Settings modal state
+  const showSettingsModal = ref(false);
   
   // Collection percentages for each revenue type
   const collectionPercentages = ref({
@@ -2431,6 +2483,26 @@
       setEditableCellText(event, (Number(paymentPercentages.value[deptKey][category][period]) || 0).toFixed(2) + '%');
     }
   }
+  
+  // ============================================================================
+  // REPORT SELECTION HANDLERS
+  // ============================================================================
+  const handleReportSelection = (reportType) => {
+    selectedReport.value = reportType;
+    // You can add additional logic here for different report types
+    console.log('Selected report:', reportType);
+  };
+  
+  // ============================================================================
+  // SETTINGS MODAL HANDLERS
+  // ============================================================================
+  const openSettings = () => {
+    showSettingsModal.value = true;
+  };
+  
+  const closeSettings = () => {
+    showSettingsModal.value = false;
+  };
   
   // ============================================================================
   // DEPARTMENT LOADING
