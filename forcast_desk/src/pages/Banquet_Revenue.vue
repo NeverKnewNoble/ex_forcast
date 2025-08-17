@@ -1,6 +1,6 @@
 <template>
     <div class="flex ">
-      <Sidebar />
+      <Sidebar @open-settings="openSettings" />
   
       <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
         <!-- Main Content Area -->
@@ -484,6 +484,12 @@
         </div>
       </div>
     </transition>
+
+    <!-- Settings Modal -->
+    <SettingsModal 
+      :is-visible="showSettingsModal" 
+      @close="closeSettings" 
+    />
   </template>
   
   
@@ -548,6 +554,7 @@
   import NoProjectSelectedState from '@/components/ui/banquet/NoProjectSelectedState.vue';
   import NoYearsSelectedState from '@/components/ui/banquet/NoYearsSelectedState.vue';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+  import SettingsModal from '@/components/ui/SettingsModal.vue';
   
   
   // Reactive state
@@ -567,6 +574,7 @@
   const newBanquetDetail = ref("");
   const customBanquetFields = ref([]); // Will hold fetched banquet details
   const removedDefaultFields = ref([]); // Track removed default fields
+  const showSettingsModal = ref(false);
 
   // ! Cache for calculations
   const calculationCache = useCalculationCache();  
@@ -622,6 +630,14 @@
   
   function cancelAdvancedSettings() {
     showAdvanced.value = false;
+  }
+
+  function openSettings() {
+    showSettingsModal.value = true;
+  }
+
+  function closeSettings() {
+    showSettingsModal.value = false;
   }
 
   function openAddBanquetDetail() {

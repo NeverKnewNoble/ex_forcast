@@ -1,6 +1,6 @@
 <template>
     <div class="flex ">
-      <Sidebar />
+      <Sidebar @open-settings="openSettings" />
   
       <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
         <!-- Main Content Area -->
@@ -988,6 +988,12 @@
         </div>
       </div>
     </transition>
+    
+    <!-- Settings Modal -->
+    <SettingsModal 
+      :is-visible="showSettingsModal" 
+      @close="closeSettings" 
+    />
   </template>
   
   
@@ -1004,6 +1010,7 @@
   import { storeToRefs } from 'pinia';
   import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
   import Sidebar from "@/components/ui/Sidebar.vue";
+import SettingsModal from "@/components/ui/SettingsModal.vue";
   import {  
     AlertTriangle, 
     UtensilsCrossed, 
@@ -1123,6 +1130,10 @@
   const saveError = ref("");
   // const pendingNavigation = ref(null); // Store the pending navigation action
   const sidebarCollapsed = ref(false);
+  
+  // Settings Modal State
+  const showSettingsModal = ref(false);
+  
   // Double Occupancy Modal State
   const doubleOccupancyByYear = ref({});
   // Keep the reactive table source in sync with the page-level state
@@ -2524,6 +2535,14 @@
     }
   }
 
+  // Settings Modal Functions
+  function openSettings() {
+    showSettingsModal.value = true;
+  }
+
+  function closeSettings() {
+    showSettingsModal.value = false;
+  }
 
   </script>
   

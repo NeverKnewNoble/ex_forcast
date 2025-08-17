@@ -1,6 +1,6 @@
 <template>
     <div class="flex ">
-      <Sidebar />
+      <Sidebar @open-settings="openSettings" />
   
       <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
         <!-- Main Content Area -->
@@ -259,7 +259,7 @@
               </div>
             </template>
             
-            <!-- Table Header with Stats -->
+                          <!-- Table Header with Stats -->
             <template v-else-if="visibleYears.length && isComponentReady">
               <div class="mb-4">
                 <div class="flex items-center gap-2">
@@ -267,6 +267,16 @@
                     <Table class="w-3 h-3 text-white" />
                   </div>
                   <h2 class="text-lg font-bold text-gray-800">Payroll Data Overview</h2>
+                </div>
+                <div class="mt-2">
+                  <button 
+                    v-if="deletedPayrollRows.size > 0"
+                    @click="restoreOriginal"
+                    class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm font-medium shadow-sm transition-all"
+                  >
+                    <RotateCcw class="w-4 h-4" />
+                    Restore ({{ deletedPayrollRows.size }})
+                  </button>
                 </div>
               </div>
   
@@ -444,7 +454,7 @@
                                 </td>
                               </tr>
                               <!-- Payroll rows for this location -->
-                              <template v-for="row in getPayrollRowsForLocationLocal(category, location)" :key="row.id">
+                              <template v-for="row in getVisiblePayrollRows(getPayrollRowsForLocationLocal(category, location))" :key="row.id">
                                 <tr class="border-b border-gray-200 hover:bg-violet-50 transition-all duration-200">
                                   <!-- Position -->
                                   <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
@@ -452,7 +462,16 @@
                                   </td>
                                   <!-- Designation -->
                                   <td class="px-3 py-2 font-medium border-r border-violet-200 text-gray-700">
-                                    {{ row.designation }}
+                                    <div class="flex items-center justify-between gap-2">
+                                      <span>{{ row.designation }}</span>
+                                      <button 
+                                        @click="deletePayrollRow(row.id)" 
+                                        class="text-red-600 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-all" 
+                                        title="Delete payroll row"
+                                      >
+                                        <X class="w-4 h-4" />
+                                      </button>
+                                    </div>
                                   </td>
                                   <!-- Salary (Editable, Reactive, row.salary) -->
                                   <td
@@ -1299,7 +1318,11 @@
       </div>
     </transition>
   
-
+    <!-- Settings Modal -->
+    <SettingsModal 
+      :is-visible="showSettingsModal" 
+      @close="closeSettings" 
+    />
   </template>
   
   
@@ -1312,6 +1335,7 @@
   import { storeToRefs } from 'pinia';
   import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
   import Sidebar from "@/components/ui/Sidebar.vue";
+import SettingsModal from "@/components/ui/SettingsModal.vue";
   import NoYearsSelectedState from '@/components/ui/payroll/NoYearsSelectedState.vue';
   import { 
     CircleAlert, 
@@ -1339,7 +1363,8 @@
     Download,
     Loader2,
     AlertCircle,
-    Filter
+    Filter,
+    RotateCcw
   } from 'lucide-vue-next';
   import alertService from "@/components/ui/ui_utility/alertService.js";
   import { 
@@ -1453,8 +1478,15 @@ import { getProjectDepartments } from '@/components/utility/dashboard/projectSer
   const isSaving = ref(false);
   const saveError = ref("");
   const sidebarCollapsed = ref(false);
+  
+  // Settings Modal State
+  const showSettingsModal = ref(false);
+  
 const isComponentReady = ref(false); // Add a flag to track if component is ready
 const projectDepartments = ref([]);
+
+// ************ Payroll Row Management ****************
+const deletedPayrollRows = ref(new Set()); // Track deleted payroll rows for restore functionality
 
   // ************ Quick Actions state ****************
   const newDepartmentName = ref('');
@@ -1513,7 +1545,9 @@ const projectDepartments = ref([]);
 
   // Computed property to check if there's any payroll data
   const hasPayrollDataComputed = computed(() => {
-    return hasPayrollData(payrollRows.value) || (defaultPayrollRows.value?.length > 0);
+    const visibleRows = getVisiblePayrollRows(payrollRows.value);
+    const visibleDefaultRows = getVisiblePayrollRows(defaultPayrollRows.value);
+    return hasPayrollData(visibleRows) || (visibleDefaultRows?.length > 0);
   });
   // Merge live payroll rows with default payroll rows for display (non-editable defaults)
   function normalizeDepartmentName(name) {
@@ -1549,7 +1583,9 @@ const projectDepartments = ref([]);
         });
       });
     }
-    return rows;
+    
+    // Filter out deleted rows
+    return getVisiblePayrollRows(rows);
   });
 
 
@@ -1560,7 +1596,7 @@ const projectDepartments = ref([]);
     const year = visibleYears.value[0];
     let tracker = 0;
     
-    payrollRows.value.forEach(row => {
+    getVisiblePayrollRows(payrollRows.value).forEach(row => {
       months.forEach(month => {
         const countValue = getPayrollCellValueLocal(row.id, 'count', year, month);
         tracker += countValue || 0;
@@ -1577,7 +1613,7 @@ const projectDepartments = ref([]);
     const year = visibleYears.value[0];
     let tracker = 0;
     
-    payrollRows.value.forEach(row => {
+    getVisiblePayrollRows(payrollRows.value).forEach(row => {
       months.forEach(month => {
         const countValue = getPayrollCellValueLocal(row.id, 'count', year, month);
         const salary = row.salary || 0;
@@ -1607,7 +1643,7 @@ const projectDepartments = ref([]);
   watch(payrollRows, (newRows, oldRows) => {
     if (newRows && oldRows) {
       // Check if any row's salary or count has changed
-      newRows.forEach((newRow, index) => {
+      getVisiblePayrollRows(newRows).forEach((newRow, index) => {
         const oldRow = oldRows[index];
         if (oldRow && (newRow.salary !== oldRow.salary || newRow.count !== oldRow.count)) {
           // Force reactive update for all monthly cells of this row
@@ -1706,6 +1742,7 @@ const projectDepartments = ref([]);
       }
 
       originalPayrollData.value = cloneDeep(payrollRows.value);
+      deletedPayrollRows.value = new Set();
       isSaved.value = true;
       isComponentReady.value = true;
       
@@ -1745,6 +1782,7 @@ const projectDepartments = ref([]);
         
         // Reset any unsaved changes
         changedCells.value = [];
+        deletedPayrollRows.value = new Set();
         isSaved.value = true;
         saveError.value = "";
         
@@ -1776,6 +1814,7 @@ const projectDepartments = ref([]);
         
         // Reset any unsaved changes
         changedCells.value = [];
+        deletedPayrollRows.value = new Set();
         isSaved.value = true;
         saveError.value = "";
         
@@ -1789,6 +1828,7 @@ const projectDepartments = ref([]);
 
   function clearYearSelection() {
     clearYearSettings();
+    deletedPayrollRows.value = new Set();
     isSaved.value = false;
   }
 
@@ -2065,6 +2105,9 @@ const projectDepartments = ref([]);
       // Clear changed cells BEFORE reloading data to prevent rowId mismatch
       changedCells.value = [];
       
+      // Clear deleted rows after successful save
+      deletedPayrollRows.value = new Set();
+      
       // Reload from backend after save
       await fetchPayrollData(selectedProject.value?.project_name, fromYear.value, toYear.value);
       originalPayrollData.value = cloneDeep(payrollRows.value);
@@ -2079,8 +2122,39 @@ const projectDepartments = ref([]);
     }
   };
 
-  // ************ Unsaved Changes Warning Modal ****************
-  // ************ Watch for unsaved changes to show warning on page refresh ****************
+  // ************ Payroll Row Management Functions ****************
+function deletePayrollRow(rowId) {
+  const next = new Set(deletedPayrollRows.value);
+  next.add(rowId);
+  deletedPayrollRows.value = next;
+  isSaved.value = false;
+  alertService.info(`Removed payroll row. Click Restore to undo before saving.`);
+}
+
+function isPayrollRowDeleted(rowId) {
+  return deletedPayrollRows.value.has(rowId);
+}
+
+function getVisiblePayrollRows(rowsArray) {
+  const deleted = deletedPayrollRows.value;
+  return (rowsArray || []).filter((row) => !deleted.has(row.id));
+}
+
+function restoreOriginal() {
+  try {
+    if (originalPayrollData.value && Object.keys(originalPayrollData.value).length) {
+      payrollRows.value = cloneDeep(originalPayrollData.value);
+    }
+    deletedPayrollRows.value = new Set();
+    isSaved.value = false;
+    alertService.info('Restored to original');
+  } catch (e) {
+    console.error('Error restoring original data:', e);
+  }
+}
+
+// ************ Unsaved Changes Warning Modal ****************
+// ************ Watch for unsaved changes to show warning on page refresh ****************
   watch(isSaved, (newValue) => {
     if (!newValue) {
       // Add beforeunload event listener when there are unsaved changes
@@ -2104,6 +2178,7 @@ const projectDepartments = ref([]);
   // Clean up event listeners when component is unmounted
   onUnmounted(() => {
     window.removeEventListener('beforeunload', handleBeforeUnload);
+    deletedPayrollRows.value = new Set();
   });
   
   // Watch for totalRooms changes
@@ -2170,7 +2245,7 @@ const projectDepartments = ref([]);
   }
 
   function getUniqueCategoriesLocal() {
-    return getUniqueCategories(payrollRowsSource.value);
+    return getUniqueCategories(getVisiblePayrollRows(payrollRowsSource.value));
   }
 
   function getPayrollRowsForCategoryLocal(category) {
@@ -2178,7 +2253,7 @@ const projectDepartments = ref([]);
   }
 
   function getUniqueLocationsForCategoryLocal(category) {
-    return getUniqueLocationsForCategory(payrollRowsSource.value, category);
+    return getUniqueLocationsForCategory(getVisiblePayrollRows(payrollRowsSource.value), category);
   }
 
   function getUniquePositionsForLocationLocal(category, location) {
@@ -2190,7 +2265,7 @@ const projectDepartments = ref([]);
   }
 
   function getPayrollRowsForLocationLocal(category, location) {
-    return getPayrollRowsForLocation(payrollRowsSource.value, category, location);
+    return getPayrollRowsForLocation(getVisiblePayrollRows(payrollRowsSource.value), category, location);
   }
 
   function formatCurrencyLocal(value) {
@@ -2279,21 +2354,21 @@ const projectDepartments = ref([]);
   function calculateHotelTotalLocal() {
     // console.log('calculateHotelTotalLocal called');
     // console.log('payrollRows.value:', payrollRows.value);
-    const result = calculateHotelTotal(payrollRows.value);
+    const result = calculateHotelTotal(getVisiblePayrollRows(payrollRows.value));
     // console.log('calculateHotelTotalLocal result:', result);
     return result;
   }
 
   function calculateHotelTotalMonthlyCountLocal(year, month) {
-    return calculateHotelTotalMonthlyCount(payrollRows.value, year, month, getPayrollCellValueLocal);
+    return calculateHotelTotalMonthlyCount(getVisiblePayrollRows(payrollRows.value), year, month, getPayrollCellValueLocal);
   }
 
   function calculateHotelTotalMonthlySalaryLocal(year, month) {
-    return calculateHotelTotalMonthlySalary(payrollRows.value, year, month, getPayrollCellValueLocal);
+    return calculateHotelTotalMonthlySalary(getVisiblePayrollRows(payrollRows.value), year, month, getPayrollCellValueLocal);
   }
 
   function calculateHotelTotalTotalLocal(year) {
-    return calculateHotelTotalTotal(payrollRows.value, year, calculatePayrollTotalLocal);
+    return calculateHotelTotalTotal(getVisiblePayrollRows(payrollRows.value), year, calculatePayrollTotalLocal);
   }
 
   function calculateHotelTotalAnnualLocal(year) {
@@ -2302,19 +2377,19 @@ const projectDepartments = ref([]);
 
   // Employee/Room Ratio Local Functions
   function calculateEmployeeRoomRatioLocal() {
-    return calculateEmployeeRoomRatio(payrollRows.value, totalRooms.value);
+    return calculateEmployeeRoomRatio(getVisiblePayrollRows(payrollRows.value), totalRooms.value);
   }
 
   function calculateEmployeeRoomRatioMonthlyLocal(year, month) {
-    return calculateEmployeeRoomRatioMonthly(payrollRows.value, year, month, getPayrollCellValueLocal, totalRooms.value);
+    return calculateEmployeeRoomRatioMonthly(getVisiblePayrollRows(payrollRows.value), year, month, getPayrollCellValueLocal, totalRooms.value);
   }
 
   function calculateEmployeeRoomRatioSalaryLocal(year, month) {
-    return calculateEmployeeRoomRatioSalary(payrollRows.value, year, month, getPayrollCellValueLocal, totalRooms.value);
+    return calculateEmployeeRoomRatioSalary(getVisiblePayrollRows(payrollRows.value), year, month, getPayrollCellValueLocal, totalRooms.value);
   }
 
   function calculateEmployeeRoomRatioTotalLocal(year) {
-    return calculateEmployeeRoomRatioTotal(payrollRows.value, year, calculatePayrollTotalLocal, totalRooms.value);
+    return calculateEmployeeRoomRatioTotal(getVisiblePayrollRows(payrollRows.value), year, calculatePayrollTotalLocal, totalRooms.value);
   }
 
   function calculateEmployeeRoomRatioAnnualLocal(year) {
@@ -2323,7 +2398,7 @@ const projectDepartments = ref([]);
 
   // Hotel Total Annual Increment Local Functions
   function calculateHotelTotalAnnualIncrementLocal(year) {
-    const hotelRows = payrollRows.value;
+    const hotelRows = getVisiblePayrollRows(payrollRows.value);
     
     return hotelRows.reduce((sum, row) => {
       return sum + calculateAnnualIncrementLocal(row.id, year);
@@ -2564,6 +2639,15 @@ const projectDepartments = ref([]);
       // If invalid, restore the original value
       event.target.textContent = row.count || '0';
     }
+  }
+  
+  // Settings Modal Functions
+  function openSettings() {
+    showSettingsModal.value = true;
+  }
+
+  function closeSettings() {
+    showSettingsModal.value = false;
   }
   </script>
   

@@ -144,6 +144,7 @@
 
 <script setup>
 import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import logoURL from '@/assets/images/icon_logo.png'
 import logoURL2 from '@/assets/images/ex_forest_logo.png'
 import { session } from '@/data/session' 
@@ -171,6 +172,9 @@ import {
   ChartNoAxesCombined,
   Settings,
 } from 'lucide-vue-next'
+
+// Get the current route
+const route = useRoute()
 
 const is_expanded = ref(localStorage.getItem("is_expanded") === "true")
 
@@ -301,7 +305,16 @@ const filteredMenuItems = computed(() => {
       })
       .filter(Boolean)
   }
-  return filterItems(menuItems)
+  
+  // Filter out settings if on home page
+  const baseItems = filterItems(menuItems)
+  return baseItems.filter(item => {
+    // Always show settings if not on home page
+    if (item.text === "Settings") {
+      return route.path !== "/"
+    }
+    return true
+  })
 })
 
 // Handle item actions

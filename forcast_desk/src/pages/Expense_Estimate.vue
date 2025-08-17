@@ -1,6 +1,6 @@
 <template>
   <div class="flex ">
-    <Sidebar />
+    <Sidebar @open-settings="openSettings" />
 
     <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
       <!-- Main Content Area -->
@@ -749,6 +749,11 @@
     </div>
   </transition>
 
+  <!-- Settings Modal -->
+  <SettingsModal 
+    :is-visible="showSettingsModal" 
+    @close="closeSettings" 
+  />
 </template>
 
 
@@ -828,6 +833,7 @@ import NoDataState from '@/components/ui/expense/NoDataState.vue';
 import ErrorState from '@/components/ui/expense/ErrorState.vue';
 import NoYearsSelectedState from '@/components/ui/expense/NoYearsSelectedState.vue';
 import { allowOnlyNumbers as allowOnlyNumbersFromPayroll } from '@/components/utility/payroll/index.js';
+import SettingsModal from '@/components/ui/SettingsModal.vue';
 
 
 // Reactive state
@@ -870,6 +876,7 @@ const categoryCreateError = ref("");
 const categoryCreateSuccess = ref("");
 const modalDepartments = ref([]);
 const modalDepartmentLocations = ref([]);
+const showSettingsModal = ref(false);
 
 // Pinia store for year settings
 const yearSettingsStore = useYearSettingsStore();
@@ -1431,6 +1438,14 @@ function handlePaste(event) {
 function validateAccountNumber(event) {
   // Remove any non-numeric characters
   newAccount.value.account_number = event.target.value.replace(/[^0-9]/g, '');
+}
+
+function openSettings() {
+  showSettingsModal.value = true;
+}
+
+function closeSettings() {
+  showSettingsModal.value = false;
 }
 </script>
 

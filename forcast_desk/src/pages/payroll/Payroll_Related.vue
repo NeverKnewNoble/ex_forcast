@@ -1,6 +1,6 @@
 <template>
-  <div class="flex ">
-    <Sidebar />
+  <div class="flex">
+    <Sidebar @open-settings="openSettings" />
 
     <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
       <!-- Main Content Area -->
@@ -1150,8 +1150,13 @@
         </div>
       </div>
     </div>
+    
+    <!-- Settings Modal -->
+    <SettingsModal 
+      :is-visible="showSettingsModal" 
+      @close="closeSettings" 
+    />
   </div>
-
 </template>
 
 
@@ -1162,6 +1167,7 @@ import { ref, onMounted, computed, watch, onUnmounted, reactive, nextTick } from
 import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
+import SettingsModal from "@/components/ui/SettingsModal.vue";
 import { 
   CircleAlert, 
   AlertTriangle, 
@@ -1454,6 +1460,10 @@ const changedCells = ref([]); // {rowId, fieldType, year, month, newValue}
 const isSaving = ref(false);
 const saveError = ref("");
 const sidebarCollapsed = ref(false);
+
+// Settings Modal State
+const showSettingsModal = ref(false);
+
 const isComponentReady = ref(false); // Add a flag to track if component is ready
 
 // Ensure payrollRows is always initialized as an array (never undefined)
@@ -2164,6 +2174,15 @@ function safeCalculateHotelTotalBenefitsOtherLocal() {
     return formatMoney(0);
   }
   return calculateHotelTotalBenefitsOtherLocal(payrollRows.value);
+}
+
+// Settings Modal Functions
+function openSettings() {
+  showSettingsModal.value = true;
+}
+
+function closeSettings() {
+  showSettingsModal.value = false;
 }
 </script>
 

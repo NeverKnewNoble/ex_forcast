@@ -1,6 +1,6 @@
 <template>
     <div class="flex ">
-      <Sidebar /> 
+      <Sidebar @open-settings="openSettings" /> 
   
       <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
         <!-- Main Content Area -->
@@ -1075,6 +1075,12 @@
         </div>
       </div>
     </transition>
+
+    <!-- Settings Modal -->
+    <SettingsModal 
+      :is-visible="showSettingsModal" 
+      @close="closeSettings" 
+    />
   </template>
   
   
@@ -1145,6 +1151,7 @@
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
 import NoProjectSelectedState from '@/components/ui/ood/NoProjectSelectedState.vue';
 import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
+import SettingsModal from '@/components/ui/SettingsModal.vue';
   
   // Reactive state
   const years = ref([]);
@@ -1919,6 +1926,20 @@ import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
   // Add at the top of <script setup>
   let isPopulatingLaundryAssumptions = false;
   let isPopulatingHealthClubData = false;
+
+  // Settings Modal
+  const showSettingsModal = ref(false);
+  const settings = reactive({
+    // Add any settings you want to include in the modal
+  });
+
+  function openSettings() {
+    showSettingsModal.value = true;
+  }
+
+  function closeSettings() {
+    showSettingsModal.value = false;
+  }
 
   </script>
   

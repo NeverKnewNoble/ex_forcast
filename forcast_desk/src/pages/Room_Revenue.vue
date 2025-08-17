@@ -1,6 +1,6 @@
 <template>
     <div class="flex ">
-      <Sidebar />
+      <Sidebar @open-settings="openSettings" />
   
       <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
         <!-- Main Content Area -->
@@ -1365,6 +1365,12 @@
       </div>
     </div>
   </transition>
+
+  <!-- Settings Modal -->
+  <SettingsModal 
+    :is-visible="showSettingsModal" 
+    @close="closeSettings" 
+  />
 </template>
   
   
@@ -1449,6 +1455,8 @@ import NoProjectSelectedState from '@/components/ui/room/NoProjectSelectedState.
 import ErrorState from '@/components/ui/room/ErrorState.vue';
 import NoYearsSelectedState from '@/components/ui/room/NoYearsSelectedState.vue';
 
+// Import SettingsModal component
+import SettingsModal from '@/components/ui/SettingsModal.vue';
 
 // Pinia store for year settings
 const yearSettingsStore = useYearSettingsStore();
@@ -1579,7 +1587,28 @@ function updateRoomRevenueCache() {
   try {
     const project = getProjectName();
     if (!visibleYears.value.length) return;
-  for (const year of visibleYears.value) {
+    
+    // Cache Total Number of Rooms based on market segmentation setting
+    if (marketSegmentation.value) {
+      // When market segmentation is enabled, cache the totalNumberOfRooms value
+      for (const year of visibleYears.value) {
+        const labels = getColumnLabelsForYearLocal(year);
+        for (const label of labels) {
+          calculationCache.setValue(project, 'Room Revenue Assumptions', 'Total Rooms', year, label, totalNumberOfRooms.value);
+        }
+      }
+    } else {
+      // When market segmentation is disabled, cache the total rooms from room package count management
+      const totalRoomsFromPackages = Object.values(roomTypeCounts.value).reduce((sum, count) => sum + (parseInt(count) || 0), 0);
+      for (const year of visibleYears.value) {
+        const labels = getColumnLabelsForYearLocal(year);
+        for (const label of labels) {
+          calculationCache.setValue(project, 'Room Revenue Assumptions', 'Total Rooms', year, label, totalRoomsFromPackages);
+        }
+      }
+    }
+    
+    for (const year of visibleYears.value) {
       const labels = getColumnLabelsForYearLocal(year);
       // Monthly totals
       for (const label of labels) {
@@ -1618,6 +1647,8 @@ watch(hospitalityExperience, (newValue) => {
 // Watch for market segmentation changes
 watch(marketSegmentation, (newValue) => {
   localStorage.setItem('marketSegmentation', newValue);
+  // Update cache when market segmentation setting changes
+  updateRoomRevenueCache();
 });
 
 // Function to load project-specific settings
@@ -1637,7 +1668,23 @@ function loadProjectSettings() {
 // Watch for total number of rooms changes
 watch(totalNumberOfRooms, (newValue) => {
   localStorage.setItem(getProjectKey('totalNumberOfRooms'), newValue.toString());
+  // Update cache when total rooms change
+  updateRoomRevenueCache();
 });
+
+// Watch for room type counts changes to update cache
+watch(roomTypeCounts, () => {
+  // Update cache when room type counts change
+  updateRoomRevenueCache();
+}, { deep: true });
+
+// Watch for room type counts changes to update cache in real-time
+watch(roomTypeCounts, (newCounts) => {
+  // Update cache in real-time as user types
+  if (Object.keys(newCounts).length > 0) {
+    updateRoomRevenueCache();
+  }
+}, { deep: true, immediate: false });
 
 // When opening the modal, copy the current settings
 watch(showAdvanced, (val) => {
@@ -1682,6 +1729,13 @@ onMounted(async () => {
     }));
     await ensureDefaultPackages();
     updateRoomTypes(roomPackages.value);
+    
+    // Initialize room type counts for current project
+    roomTypeCounts.value = {};
+    ROOM_TYPES.forEach(roomType => {
+      roomTypeCounts.value[roomType] = getNumberOfRoomsForType(roomPackages.value, roomType, roomData.value);
+    });
+    
     isSaved.value = true;
     // ... keep VAT, breakfast, exchange, service charge, roomTypeCounts logic ...
     // Publish current totals into calculation cache for cross-page usage
@@ -2255,6 +2309,9 @@ async function saveRoomTypeCounts() {
       originalRoomData.value = cloneDeep(roomData.value);
       isSaved.value = true;
       
+      // Update cache with new room counts
+      updateRoomRevenueCache();
+      
       // Close modal
       showRoomTypeCountModal.value = false;
       
@@ -2267,6 +2324,17 @@ async function saveRoomTypeCounts() {
     console.error('Error saving room type counts:', error);
     alertService.error("Failed to save room type counts. Please try again.");
   }
+}
+
+// Settings Modal Functions
+const showSettingsModal = ref(false);
+
+function openSettings() {
+  showSettingsModal.value = true;
+}
+
+function closeSettings() {
+  showSettingsModal.value = false;
 }
 </script>
   
