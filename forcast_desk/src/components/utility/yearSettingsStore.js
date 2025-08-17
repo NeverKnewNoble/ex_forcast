@@ -81,6 +81,21 @@ export const useYearSettingsStore = defineStore('yearSettings', () => {
     });
   }
 
+  // Year collapse state management
+  const collapsedYears = ref(new Set());
+
+  function toggleCollapse(year) {
+    if (collapsedYears.value.has(year)) {
+      collapsedYears.value.delete(year);
+    } else {
+      collapsedYears.value.add(year);
+    }
+  }
+
+  function isYearCollapsed(year) {
+    return collapsedYears.value.has(year);
+  }
+
   // Watch for project changes and reload settings
   watch(selectedProject, () => {
     loadProjectSettings();
@@ -109,5 +124,8 @@ export const useYearSettingsStore = defineStore('yearSettings', () => {
     loadProjectSettings,
     clearOldLocalStorageKeys,
     getAllProjectKeys,
+    collapsedYears,
+    toggleCollapse,
+    isYearCollapsed,
   };
 }); 

@@ -1,6 +1,6 @@
 <template>
     <div class="flex">
-      <Sidebar />
+      <Sidebar @open-settings="openSettings" />
   
       <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
         <!-- Main Content Area -->
@@ -1372,6 +1372,12 @@
         </div>
       </div>
     </transition>
+    
+    <!-- Settings Modal -->
+    <SettingsModal 
+      :is-visible="showSettingsModal" 
+      @close="closeSettings" 
+    />
   </template>
     
   
@@ -1390,6 +1396,7 @@
   
   // Component imports
   import Sidebar from "@/components/ui/Sidebar.vue";
+import SettingsModal from "@/components/ui/SettingsModal.vue";
   import NoProjectSelectedState from '@/components/ui/expense/NoProjectSelectedState.vue';
   import ErrorState from '@/components/ui/expense/ErrorState.vue';
   import NoYearsSelectedState from '@/components/ui/receipts/NoYearsSelectedState.vue';
@@ -1482,6 +1489,10 @@
   const showUnsavedWarning = ref(false);
   const pendingNavigation = ref(null);
   const sidebarCollapsed = ref(false);
+  
+  // Settings Modal State
+  const showSettingsModal = ref(false);
+  
   const departments = ref([]); // Add departments state
   const calculationCache = useCalculationCache();
   
@@ -2484,6 +2495,15 @@
       console.error("Error loading departments:", error);
       departments.value = [];
     }
+  }
+  
+  // Settings Modal Functions
+  function openSettings() {
+    showSettingsModal.value = true;
+  }
+
+  function closeSettings() {
+    showSettingsModal.value = false;
   }
   </script>
   
