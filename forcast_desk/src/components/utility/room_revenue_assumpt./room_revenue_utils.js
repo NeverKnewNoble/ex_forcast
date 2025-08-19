@@ -1,5 +1,7 @@
 // Room Revenue Utilities - Core calculations and table display functions
 import { ref } from 'vue'
+import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js'
+import { selectedProject } from '@/components/utility/dashboard/projectService.js'
 
 //? Default room types (will be overridden by dynamic packages)
 export const DEFAULT_ROOM_TYPES = ['Standard', 'Superior', 'Deluxe', 'Suite', 'Presidential']
@@ -211,6 +213,13 @@ export function calculateRevenue(roomRevenueData, roomType, year, label, display
   }
   
   const revenue = availableBeds * (data.occupied_beds / 100) * data.rate
+  // Cache per-room-type monthly revenue (> 0 only)
+  try {
+    const calculationCache = useCalculationCache()
+    const project = selectedProject.value?.project_name || 'default'
+    const rowCode = `Room Type:${roomType}`
+    calculationCache.setValue(project, 'Room Revenue Assumptions', rowCode, year, label, revenue)
+  } catch (e) {}
   return getFormattedValue(revenue, "currency")
 }
 
@@ -268,6 +277,15 @@ export function calculateRoomTypeTotal(roomRevenueData, roomType, year, displayM
   
   const type = calculationType === "occupied_beds" ? "percentage" : 
                calculationType === "rate" || calculationType === "revenue" ? "currency" : "number"
+  // Cache yearly total for room type revenue (> 0 only)
+  try {
+    if (calculationType === 'revenue') {
+      const calculationCache = useCalculationCache()
+      const project = selectedProject.value?.project_name || 'default'
+      const rowCode = `Room Type Year:${roomType}`
+      calculationCache.setValue(project, 'Room Revenue Assumptions', rowCode, year, 'ALL', total)
+    }
+  } catch (e) {}
   return getFormattedValue(total, type)
 }
 
