@@ -196,18 +196,18 @@
               <!-- Modern Table Container -->
               <div v-if="selectedReport === 'room-pnl'" class="mt-28">
                 <RoomProfitLoss :visible-years="visibleYears" />
-              </div>
+                            </div>
               
               <!-- Placeholder for other report types -->
               <div v-else class="mt-28 p-8 text-center text-gray-500">
                 <FileText class="w-16 h-16 mx-auto mb-4 text-gray-300" />
                 <h3 class="text-lg font-medium mb-2">Report Not Implemented</h3>
                 <p class="text-sm">The {{ selectedReport }} report is not yet implemented.</p>
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
+                            </div>
+                                </template>
+                            </div>
+                            </div>
+                            </div>
     </div>
   
     <!-- Advanced Setting Modal -->
@@ -274,7 +274,7 @@
       </div>
     </transition>
     
-    <!-- Settings Modal -->
+    <!-- Settings Modal --> 
     <SettingsModal 
       :is-visible="showSettingsModal" 
       @close="closeSettings" 
@@ -291,18 +291,18 @@
   import { ref, onMounted, computed, watch, onUnmounted } from "vue";
   import { storeToRefs } from 'pinia';
   import { cloneDeep } from 'lodash-es';
-  
+
   // Store imports
   import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
-  
+
   // Component imports
-import Sidebar from "@/components/ui/Sidebar.vue";
-import NoProjectSelectedState from '@/components/ui/expense/NoProjectSelectedState.vue';
-import ErrorState from '@/components/ui/expense/ErrorState.vue';
-import NoYearsSelectedState from '@/components/ui/reports/NoYearsSelectedState.vue';
-import ReportSelector from '@/components/ui/reports/ReportSelector.vue';
-import SettingsModal from "@/components/ui/SettingsModal.vue";
-import RoomProfitLoss from '@/components/ui/reports/RoomProfitLoss.vue';
+  import Sidebar from "@/components/ui/Sidebar.vue";
+  import NoProjectSelectedState from '@/components/ui/expense/NoProjectSelectedState.vue';
+  import ErrorState from '@/components/ui/expense/ErrorState.vue';
+  import NoYearsSelectedState from '@/components/ui/reports/NoYearsSelectedState.vue';
+  import ReportSelector from '@/components/ui/reports/ReportSelector.vue';
+  import SettingsModal from "@/components/ui/SettingsModal.vue";
+  import RoomProfitLoss from '@/components/ui/reports/RoomProfitLoss.vue';
   
   // Icon imports
   import { 
@@ -370,8 +370,8 @@ import RoomProfitLoss from '@/components/ui/reports/RoomProfitLoss.vue';
   import { selectedProject, initializeProjectService, getProjectDepartments } from '@/components/utility/dashboard/projectService.js';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
   // Month labels and quarter utilities
-import { monthLabels as monthlyBaseLabels, quarterToMonths } from '@/components/utility/expense_assumption/expense_formular.js';
-import { allowOnlyNumbers } from '@/components/utility/payroll/index.js';
+  import { monthLabels as monthlyBaseLabels, quarterToMonths } from '@/components/utility/expense_assumption/expense_formular.js';
+  import { allowOnlyNumbers } from '@/components/utility/payroll/index.js';
   
   // ============================================================================
   // REACTIVE STATE
@@ -441,7 +441,7 @@ import { allowOnlyNumbers } from '@/components/utility/payroll/index.js';
     // This is specific to the Receipts_Payments page only
     return [...baseLabels, 'ex1', 'ex2'];
   };
-
+  
   // =========================================================================
   // ROOMS REVENUE LOOKUP FROM PINIA CALCULATION CACHE
   // =========================================================================
@@ -881,7 +881,7 @@ import { allowOnlyNumbers } from '@/components/utility/payroll/index.js';
   const handleReportSelection = (reportType) => {
     selectedReport.value = reportType;
     // You can add additional logic here for different report types
-    console.log('Selected report:', reportType);
+    // console.log('Selected report:', reportType);
   };
   
   // ============================================================================

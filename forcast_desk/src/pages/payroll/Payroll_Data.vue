@@ -2220,7 +2220,19 @@ function restoreOriginal() {
       if (!row) return 0;
       
       // Calculate salary as count * base salary
-      return (countValue || 0) * (row.salary || 0);
+      const amount = (countValue || 0) * (row.salary || 0);
+      
+      // Cache monthly salary per position, designation, and location (> 0 only)
+      try {
+        const projectId = selectedProject.value?.project_name || 'default';
+        const position = (row.position || '').toString();
+        const designation = (row.designation || '').toString();
+        const location = (row.departmentLocation || '').toString();
+        const rowCode = `MonthlySalary|position:${position}|location:${location}|designation:${designation}`;
+        calculationCache.setValue(projectId, 'Payroll', rowCode, year, month, amount);
+      } catch (e) {}
+      
+      return amount;
     }
     
     return getPayrollCellValue(payrollRows.value, payrollData, rowId, fieldType, year, month);
