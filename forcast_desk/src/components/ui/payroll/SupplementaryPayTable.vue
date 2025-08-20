@@ -596,6 +596,10 @@ import {
   calculateTotalOtherValue
 } from '@/components/utility/payroll_related/calculation_handlers.js';
 
+// Import calculation cache and project service for supplementary pay caching
+import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+import { selectedProject } from '@/components/utility/dashboard/projectService.js';
+
 // Props
 const props = defineProps({
   payrollRows: {
@@ -619,6 +623,9 @@ const props = defineProps({
           default: () => ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
   }
 });
+
+// Initialize calculation cache for supplementary pay values
+const calculationCache = useCalculationCache();
 
 // Debug props
 watch(() => props, (newProps) => {
@@ -835,6 +842,7 @@ function calculateMonthlyVacationValueLocal(row, year, month) {
   const vacationBase = getSupplementaryPayValue(row, 'vacation');
   const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
   const monthlyValue = vacationBase * monthlyCount;
+  
   // console.log('Vacation calculation:', { rowId: row.id, vacationBase, monthlyCount, monthlyValue });
   return formatMoney(monthlyValue);
 }
@@ -843,6 +851,7 @@ function calculateMonthlyRelocationValueLocal(row, year, month) {
   const relocationBase = getSupplementaryPayValue(row, 'relocation');
   const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
   const monthlyValue = relocationBase * monthlyCount;
+  
   // console.log('Relocation calculation:', { rowId: row.id, relocationBase, monthlyCount, monthlyValue });
   return formatMoney(monthlyValue);
 }
@@ -851,6 +860,7 @@ function calculateMonthlySeverenceIndemnityValueLocal(row, year, month) {
   const severenceBase = getSupplementaryPayValue(row, 'severence_indemnity');
   const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
   const monthlyValue = severenceBase * monthlyCount;
+  
   // console.log('Severence calculation:', { rowId: row.id, severenceBase, monthlyCount, monthlyValue });
   return formatMoney(monthlyValue);
 }
@@ -859,6 +869,7 @@ function calculateMonthlyOtherValueLocal(row, year, month) {
   const otherBase = getSupplementaryPayValue(row, 'other');
   const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
   const monthlyValue = otherBase * monthlyCount;
+  
   // console.log('Other calculation:', { rowId: row.id, otherBase, monthlyCount, monthlyValue });
   return formatMoney(monthlyValue);
 }
@@ -870,6 +881,7 @@ function calculateTotalVacationValueLocal(row, year, months) {
     return sum + monthlyCount;
   }, 0);
   const totalValue = vacationBase * totalCount;
+  
   return formatMoney(totalValue);
 }
 
@@ -880,6 +892,7 @@ function calculateTotalRelocationValueLocal(row, year, months) {
     return sum + monthlyCount;
   }, 0);
   const totalValue = relocationBase * totalCount;
+  
   return formatMoney(totalValue);
 }
 
@@ -890,6 +903,7 @@ function calculateTotalSeverenceIndemnityValueLocal(row, year, months) {
     return sum + monthlyCount;
   }, 0);
   const totalValue = severenceBase * totalCount;
+  
   return formatMoney(totalValue);
 }
 
@@ -900,6 +914,7 @@ function calculateTotalOtherValueLocal(row, year, months) {
     return sum + monthlyCount;
   }, 0);
   const totalValue = otherBase * totalCount;
+  
   return formatMoney(totalValue);
 }
 
@@ -912,9 +927,20 @@ function calculateSubTotalManagementVacationMonthlyLocal(category, location, yea
   );
   
   const totalValue = managementRows.reduce((sum, row) => {
-    const monthlyValue = calculateMonthlyVacationValue(row, year, month, getMonthlyCountValueLocal);
+    const monthlyValue = calculateMonthlyVacationValueLocal(row, year, month);
     return sum + parseFloat(monthlyValue) || 0;
   }, 0);
+  
+  // Cache management vacation subtotal monthly value (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `category: ${category} | vacation`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalValue);
 }
@@ -927,9 +953,20 @@ function calculateSubTotalManagementVacationTotalLocal(category, location, year,
   );
   
   const totalValue = managementRows.reduce((sum, row) => {
-    const totalValue = calculateTotalVacationValue(row, year, months, getMonthlyCountValueLocal);
+    const totalValue = calculateTotalVacationValueLocal(row, year, months);
     return sum + parseFloat(totalValue) || 0;
   }, 0);
+  
+  // Cache management vacation subtotal yearly total (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `category: ${category} | vacation`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalValue);
 }
@@ -942,9 +979,20 @@ function calculateSubTotalManagementRelocationMonthlyLocal(category, location, y
   );
   
   const totalValue = managementRows.reduce((sum, row) => {
-    const monthlyValue = calculateMonthlyRelocationValue(row, year, month, getMonthlyCountValueLocal);
+    const monthlyValue = calculateMonthlyRelocationValueLocal(row, year, month);
     return sum + parseFloat(monthlyValue) || 0;
   }, 0);
+  
+  // Cache management relocation subtotal monthly value (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `category: ${category} | relocation`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalValue);
 }
@@ -957,9 +1005,20 @@ function calculateSubTotalManagementRelocationTotalLocal(category, location, yea
   );
   
   const totalValue = managementRows.reduce((sum, row) => {
-    const totalValue = calculateTotalRelocationValue(row, year, months, getMonthlyCountValueLocal);
+    const totalValue = calculateTotalRelocationValueLocal(row, year, months);
     return sum + parseFloat(totalValue) || 0;
   }, 0);
+  
+  // Cache management relocation subtotal yearly total (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `category: ${category} | relocation`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalValue);
 }
@@ -972,9 +1031,20 @@ function calculateSubTotalManagementSeverenceIndemnityMonthlyLocal(category, loc
   );
   
   const totalValue = managementRows.reduce((sum, row) => {
-    const monthlyValue = calculateMonthlySeverenceIndemnityValue(row, year, month, getMonthlyCountValueLocal);
+    const monthlyValue = calculateMonthlySeverenceIndemnityValueLocal(row, year, month);
     return sum + parseFloat(monthlyValue) || 0;
   }, 0);
+  
+  // Cache management severence indemnity subtotal monthly value (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `category: ${category} | severence & indemnity`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalValue);
 }
@@ -987,9 +1057,20 @@ function calculateSubTotalManagementSeverenceIndemnityTotalLocal(category, locat
   );
   
   const totalValue = managementRows.reduce((sum, row) => {
-    const totalValue = calculateTotalSeverenceIndemnityValue(row, year, months, getMonthlyCountValueLocal);
+    const totalValue = calculateTotalSeverenceIndemnityValueLocal(row, year, months);
     return sum + parseFloat(totalValue) || 0;
   }, 0);
+  
+  // Cache management severence indemnity subtotal yearly total (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `category: ${category} | severence & indemnity`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalValue);
 }
@@ -1002,9 +1083,20 @@ function calculateSubTotalManagementOtherMonthlyLocal(category, location, year, 
   );
   
   const totalValue = managementRows.reduce((sum, row) => {
-    const monthlyValue = calculateMonthlyOtherValue(row, year, month, getMonthlyCountValueLocal);
+    const monthlyValue = calculateMonthlyOtherValueLocal(row, year, month);
     return sum + parseFloat(monthlyValue) || 0;
   }, 0);
+  
+  // Cache management other subtotal monthly value (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `category: ${category} | other`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalValue);
 }
@@ -1017,9 +1109,20 @@ function calculateSubTotalManagementOtherTotalLocal(category, location, year, mo
   );
   
   const totalValue = managementRows.reduce((sum, row) => {
-    const totalValue = calculateTotalOtherValue(row, year, months, getMonthlyCountValueLocal);
+    const totalValue = calculateTotalOtherValueLocal(row, year, months);
     return sum + parseFloat(totalValue) || 0;
   }, 0);
+  
+  // Cache management other subtotal yearly total (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `category: ${category} | other`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalValue);
 }
@@ -1265,6 +1368,17 @@ function calculateHotelTotalVacationMonthlyLocal(year, month) {
     return sum + parseFloat(monthlyValue) || 0;
   }, 0);
   
+  // Cache hotel vacation total monthly value (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `hotel | vacation`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
+  
   return formatMoney(totalValue);
 }
 
@@ -1273,6 +1387,17 @@ function calculateHotelTotalVacationTotalLocal(year, months) {
     const totalValue = calculateTotalVacationValue(row, year, months, getMonthlyCountValueLocal);
     return sum + parseFloat(totalValue) || 0;
   }, 0);
+  
+  // Cache hotel vacation total yearly total (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `hotel | vacation`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalValue);
 }
@@ -1283,6 +1408,17 @@ function calculateHotelTotalRelocationMonthlyLocal(year, month) {
     return sum + parseFloat(monthlyValue) || 0;
   }, 0);
   
+  // Cache hotel relocation total monthly value (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `hotel | relocation`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
+  
   return formatMoney(totalValue);
 }
 
@@ -1291,6 +1427,17 @@ function calculateHotelTotalRelocationTotalLocal(year, months) {
     const totalValue = calculateTotalRelocationValue(row, year, months, getMonthlyCountValueLocal);
     return sum + parseFloat(totalValue) || 0;
   }, 0);
+  
+  // Cache hotel relocation total yearly total (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `hotel | relocation`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalValue);
 }
@@ -1301,6 +1448,17 @@ function calculateHotelTotalSeverenceIndemnityMonthlyLocal(year, month) {
     return sum + parseFloat(monthlyValue) || 0;
   }, 0);
   
+  // Cache hotel severence indemnity total monthly value (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `hotel | severence & indemnity`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
+  
   return formatMoney(totalValue);
 }
 
@@ -1309,6 +1467,17 @@ function calculateHotelTotalSeverenceIndemnityTotalLocal(year, months) {
     const totalValue = calculateTotalSeverenceIndemnityValue(row, year, months, getMonthlyCountValueLocal);
     return sum + parseFloat(totalValue) || 0;
   }, 0);
+  
+  // Cache hotel severence indemnity total yearly total (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `hotel | severence & indemnity`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalValue);
 }
@@ -1319,6 +1488,17 @@ function calculateHotelTotalOtherMonthlyLocal(year, month) {
     return sum + parseFloat(monthlyValue) || 0;
   }, 0);
   
+  // Cache hotel other total monthly value (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `hotel | other`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
+  
   return formatMoney(totalValue);
 }
 
@@ -1327,6 +1507,17 @@ function calculateHotelTotalOtherTotalLocal(year, months) {
     const totalValue = calculateTotalOtherValue(row, year, months, getMonthlyCountValueLocal);
     return sum + parseFloat(totalValue) || 0;
   }, 0);
+  
+  // Cache hotel other total yearly total (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalValue > 0) {
+      const rowCode = `hotel | other`;
+      calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalValue);
 }
