@@ -165,8 +165,8 @@
             <NoProjectSelectedState />
           </div>
 
-          <!-- No Data State -->
-          <div v-else-if="expenseData.status === 'no_data'">
+          <!-- No Data State (only when no default expenses exist) -->
+          <div v-else-if="expenseData.status === 'no_data' && (!defaultExpenses || defaultExpenses.length === 0)">
             <NoDataState :project="expenseData.project" @add-expense="showAddExpenseModal = true" />
           </div>
 
@@ -176,7 +176,7 @@
           </div>
 
           <!-- Table Header with Stats -->
-          <template v-else-if="visibleYears.length && hasDataForSelectedYears">
+          <template v-else-if="visibleYears.length">
             <div class="mb-4">
               <div class="flex items-center gap-2">
                 <div class="flex items-center gap-2">
@@ -422,25 +422,7 @@
             </div>
           </template>
 
-          <!-- No Data for Selected Years State -->
-          <template v-else-if="visibleYears.length && !hasDataForSelectedYears">
-            <div class="flex flex-col items-center justify-center min-h-[400px] bg-white border-2 border-dashed border-violet-300 rounded-xl shadow-sm">
-              <div class="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mb-4">
-                <Receipt class="w-8 h-8 text-blue-600" />
-              </div>
-              <h3 class="text-lg text-gray-800 font-semibold mb-2">No Expense Data Found</h3>
-              <p class="text-gray-600 text-center max-w-md leading-relaxed text-sm">
-                No expense data found for the selected years ({{ fromYear }} - {{ toYear }}) in project <span class="font-semibold text-violet-600">{{ selectedProject?.project_name }}</span>.
-              </p>
-              <button 
-                @click="showAddExpenseModal = true"
-                class="mt-4 flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-lg hover:from-violet-600 hover:to-violet-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-              >
-                <Plus class="w-4 h-4" />
-                Add First Expense
-              </button>
-            </div>
-          </template>
+          
           
           <!-- Enhanced No Years Selected State -->
           <template v-else>
@@ -928,37 +910,8 @@ function getVisibleExpenses(expensesArray) {
   return (expensesArray || []).filter((name) => !deleted.has(name));
 }
 
-// Check if there's data for the selected years
-const hasDataForSelectedYears = computed(() => {
-  // If we have default expenses, always return true to show them
-  if (defaultExpenses.value.length > 0) {
-    return true;
-  }
-  
-  // If no years are selected, return false (unless we have default expenses)
-  if (!visibleYears.value.length) {
-    return false;
-  }
-  
-  // If expenseData has a status (error, no_data, etc.), return false
-  if (expenseData.value.status) {
-    return false;
-  }
-  
-  // Check if there's any data for the selected years
-  for (const year of visibleYears.value) {
-    if (expenseData.value[year] && Object.keys(expenseData.value[year]).length > 0) {
-      // Check if any month has data
-      for (const month in expenseData.value[year]) {
-        if (expenseData.value[year][month] && expenseData.value[year][month].length > 0) {
-          return true;
-        }
-      }
-    }
-  }
-  
-  return false;
-});
+// Removed hasDataForSelectedYears check; table now shows when years are selected,
+// and default expenses will render when present
 
 // Computed property to get column labels for a specific year
 const getColumnLabelsForYearLocal = (year) => {
