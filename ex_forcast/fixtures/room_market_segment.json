@@ -182,6 +182,24 @@
  {
   "docstatus": 0,
   "doctype": "Room Market Segment",
+  "market_segment": "Groups Corporate",
+  "modified": "2025-07-01 13:10:22.582560",
+  "module": "Ex Forcast",
+  "name": "Groups Corporate",
+  "segment_category": "GROUP ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
+  "market_segment": "Groups Sports",
+  "modified": "2025-07-01 13:11:52.241949",
+  "module": "Ex Forcast",
+  "name": "Groups Sports",
+  "segment_category": "GROUP ROOMS REVENUE"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Room Market Segment",
   "market_segment": "Hotel Discount",
   "modified": "2025-07-01 13:03:45.952828",
   "module": "Ex Forcast",
@@ -205,24 +223,6 @@
   "module": "Ex Forcast",
   "name": "Global Promotion",
   "segment_category": "DISCOUNT"
- },
- {
-  "docstatus": 0,
-  "doctype": "Room Market Segment",
-  "market_segment": "Groups Corporate",
-  "modified": "2025-07-01 13:10:22.582560",
-  "module": "Ex Forcast",
-  "name": "Groups Corporate",
-  "segment_category": "GROUP ROOMS REVENUE"
- },
- {
-  "docstatus": 0,
-  "doctype": "Room Market Segment",
-  "market_segment": "Groups Sports",
-  "modified": "2025-07-01 13:11:52.241949",
-  "module": "Ex Forcast",
-  "name": "Groups Sports",
-  "segment_category": "GROUP ROOMS REVENUE"
  },
  {
   "docstatus": 0,

@@ -1,13 +1,5 @@
 [
  {
-  "department_location": "Front Office",
-  "docstatus": 0,
-  "doctype": "Payroll Department Location",
-  "modified": "2025-08-08 01:19:15.314971",
-  "module": "Ex Forcast",
-  "name": "Front Office"
- },
- {
   "department_location": "Housekeeping & Laundry",
   "docstatus": 0,
   "doctype": "Payroll Department Location",
@@ -230,5 +222,13 @@
   "modified": "2025-08-14 15:40:29.814906",
   "module": "Ex Forcast",
   "name": "Loading / Receiving Area"
+ },
+ {
+  "department_location": "Front Office",
+  "docstatus": 0,
+  "doctype": "Payroll Department Location",
+  "modified": "2025-08-08 01:19:15.314971",
+  "module": "Ex Forcast",
+  "name": "Front Office"
  }
 ]
