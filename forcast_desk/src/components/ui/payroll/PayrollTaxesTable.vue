@@ -253,11 +253,17 @@ import { getPayrollRowsForLocation } from '@/components/utility/payroll/payroll_
 // Import the standardized calculation functions from payroll utility
 import {
   calculateSubTotalManagementCount,
+  calculateSubTotalManagement,
   calculateSubTotalNonManagementCount,
+  calculateSubTotalNonManagement,
   calculateLocationTotalCount,
+  calculateLocationTotal,
   calculateHotelTotal,
   calculateEmployeeRoomRatio
 } from '@/components/utility/payroll/payroll_calculations.js';
+// Import calculation cache and project service for NSSF caching
+import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+import { selectedProject } from '@/components/utility/dashboard/projectService.js';
 
 // Props
 const props = defineProps({
@@ -294,6 +300,9 @@ const props = defineProps({
     default: () => {}
   }
 });
+
+// Initialize calculation cache for NSSF values
+const calculationCache = useCalculationCache();
 
 // Debug reactive data
 // const debugData = computed(() => {
@@ -485,6 +494,24 @@ function calculateNSSFMonthlyValue(row, month) {
   const monthlyCount = getMonthlyCountForRow(row, month);
   
   const nssfValue = taxTotal * monthlyCount;
+  
+  // Cache NSSF monthly value per designation and month (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    const designation = (row.designation || '').toString();
+    const position = (row.position || '').toString();
+    const location = (row.departmentLocation || '').toString();
+    
+    if (nssfValue > 0) {
+      const rowCode = `NSSF|position:${position}|location:${location}|designation:${designation}`;
+      // Use the correct year from visibleYears instead of current year
+      const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, nssfValue);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
+  
   // console.log('calculateNSSFMonthlyValue:', { rowId: row.id, month, taxTotal, monthlyCount, nssfValue });
   return formatMoney(nssfValue);
 }
@@ -498,6 +525,23 @@ function calculateNSSFTotalValue(row) {
     const monthlyCount = getMonthlyCountForRow(row, month);
     totalNSSF += taxTotal * monthlyCount;
   });
+  
+  // Cache NSSF yearly total per designation (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    const designation = (row.designation || '').toString();
+    const position = (row.position || '').toString();
+    const location = (row.departmentLocation || '').toString();
+    
+    if (totalNSSF > 0) {
+      const rowCode = `NSSF Year|position:${position}|location:${location}|designation:${designation}`;
+      // Use the correct year from visibleYears instead of current year
+      const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSF);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   // console.log('calculateNSSFTotalValue:', { rowId: row.id, totalNSSF });
   return formatMoney(totalNSSF);
@@ -516,6 +560,19 @@ function calculateSubTotalManagementNSSFMonthly(category, location, month) {
     totalNSSF += taxTotal * monthlyCount;
   });
   
+  // Cache management subtotal NSSF monthly value (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalNSSF > 0) {
+      const rowCode = `NSSF Management Subtotal|category:${category}|location:${location}`;
+      // Use the correct year from visibleYears instead of current year
+      const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSF);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
+  
   return formatMoney(totalNSSF);
 }
 
@@ -525,6 +582,19 @@ function calculateSubTotalManagementNSSFTotal(category, location) {
   props.months.forEach(month => {
     totalNSSF += parseFloat(calculateSubTotalManagementNSSFMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
   });
+  
+  // Cache management subtotal NSSF yearly total (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalNSSF > 0) {
+      const rowCode = `NSSF Management Subtotal Year|category:${category}|location:${location}`;
+      // Use the correct year from visibleYears instead of current year
+      const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSF);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalNSSF);
 }
@@ -541,6 +611,19 @@ function calculateSubTotalNonManagementNSSFMonthly(category, location, month) {
     totalNSSF += taxTotal * monthlyCount;
   });
   
+  // Cache non-management subtotal NSSF monthly value (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalNSSF > 0) {
+      const rowCode = `NSSF Non-Management Subtotal|category:${category}|location:${location}`;
+      // Use the correct year from visibleYears instead of current year
+      const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSF);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
+  
   return formatMoney(totalNSSF);
 }
 
@@ -550,6 +633,19 @@ function calculateSubTotalNonManagementNSSFTotal(category, location) {
   props.months.forEach(month => {
     totalNSSF += parseFloat(calculateSubTotalNonManagementNSSFMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
   });
+  
+  // Cache non-management subtotal NSSF yearly total (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalNSSF > 0) {
+      const rowCode = `NSSF Non-Management Subtotal Year|category:${category}|location:${location}`;
+      // Use the correct year from visibleYears instead of current year
+      const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSF);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalNSSF);
 }
@@ -564,6 +660,19 @@ function calculateLocationTotalNSSFMonthly(category, location, month) {
     totalNSSF += taxTotal * monthlyCount;
   });
   
+  // Cache location total NSSF monthly value (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalNSSF > 0) {
+      const rowCode = `NSSF Location Total|category:${category}|location:${location}`;
+      // Use the correct year from visibleYears instead of current year
+      const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSF);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
+  
   return formatMoney(totalNSSF);
 }
 
@@ -573,6 +682,19 @@ function calculateLocationTotalNSSFTotal(category, location) {
   props.months.forEach(month => {
     totalNSSF += parseFloat(calculateLocationTotalNSSFMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
   });
+  
+  // Cache location total NSSF yearly total (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalNSSF > 0) {
+      const rowCode = `NSSF Location Total Year|category:${category}|location:${location}`;
+      // Use the correct year from visibleYears instead of current year
+      const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSF);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
   
   return formatMoney(totalNSSF);
 }
@@ -586,6 +708,19 @@ function calculateHotelTotalNSSFMonthly(month) {
     totalNSSF += taxTotal * monthlyCount;
   });
   
+  // Cache hotel total NSSF monthly value (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalNSSF > 0) {
+      const rowCode = `NSSF`;
+      // Use the correct year from visibleYears instead of current year
+      const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSF);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
+  
   return formatMoney(totalNSSF);
 }
 
@@ -596,6 +731,19 @@ function calculateHotelTotalNSSFTotal() {
     totalNSSF += parseFloat(calculateHotelTotalNSSFMonthly(month).replace(/[^0-9.-]/g, '')) || 0;
   });
   
+  // Cache hotel total NSSF yearly total (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (totalNSSF > 0) {
+      const rowCode = `NSSF Hotel Total Year`;
+      // Use the correct year from visibleYears instead of current year
+      const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSF);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
+  
   return formatMoney(totalNSSF);
 }
 
@@ -603,22 +751,50 @@ function calculateEmployeeRoomRatioNSSFMonthly(month) {
   const hotelTotalNSSF = parseFloat(calculateHotelTotalNSSFMonthly(month).replace(/[^0-9.-]/g, '')) || 0;
   const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
   
+  let ratioNSSF = 0;
   if (totalRooms > 0) {
-    return formatMoney(hotelTotalNSSF / totalRooms);
+    ratioNSSF = hotelTotalNSSF / totalRooms;
   }
   
-  return formatMoney(0);
+  // Cache employee room ratio NSSF monthly value (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (ratioNSSF > 0) {
+      const rowCode = `NSSF Employee Room Ratio`;
+      // Use the correct year from visibleYears instead of current year
+      const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, ratioNSSF);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
+  
+  return formatMoney(ratioNSSF);
 }
 
 function calculateEmployeeRoomRatioNSSFTotal() {
   const hotelTotalNSSF = parseFloat(calculateHotelTotalNSSFTotal().replace(/[^0-9.-]/g, '')) || 0;
   const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
   
+  let ratioNSSF = 0;
   if (totalRooms > 0) {
-    return formatMoney(hotelTotalNSSF / totalRooms);
+    ratioNSSF = hotelTotalNSSF / totalRooms;
   }
   
-  return formatMoney(0);
+  // Cache employee room ratio NSSF yearly total (> 0 only)
+  try {
+    const projectId = selectedProject.value?.project_name || 'default';
+    if (ratioNSSF > 0) {
+      const rowCode = `NSSF Employee Room Ratio Year`;
+      // Use the correct year from visibleYears instead of current year
+      const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', ratioNSSF);
+    }
+  } catch (e) {
+    // Silently handle caching errors
+  }
+  
+  return formatMoney(ratioNSSF);
 }
 
 // Force reactivity by accessing debugData

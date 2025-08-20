@@ -90,14 +90,14 @@ export function handleTaxTotalInput(row, event, payrollData, visibleYears) {
   // Store in payrollData for persistence
   if (visibleYears.length > 0) {
     const year = visibleYears[0];
-    if (!payrollData.value[year]) {
-      payrollData.value[year] = {};
+    if (!payrollData[year]) {
+      payrollData[year] = {};
     }
-    if (!payrollData.value[year][row.id]) {
-      payrollData.value[year][row.id] = {};
+    if (!payrollData[year][row.id]) {
+      payrollData[year][row.id] = {};
     }
-    payrollData.value[year][row.id].tax_total = parseFloat(value) || 0;
-    payrollData.value[year][row.id]._lastUpdate = Date.now();
+    payrollData[year][row.id].tax_total = parseFloat(value) || 0;
+    payrollData[year][row.id]._lastUpdate = Date.now();
   }
 }
 
@@ -123,14 +123,14 @@ export function handleTaxTotalBlur(row, event, isSaved, payrollData, visibleYear
     // Store in payrollData
     if (visibleYears.length > 0) {
       const year = visibleYears[0];
-      if (!payrollData.value[year]) {
-        payrollData.value[year] = {};
+      if (!payrollData[year]) {
+        payrollData[year] = {};
       }
-      if (!payrollData.value[year][row.id]) {
-        payrollData.value[year][row.id] = {};
+      if (!payrollData[year][row.id]) {
+        payrollData[year][row.id] = {};
       }
-      payrollData.value[year][row.id].tax_total = value;
-      payrollData.value[year][row.id]._lastUpdate = Date.now();
+      payrollData[year][row.id].tax_total = value;
+      payrollData[year][row.id]._lastUpdate = Date.now();
     }
   } else {
     event.target.textContent = '0.00';

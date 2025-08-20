@@ -394,7 +394,7 @@
                     </td>
                     <!-- Telephone Total for subtotal -->
                     <td class="px-2 py-1.5 text-right border border-blue-300 bg-gradient-to-r from-blue-100 to-blue-200 font-semibold">
-                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementTelephoneTotalLocal(category, location, visibleYears[0], monthsList) }}</span>
+                      <span class="font-mono text-xs text-blue-900">{{ calculateSubTotalManagementTelephoneTotalLocal(category, location, visibleYears[0], month) }}</span>
                     </td>
                     </template>
                     <!-- Air Ticket Monthly cells for subtotal -->
@@ -914,6 +914,10 @@
     calculateTotalBenefitsOtherValue
   } from '@/components/utility/payroll_related/calculation_handlers.js';
 
+  // Import calculation cache for performance optimization
+  import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+  import { selectedProject } from '@/components/utility/dashboard/projectService.js';
+
   // Props
   const props = defineProps({
     payrollRows: {
@@ -940,6 +944,9 @@
 
   // Computed property to ensure months are reactive
   const monthsList = computed(() => props.months || ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]);
+
+  // Initialize calculation cache and project service
+  const calculationCache = useCalculationCache();
 
   // Computed properties to check if columns have data
   const hasMedicalData = computed(() => {
@@ -1317,6 +1324,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (medicalBase * monthlyCount);
     }, 0);
+    
+    // Cache medical management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | medical`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1327,6 +1346,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (uniformsBase * monthlyCount);
     }, 0);
+    
+    // Cache uniforms management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | uniforms`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1337,6 +1368,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (employeeMealBase * monthlyCount);
     }, 0);
+    
+    // Cache employee meal management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | employee_meal`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1347,6 +1390,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (transportBase * monthlyCount);
     }, 0);
+    
+    // Cache transport management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | transport`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1357,6 +1412,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (telephoneBase * monthlyCount);
     }, 0);
+    
+    // Cache telephone management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | telephone`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1367,6 +1434,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (airTicketBase * monthlyCount);
     }, 0);
+    
+    // Cache air ticket management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | air_ticket`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1377,6 +1456,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (benefitsOtherBase * monthlyCount);
     }, 0);
+    
+    // Cache other benefits management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | other_benefits`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1391,6 +1482,18 @@
       }, 0);
       return sum + (medicalBase * totalCount);
     }, 0);
+    
+    // Cache medical management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | medical`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1405,6 +1508,18 @@
       }, 0);
       return sum + (uniformsBase * totalCount);
     }, 0);
+    
+    // Cache uniforms management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | uniforms`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1419,6 +1534,18 @@
       }, 0);
       return sum + (employeeMealBase * totalCount);
     }, 0);
+    
+    // Cache employee meal management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | employee_meal`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1433,6 +1560,18 @@
       }, 0);
       return sum + (transportBase * totalCount);
     }, 0);
+    
+    // Cache transport management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | transport`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1447,6 +1586,18 @@
       }, 0);
       return sum + (telephoneBase * totalCount);
     }, 0);
+    
+    // Cache telephone management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | telephone`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1461,6 +1612,18 @@
       }, 0);
       return sum + (airTicketBase * totalCount);
     }, 0);
+    
+    // Cache air ticket management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | air_ticket`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1475,6 +1638,18 @@
       }, 0);
       return sum + (benefitsOtherBase * totalCount);
     }, 0);
+    
+    // Cache other benefits management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | other_benefits`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1486,6 +1661,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (medicalBase * monthlyCount);
     }, 0);
+    
+    // Cache medical non-management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | medical`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1496,6 +1683,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (uniformsBase * monthlyCount);
     }, 0);
+    
+    // Cache uniforms non-management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | uniforms`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1506,6 +1705,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (employeeMealBase * monthlyCount);
     }, 0);
+    
+    // Cache employee meal non-management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | employee_meal`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1516,6 +1727,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (transportBase * monthlyCount);
     }, 0);
+    
+    // Cache transport non-management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | transport`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1526,6 +1749,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (telephoneBase * monthlyCount);
     }, 0);
+    
+    // Cache telephone non-management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | telephone`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1536,6 +1771,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (airTicketBase * monthlyCount);
     }, 0);
+    
+    // Cache air ticket non-management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | air_ticket`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1546,6 +1793,18 @@
       const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
       return sum + (benefitsOtherBase * monthlyCount);
     }, 0);
+    
+    // Cache other benefits non-management subtotal monthly value (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | other_benefits`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, month, totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1560,6 +1819,18 @@
       }, 0);
       return sum + (medicalBase * totalCount);
     }, 0);
+    
+    // Cache medical non-management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | medical`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1574,6 +1845,18 @@
       }, 0);
       return sum + (uniformsBase * totalCount);
     }, 0);
+    
+    // Cache uniforms non-management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | uniforms`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1588,6 +1871,18 @@
       }, 0);
       return sum + (employeeMealBase * totalCount);
     }, 0);
+    
+    // Cache employee meal non-management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | employee_meal`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1602,6 +1897,18 @@
       }, 0);
       return sum + (transportBase * totalCount);
     }, 0);
+    
+    // Cache transport non-management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | transport`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1616,6 +1923,18 @@
       }, 0);
       return sum + (telephoneBase * totalCount);
     }, 0);
+    
+    // Cache telephone non-management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | telephone`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1630,6 +1949,18 @@
       }, 0);
       return sum + (airTicketBase * totalCount);
     }, 0);
+    
+    // Cache air ticket non-management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | air_ticket`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 
@@ -1644,6 +1975,18 @@
       }, 0);
       return sum + (benefitsOtherBase * totalCount);
     }, 0);
+    
+    // Cache other benefits non-management subtotal yearly total (> 0 only)
+    try {
+      const projectId = selectedProject.value?.project_name || 'default';
+      if (totalValue > 0) {
+        const rowCode = `category: ${category} | other_benefits`;
+        calculationCache.setValue(projectId, 'Payroll Related', rowCode, year, 'Total', totalValue);
+      }
+    } catch (e) {
+      // Silently handle caching errors
+    }
+    
     return formatMoney(totalValue);
   }
 

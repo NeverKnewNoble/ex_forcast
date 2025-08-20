@@ -758,6 +758,364 @@
               </tr>
             </template>
 
+            <!-- Payroll Related Sub Header -->
+            <tr class="bg-blue-50 border-b border-blue-200">
+              <td class="px-3 py-2 font-semibold border-r border-blue-200">
+                <div class="flex items-center gap-1">
+                  Payroll Related
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'payroll-related-subheader-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td
+                    v-for="label in getColumnLabelsForYear(year)"
+                    :key="'payroll-related-subheader-cell-' + year + '-' + label"
+                    class="px-2 py-1 text-center border border-blue-200 bg-blue-50"
+                  ></td>
+                  <td class="px-2 py-1 text-center border border-blue-200 bg-blue-100"></td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-center border border-blue-200 bg-blue-100"></td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- NSSF Row -->
+            <tr class="bg-white border-b border-blue-200">
+              <td class="px-3 py-2 border-r border-blue-200">
+                <div class="flex items-center gap-1">
+                  NSSF
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'nssf-row-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td
+                    v-for="label in getColumnLabelsForYear(year)"
+                    :key="'nssf-cell-' + year + '-' + label"
+                    class="px-2 py-1 text-right border border-blue-200 bg-white"
+                  >
+                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'NSSF')) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'NSSF')) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'NSSF')) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Vacation Row -->
+            <tr class="bg-white border-b border-blue-200">
+              <td class="px-3 py-2 border-r border-blue-200">
+                <div class="flex items-center gap-1">
+                  Vacation
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'vacation-row-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td
+                    v-for="label in getColumnLabelsForYear(year)"
+                    :key="'vacation-cell-' + year + '-' + label"
+                    class="px-2 py-1 text-right border border-blue-200 bg-white"
+                  >
+                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Vacation')) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Vacation')) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Vacation')) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Relocation Row -->
+            <tr class="bg-white border-b border-blue-200">
+              <td class="px-3 py-2 border-r border-blue-200">
+                <div class="flex items-center gap-1">
+                  Relocation
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'relocation-row-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td
+                    v-for="label in getColumnLabelsForYear(year)"
+                    :key="'relocation-cell-' + year + '-' + label"
+                    class="px-2 py-1 text-right border border-blue-200 bg-white"
+                  >
+                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Relocation')) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Relocation')) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Relocation')) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Severence & Indemnity Row -->
+            <tr class="bg-white border-b border-blue-200">
+              <td class="px-3 py-2 border-r border-blue-200">
+                <div class="flex items-center gap-1">
+                  Severence & Indemnity
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'severence-row-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td
+                    v-for="label in getColumnLabelsForYear(year)"
+                    :key="'severence-cell-' + year + '-' + label"
+                    class="px-2 py-1 text-right border border-blue-200 bg-white"
+                  >
+                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Severence & Indemnity')) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Severence & Indemnity')) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Severence & Indemnity')) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Other Row -->
+            <tr class="bg-white border-b border-blue-200">
+              <td class="px-3 py-2 border-r border-blue-200">
+                <div class="flex items-center gap-1">
+                  Other
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'other-row-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td
+                    v-for="label in getColumnLabelsForYear(year)"
+                    :key="'other-cell-' + year + '-' + label"
+                    class="px-2 py-1 text-right border border-blue-200 bg-white"
+                  >
+                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Other')) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Other')) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Other')) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Medical Row -->
+            <tr class="bg-white border-b border-blue-200">
+              <td class="px-3 py-2 border-r border-blue-200">
+                <div class="flex items-center gap-1">
+                  Medical
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'medical-row-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td
+                    v-for="label in getColumnLabelsForYear(year)"
+                    :key="'medical-cell-' + year + '-' + label"
+                    class="px-2 py-1 text-right border border-blue-200 bg-white"
+                  >
+                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Medical')) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Medical')) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Medical')) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Uniforms Row -->
+            <tr class="bg-white border-b border-blue-200">
+              <td class="px-3 py-2 border-r border-blue-200">
+                <div class="flex items-center gap-1">
+                  Uniforms
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'uniforms-row-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td
+                    v-for="label in getColumnLabelsForYear(year)"
+                    :key="'uniforms-cell-' + year + '-' + label"
+                    class="px-2 py-1 text-right border border-blue-200 bg-white"
+                  >
+                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Uniforms')) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Uniforms')) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Uniforms')) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Employee Meal Row -->
+            <tr class="bg-white border-b border-blue-200">
+              <td class="px-3 py-2 border-r border-blue-200">
+                <div class="flex items-center gap-1">
+                  Employee Meal
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'employee-meal-row-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td
+                    v-for="label in getColumnLabelsForYear(year)"
+                    :key="'employee-meal-cell-' + year + '-' + label"
+                    class="px-2 py-1 text-right border border-blue-200 bg-white"
+                  >
+                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Employee Meal')) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Employee Meal')) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Employee Meal')) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Transport Row -->
+            <tr class="bg-white border-b border-blue-200">
+              <td class="px-3 py-2 border-r border-blue-200">
+                <div class="flex items-center gap-1">
+                  Transport
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'transport-row-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td
+                    v-for="label in getColumnLabelsForYear(year)"
+                    :key="'transport-cell-' + year + '-' + label"
+                    class="px-2 py-1 text-right border border-blue-200 bg-white"
+                  >
+                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Transport')) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Transport')) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Transport')) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Telephone Row -->
+            <tr class="bg-white border-b border-blue-200">
+              <td class="px-3 py-2 border-r border-blue-200">
+                <div class="flex items-center gap-1">
+                  Telephone
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'telephone-row-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td
+                    v-for="label in getColumnLabelsForYear(year)"
+                    :key="'telephone-cell-' + year + '-' + label"
+                    class="px-2 py-1 text-right border border-blue-200 bg-white"
+                  >
+                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Telephone')) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Telephone')) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Telephone')) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Air Ticket Row -->
+            <tr class="bg-white border-b border-blue-200">
+              <td class="px-3 py-2 border-r border-blue-200">
+                <div class="flex items-center gap-1">
+                  Air Ticket
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'air-ticket-row-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td
+                    v-for="label in getColumnLabelsForYear(year)"
+                    :key="'air-ticket-cell-' + year + '-' + label"
+                    class="px-2 py-1 text-right border border-blue-200 bg-white"
+                  >
+                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Air Ticket')) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Air Ticket')) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Air Ticket')) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Other Benefits Row -->
+            <tr class="bg-white border-b border-blue-200">
+              <td class="px-3 py-2 border-r border-blue-200">
+                <div class="flex items-center gap-1">
+                  Other Benefits
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'other-benefits-row-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td
+                    v-for="label in getColumnLabelsForYear(year)"
+                    :key="'other-benefits-cell-' + year + '-' + label"
+                    class="px-2 py-1 text-right border border-blue-200 bg-white"
+                  >
+                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Other Benefits')) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Other Benefits')) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                    <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Other Benefits')) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
         </tbody>
       </table>
       </div>
@@ -1954,6 +2312,78 @@ function hasSuiteData() {
 
 // All functions are automatically available in the template in Vue 3 composition API
 
+// ============================================================================
+// PAYROLL RELATED FUNCTIONS
+// ============================================================================
+
+// Get payroll related value for a specific benefit type, year, and period
+function getPayrollRelatedValue(year, label, benefitType) {
+  try {
+    const project = projectName.value;
+    const months = getMonthsForLabel(label);
+    let sum = 0;
+    
+    // Map benefit types to their corresponding page and rowCode in the cache
+    // Updated to match the actual cached row codes from SupplementaryPayTable.vue and EmployeeBenefitsTable.vue
+    const fieldMapping = {
+      'NSSF': { page: 'Payroll Taxes', rowCode: 'NSSF' },
+      'Vacation': { page: 'Payroll Related', rowCode: 'hotel | vacation' },
+      'Relocation': { page: 'Payroll Related', rowCode: 'hotel | relocation' },
+      'Severence & Indemnity': { page: 'Payroll Related', rowCode: 'hotel | severence & indemnity' },
+      'Other': { page: 'Payroll Related', rowCode: 'hotel | other' },
+      'Medical': { page: 'Payroll Related', rowCode: 'category: Rooms | medical' },
+      'Uniforms': { page: 'Payroll Related', rowCode: 'category: Rooms | uniforms' },
+      'Employee Meal': { page: 'Payroll Related', rowCode: 'category: Rooms | employee_meal' },
+      'Transport': { page: 'Payroll Related', rowCode: 'category: Rooms | transport' },
+      'Telephone': { page: 'Payroll Related', rowCode: 'category: Rooms | telephone' },
+      'Air Ticket': { page: 'Payroll Related', rowCode: 'category: Rooms | air_ticket' },
+      'Other Benefits': { page: 'Payroll Related', rowCode: 'category: Rooms | other_benefits' }
+    };
+    
+    const mapping = fieldMapping[benefitType];
+    if (!mapping) return 0;
+    
+    // Get data from the appropriate page cache using rowCode
+    for (const month of months) {
+      const val = calculationCache.getValue(project, mapping.page, mapping.rowCode, year, month);
+      
+      if (val !== undefined && val !== null) {
+        sum += getNumber(val);
+      }
+    }
+    
+    return sum;
+  } catch (error) {
+    console.error('Error fetching payroll related value:', benefitType, error);
+    return 0;
+  }
+}
+
+// Get payroll related total for a specific benefit type and year
+function getPayrollRelatedTotal(year, benefitType) {
+  try {
+    const labels = getColumnLabelsForYear(year);
+    return labels.reduce((sum, label) => sum + getNumber(getPayrollRelatedValue(year, label, benefitType)), 0);
+  } catch (error) {
+    console.error('Error calculating payroll related total:', benefitType, error);
+    return 0;
+  }
+}
+
+// Check if payroll related data exists for a specific benefit type
+function hasPayrollRelatedData(benefitType) {
+  if (!props.visibleYears || props.visibleYears.length === 0) return false;
+  
+  for (const year of props.visibleYears) {
+    const labels = getColumnLabelsForYear(year);
+    for (const label of labels) {
+      if (getPayrollRelatedValue(year, label, benefitType) > 0) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
 
 </script>
 
