@@ -1128,12 +1128,22 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   watch(bonusData, (newData, oldData) => {
     // console.log('bonusData changed:', newData);
     
+    // Clear cache when bonus data changes
+    if (selectedProject.value?.project_name) {
+      calculationCache.clearPageCache(selectedProject.value.project_name, 'Bonus');
+    }
+    
     // Make bonus data available globally for the utility functions
     window.__bonusData = newData;
   }, { deep: true, immediate: true });
   
   // Watch for changes in payrollRows to trigger reactive updates for monthly cells
   watch(payrollRows, (newRows, oldRows) => {
+    // Clear cache when payroll data changes
+    if (selectedProject.value?.project_name) {
+      calculationCache.clearPageCache(selectedProject.value.project_name, 'Bonus');
+    }
+    
     // Ensure payrollRows is always an array
     if (!newRows || !Array.isArray(newRows)) {
       payrollRows.value = [];
@@ -1197,7 +1207,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   const submitPayrollDataWrapper = async () => {
     await submitPayrollData(selectedProject.value, payrollRows.value, async () => {
       // Reload data after submission
-      await fetchPayrollData(selectedProject.value?.project_name);
+      await fetchPayrollData(selectedProject.value.project_name);
     });
   };
   
@@ -1248,6 +1258,15 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   watch(selectedProject, async (newProject, oldProject) => {
     // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
     
+    // Clear cache for old project if it exists
+    if (oldProject?.project_name) {
+      // Clear entire project cache
+      if (calculationCache.cache[oldProject.project_name]) {
+        delete calculationCache.cache[oldProject.project_name];
+        console.log('[CACHE CLEAR] Project cache cleared:', oldProject.project_name);
+      }
+    }
+    
     if (newProject) {
       try {
         // console.log('Reloading Payroll data for new project:', newProject.project_name);
@@ -1291,6 +1310,12 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     // Only reload if both years are selected and they've actually changed
     if (selectedProject.value && newFromYear && newToYear && 
         (newFromYear !== oldFromYear || newToYear !== oldToYear)) {
+      
+      // Clear cache for the current project and year range
+      if (selectedProject.value?.project_name) {
+        calculationCache.clearPageCache(selectedProject.value.project_name, 'Bonus');
+      }
+      
       try {
         await fetchPayrollData(selectedProject.value.project_name, newFromYear, newToYear);
         // Also load bonus data for the new year range
@@ -1708,19 +1733,23 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   }
   
   function safeCalculateHotelTotalBonusLocal(month) {
-    return safeCalculateHotelTotalBonus(payrollRows.value, month, visibleYears.value[0], getPayrollCellValueLocal);
+    const projectId = selectedProject.value?.project_name || 'default';
+    return safeCalculateHotelTotalBonus(payrollRows.value, month, visibleYears.value[0], getPayrollCellValueLocal, calculationCache, projectId);
   }
   
   function safeCalculateHotelTotalBonusTotalLocal() {
-    return safeCalculateHotelTotalBonusTotal(payrollRows.value, visibleYears.value[0], months, getPayrollCellValueLocal);
+    const projectId = selectedProject.value?.project_name || 'default';
+    return safeCalculateHotelTotalBonusTotal(payrollRows.value, visibleYears.value[0], months, getPayrollCellValueLocal, calculationCache, projectId);
   }
   
   function calculateEmployeeRoomRatioBonusLocal(payrollRows, totalRooms, month) {
-    return safeCalculateEmployeeRoomRatioBonus(payrollRows, totalRooms, month, visibleYears.value[0], getPayrollCellValueLocal);
+    const projectId = selectedProject.value?.project_name || 'default';
+    return safeCalculateEmployeeRoomRatioBonus(payrollRows, totalRooms, month, visibleYears.value[0], getPayrollCellValueLocal, calculationCache, projectId);
   }
   
   function calculateEmployeeRoomRatioBonusTotalLocal(payrollRows, totalRooms) {
-    return safeCalculateEmployeeRoomRatioBonusTotal(payrollRows, totalRooms, visibleYears.value[0], months, getPayrollCellValueLocal);
+    const projectId = selectedProject.value?.project_name || 'default';
+    return safeCalculateEmployeeRoomRatioBonusTotal(payrollRows, totalRooms, visibleYears.value[0], months, getPayrollCellValueLocal, calculationCache, projectId);
   }
   
   // Bonus percentage calculation functions - using imported functions

@@ -31,10 +31,10 @@
                   Count
                 </div>
               </th>
-              <!-- NSSF Column -->
+              <!-- NSSIT Column -->
               <th colspan="13" class="px-2 py-2 text-center border-x-2 border-white font-semibold text-sm">
                 <div class="flex items-center justify-center gap-1">
-                  <span class="font-semibold">NSSF</span>
+                  <span class="font-semibold">NSSIT</span>
                 </div>
               </th>
             </tr>
@@ -42,7 +42,7 @@
               <!-- Monthly Sub-columns -->
               <th 
                 v-for="month in months" 
-                :key="'nssf-' + month"
+                :key="'nssit-' + month"
                 class="px-2 py-1 text-center border border-green-300 min-w-[80px] font-medium"
               >
                 {{ month }}
@@ -94,17 +94,17 @@
               <td class="px-3 py-2 text-right border-r border-green-200 font-mono text-sm">
                       {{ row.count }}
                     </td>
-                    <!-- NSSF Monthly Values -->
+                    <!-- NSSIT Monthly Values -->
                     <td 
                       v-for="month in months" 
-                      :key="'nssf-value-' + month + '-' + row.id"
+                      :key="'nssit-value-' + month + '-' + row.id"
                       class="px-2 py-1 text-right border border-green-200 hover:bg-green-50 outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
                     >
-                      <span class="font-mono text-xs text-green-700">{{ calculateNSSFMonthlyValue(row, month) }}</span>
+                      <span class="font-mono text-xs text-green-700">{{ calculateNSSITMonthlyValue(row, month) }}</span>
                     </td>
-                    <!-- NSSF Total -->
+                    <!-- NSSIT Total -->
                     <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-50">
-                      <span class="font-mono text-xs text-green-900">{{ calculateNSSFTotalValue(row) }}</span>
+                      <span class="font-mono text-xs text-green-900">{{ calculateNSSITTotalValue(row) }}</span>
                     </td>
                   </tr>
                 </template>
@@ -123,14 +123,14 @@
                   <!-- Monthly cells for subtotal -->
                   <td 
                     v-for="month in months" 
-                    :key="'subtotal-mgmt-nssf-' + month"
+                    :key="'subtotal-mgmt-nssit-' + month"
                     class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
                   >
-                    <span class="font-mono text-xs text-green-900">{{ calculateSubTotalManagementNSSFMonthly(category, location, month) }}</span>
+                    <span class="font-mono text-xs text-green-900">{{ calculateSubTotalManagementNSSITMonthly(category, location, month) }}</span>
                   </td>
-                  <!-- NSSF Total for subtotal -->
+                  <!-- NSSIT Total for subtotal -->
                   <td class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold">
-                    <span class="font-mono text-xs text-green-900">{{ calculateSubTotalManagementNSSFTotal(category, location) }}</span>
+                    <span class="font-mono text-xs text-green-900">{{ calculateSubTotalManagementNSSITTotal(category, location) }}</span>
                   </td>
                 </tr>
                 
@@ -148,14 +148,14 @@
                   <!-- Monthly cells for subtotal -->
                   <td 
                     v-for="month in months" 
-                    :key="'subtotal-nonmgmt-nssf-' + month"
+                    :key="'subtotal-nonmgmt-nssit-' + month"
                     class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold"
                   >
-                    <span class="font-mono text-xs text-green-900">{{ calculateSubTotalNonManagementNSSFMonthly(category, location, month) }}</span>
+                    <span class="font-mono text-xs text-green-900">{{ calculateSubTotalNonManagementNSSITMonthly(category, location, month) }}</span>
                   </td>
-                  <!-- NSSF Total for subtotal -->
+                  <!-- NSSIT Total for subtotal -->
                   <td class="px-2 py-1.5 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-semibold">
-                    <span class="font-mono text-xs text-green-900">{{ calculateSubTotalNonManagementNSSFTotal(category, location) }}</span>
+                    <span class="font-mono text-xs text-green-900">{{ calculateSubTotalNonManagementNSSITTotal(category, location) }}</span>
                   </td>
                 </tr>
                 
@@ -173,14 +173,14 @@
                   <!-- Monthly cells for total -->
                   <td 
                     v-for="month in months" 
-                    :key="'total-nssf-' + month"
+                    :key="'total-nssit-' + month"
                     class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
                   >
-                    <span class="font-mono text-xs text-green-900">{{ calculateLocationTotalNSSFMonthly(category, location, month) }}</span>
+                    <span class="font-mono text-xs text-green-900">{{ calculateLocationTotalNSSITMonthly(category, location, month) }}</span>
                   </td>
-                  <!-- NSSF Total for total -->
+                  <!-- NSSIT Total for total -->
                   <td class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold">
-                    <span class="font-mono text-xs text-green-900">{{ calculateLocationTotalNSSFTotal(category, location) }}</span>
+                    <span class="font-mono text-xs text-green-900">{{ calculateLocationTotalNSSITTotal(category, location) }}</span>
                   </td>
                 </tr>
               </template>
@@ -204,14 +204,14 @@
               <!-- Monthly cells for hotel total -->
               <td 
                 v-for="month in months" 
-                :key="'hotel-nssf-' + month"
+                :key="'hotel-nssit-' + month"
                 class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
               >
-                <span class="font-mono text-xs text-green-900">{{ calculateHotelTotalNSSFMonthly(month) }}</span>
+                <span class="font-mono text-xs text-green-900">{{ calculateHotelTotalNSSITMonthly(month) }}</span>
               </td>
-              <!-- NSSF Total for hotel total -->
+              <!-- NSSIT Total for hotel total -->
               <td class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold">
-                <span class="font-mono text-xs text-green-900">{{ calculateHotelTotalNSSFTotal() }}</span>
+                <span class="font-mono text-xs text-green-900">{{ calculateHotelTotalNSSITTotal() }}</span>
               </td>
             </tr>
             
@@ -229,14 +229,14 @@
               <!-- Monthly cells for ratio -->
               <td 
                 v-for="month in months" 
-                :key="'ratio-nssf-' + month"
+                :key="'ratio-nssit-' + month"
                 class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold"
               >
-                <span class="font-mono text-xs text-green-900">{{ calculateEmployeeRoomRatioNSSFMonthly(month) }}</span>
+                <span class="font-mono text-xs text-green-900">{{ calculateEmployeeRoomRatioNSSITMonthly(month) }}</span>
               </td>
-              <!-- NSSF Total for ratio -->
+              <!-- NSSIT Total for ratio -->
               <td class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-green-200 font-bold">
-                <span class="font-mono text-xs text-green-900">{{ calculateEmployeeRoomRatioNSSFTotal() }}</span>
+                <span class="font-mono text-xs text-green-900">{{ calculateEmployeeRoomRatioNSSITTotal() }}</span>
               </td>
             </tr>
           </tbody>
@@ -261,7 +261,7 @@ import {
   calculateHotelTotal,
   calculateEmployeeRoomRatio
 } from '@/components/utility/payroll/payroll_calculations.js';
-// Import calculation cache and project service for NSSF caching
+  // Import calculation cache and project service for NSSIT caching
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
 import { selectedProject } from '@/components/utility/dashboard/projectService.js';
 
@@ -301,7 +301,7 @@ const props = defineProps({
   }
 });
 
-// Initialize calculation cache for NSSF values
+  // Initialize calculation cache for NSSIT values
 const calculationCache = useCalculationCache();
 
 // Debug reactive data
@@ -400,7 +400,7 @@ function calculateEmployeeRoomRatioLocal() {
   return calculateEmployeeRoomRatio(props.payrollRows, totalRooms);
 }
 
-// NSSF Calculation Functions - Made more reactive
+  // NSSIT Calculation Functions - Made more reactive
 function getTaxTotalForRow(row) {
   // Get the tax total from the Payroll_Related.vue data
   // This should match the calculation used in Payroll_Related.vue
@@ -488,313 +488,313 @@ function getMonthlyCountForRow(row, month) {
   return row.count || 0;
 }
 
-function calculateNSSFMonthlyValue(row, month) {
-  // NSSF Monthly Value = Tax Total × Monthly Count for that month
+function calculateNSSITMonthlyValue(row, month) {
+  // NSSIT Monthly Value = Tax Total × Monthly Count for that month
   const taxTotal = getTaxTotalForRow(row);
   const monthlyCount = getMonthlyCountForRow(row, month);
   
-  const nssfValue = taxTotal * monthlyCount;
+  const nssitValue = taxTotal * monthlyCount;
   
-  // Cache NSSF monthly value per designation and month (> 0 only)
+  // Cache NSSIT monthly value per designation and month (> 0 only)
   try {
     const projectId = selectedProject.value?.project_name || 'default';
     const designation = (row.designation || '').toString();
     const position = (row.position || '').toString();
     const location = (row.departmentLocation || '').toString();
     
-    if (nssfValue > 0) {
-      const rowCode = `NSSF|position:${position}|location:${location}|designation:${designation}`;
+    if (nssitValue > 0) {
+      const rowCode = `NSSIT|position:${position}|location:${location}|designation:${designation}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, nssfValue);
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, nssitValue);
     }
   } catch (e) {
     // Silently handle caching errors
   }
   
-  // console.log('calculateNSSFMonthlyValue:', { rowId: row.id, month, taxTotal, monthlyCount, nssfValue });
-  return formatMoney(nssfValue);
+  // console.log('calculateNSSITMonthlyValue:', { rowId: row.id, month, taxTotal, monthlyCount, nssitValue });
+  return formatMoney(nssitValue);
 }
 
-function calculateNSSFTotalValue(row) {
-  // Calculate total NSSF for the year by summing all monthly values
-  let totalNSSF = 0;
+function calculateNSSITTotalValue(row) {
+  // Calculate total NSSIT for the year by summing all monthly values
+  let totalNSSIT = 0;
   
   props.months.forEach(month => {
     const taxTotal = getTaxTotalForRow(row);
     const monthlyCount = getMonthlyCountForRow(row, month);
-    totalNSSF += taxTotal * monthlyCount;
+    totalNSSIT += taxTotal * monthlyCount;
   });
   
-  // Cache NSSF yearly total per designation (> 0 only)
+  // Cache NSSIT yearly total per designation (> 0 only)
   try {
     const projectId = selectedProject.value?.project_name || 'default';
     const designation = (row.designation || '').toString();
     const position = (row.position || '').toString();
     const location = (row.departmentLocation || '').toString();
     
-    if (totalNSSF > 0) {
-      const rowCode = `NSSF Year|position:${position}|location:${location}|designation:${designation}`;
+    if (totalNSSIT > 0) {
+      const rowCode = `NSSIT Year|position:${position}|location:${location}|designation:${designation}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSF);
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSIT);
     }
   } catch (e) {
     // Silently handle caching errors
   }
   
-  // console.log('calculateNSSFTotalValue:', { rowId: row.id, totalNSSF });
-  return formatMoney(totalNSSF);
+  // console.log('calculateNSSITTotalValue:', { rowId: row.id, totalNSSIT });
+  return formatMoney(totalNSSIT);
 }
 
-// NSSF Calculation Functions for Summary Rows
-function calculateSubTotalManagementNSSFMonthly(category, location, month) {
+// NSSIT Calculation Functions for Summary Rows
+function calculateSubTotalManagementNSSITMonthly(category, location, month) {
   const managementRows = getPayrollRowsForLocation(props.payrollRows, category, location).filter(row => 
     row.position === 'Manager'
   );
   
-  let totalNSSF = 0;
+  let totalNSSIT = 0;
   managementRows.forEach(row => {
     const taxTotal = getTaxTotalForRow(row);
     const monthlyCount = getMonthlyCountForRow(row, month);
-    totalNSSF += taxTotal * monthlyCount;
+    totalNSSIT += taxTotal * monthlyCount;
   });
   
-  // Cache management subtotal NSSF monthly value (> 0 only)
+  // Cache management subtotal NSSIT monthly value (> 0 only)
   try {
     const projectId = selectedProject.value?.project_name || 'default';
-    if (totalNSSF > 0) {
-      const rowCode = `NSSF Management Subtotal|category:${category}|location:${location}`;
+    if (totalNSSIT > 0) {
+      const rowCode = `NSSIT Management Subtotal|category:${category}|location:${location}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSF);
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSIT);
     }
   } catch (e) {
     // Silently handle caching errors
   }
   
-  return formatMoney(totalNSSF);
+  return formatMoney(totalNSSIT);
 }
 
-function calculateSubTotalManagementNSSFTotal(category, location) {
-  let totalNSSF = 0;
+function calculateSubTotalManagementNSSITTotal(category, location) {
+  let totalNSSIT = 0;
   
   props.months.forEach(month => {
-    totalNSSF += parseFloat(calculateSubTotalManagementNSSFMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
+    totalNSSIT += parseFloat(calculateSubTotalManagementNSSITMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
   });
   
-  // Cache management subtotal NSSF yearly total (> 0 only)
+  // Cache management subtotal NSSIT yearly total (> 0 only)
   try {
     const projectId = selectedProject.value?.project_name || 'default';
-    if (totalNSSF > 0) {
-      const rowCode = `NSSF Management Subtotal Year|category:${category}|location:${location}`;
+    if (totalNSSIT > 0) {
+      const rowCode = `NSSIT Management Subtotal Year|category:${category}|location:${location}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSF);
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSIT);
     }
   } catch (e) {
     // Silently handle caching errors
   }
   
-  return formatMoney(totalNSSF);
+  return formatMoney(totalNSSIT);
 }
 
-function calculateSubTotalNonManagementNSSFMonthly(category, location, month) {
+function calculateSubTotalNonManagementNSSITMonthly(category, location, month) {
   const nonManagementRows = getPayrollRowsForLocation(props.payrollRows, category, location).filter(row => 
     row.position !== 'Manager'
   );
   
-  let totalNSSF = 0;
+  let totalNSSIT = 0;
   nonManagementRows.forEach(row => {
     const taxTotal = getTaxTotalForRow(row);
     const monthlyCount = getMonthlyCountForRow(row, month);
-    totalNSSF += taxTotal * monthlyCount;
+    totalNSSIT += taxTotal * monthlyCount;
   });
   
-  // Cache non-management subtotal NSSF monthly value (> 0 only)
+  // Cache non-management subtotal NSSIT monthly value (> 0 only)
   try {
     const projectId = selectedProject.value?.project_name || 'default';
-    if (totalNSSF > 0) {
-      const rowCode = `NSSF Non-Management Subtotal|category:${category}|location:${location}`;
+    if (totalNSSIT > 0) {
+      const rowCode = `NSSIT Non-Management Subtotal|category:${category}|location:${location}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSF);
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSIT);
     }
   } catch (e) {
     // Silently handle caching errors
   }
   
-  return formatMoney(totalNSSF);
+  return formatMoney(totalNSSIT);
 }
 
-function calculateSubTotalNonManagementNSSFTotal(category, location) {
-  let totalNSSF = 0;
+function calculateSubTotalNonManagementNSSITTotal(category, location) {
+  let totalNSSIT = 0;
   
   props.months.forEach(month => {
-    totalNSSF += parseFloat(calculateSubTotalNonManagementNSSFMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
+    totalNSSIT += parseFloat(calculateSubTotalNonManagementNSSITMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
   });
   
-  // Cache non-management subtotal NSSF yearly total (> 0 only)
+  // Cache non-management subtotal NSSIT yearly total (> 0 only)
   try {
     const projectId = selectedProject.value?.project_name || 'default';
-    if (totalNSSF > 0) {
-      const rowCode = `NSSF Non-Management Subtotal Year|category:${category}|location:${location}`;
+    if (totalNSSIT > 0) {
+      const rowCode = `NSSIT Non-Management Subtotal Year|category:${category}|location:${location}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSF);
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSIT);
     }
   } catch (e) {
     // Silently handle caching errors
   }
   
-  return formatMoney(totalNSSF);
+  return formatMoney(totalNSSIT);
 }
 
-function calculateLocationTotalNSSFMonthly(category, location, month) {
+function calculateLocationTotalNSSITMonthly(category, location, month) {
   const locationRows = getPayrollRowsForLocation(props.payrollRows, category, location);
   
-  let totalNSSF = 0;
+  let totalNSSIT = 0;
   locationRows.forEach(row => {
     const taxTotal = getTaxTotalForRow(row);
     const monthlyCount = getMonthlyCountForRow(row, month);
-    totalNSSF += taxTotal * monthlyCount;
+    totalNSSIT += taxTotal * monthlyCount;
   });
   
-  // Cache location total NSSF monthly value (> 0 only)
+  // Cache location total NSSIT monthly value (> 0 only)
   try {
     const projectId = selectedProject.value?.project_name || 'default';
-    if (totalNSSF > 0) {
-      const rowCode = `NSSF Location Total|category:${category}|location:${location}`;
+    if (totalNSSIT > 0) {
+      const rowCode = `NSSIT Location Total|category:${category}|location:${location}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSF);
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSIT);
     }
   } catch (e) {
     // Silently handle caching errors
   }
   
-  return formatMoney(totalNSSF);
+  return formatMoney(totalNSSIT);
 }
 
-function calculateLocationTotalNSSFTotal(category, location) {
-  let totalNSSF = 0;
+function calculateLocationTotalNSSITTotal(category, location) {
+  let totalNSSIT = 0;
   
   props.months.forEach(month => {
-    totalNSSF += parseFloat(calculateLocationTotalNSSFMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
+    totalNSSIT += parseFloat(calculateLocationTotalNSSITMonthly(category, location, month).replace(/[^0-9.-]/g, '')) || 0;
   });
   
-  // Cache location total NSSF yearly total (> 0 only)
+  // Cache location total NSSIT yearly total (> 0 only)
   try {
     const projectId = selectedProject.value?.project_name || 'default';
-    if (totalNSSF > 0) {
-      const rowCode = `NSSF Location Total Year|category:${category}|location:${location}`;
+    if (totalNSSIT > 0) {
+      const rowCode = `NSSIT Location Total Year|category:${category}|location:${location}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSF);
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSIT);
     }
   } catch (e) {
     // Silently handle caching errors
   }
   
-  return formatMoney(totalNSSF);
+  return formatMoney(totalNSSIT);
 }
 
-function calculateHotelTotalNSSFMonthly(month) {
-  let totalNSSF = 0;
+function calculateHotelTotalNSSITMonthly(month) {
+  let totalNSSIT = 0;
   
   props.payrollRows.forEach(row => {
     const taxTotal = getTaxTotalForRow(row);
     const monthlyCount = getMonthlyCountForRow(row, month);
-    totalNSSF += taxTotal * monthlyCount;
+    totalNSSIT += taxTotal * monthlyCount;
   });
   
-  // Cache hotel total NSSF monthly value (> 0 only)
+  // Cache hotel total NSSIT monthly value (> 0 only)
   try {
     const projectId = selectedProject.value?.project_name || 'default';
-    if (totalNSSF > 0) {
-      const rowCode = `NSSF`;
+    if (totalNSSIT > 0) {
+      const rowCode = `NSSIT`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSF);
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSIT);
     }
   } catch (e) {
     // Silently handle caching errors
   }
   
-  return formatMoney(totalNSSF);
+  return formatMoney(totalNSSIT);
 }
 
-function calculateHotelTotalNSSFTotal() {
-  let totalNSSF = 0;
+function calculateHotelTotalNSSITTotal() {
+  let totalNSSIT = 0;
   
   props.months.forEach(month => {
-    totalNSSF += parseFloat(calculateHotelTotalNSSFMonthly(month).replace(/[^0-9.-]/g, '')) || 0;
+    totalNSSIT += parseFloat(calculateHotelTotalNSSITMonthly(month).replace(/[^0-9.-]/g, '')) || 0;
   });
   
-  // Cache hotel total NSSF yearly total (> 0 only)
+  // Cache hotel total NSSIT yearly total (> 0 only)
   try {
     const projectId = selectedProject.value?.project_name || 'default';
-    if (totalNSSF > 0) {
-      const rowCode = `NSSF Hotel Total Year`;
+    if (totalNSSIT > 0) {
+      const rowCode = `NSSIT Hotel Total Year`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSF);
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSIT);
     }
   } catch (e) {
     // Silently handle caching errors
   }
   
-  return formatMoney(totalNSSF);
+  return formatMoney(totalNSSIT);
 }
 
-function calculateEmployeeRoomRatioNSSFMonthly(month) {
-  const hotelTotalNSSF = parseFloat(calculateHotelTotalNSSFMonthly(month).replace(/[^0-9.-]/g, '')) || 0;
+function calculateEmployeeRoomRatioNSSITMonthly(month) {
+  const hotelTotalNSSIT = parseFloat(calculateHotelTotalNSSITMonthly(month).replace(/[^0-9.-]/g, '')) || 0;
   const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
   
-  let ratioNSSF = 0;
+  let ratioNSSIT = 0;
   if (totalRooms > 0) {
-    ratioNSSF = hotelTotalNSSF / totalRooms;
+    ratioNSSIT = hotelTotalNSSIT / totalRooms;
   }
   
-  // Cache employee room ratio NSSF monthly value (> 0 only)
+  // Cache employee room ratio NSSIT monthly value (> 0 only)
   try {
     const projectId = selectedProject.value?.project_name || 'default';
-    if (ratioNSSF > 0) {
-      const rowCode = `NSSF Employee Room Ratio`;
+    if (ratioNSSIT > 0) {
+      const rowCode = `NSSIT Employee Room Ratio`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, ratioNSSF);
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, ratioNSSIT);
     }
   } catch (e) {
     // Silently handle caching errors
   }
   
-  return formatMoney(ratioNSSF);
+  return formatMoney(ratioNSSIT);
 }
 
-function calculateEmployeeRoomRatioNSSFTotal() {
-  const hotelTotalNSSF = parseFloat(calculateHotelTotalNSSFTotal().replace(/[^0-9.-]/g, '')) || 0;
+function calculateEmployeeRoomRatioNSSITTotal() {
+  const hotelTotalNSSIT = parseFloat(calculateHotelTotalNSSITTotal().replace(/[^0-9.-]/g, '')) || 0;
   const totalRooms = parseInt(localStorage.getItem('totalRooms')) || 100;
   
-  let ratioNSSF = 0;
+  let ratioNSSIT = 0;
   if (totalRooms > 0) {
-    ratioNSSF = hotelTotalNSSF / totalRooms;
+    ratioNSSIT = hotelTotalNSSIT / totalRooms;
   }
   
-  // Cache employee room ratio NSSF yearly total (> 0 only)
+  // Cache employee room ratio NSSIT yearly total (> 0 only)
   try {
     const projectId = selectedProject.value?.project_name || 'default';
-    if (ratioNSSF > 0) {
-      const rowCode = `NSSF Employee Room Ratio Year`;
+    if (ratioNSSIT > 0) {
+      const rowCode = `NSSIT Employee Room Ratio Year`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', ratioNSSF);
+      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', ratioNSSIT);
     }
   } catch (e) {
     // Silently handle caching errors
   }
   
-  return formatMoney(ratioNSSF);
+  return formatMoney(ratioNSSIT);
 }
 
 // Force reactivity by accessing debugData
