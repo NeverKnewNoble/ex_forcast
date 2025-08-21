@@ -198,6 +198,10 @@
                 <RoomProfitLoss :visible-years="visibleYears" />
                             </div>
               
+              <div v-else-if="selectedReport === 'fnb-pnl'" class="mt-28">
+                <FoodBeverageProfitLoss :visible-years="visibleYears" />
+              </div>
+              
               <!-- Placeholder for other report types -->
               <div v-else class="mt-28 p-8 text-center text-gray-500">
                 <FileText class="w-16 h-16 mx-auto mb-4 text-gray-300" />
@@ -303,6 +307,7 @@
   import ReportSelector from '@/components/ui/reports/ReportSelector.vue';
   import SettingsModal from "@/components/ui/SettingsModal.vue";
   import RoomProfitLoss from '@/components/ui/reports/RoomProfitLoss.vue';
+  import FoodBeverageProfitLoss from '@/components/ui/reports/FoodBeverageProfitLoss.vue';
   
   // Icon imports
   import { 

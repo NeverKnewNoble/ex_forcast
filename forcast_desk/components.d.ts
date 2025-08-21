@@ -11,6 +11,8 @@ declare module 'vue' {
     Alert: typeof import('./src/components/ui/Alert.vue')['default']
     EmployeeBenefitsTable: typeof import('./src/components/ui/payroll/EmployeeBenefitsTable.vue')['default']
     ErrorState: typeof import('./src/components/ui/expense/ErrorState.vue')['default']
+    FnbProfitLoss: typeof import('./src/components/ui/reports/FnbProfitLoss.vue')['default']
+    FoodBeverageProfitLoss: typeof import('./src/components/ui/reports/FoodBeverageProfitLoss.vue')['default']
     LoadingState: typeof import('./src/components/ui/payroll/LoadingState.vue')['default']
     MarketSegmentationTables: typeof import('./src/components/ui/MarketSegmentationTables.vue')['default']
     NoDataState: typeof import('./src/components/ui/expense/NoDataState.vue')['default']
