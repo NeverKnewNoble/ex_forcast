@@ -9,6 +9,9 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Alert: typeof import('./src/components/ui/Alert.vue')['default']
+    CacheManager: typeof import('./src/components/ui/CacheManager.vue')['default']
+    DataCompletenessIndicator: typeof import('./src/components/ui/reports/DataCompletenessIndicator.vue')['default']
+    DataRecoveryModal: typeof import('./src/components/ui/DataRecoveryModal.vue')['default']
     EmployeeBenefitsTable: typeof import('./src/components/ui/payroll/EmployeeBenefitsTable.vue')['default']
     ErrorState: typeof import('./src/components/ui/expense/ErrorState.vue')['default']
     FnbProfitLoss: typeof import('./src/components/ui/reports/FnbProfitLoss.vue')['default']
@@ -21,6 +24,7 @@ declare module 'vue' {
     NoYearsSelectedState: typeof import('./src/components/ui/banquet/NoYearsSelectedState.vue')['default']
     PayrollRelatedTabs: typeof import('./src/components/ui/payroll/PayrollRelatedTabs.vue')['default']
     PayrollTaxesTable: typeof import('./src/components/ui/payroll/PayrollTaxesTable.vue')['default']
+    PerformanceMonitor: typeof import('./src/components/ui/payroll/PerformanceMonitor.vue')['default']
     ProjectSelector: typeof import('./src/components/ui/ProjectSelector.vue')['default']
     ReportSelector: typeof import('./src/components/ui/reports/ReportSelector.vue')['default']
     RoomProfitLoss: typeof import('./src/components/ui/reports/RoomProfitLoss.vue')['default']

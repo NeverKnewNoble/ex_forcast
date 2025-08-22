@@ -64,6 +64,59 @@
                   </div>
                 </div>
 
+                <!-- Data Status Section -->
+                <div class="mb-4 pt-4">
+                  <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <Database class="w-4 h-4 text-violet-600" />
+                    Data Status
+                  </h3>
+                  
+                  <!-- Loading State -->
+                  <div v-if="dataLoading" class="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <Loader2 class="w-4 h-4 text-blue-600 animate-spin" />
+                    <span class="text-sm text-blue-700">Loading report data...</span>
+                  </div>
+                  
+                  <!-- Error State -->
+                  <div v-else-if="dataError" class="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <AlertCircle class="w-4 h-4 text-red-600" />
+                    <span class="text-sm text-red-700">{{ dataError }}</span>
+                    <button 
+                      @click="loadReportData"
+                      class="ml-auto px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-all"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                  
+                  <!-- Success State -->
+                  <div v-else-if="dataCompleteness > 0" class="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <CheckCircle class="w-4 h-4 text-green-600" />
+                    <span class="text-sm text-green-700">Data loaded successfully</span>
+                    <div class="ml-auto flex items-center gap-2">
+                      <span class="text-xs text-green-600">{{ dataCompleteness }}% complete</span>
+                      <button 
+                        @click="loadReportData"
+                        class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition-all"
+                      >
+                        Refresh
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- No Data State -->
+                  <div v-else class="flex items-center gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <AlertTriangle class="w-4 h-4 text-yellow-600" />
+                    <span class="text-sm text-yellow-700">No report data available</span>
+                    <button 
+                      @click="loadReportData"
+                      class="ml-auto px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 transition-all"
+                    >
+                      Load Data
+                    </button>
+                  </div>
+                </div>
+
                 <!-- Action Buttons Section -->
                 <div class="mb-4 pt-4">
                   <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
@@ -92,6 +145,27 @@
                       <Printer class="w-4 h-4" />
                       Print
                     </button>
+                  </div>
+                  
+                  <!-- Debug Section -->
+                  <div class="mt-4 pt-4 border-t border-violet-200">
+                    <h4 class="text-xs font-medium text-violet-600 mb-2">Debug Tools</h4>
+                    <div class="flex gap-2">
+                      <button 
+                        @click="debugCache"
+                        class="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded-lg hover:bg-yellow-100 transition-all text-xs font-medium"
+                      >
+                        <Database class="w-3 h-3" />
+                        Debug Cache
+                      </button>
+                      <button 
+                        @click="debugReportData"
+                        class="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 text-blue-700 rounded-lg hover:bg-blue-100 transition-all text-xs font-medium"
+                      >
+                        <FileText class="w-3 h-3" />
+                        Debug Reports
+                      </button>
+                    </div>
                   </div>
                 </div>
   
@@ -339,11 +413,14 @@
     Save,
     Loader2,
     FileText,
-    Plus
+    Plus,
+    Database,
+    CheckCircle
   } from 'lucide-vue-next';
   
   // Service imports
   import alertService from "@/components/ui/ui_utility/alertService.js";
+  import reportDataService from "@/components/utility/reports/reportDataService.js";
   
   // Utility imports
   import {
@@ -415,6 +492,10 @@
   const showSettingsModal = ref(false);
   
   // Report-specific state will be added here as needed
+  const reportData = ref({});
+  const dataLoading = ref(false);
+  const dataError = ref(null);
+  const dataCompleteness = ref(0);
 
   // Department management functions will be added here as needed
   
@@ -490,14 +571,21 @@
   // ============================================================================
   // WATCHERS
   // ============================================================================
-  // Watch for changes in visible years to initialize advanced modes
-  watch(visibleYears, () => {
-    visibleYears.value.forEach(year => {
+  // Watch for changes in visible years to initialize advanced modes and load data
+  watch(visibleYears, async (newYears, oldYears) => {
+    // Initialize advanced modes for new years
+    newYears.forEach(year => {
       if (!advancedModes.value[year]) {
         // Use Pinia action to set mode for new years
         yearSettingsStore.setAdvancedMode(year, displayMode.value);
       }
     });
+    
+    // Load report data when years change (if project is selected)
+    if (selectedProject.value && newYears.length > 0 && 
+        (!oldYears || oldYears.length === 0 || JSON.stringify(newYears) !== JSON.stringify(oldYears))) {
+      await loadReportData();
+    }
   });
   
   // Watch for project changes to reload data
@@ -508,6 +596,8 @@
         expenseData.value = {};
         allExpensesData.value = [];
         expenses.value = [];
+        reportData.value = {};
+        dataCompleteness.value = 0;
         
         // Load departments for the new project
         await loadDepartments();
@@ -521,6 +611,11 @@
         // selectedReport.value = '';
         
         alertService.success(`Switched to project: ${newProject.project_name}`);
+        
+        // Auto-load report data for the new project if years are selected
+        if (visibleYears.value.length > 0) {
+          await loadReportData();
+        }
       } catch (error) {
         console.error("Error loading project data:", error);
         alertService.error("Failed to load project data. Please try again.");
@@ -571,12 +666,18 @@
       expenseData.value = {};
       allExpensesData.value = [];
       expenses.value = [];
+      reportData.value = {};
       
       isSaved.value = true;
       
       // Load departments and hydrate if a project is selected
       if (selectedProject.value) {
         await loadDepartments();
+        
+        // Auto-load report data if years are already selected
+        if (visibleYears.value.length > 0) {
+          await loadReportData();
+        }
       }
       
       // Check if we should show refresh success alert
@@ -678,7 +779,68 @@
   // ============================================================================
   // REPORT-SPECIFIC FUNCTIONS
   // ============================================================================
-  // Report-specific functions will be added here as needed
+  
+  /**
+   * Load all report data using the unified service
+   * This eliminates the need to visit other pages first
+   */
+  async function loadReportData() {
+    if (!selectedProject.value || !visibleYears.value.length) {
+      return;
+    }
+
+    try {
+      dataLoading.value = true;
+      dataError.value = null;
+      
+      console.log('Reports: Loading data for project:', selectedProject.value.project_name, 'years:', visibleYears.value);
+      
+      // Use the unified service to get all data
+      const unifiedData = await reportDataService.getReportData(
+        selectedProject.value.project_name, 
+        visibleYears.value
+      );
+      
+      reportData.value = unifiedData;
+      dataCompleteness.value = unifiedData.metadata?.dataCompleteness || 0;
+      
+      console.log('Reports: Successfully loaded unified data, completeness:', dataCompleteness.value + '%');
+      
+      // Show success message if data is loaded
+      if (dataCompleteness.value > 0) {
+        alertService.success(`Report data loaded successfully (${dataCompleteness.value}% complete)`);
+      }
+      
+    } catch (error) {
+      console.error('Reports: Error loading report data:', error);
+      dataError.value = error.message;
+      alertService.error(`Failed to load report data: ${error.message}`);
+    } finally {
+      dataLoading.value = false;
+    }
+  }
+
+  /**
+   * Load data for a specific report type
+   */
+  async function loadReportSpecificData(reportType) {
+    if (!selectedProject.value || !visibleYears.value.length) {
+      return null;
+    }
+
+    try {
+      const specificData = await reportDataService.getReportSpecificData(
+        reportType,
+        selectedProject.value.project_name,
+        visibleYears.value
+      );
+      
+      return specificData;
+    } catch (error) {
+      console.error('Reports: Error loading specific report data:', error);
+      return null;
+    }
+  }
   
   // ============================================================================
   // ADVANCED SETTINGS HANDLERS
@@ -920,6 +1082,131 @@
   const clearSelectedReport = () => {
     selectedReport.value = '';
     // The watcher will automatically remove from localStorage
+  };
+  
+  // ============================================================================
+  // DEBUG FUNCTIONS
+  // ============================================================================
+  
+  /**
+   * Debug cache contents to identify data retrieval issues
+   */
+  const debugCache = () => {
+    try {
+      if (!selectedProject.value?.project_name) {
+        alertService.warning('Please select a project first');
+        return;
+      }
+      
+      console.log('=== CACHE DEBUG ===');
+      console.log('Project:', selectedProject.value.project_name);
+      
+      // Debug using the report service
+      if (window.debugReportCache) {
+        const cacheInfo = window.debugReportCache(selectedProject.value.project_name);
+        console.log('Cache inspection results:', cacheInfo);
+        
+        // Show summary in alert
+        const pages = Object.keys(cacheInfo);
+        const totalRowCodes = pages.reduce((sum, page) => sum + (cacheInfo[page]?.rowCodes?.length || 0), 0);
+        
+        alertService.info(`Cache Debug: ${pages.length} pages, ${totalRowCodes} total row codes. Check console for details.`);
+      } else {
+        // Fallback: direct cache inspection
+        const cache = calculationCache.cache[selectedProject.value.project_name] || {};
+        const pages = Object.keys(cache);
+        
+        console.log('Available pages:', pages);
+        pages.forEach(page => {
+          const pageData = cache[page] || {};
+          const rowCodes = Object.keys(pageData);
+          console.log(`Page "${page}": ${rowCodes.length} row codes`);
+          console.log('Sample row codes:', rowCodes.slice(0, 5));
+        });
+        
+        alertService.info(`Cache Debug: ${pages.length} pages found. Check console for details.`);
+      }
+      
+    } catch (error) {
+      console.error('Error debugging cache:', error);
+      alertService.error('Failed to debug cache. Check console for errors.');
+    }
+  };
+  
+  /**
+   * Debug report data loading to identify specific issues
+   */
+  const debugReportData = async () => {
+    try {
+      if (!selectedProject.value?.project_name) {
+        alertService.warning('Please select a project first');
+        return;
+      }
+      
+      if (!visibleYears.value.length) {
+        alertService.warning('Please select years first');
+        return;
+      }
+      
+      console.log('=== REPORT DATA DEBUG ===');
+      console.log('Project:', selectedProject.value.project_name);
+      console.log('Years:', visibleYears.value);
+      
+      // Test data loading for each report type
+      const reportTypes = ['room-pnl', 'fnb-pnl', 'ood-pnl'];
+      
+      for (const reportType of reportTypes) {
+        console.log(`\n--- Testing ${reportType} ---`);
+        
+        try {
+          const data = await reportDataService.getReportSpecificData(
+            reportType,
+            selectedProject.value.project_name,
+            visibleYears.value
+          );
+          
+          console.log(`${reportType} data loaded:`, data);
+          
+          // Check data completeness
+          let totalPoints = 0;
+          let populatedPoints = 0;
+          
+          Object.values(data).forEach(yearData => {
+            Object.values(yearData).forEach(categoryData => {
+              if (typeof categoryData === 'object' && categoryData !== null) {
+                Object.values(categoryData).forEach(monthData => {
+                  if (typeof monthData === 'object' && monthData !== null) {
+                    Object.values(monthData).forEach(value => {
+                      totalPoints++;
+                      if (value !== null && value !== undefined && value !== 0) {
+                        populatedPoints++;
+                      }
+                    });
+                  } else {
+                    totalPoints++;
+                    if (monthData !== null && monthData !== undefined && monthData !== 0) {
+                      populatedPoints++;
+                    }
+                  }
+                });
+              }
+            });
+          });
+          
+          const completeness = totalPoints > 0 ? Math.round((populatedPoints / totalPoints) * 100) : 0;
+          console.log(`${reportType} completeness: ${populatedPoints}/${totalPoints} (${completeness}%)`);
+          
+        } catch (error) {
+          console.error(`Error loading ${reportType} data:`, error);
+        }
+      }
+      
+      alertService.success('Report data debug complete. Check console for detailed results.');
+      
+    } catch (error) {
+      console.error('Error debugging report data:', error);
+      alertService.error('Failed to debug report data. Check console for errors.');
+    }
   };
   
   // ============================================================================

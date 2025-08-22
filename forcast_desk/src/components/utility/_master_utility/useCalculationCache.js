@@ -74,6 +74,9 @@ export const useCalculationCache = defineStore('calculationCache', {
       }
     }
   },
-  persist: true
+  persist: {
+    storage: localStorage,
+    key: 'calculation-cache'
+  }
 });
  
