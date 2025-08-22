@@ -55,8 +55,8 @@
                   </div>
                   <div v-if="selectedReport" class="mt-2 flex gap-2">
                     <button 
-                      @click="selectedReport = ''"
-                      class="flex items-center gap-1 px-2 py-1 text-xs text-violet-600 hover:text-violet-700 hover:bg-violet-50 rounded transition-all"
+                      @click="clearSelectedReport"
+                      class="flex items-center gap-1 px-2 py-1 text-xs text-violet-600 hover:text-violet-700 hover:bg-violet-700 hover:bg-violet-50 rounded transition-all"
                     >
                       <RefreshCw class="w-3 h-3" />
                       Change Report
@@ -198,6 +198,10 @@
                 <RoomProfitLoss :visible-years="visibleYears" />
                             </div>
               
+              <div v-else-if="selectedReport === 'fnb-pnl'" class="mt-28">
+                <FoodBeverageProfitLoss :visible-years="visibleYears" />
+              </div>
+              
               <!-- Placeholder for other report types -->
               <div v-else class="mt-28 p-8 text-center text-gray-500">
                 <FileText class="w-16 h-16 mx-auto mb-4 text-gray-300" />
@@ -303,6 +307,7 @@
   import ReportSelector from '@/components/ui/reports/ReportSelector.vue';
   import SettingsModal from "@/components/ui/SettingsModal.vue";
   import RoomProfitLoss from '@/components/ui/reports/RoomProfitLoss.vue';
+  import FoodBeverageProfitLoss from '@/components/ui/reports/FoodBeverageProfitLoss.vue';
   
   // Icon imports
   import { 
@@ -394,8 +399,17 @@
   const departments = ref([]); // Add departments state
   const calculationCache = useCalculationCache();
   
-  // Report selection state
-  const selectedReport = ref('');
+  // Report selection state - with persistence
+  const getStoredReport = () => {
+    try {
+      return localStorage.getItem('selectedReport') || '';
+    } catch (e) {
+      console.warn('Could not access localStorage:', e);
+      return '';
+    }
+  };
+
+  const selectedReport = ref(getStoredReport());
   
   // Settings modal state
   const showSettingsModal = ref(false);
@@ -502,6 +516,10 @@
         changedCells.value = [];
         isSaved.value = true;
         
+        // Optionally reset report selection for new project
+        // Uncomment the next line if you want to reset report selection on project change
+        // selectedReport.value = '';
+        
         alertService.success(`Switched to project: ${newProject.project_name}`);
       } catch (error) {
         console.error("Error loading project data:", error);
@@ -525,6 +543,19 @@
     } else {
       // Remove beforeunload event listener when changes are saved
       window.removeEventListener('beforeunload', handleBeforeUnload);
+    }
+  });
+
+  // Watch for report selection changes to persist in localStorage
+  watch(selectedReport, (newValue) => {
+    try {
+      if (newValue) {
+        localStorage.setItem('selectedReport', newValue);
+      } else {
+        localStorage.removeItem('selectedReport');
+      }
+    } catch (e) {
+      console.warn('Could not save to localStorage:', e);
     }
   });
   
@@ -760,6 +791,7 @@
   function refreshTable() {
     // Set flag to show success alert after reload
     localStorage.setItem('showRefreshSuccess', 'true');
+    // The watcher automatically saves selectedReport to localStorage
     // Reload the entire page
     window.location.reload();
   }
@@ -880,8 +912,14 @@
   // ============================================================================
   const handleReportSelection = (reportType) => {
     selectedReport.value = reportType;
+    // The watcher will automatically save to localStorage
     // You can add additional logic here for different report types
     // console.log('Selected report:', reportType);
+  };
+
+  const clearSelectedReport = () => {
+    selectedReport.value = '';
+    // The watcher will automatically remove from localStorage
   };
   
   // ============================================================================

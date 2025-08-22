@@ -439,11 +439,11 @@ function getEmployeeBenefitsForRow(row, type) {
 function calculateTotalMonthlyValue(row, month) {
   const monthlyCount = getMonthlyCountForRow(row, month);
   
-  // Calculate Payroll Taxes (NSSF)
+  // Calculate Payroll Taxes (NSSIT)
   const taxPercentage = getTaxPercentageForRow(row);
   const salary = row.salary || 0;
   const taxTotal = (salary * taxPercentage) / 100;
-  const nssfValue = taxTotal * monthlyCount;
+  const nssitValue = taxTotal * monthlyCount;
   
   // Calculate Supplementary Pay
   const vacationValue = getSupplementaryPayForRow(row, 'vacation') * monthlyCount;
@@ -461,7 +461,7 @@ function calculateTotalMonthlyValue(row, month) {
   const otherBenefitsValue = getEmployeeBenefitsForRow(row, 'other') * monthlyCount;
   
   // Sum all values
-  const totalValue = nssfValue + vacationValue + relocationValue + severenceValue + otherSupplementaryValue + 
+  const totalValue = nssitValue + vacationValue + relocationValue + severenceValue + otherSupplementaryValue + 
                     medicalValue + uniformsValue + employeeMealValue + transportValue + telephoneValue + airTicketValue + otherBenefitsValue;
   
   return formatMoney(totalValue);

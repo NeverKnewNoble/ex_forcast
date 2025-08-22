@@ -31,6 +31,13 @@
           <Edit3 class="w-4 h-4" />
           Reset to Defaults
         </button>
+        <button 
+          @click="refreshCache"
+          class="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm font-medium"
+        >
+          <RefreshCw class="w-4 h-4" />
+          Refresh Cache
+        </button>
       </div>
     </div>
     <div class="space-y-8">
@@ -937,7 +944,7 @@
 
 <script setup>
 import { ref, watch, onMounted, nextTick } from 'vue';
-import { BedDouble, Table, DollarSign, Calculator, ChevronDown, ChevronRight, Plus, X, Trash2, Edit3 } from 'lucide-vue-next';
+import { BedDouble, Table, DollarSign, Calculator, ChevronDown, ChevronRight, Plus, X, Trash2, Edit3, RefreshCw } from 'lucide-vue-next';
 import { AverageDailyRateCalculation } from '@/components/utility/room_revenue_assumpt./market_segments.js';
 import { getDaysInMonth, calculateTotalRoomCount } from '@/components/utility/room_revenue_assumpt./room_revenue_utils.js';
 import { 
@@ -1061,13 +1068,20 @@ watch(() => props.marketSegmentData, (newData) => {
 // Watch for changes in totalNumberOfRooms and clear cache
 watch(() => props.totalNumberOfRooms, (newValue, oldValue) => {
   if (newValue !== oldValue) {
-    // console.log('TotalNumberOfRooms changed from', oldValue, 'to', newValue, '- clearing cache');
+    console.log('TotalNumberOfRooms changed from', oldValue, 'to', newValue, '- clearing cache');
     // Clear the Total Available Rooms cache when totalRooms changes
     const project = getProjectName();
     if (calculationCache.cache[project]?.[PAGE_KEY]) {
+      // Clear the specific cache keys for total available rooms
       calculationCache.cache[project][PAGE_KEY]['Total Available Rooms'] = {};
       calculationCache.cache[project][PAGE_KEY]['Total Available Rooms Year'] = {};
     }
+    
+    // Force a re-render by triggering a reactive update
+    nextTick(() => {
+      // This will force the component to recalculate the total available rooms
+      marketSegmentChanges.value = [...marketSegmentChanges.value];
+    });
   }
 });
 
@@ -1361,24 +1375,33 @@ function getTotalOccupiedRoomYear(year) {
 // --- Total Available Rooms helpers ---
 function getTotalAvailableRooms(year, label) {
   const project = getProjectName();
-  const totalRooms = props.totalNumberOfRooms || 0;
   
-  // Debug logging
-  // console.log('Total Available Rooms Debug:', {
-  //   year,
-  //   label,
-  //   totalRooms,
-  //   project
-  // });
+  // First try to get total rooms from cache (Room Revenue page)
+  let totalRooms = calculationCache.getValue(project, 'Room Revenue Assumptions', 'Total Rooms', year, label);
   
-  // If totalRooms is 0, return 0 regardless of cache
+  // If not found in cache, fall back to prop
+  if (!totalRooms || totalRooms === 0) {
+    totalRooms = props.totalNumberOfRooms || 0;
+  }
+  
+  // Debug logging - uncomment to troubleshoot
+  console.log('Total Available Rooms Debug:', {
+    year,
+    label,
+    totalRooms,
+    project,
+    fromCache: calculationCache.getValue(project, 'Room Revenue Assumptions', 'Total Rooms', year, label),
+    fromProp: props.totalNumberOfRooms,
+    cacheKeys: Object.keys(calculationCache.cache[project]?.[PAGE_KEY] || {})
+  });
+  
+  // If totalRooms is still 0, return 0
   if (totalRooms === 0) {
-  
     return 0;
   }
   
-  // Use totalRooms in cache key to avoid conflicts between different totalRooms values
-  const cacheKey = `Total Available Rooms (${totalRooms})`;
+  // Use a simple cache key that doesn't include totalRooms value
+  const cacheKey = 'Total Available Rooms';
   const cacheVal = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, label);
   if (cacheVal && cacheVal > 0) {
     // console.log('Using cached value:', cacheVal);
@@ -1387,8 +1410,6 @@ function getTotalAvailableRooms(year, label) {
   
   const days = getDaysInMonth(year, label);
   const val = days * totalRooms;
-  
-
   
   // Only cache if value is greater than 0
   if (val > 0) {
@@ -1400,15 +1421,23 @@ function getTotalAvailableRooms(year, label) {
 
 function getTotalAvailableRoomsYear(year) {
   const project = getProjectName();
-  const totalRooms = props.totalNumberOfRooms || 0;
   
-  // If totalRooms is 0, return 0 regardless of cache
+  // First try to get total rooms from cache (Room Revenue page) - use first month of year as reference
+  const firstLabel = props.getColumnLabelsForYearLocal(year)[0];
+  let totalRooms = calculationCache.getValue(project, 'Room Revenue Assumptions', 'Total Rooms', year, firstLabel);
+  
+  // If not found in cache, fall back to prop
+  if (!totalRooms || totalRooms === 0) {
+    totalRooms = props.totalNumberOfRooms || 0;
+  }
+  
+  // If totalRooms is still 0, return 0
   if (totalRooms === 0) {
     return 0;
   }
   
-  // Use totalRooms in cache key to avoid conflicts between different totalRooms values
-  const cacheKey = `Total Available Rooms Year (${totalRooms})`;
+  // Use a simple cache key that doesn't include totalRooms value
+  const cacheKey = 'Total Available Rooms Year';
   const cacheVal = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, 'ALL');
   if (cacheVal && cacheVal > 0) return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   
@@ -1623,6 +1652,40 @@ async function handleResetToDefaults() {
   } catch (error) {
     console.error('Error in reset to defaults:', error);
   }
+}
+
+// Function to manually refresh the cache
+function refreshCache() {
+  const project = getProjectName();
+  console.log('Refreshing cache for project:', project);
+  console.log('Current cache state:', calculationCache.cache[project]?.[PAGE_KEY]);
+  
+  // Log the total rooms from cache vs prop
+  const firstYear = props.visibleYears?.[0];
+  const firstLabel = firstYear ? props.getColumnLabelsForYearLocal(firstYear)?.[0] : null;
+  if (firstYear && firstLabel) {
+    const cachedTotalRooms = calculationCache.getValue(project, 'Room Revenue Assumptions', 'Total Rooms', firstYear, firstLabel);
+    console.log('Cache comparison:', {
+      fromCache: cachedTotalRooms,
+      fromProp: props.totalNumberOfRooms,
+      project,
+      year: firstYear,
+      label: firstLabel
+    });
+  }
+  
+  // Clear the total available rooms cache
+  if (calculationCache.cache[project]?.[PAGE_KEY]) {
+    calculationCache.cache[project][PAGE_KEY]['Total Available Rooms'] = {};
+    calculationCache.cache[project][PAGE_KEY]['Total Available Rooms Year'] = {};
+  }
+  
+  // Force a re-render
+  nextTick(() => {
+    marketSegmentChanges.value = [...marketSegmentChanges.value];
+  });
+  
+  console.log('Cache refreshed');
 }
 
 // Expose functions for parent component

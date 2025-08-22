@@ -1591,6 +1591,7 @@ function updateRoomRevenueCache() {
     // Cache Total Number of Rooms based on market segmentation setting
     if (marketSegmentation.value) {
       // When market segmentation is enabled, cache the totalNumberOfRooms value
+      console.log('Caching manual total rooms:', totalNumberOfRooms.value, 'for market segmentation');
       for (const year of visibleYears.value) {
         const labels = getColumnLabelsForYearLocal(year);
         for (const label of labels) {
@@ -1600,6 +1601,7 @@ function updateRoomRevenueCache() {
     } else {
       // When market segmentation is disabled, cache the total rooms from room package count management
       const totalRoomsFromPackages = Object.values(roomTypeCounts.value).reduce((sum, count) => sum + (parseInt(count) || 0), 0);
+      console.log('Caching calculated total rooms from packages:', totalRoomsFromPackages);
       for (const year of visibleYears.value) {
         const labels = getColumnLabelsForYearLocal(year);
         for (const label of labels) {
@@ -1662,11 +1664,18 @@ function loadProjectSettings() {
 
   // Load project-specific settings
   const storedTotalRooms = localStorage.getItem(getProjectKey('totalNumberOfRooms'));
-  totalNumberOfRooms.value = storedTotalRooms ? parseInt(storedTotalRooms) : 0;
+  if (storedTotalRooms) {
+    // If there's a stored value, use it
+    totalNumberOfRooms.value = parseInt(storedTotalRooms);
+  } else {
+    // If no stored value, calculate from room packages
+    totalNumberOfRooms.value = calculateTotalRoomCount(roomPackages.value, roomData.value);
+  }
 }
 
 // Watch for total number of rooms changes
 watch(totalNumberOfRooms, (newValue) => {
+  console.log('TotalNumberOfRooms changed to:', newValue, 'Market Segmentation:', marketSegmentation.value);
   localStorage.setItem(getProjectKey('totalNumberOfRooms'), newValue.toString());
   // Update cache when total rooms change
   updateRoomRevenueCache();
@@ -1677,6 +1686,26 @@ watch(roomTypeCounts, () => {
   // Update cache when room type counts change
   updateRoomRevenueCache();
 }, { deep: true });
+
+// Watch for room packages changes to recalculate total rooms
+watch(roomPackages, () => {
+  // Only recalculate total rooms from packages when market segmentation is DISABLED
+  // When market segmentation is enabled, user has manual control over total rooms
+  if (!marketSegmentation.value) {
+    totalNumberOfRooms.value = calculateTotalRoomCount(roomPackages.value, roomData.value);
+  }
+  // Update cache when room packages change
+  updateRoomRevenueCache();
+}, { deep: true });
+
+// Function to recalculate total rooms manually
+function recalculateTotalRooms() {
+  // Only recalculate from room packages when market segmentation is disabled
+  if (!marketSegmentation.value) {
+    totalNumberOfRooms.value = calculateTotalRoomCount(roomPackages.value, roomData.value);
+  }
+  updateRoomRevenueCache();
+}
 
 // Watch for room type counts changes to update cache in real-time
 watch(roomTypeCounts, (newCounts) => {
@@ -1735,6 +1764,12 @@ onMounted(async () => {
     ROOM_TYPES.forEach(roomType => {
       roomTypeCounts.value[roomType] = getNumberOfRoomsForType(roomPackages.value, roomType, roomData.value);
     });
+    
+    // Only calculate total rooms from packages if no stored value exists
+    // This preserves user input when market segmentation is enabled
+    if (!localStorage.getItem(getProjectKey('totalNumberOfRooms'))) {
+      totalNumberOfRooms.value = calculateTotalRoomCount(roomPackages.value, roomData.value);
+    }
     
     isSaved.value = true;
     // ... keep VAT, breakfast, exchange, service charge, roomTypeCounts logic ...
@@ -1808,6 +1843,12 @@ async function reloadDataForProject(newProject) {
       roomTypeCounts.value[roomType] = getNumberOfRoomsForType(roomPackages.value, roomType, roomData.value);
     });
     
+    // Only calculate total rooms from packages if no stored value exists for new project
+    // This preserves user input when market segmentation is enabled
+    if (!localStorage.getItem(getProjectKey('totalNumberOfRooms'))) {
+      totalNumberOfRooms.value = calculateTotalRoomCount(roomPackages.value, roomData.value);
+    }
+    
     // Load project-specific settings after data reload
     loadProjectSettings();
     // Update cache after reloading data
@@ -1853,6 +1894,9 @@ function handleRoomCountEditWrapper({ roomType, event }) {
   });
   // Update cache after count edit
   updateRoomRevenueCache();
+  
+  // Recalculate total rooms after editing room counts
+  recalculateTotalRooms();
 }
 
 // Wrapper functions for modal form handling
@@ -1884,6 +1928,9 @@ const submitAddRoomRevenueWrapper = async () => {
         originalRoomData.value = cloneDeep(roomData.value);
         updateRoomRevenueCache();
         
+        // Recalculate total rooms after adding new room revenue
+        recalculateTotalRooms();
+        
         // Show success message
         alertService.success("Room revenue assumption created successfully!");
       }
@@ -1900,6 +1947,9 @@ const saveChangesWrapper = async () => {
   await saveRoomChanges(changedCells, isSaving, saveError, roomData, originalRoomData, isSaved);
   // Update cache after saving
   updateRoomRevenueCache();
+  
+  // Recalculate total rooms after saving in case room data changed
+  recalculateTotalRooms();
   
   // Also save market segment changes if any
   if (marketSegmentationTablesRef.value && marketSegmentationTablesRef.value.marketSegmentChanges) {
@@ -2030,6 +2080,9 @@ function removeRoomPackage(roomType) {
   deletedPackages.value = next;
   isSaved.value = false;
   alertService.info(`Removed '${roomType}'. Click Restore to undo before saving.`);
+  
+  // Recalculate total rooms after removing package
+  recalculateTotalRooms();
 }
 
 // Restore all removed packages
@@ -2037,6 +2090,9 @@ function restorePackages() {
   deletedPackages.value = new Set();
   isSaved.value = false;
   alertService.info('Restored removed packages');
+  
+  // Recalculate total rooms after restoring packages
+  recalculateTotalRooms();
 }
 
 // Refresh room packages list
@@ -2311,6 +2367,9 @@ async function saveRoomTypeCounts() {
       
       // Update cache with new room counts
       updateRoomRevenueCache();
+      
+      // Recalculate total rooms after saving room type counts
+      recalculateTotalRooms();
       
       // Close modal
       showRoomTypeCountModal.value = false;
