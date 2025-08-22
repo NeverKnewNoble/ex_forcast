@@ -1,4 +1,4 @@
-<template>
+z<template>
   <div class="bg-white rounded-lg border border-green-200 shadow-sm overflow-hidden">
     <!-- Table Container -->
     <div class="overflow-x-auto">
