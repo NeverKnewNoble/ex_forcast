@@ -183,6 +183,30 @@
                     </div>
                   </div>
 
+                  <!-- Data Recovery -->
+                  <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                      <Database class="w-5 h-5 text-violet-600" />Data Recovery
+                    </h4>
+                    <div class="space-y-4">
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <p class="font-medium text-gray-800">Cache Management</p>
+                          <p class="text-sm text-gray-600">Manage and recover cached data</p>
+                        </div>
+                        <button 
+                          @click="openDataRecovery"
+                          class="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium"
+                        >
+                          Manage Cache
+                        </button>
+                      </div>
+                      <div class="text-xs text-gray-500 bg-blue-50 p-3 rounded-lg">
+                        <p>Use this tool to monitor cache health, export/import data, and recover lost information.</p>
+                      </div>
+                    </div>
+                  </div>
+
                   <!-- Security -->
                   <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
                     <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -339,6 +363,12 @@
       </div>
     </div>
   </transition>
+
+  <!-- Data Recovery Modal -->
+  <DataRecoveryModal 
+    :is-visible="showDataRecoveryModal" 
+    @close="showDataRecoveryModal = false" 
+  />
 </template>
 
 <script setup>
@@ -350,6 +380,7 @@ import {
 } from 'lucide-vue-next'
 import { session } from '@/data/session'
 import { createResource } from 'frappe-ui'
+import DataRecoveryModal from './DataRecoveryModal.vue'
 
 const props = defineProps({
   isVisible: { type: Boolean, default: false }
@@ -357,6 +388,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 const activeSection = ref('user')
+const showDataRecoveryModal = ref(false)
 
 const userSettings = ref({
   username: '',
@@ -459,6 +491,11 @@ const resetToDefaults = () => {
     sessionTimeout: true, sessionTimeoutMinutes: 30, 
     autoUpdates: true, betaFeatures: false 
   }
+}
+
+// Methods
+const openDataRecovery = () => {
+  showDataRecoveryModal.value = true
 }
 
 onMounted(() => {

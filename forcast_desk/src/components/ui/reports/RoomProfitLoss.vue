@@ -8,7 +8,7 @@
           <thead class="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
             <!-- Project Name Header Row -->
             <tr class="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white">
-                <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length + 1), 0)" class="px-6 py-4 text-center">
+                <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length * 2 + 1), 0)" class="px-6 py-4 text-center">
                 <div class="flex items-center justify-center gap-3">
                     <Building2 class="w-6 h-6 text-blue-200" />
                     <h1 class="text-3xl font-bold tracking-tight">{{ projectName }}</h1>
@@ -18,7 +18,7 @@
             
             <!-- Rooms Section Header Row -->
             <tr class="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white">
-                <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length + 1), 0)" class="px-6 py-4 text-center">
+                <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length * 2 + 1), 0)" class="px-6 py-4 text-center">
                 <div class="flex items-center justify-center gap-2">
                     <h2 class="text-xl font-semibold tracking-wide">Room Profit & Loss Report</h2>
                 </div>
@@ -34,7 +34,7 @@
               <th
                 v-for="year in visibleYears"
                 :key="'header-' + year"
-                :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length + 1"
+                :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length * 2 + 1"
                 class="px-2 py-2 text-center border-x-2 border-white cursor-pointer select-none hover:bg-blue-700 transition-all duration-200 group text-sm"
                 @click="toggleCollapse(year)"
                 title="Click to collapse/expand"
@@ -55,13 +55,14 @@
             <tr class="bg-blue-500/90 text-xs">
               <template v-for="year in visibleYears" :key="'months-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <th
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="year + '-' + label"
-                    class="px-2 py-1 text-center border border-blue-300 min-w-[100px] font-medium"
-                  >
-                    {{ label }}
-                  </th>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="year + '-' + label">
+                    <th class="px-2 py-1 text-center border border-blue-300 min-w-[100px] font-medium">
+                      {{ label }}
+                    </th>
+                    <th class="px-2 py-1 text-center border border-blue-300 min-w-[80px] font-medium text-blue-200">
+                      %
+                    </th>
+                  </template>
                   <th class="px-2 py-1 text-center border border-blue-300 min-w-[110px] font-semibold">
                     <div class="flex items-center justify-center gap-1">
                       <BookOpen class="w-2 h-2" />
@@ -93,11 +94,10 @@
             </td>
               <template v-for="year in visibleYears" :key="'stats-divider-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'stats-divider-cell-' + year + '-' + label"
-                    class="px-1 py-1 text-center border border-blue-700 bg-blue-800"
-                  ></td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'stats-divider-cell-' + year + '-' + label">
+                    <td class="px-1 py-1 text-center border border-blue-700 bg-blue-800"></td>
+                    <td class="px-1 py-1 text-center border border-blue-700 bg-blue-800"></td>
+                  </template>
                   <td class="px-1 py-1 text-center border border-blue-700 bg-blue-800"></td>
                 </template>
                 <template v-else>
@@ -115,21 +115,22 @@
               </td>
               <template v-for="year in visibleYears" :key="'no-rooms-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'no-rooms-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-blue-50"
-                  >
-                    <span class="font-mono text-xs">{{ formatNumber(getNoOfRooms(year, label)) }}</span>
-            </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'no-rooms-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      <span class="font-mono text-xs">{{ formatNumber(getNoOfRooms(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatNumber(getNoOfRoomsTotal(year)) }}</span>
-            </td>
+                  </td>
                 </template>
                 <template v-else>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatNumber(getNoOfRoomsTotal(year)) }}</span>
-            </td>
+                  </td>
                 </template>
               </template>
           </tr>
@@ -143,13 +144,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'no-days-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'no-days-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-blue-50"
-                  >
-                    <span class="font-mono text-xs">{{ formatNumber(getNoOfDays(year, label)) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'no-days-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      <span class="font-mono text-xs">{{ formatNumber(getNoOfDays(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatNumber(getNoOfDaysTotal(year)) }}</span>
                   </td>
@@ -157,7 +159,7 @@
                 <template v-else>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatNumber(getNoOfDaysTotal(year)) }}</span>
-              </td>
+                  </td>
                 </template>
               </template>
             </tr>
@@ -171,13 +173,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'available-rooms-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'available-rooms-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-blue-50"
-                  >
-                    <span class="font-mono text-xs">{{ formatNumber(getAvailableRooms(year, label)) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'available-rooms-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      <span class="font-mono text-xs">{{ formatNumber(getAvailableRooms(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatNumber(getAvailableRoomsTotal(year)) }}</span>
                   </td>
@@ -185,7 +188,7 @@
                 <template v-else>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatNumber(getAvailableRoomsTotal(year)) }}</span>
-              </td>
+                  </td>
                 </template>
               </template>
             </tr>
@@ -199,21 +202,22 @@
               </td>
               <template v-for="year in visibleYears" :key="'sold-rooms-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'sold-rooms-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-blue-50"
-                  >
-                    <span class="font-mono text-xs">{{ formatNumber(getSoldRooms(year, label)) }}</span>
-            </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'sold-rooms-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      <span class="font-mono text-xs">{{ formatNumber(getSoldRooms(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatNumber(getSoldRoomsTotal(year)) }}</span>
-            </td>
+                  </td>
                 </template>
                 <template v-else>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatNumber(getSoldRoomsTotal(year)) }}</span>
-            </td>
+                  </td>
                 </template>
               </template>
           </tr>
@@ -227,21 +231,22 @@
             </td>
               <template v-for="year in visibleYears" :key="'occupancy-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'occupancy-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-blue-50"
-                  >
-                    <span class="font-mono text-xs">{{ formatPercentage(getOccupancyPercentage(year, label)) }}%</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'occupancy-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      <span class="font-mono text-xs">{{ formatPercentage(getOccupancyPercentage(year, label)) }}%</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatPercentage(getOccupancyPercentageTotal(year)) }}%</span>
-            </td>
+                  </td>
                 </template>
                 <template v-else>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatPercentage(getOccupancyPercentageTotal(year)) }}%</span>
-            </td>
+                  </td>
                 </template>
               </template>
           </tr>
@@ -255,49 +260,51 @@
             </td>
               <template v-for="year in visibleYears" :key="'guests-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'guests-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-blue-50"
-                  >
-                    <span class="font-mono text-xs">{{ formatNumber(getNumberOfGuests(year, label)) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'guests-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      <span class="font-mono text-xs">{{ formatNumber(getNumberOfGuests(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatNumber(getNumberOfGuestsTotal(year)) }}</span>
-            </td>
+                  </td>
                 </template>
                 <template v-else>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatNumber(getNumberOfGuestsTotal(year)) }}</span>
-            </td>
+                  </td>
                 </template>
               </template>
           </tr>
 
-            <!-- NUMBER OF F&B COVERS -->
+                                                 <!-- NUMBER OF F&B COVERS -->
             <tr v-if="hasCoversData()" class="bg-blue-50 border-b border-blue-200">
               <td class="px-3 py-2 font-medium border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   NUMBER OF F&B COVERS
                 </div>
-              </td>
+            </td>
               <template v-for="year in visibleYears" :key="'covers-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'covers-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-blue-50"
-                  >
-                    <span class="font-mono text-xs">{{ formatNumber(getNumberOfCovers(year, label)) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'covers-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      <span class="font-mono text-xs">{{ formatNumber(getNumberOfCovers(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatNumber(getNumberOfCoversTotal(year)) }}</span>
-            </td>
+                  </td>
                 </template>
                 <template v-else>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatNumber(getNumberOfCoversTotal(year)) }}</span>
-            </td>
+                  </td>
                 </template>
               </template>
           </tr>
@@ -311,21 +318,22 @@
               </td>
               <template v-for="year in visibleYears" :key="'avg-fnb-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'avg-fnb-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-blue-50"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getAverageFnbSpent(year, label)) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'avg-fnb-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      <span class="font-mono text-xs">{{ formatMoney(getAverageFnbSpent(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getAverageFnbSpentTotal(year)) }}</span>
-            </td>
+                  </td>
                 </template>
                 <template v-else>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getAverageFnbSpentTotal(year)) }}</span>
-            </td>
+                  </td>
                 </template>
               </template>
           </tr>
@@ -339,21 +347,22 @@
               </td>
               <template v-for="year in visibleYears" :key="'avg-rate-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'avg-rate-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-blue-50"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getAverageRoomRate(year, label)) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'avg-rate-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      <span class="font-mono text-xs">{{ formatMoney(getAverageRoomRate(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getAverageRoomRateTotal(year)) }}</span>
-            </td>
+                  </td>
                 </template>
                 <template v-else>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getAverageRoomRateTotal(year)) }}</span>
-            </td>
+                  </td>
                 </template>
               </template>
           </tr>
@@ -367,13 +376,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'rev-per-room-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'rev-per-room-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-blue-50"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getRevPerAvailableRoom(year, label)) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'rev-per-room-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      <span class="font-mono text-xs">{{ formatMoney(getRevPerAvailableRoom(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getRevPerAvailableRoomTotal(year)) }}</span>
                   </td>
@@ -395,13 +405,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'empty-stats-1-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'empty-stats-1-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-center border border-gray-200 bg-gray-100"
-                  >
-                    
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'empty-stats-1-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
+                      
+                    </td>
+                    <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
                     
                   </td>
@@ -423,13 +434,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'empty-stats-2-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'empty-stats-2-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-center border border-gray-200 bg-gray-100"
-                  >
-                    
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'empty-stats-2-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
+                      
+                    </td>
+                    <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
                     
                   </td>
@@ -451,11 +463,10 @@
               </td>
               <template v-for="year in visibleYears" :key="'rooms-revenue-divider-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'rooms-revenue-divider-cell-' + year + '-' + label"
-                    class="px-1 py-1 text-center border border-blue-700 bg-blue-800"
-                  ></td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'rooms-revenue-divider-cell-' + year + '-' + label">
+                    <td class="px-1 py-1 text-center border border-blue-700 bg-blue-800"></td>
+                    <td class="px-1 py-1 text-center border border-blue-700 bg-blue-800"></td>
+                  </template>
                   <td class="px-1 py-1 text-center border border-blue-700 bg-blue-800"></td>
                 </template>
                 <template v-else>
@@ -476,13 +487,14 @@
                   </td>
                   <template v-for="year in visibleYears" :key="'segment-' + segment + '-' + year">
                     <template v-if="!isYearCollapsed(year)">
-                      <td
-                        v-for="label in getColumnLabelsForYear(year)"
-                        :key="'segment-cell-' + segment + '-' + year + '-' + label"
-                        class="px-2 py-1 text-right border border-blue-200 bg-blue-50"
-                      >
-                        <span class="font-mono text-xs">{{ formatMoney(getSegmentRevenue(year, label, segment)) }}</span>
-                      </td>
+                      <template v-for="label in getColumnLabelsForYear(year)" :key="'segment-cell-' + segment + '-' + year + '-' + label">
+                        <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                          <span class="font-mono text-xs">{{ formatMoney(getSegmentRevenue(year, label, segment)) }}</span>
+                        </td>
+                        <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                          <span class="font-mono text-xs text-blue-600">{{ formatPercentage(getSegmentRevenuePercentage(year, label, segment)) }}%</span>
+                        </td>
+                      </template>
                       <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                         <span class="font-mono text-xs text-blue-700">{{ formatMoney(getSegmentRevenueTotal(year, segment)) }}</span>
                       </td>
@@ -498,20 +510,21 @@
 
               <!-- TOTAL REVENUE -->
               <tr class="bg-blue-500 border-b-2 border-blue-600">
-                <td class="px-3 py-2 font-bold border-r border-blue-600">
+                <td class="px-2 py-1 font-bold border-r border-blue-600">
                   <div class="flex items-center gap-1 text-white">
                     TOTAL REVENUE
                   </div>
                 </td>
                 <template v-for="year in visibleYears" :key="'total-rooms-revenue-' + year">
                   <template v-if="!isYearCollapsed(year)">
-                    <td
-                      v-for="label in getColumnLabelsForYear(year)"
-                      :key="'total-rooms-revenue-cell-' + year + '-' + label"
-                      class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500"
-                    >
-                      <span class="font-mono text-xs text-white">{{ formatMoney(getTotalRoomsRevenue(year, label)) }}</span>
-                    </td>
+                    <template v-for="label in getColumnLabelsForYear(year)" :key="'total-rooms-revenue-cell-' + year + '-' + label">
+                      <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500">
+                        <span class="font-mono text-xs text-white">{{ formatMoney(getTotalRoomsRevenue(year, label)) }}</span>
+                      </td>
+                      <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500">
+                        
+                      </td>
+                    </template>
                     <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500">
                       <span class="font-mono text-xs text-white">{{ formatMoney(getTotalRoomsRevenueTotal(year)) }}</span>
                     </td>
@@ -533,13 +546,14 @@
                 </td>
                 <template v-for="year in visibleYears" :key="'empty-row-1-' + year">
                   <template v-if="!isYearCollapsed(year)">
-                    <td
-                      v-for="label in getColumnLabelsForYear(year)"
-                      :key="'empty-row-1-cell-' + year + '-' + label"
-                      class="px-2 py-1 text-center border border-gray-200 bg-gray-100"
-                    >
-                      
-                    </td>
+                    <template v-for="label in getColumnLabelsForYear(year)" :key="'empty-row-1-cell-' + year + '-' + label">
+                      <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
+                        
+                      </td>
+                      <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
+                        
+                      </td>
+                    </template>
                     <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
                       
                     </td>
@@ -561,13 +575,14 @@
                 </td>
                 <template v-for="year in visibleYears" :key="'empty-row-2-' + year">
                   <template v-if="!isYearCollapsed(year)">
-                    <td
-                      v-for="label in getColumnLabelsForYear(year)"
-                      :key="'empty-row-2-cell-' + year + '-' + label"
-                      class="px-2 py-1 text-center border border-gray-200 bg-gray-100"
-                    >
-                      
-                    </td>
+                    <template v-for="label in getColumnLabelsForYear(year)" :key="'empty-row-2-cell-' + year + '-' + label">
+                      <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
+                        
+                      </td>
+                      <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
+                        
+                      </td>
+                    </template>
                     <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
                       
                     </td>
@@ -593,13 +608,14 @@
                   </td>
                   <template v-for="year in visibleYears" :key="'pkg-' + pkg + '-' + year">
                     <template v-if="!isYearCollapsed(year)">
-                      <td
-                        v-for="label in getColumnLabelsForYear(year)"
-                        :key="'pkg-cell-' + pkg + '-' + year + '-' + label"
-                        class="px-2 py-1 text-right border border-blue-200 bg-blue-50"
-                      >
-                        <span class="font-mono text-xs">{{ formatMoney(getRoomTypeRevenue(year, label, pkg)) }}</span>
-                      </td>
+                      <template v-for="label in getColumnLabelsForYear(year)" :key="'pkg-cell-' + pkg + '-' + year + '-' + label">
+                        <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                          <span class="font-mono text-xs">{{ formatMoney(getRoomTypeRevenue(year, label, pkg)) }}</span>
+                        </td>
+                        <td class="px-2 py-1 text-right border border-blue-200 bg-blue-50">
+                          <span class="font-mono text-xs text-blue-600">{{ formatPercentage(getRoomTypeRevenuePercentage(year, label, pkg)) }}%</span>
+                        </td>
+                      </template>
                       <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-100">
                         <span class="font-mono text-xs text-blue-700">{{ formatMoney(getRoomTypeRevenueTotal(year, pkg)) }}</span>
                       </td>
@@ -615,20 +631,21 @@
 
               <!-- Total Rooms Revenue -->
               <tr class="bg-blue-500 border-b-2 border-blue-600">
-                <td class="px-3 py-2 font-bold border-r border-blue-600">
+                <td class="px-2 py-1 font-bold border-r border-blue-600">
                   <div class="flex items-center gap-1 text-white">
                     TOTAL ROOMS REVENUE
                   </div>
                 </td>
                 <template v-for="year in visibleYears" :key="'total-rooms-revenue-' + year">
                   <template v-if="!isYearCollapsed(year)">
-                    <td
-                      v-for="label in getColumnLabelsForYear(year)"
-                      :key="'total-rooms-revenue-cell-' + year + '-' + label"
-                      class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500"
-                    >
-                      <span class="font-mono text-xs text-white">{{ formatMoney(getTotalRoomsRevenue(year, label)) }}</span>
-                    </td>
+                    <template v-for="label in getColumnLabelsForYear(year)" :key="'total-rooms-revenue-cell-' + year + '-' + label">
+                      <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500">
+                        <span class="font-mono text-xs text-white">{{ formatMoney(getTotalRoomsRevenue(year, label)) }}</span>
+                      </td>
+                      <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500">
+                        
+                      </td>
+                    </template>
                     <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500">
                       <span class="font-mono text-xs text-white">{{ formatMoney(getTotalRoomsRevenueTotal(year)) }}</span>
                     </td>
@@ -651,11 +668,10 @@
               </td>
               <template v-for="year in visibleYears" :key="'room-expenses-divider-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'room-expenses-divider-cell-' + year + '-' + label"
-                    class="px-1 py-1 text-center border border-blue-700 bg-blue-800"
-                  ></td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'room-expenses-divider-cell-' + year + '-' + label">
+                    <td class="px-1 py-1 text-center border border-blue-700 bg-blue-800"></td>
+                    <td class="px-1 py-1 text-center border border-blue-700 bg-blue-800"></td>
+                  </template>
                   <td class="px-1 py-1 text-center border border-blue-700 bg-blue-800"></td>
                 </template>
                 <template v-else>
@@ -665,23 +681,22 @@
             </tr>
 
             <!-- Expense Sub Header -->
-            <tr class="bg-gray-400 border-b border-gray-500">
-              <td class="px-3 py-2 font-semibold border-r border-gray-500">
+            <tr class="bg-[#5FA8AF] border-b border-[#5FA8AF]">
+              <td class="px-3 py-2 font-semibold border-r border-[#5FA8AF]">
                 <div class="flex items-center gap-1 text-white">
                   Expense
                 </div>
               </td>
               <template v-for="year in visibleYears" :key="'expense-subheader-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'expense-subheader-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-center border border-gray-500 bg-gray-400"
-                  ></td>
-                  <td class="px-2 py-1 text-center border border-gray-500 bg-gray-400"></td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'expense-subheader-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
+                    <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
+                  </template>
+                  <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-center border border-gray-500 bg-gray-400"></td>
+                  <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
                 </template>
               </template>
             </tr>
@@ -696,13 +711,14 @@
                 </td>
                 <template v-for="year in visibleYears" :key="'room-expense-' + exp + '-' + year">
                   <template v-if="!isYearCollapsed(year)">
-                    <td
-                      v-for="label in getColumnLabelsForYear(year)"
-                      :key="'room-expense-cell-' + exp + '-' + year + '-' + label"
-                      class="px-2 py-1 text-right border border-blue-200 bg-white"
-                    >
-                      <span class="font-mono text-xs">{{ formatMoney(getRoomExpenseAmount(year, label, exp)) }}</span>
-                    </td>
+                    <template v-for="label in getColumnLabelsForYear(year)" :key="'room-expense-cell-' + exp + '-' + year + '-' + label">
+                      <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                        <span class="font-mono text-xs">{{ formatMoney(getRoomExpenseAmount(year, label, exp)) }}</span>
+                      </td>
+                      <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                        
+                      </td>
+                    </template>
                     <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                       <span class="font-mono text-xs text-blue-700">{{ formatMoney(getRoomExpenseTotal(year, exp)) }}</span>
                     </td>
@@ -725,13 +741,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'gross-expenses-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'gross-expenses-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500"
-                  >
-                    <span class="font-mono text-xs text-white">{{ formatMoney(getGrossRoomExpenses(year, label)) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'gross-expenses-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500">
+                      <span class="font-mono text-xs text-white">{{ formatMoney(getGrossRoomExpenses(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500">
+                      <span class="font-mono text-xs text-white">{{ formatPercentage(getGrossRoomExpensesPercentage(year, label)) }}%</span>
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500">
                     <span class="font-mono text-xs text-white">{{ formatMoney(getGrossRoomExpensesYear(year)) }}</span>
                   </td>
@@ -745,23 +762,22 @@
             </tr>
 
             <!-- Payroll Sub Header -->
-            <tr class="bg-gray-400 border-b border-gray-500">
-              <td class="px-3 py-2 font-semibold border-r border-gray-500">
+            <tr class="bg-[#5FA8AF] border-b border-[#5FA8AF]">
+              <td class="px-3 py-2 font-semibold border-r border-[#5FA8AF]">
                 <div class="flex items-center gap-1 text-white">
                   Payroll
                 </div>
               </td>
-              <template v-for="year in visibleYears" :key="'expense-subheader-' + year">
+              <template v-for="year in visibleYears" :key="'payroll-subheader-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'expense-subheader-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-center border border-gray-500 bg-gray-400"
-                  ></td>
-                  <td class="px-2 py-1 text-center border border-gray-500 bg-gray-400"></td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'payroll-subheader-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
+                    <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
+                  </template>
+                  <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-center border border-gray-500 bg-gray-400"></td>
+                  <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
                 </template>
               </template>
             </tr>
@@ -775,11 +791,10 @@
               </td>
               <template v-for="year in visibleYears" :key="'mgmt-subheader-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'mgmt-subheader-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-center border border-blue-200 bg-blue-50"
-                  ></td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'mgmt-subheader-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-center border border-blue-200 bg-blue-50"></td>
+                    <td class="px-2 py-1 text-center border border-blue-200 bg-blue-50"></td>
+                  </template>
                   <td class="px-2 py-1 text-center border border-blue-200 bg-blue-100"></td>
                 </template>
                 <template v-else>
@@ -798,13 +813,14 @@
                 </td>
                 <template v-for="year in visibleYears" :key="'mgmt-row-' + loc + '-' + year">
                   <template v-if="!isYearCollapsed(year)">
-                    <td
-                      v-for="label in getColumnLabelsForYear(year)"
-                      :key="'mgmt-cell-' + loc + '-' + year + '-' + label"
-                      class="px-2 py-1 text-right border border-blue-200 bg-white"
-                    >
-                      <span class="font-mono text-xs">{{ formatMoney(getPayrollMonthlySalaryByLocation(year, label, loc, 'management')) }}</span>
-                    </td>
+                    <template v-for="label in getColumnLabelsForYear(year)" :key="'mgmt-cell-' + loc + '-' + year + '-' + label">
+                      <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                        <span class="font-mono text-xs">{{ formatMoney(getPayrollMonthlySalaryByLocation(year, label, loc, 'management')) }}</span>
+                      </td>
+                      <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                        
+                      </td>
+                    </template>
                     <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                       <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollMonthlySalaryTotal(year, loc, 'management')) }}</span>
                     </td>
@@ -827,11 +843,10 @@
               </td>
               <template v-for="year in visibleYears" :key="'nonmgmt-subheader-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'nonmgmt-subheader-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-center border border-blue-200 bg-blue-50"
-                  ></td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'nonmgmt-subheader-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-center border border-blue-200 bg-blue-50"></td>
+                    <td class="px-2 py-1 text-center border border-blue-200 bg-blue-50"></td>
+                  </template>
                   <td class="px-2 py-1 text-center border border-blue-200 bg-blue-100"></td>
                 </template>
                 <template v-else>
@@ -850,13 +865,14 @@
                 </td>
                 <template v-for="year in visibleYears" :key="'nonmgmt-row-' + loc + '-' + year">
                   <template v-if="!isYearCollapsed(year)">
-                    <td
-                      v-for="label in getColumnLabelsForYear(year)"
-                      :key="'nonmgmt-cell-' + loc + '-' + year + '-' + label"
-                      class="px-2 py-1 text-right border border-blue-200 bg-white"
-                    >
-                      <span class="font-mono text-xs">{{ formatMoney(getPayrollMonthlySalaryByLocation(year, label, loc, 'non-management')) }}</span>
-                    </td>
+                    <template v-for="label in getColumnLabelsForYear(year)" :key="'nonmgmt-cell-' + loc + '-' + year + '-' + label">
+                      <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                        <span class="font-mono text-xs">{{ formatMoney(getPayrollMonthlySalaryByLocation(year, label, loc, 'non-management')) }}</span>
+                      </td>
+                      <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                        
+                      </td>
+                    </template>
                     <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                       <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollMonthlySalaryTotal(year, loc, 'non-management')) }}</span>
                     </td>
@@ -879,13 +895,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'total-payroll-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'total-payroll-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500"
-                  >
-                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalPayroll(year, label)) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'total-payroll-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500">
+                      <span class="font-mono text-xs text-white">{{ formatMoney(getTotalPayroll(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500">
+                      <span class="font-mono text-xs text-white">{{ formatPercentage(getTotalPayrollPercentage(year, label)) }}%</span>
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500">
                     <span class="font-mono text-xs text-white">{{ formatMoney(getTotalPayrollYear(year)) }}</span>
                   </td>
@@ -900,23 +917,22 @@
 
 
             <!-- Payroll Related Sub Header -->
-            <tr class="bg-gray-400 border-b border-gray-500">
-              <td class="px-3 py-2 font-semibold border-r border-gray-500">
+            <tr class="bg-[#5FA8AF] border-b border-[#5FA8AF]">
+              <td class="px-3 py-2 font-semibold border-r border-[#5FA8AF]">
                 <div class="flex items-center gap-1 text-white">
                   Payroll Related
                 </div>
               </td>
               <template v-for="year in visibleYears" :key="'payroll-related-subheader-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'payroll-related-subheader-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-center border border-gray-500 bg-gray-400"
-                  ></td>
-                  <td class="px-2 py-1 text-center border border-gray-500 bg-gray-400"></td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'payroll-related-subheader-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
+                    <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
+                  </template>
+                  <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-center border border-gray-500 bg-gray-400"></td>
+                  <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
                 </template>
               </template>
             </tr>
@@ -930,13 +946,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'nssit-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'nssit-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-white"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'NSSIT')) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'nssit-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'NSSIT')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'NSSIT')) }}</span>
                   </td>
@@ -958,13 +975,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'vacation-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'vacation-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-white"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Vacation')) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'vacation-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Vacation')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Vacation')) }}</span>
                   </td>
@@ -986,13 +1004,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'relocation-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'relocation-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-white"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Relocation')) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'relocation-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Relocation')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Relocation')) }}</span>
                   </td>
@@ -1014,13 +1033,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'severence-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'severence-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-white"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Severence & Indemnity')) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'severence-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Severence & Indemnity')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Severence & Indemnity')) }}</span>
                   </td>
@@ -1042,13 +1062,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'other-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'other-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-white"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Other')) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'other-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Other')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Other')) }}</span>
                   </td>
@@ -1070,13 +1091,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'medical-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'medical-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-white"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Medical')) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'medical-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Medical')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Medical')) }}</span>
                   </td>
@@ -1098,13 +1120,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'uniforms-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'uniforms-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-white"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Uniforms')) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'uniforms-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Uniforms')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Uniforms')) }}</span>
                   </td>
@@ -1126,13 +1149,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'employee-meal-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'employee-meal-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-white"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Employee Meal')) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'employee-meal-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Employee Meal')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Employee Meal')) }}</span>
                   </td>
@@ -1154,13 +1178,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'transport-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'transport-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-white"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Transport')) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'transport-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Transport')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Transport')) }}</span>
                   </td>
@@ -1182,13 +1207,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'telephone-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'telephone-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-white"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Telephone')) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'telephone-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Telephone')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Telephone')) }}</span>
                   </td>
@@ -1210,13 +1236,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'air-ticket-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'air-ticket-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-white"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Air Ticket')) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'air-ticket-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Air Ticket')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Air Ticket')) }}</span>
                   </td>
@@ -1238,13 +1265,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'other-benefits-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'other-benefits-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-white"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Other Benefits')) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'other-benefits-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Other Benefits')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Other Benefits')) }}</span>
                   </td>
@@ -1266,13 +1294,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'total-payroll-related-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'total-payroll-related-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500"
-                  >
-                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalPayrollRelatedExpenses(year, label)) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'total-payroll-related-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500">
+                      <span class="font-mono text-xs text-white">{{ formatMoney(getTotalPayrollRelatedExpenses(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500">
+                      <span class="font-mono text-xs text-white">{{ formatPercentage(getTotalPayrollRelatedExpensesPercentage(year, label)) }}%</span>
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500">
                     <span class="font-mono text-xs text-white">{{ formatMoney(getTotalPayrollRelatedExpensesYear(year)) }}</span>
                   </td>
@@ -1286,23 +1315,22 @@
             </tr>
 
             <!-- Bonus Sub Header -->
-            <tr class="bg-gray-400 border-b border-gray-500">
-              <td class="px-3 py-2 font-semibold border-r border-gray-500">
+            <tr class="bg-[#5FA8AF] border-b border-[#5FA8AF]">
+              <td class="px-3 py-2 font-semibold border-r border-[#5FA8AF]">
                 <div class="flex items-center gap-1 text-white">
                   Bonus
                 </div>
               </td>
               <template v-for="year in visibleYears" :key="'bonus-subheader-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'bonus-subheader-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-center border border-gray-500 bg-gray-400"
-                  ></td>
-                  <td class="px-2 py-1 text-center border border-gray-500 bg-gray-400"></td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'bonus-subheader-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
+                    <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
+                  </template>
+                  <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-center border border-gray-500 bg-gray-400"></td>
+                  <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
                 </template>
               </template>
             </tr>
@@ -1316,19 +1344,21 @@
               </td>
               <template v-for="year in visibleYears" :key="'bonus-details-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'bonus-details-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-200 bg-white"
-                  >
-                    <span class="font-mono text-xs">{{ formatMoney(getBonusValue(year, label)) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'bonus-details-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs">{{ formatMoney(getBonusValue(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-200 bg-white">
+                      <span class="font-mono text-xs text-blue-600">{{ formatPercentage(getBonusPercentage(year, label)) }}%</span>
+                      <!-- Debug: {{ getBonusValue(year, label) }} / {{ getBonusTotal(year) }} = {{ getBonusPercentage(year, label) }}% -->
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getBonusTotal(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
+                  <td class="px-2 py-1 text-right border border-blue-200 bg-white">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getBonusTotal(year)) }}</span>
                   </td>
                 </template>
@@ -1344,13 +1374,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'empty-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'empty-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-center border border-gray-200 bg-gray-100"
-                  >
-                    
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'empty-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
+                      
+                    </td>
+                    <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
+                      
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100">
                     
                   </td>
@@ -1372,13 +1403,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'total-expenses-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'total-expenses-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-red-700 font-semibold bg-red-600"
-                  >
-                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalExpenses(year, label)) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'total-expenses-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-red-700 font-semibold bg-red-600">
+                      <span class="font-mono text-xs text-white">{{ formatMoney(getTotalExpenses(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-red-700 font-semibold bg-red-600">
+                      <span class="font-mono text-xs text-red-200">{{ formatPercentage(getTotalExpensesPercentage(year, label)) }}%</span>
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-red-700 font-bold bg-red-600">
                     <span class="font-mono text-xs text-white">{{ formatMoney(getTotalExpensesYear(year)) }}</span>
                   </td>
@@ -1400,13 +1432,14 @@
               </td>
               <template v-for="year in visibleYears" :key="'departmental-income-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td
-                    v-for="label in getColumnLabelsForYear(year)"
-                    :key="'departmental-income-cell-' + year + '-' + label"
-                    class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500"
-                  >
-                    <span class="font-mono text-xs text-white">{{ formatMoney(getDepartmentalIncome(year, label)) }}</span>
-                  </td>
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'departmental-income-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500">
+                      <span class="font-mono text-xs text-white">{{ formatMoney(getDepartmentalIncome(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500">
+                      <span class="font-mono text-xs text-blue-200">{{ formatPercentage(getDepartmentalIncomePercentage(year, label)) }}%</span>
+                    </td>
+                  </template>
                   <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500">
                     <span class="font-mono text-xs text-white">{{ formatMoney(getDepartmentalIncomeYear(year)) }}</span>
                   </td>
@@ -1444,6 +1477,7 @@ import {
   DollarSign
 } from 'lucide-vue-next';
 import { loadExpenseData } from '@/components/utility/expense_assumption/index.js';
+import reportDataService from '@/components/utility/reports/reportDataService.js';
 
 // Props
 const props = defineProps({
@@ -1489,56 +1523,22 @@ watch(selectedProject, () => {
 
 // Add debugging for cache access
 onMounted(() => {
-  // console.log('Room P&L: Component mounted, project name:', projectName.value);
-  // console.log('Room P&L: Calculation cache available:', !!calculationCache);
-  
-  // Test cache access
-  if (projectName.value && projectName.value !== 'Project Name') {
-    // Test multiple cache keys to see what's available
-    const testKeys = [
-      'Number of rooms available',
-      'Number of rooms sold (excl.)',
-      'Occupancy (excl.) %',
-      'Number of guests',
-      'Total Covers',
-      'Average Spent Per F&B Customer',
-      'Average Room Rate',
-      'Revenue Per Available Room'
-    ];
-    
-    // console.log('Room P&L: Testing all cache keys...');
-    testKeys.forEach(key => {
-      const value = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', key, 2025, 'Jan');
-      // console.log(`Room P&L: Cache key "${key}":`, {
-      //   value,
-      //   exists: value !== undefined && value !== null
-      // });
-    });
-    
-    // If no data in cache, wait a bit and try again (F&B page might still be loading)
-    const hasAnyData = testKeys.some(key => {
-      const value = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', key, 2025, 'Jan');
-      return value !== undefined && value !== null;
-    });
-    
-    if (!hasAnyData) {
-      // console.log('Room P&L: No data in cache yet, waiting for F&B page to load...');
-      console.warn('Room P&L: To get accurate data, please visit the F&B Revenue page first to populate the cache.');
-      setTimeout(() => {
-        // console.log('Room P&L: Retrying cache access after delay...');
-        testKeys.forEach(key => {
-          const retryValue = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', key, 2025, 'Jan');
-          // console.log(`Room P&L: Retry "${key}":`, {
-          //   retryValue,
-          //   exists: retryValue !== undefined && retryValue !== null
-          // });
-        });
-      }, 3000); // Wait 3 seconds
-    }
-  }
   // Load Room department expenses from Expense Assumptions API
   loadRoomExpensesFromApi();
+  
+  // The parent component (Reports.vue) now handles data loading via the unified service
+  // This eliminates the need to visit other pages first
+  console.log('Room P&L: Component mounted, data should be loaded by parent component');
+  
+  // Debug: Log what's available in cache
+  if (selectedProject.value?.project_name) {
+    console.log('Room P&L: Debugging cache access for project:', selectedProject.value.project_name);
+    console.log('Room P&L: Available cache pages:', Object.keys(calculationCache.cache[selectedProject.value.project_name] || {}));
+  }
 });
+
+// The unified data service is now handled by the parent component (Reports.vue)
+// This eliminates the need for individual components to manage data loading
 
 
 
@@ -1641,6 +1641,21 @@ function getRoomExpenseTotal(year, expenseName) {
   }
 }
 
+function getRoomExpensePercentage(year, label, expenseName) {
+  try {
+    const monthValue = getRoomExpenseAmount(year, label, expenseName);
+    const yearTotal = getRoomExpenseTotal(year, expenseName);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating room expense percentage:', error);
+    return 0;
+  }
+}
+
 function hasRoomExpenseData(expenseName) {
   if (!props.visibleYears || props.visibleYears.length === 0) return false;
   for (const year of props.visibleYears) {
@@ -1674,6 +1689,22 @@ function getGrossRoomExpensesYear(year) {
     return 0;
   }
 }
+
+function getGrossRoomExpensesPercentage(year, label) {
+  try {
+    const monthValue = getGrossRoomExpenses(year, label);
+    const monthRevenue = getTotalRoomsRevenue(year, label);
+    
+    if (monthRevenue > 0) {
+      return Number(((monthValue / monthRevenue) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating gross room expenses percentage:', error);
+    return 0;
+  }
+}
+
 function getNoOfRooms(year, label) {
   try {
     // Check if market segmentation is enabled
@@ -1684,12 +1715,16 @@ function getNoOfRooms(year, label) {
     const roomCount = calculationCache.getValue(projectName.value, 'Room Revenue Assumptions', 'Total Rooms', year, label);
     
     if (roomCount !== undefined && roomCount !== null) {
-      // console.log(`Room P&L: Retrieved room count for ${year}/${label}:`, roomCount, 'Market segmentation:', isMarketSegmentationEnabled);
+      console.log(`Room P&L: Retrieved room count for ${year}/${label}:`, roomCount, 'Market segmentation:', isMarketSegmentationEnabled);
       return getNumber(roomCount);
     }
     
+    // Debug: Log what's available in cache
+    console.log(`Room P&L: No cached room count found for ${year}/${label}`);
+    console.log(`Room P&L: Available cache for project ${projectName.value}:`, Object.keys(calculationCache.cache[projectName.value] || {}));
+    
     // Default fallback
-    // console.log(`Room P&L: No cached room count found for ${year}/${label}, using default: 100`);
+    console.log(`Room P&L: Using default room count: 100`);
     return 100;
   } catch (error) {
     console.error('Error fetching room count:', error);
@@ -1714,6 +1749,21 @@ function getNoOfRoomsTotal(year) {
   }
 }
 
+function getNoOfRoomsPercentage(year, label) {
+  try {
+    const monthValue = getNoOfRooms(year, label);
+    const yearTotal = getNoOfRoomsTotal(year);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating room percentage:', error);
+    return 0;
+  }
+}
+
 function getNoOfDays(year, label) {
   // TODO: Connect to calculation cache for days in month/quarter
   if (label === 'Jan' || label === 'Mar' || label === 'May' || label === 'Jul' || 
@@ -1732,17 +1782,32 @@ function getNoOfDaysTotal(year) {
   return labels.reduce((sum, label) => sum + getNumber(getNoOfDays(year, label)), 0);
 }
 
+function getNoOfDaysPercentage(year, label) {
+  try {
+    const monthValue = getNoOfDays(year, label);
+    const yearTotal = getNoOfDaysTotal(year);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating no of days percentage:', error);
+    return 0;
+  }
+}
+
 function getAvailableRooms(year, label) {
   try {
     // First try: Get from F&B page - Number of rooms available row
     let availableRooms = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Number of rooms available', year, label);
     
-    // console.log(`Room P&L: Available Rooms cache lookup for ${year}/${label}:`, {
-    //   projectName: projectName.value,
-    //   cacheKey: 'Number of rooms available',
-    //   cachedValue: availableRooms,
-    //   cacheExists: availableRooms !== undefined && availableRooms !== null
-    // });
+    console.log(`Room P&L: Available Rooms cache lookup for ${year}/${label}:`, {
+      projectName: projectName.value,
+      cacheKey: 'Number of rooms available',
+      cachedValue: availableRooms,
+      cacheExists: availableRooms !== undefined && availableRooms !== null
+    });
     
     if (availableRooms !== undefined && availableRooms !== null) {
       return getNumber(availableRooms);
@@ -1755,11 +1820,11 @@ function getAvailableRooms(year, label) {
       if (totalRooms !== undefined && totalRooms !== null) {
         const days = getNoOfDays(year, label);
         const calculatedValue = getNumber(totalRooms) * days;
-        // console.log(`Room P&L: Calculated from Room Revenue Total Rooms:`, {
-        //   totalRooms,
-        //   days,
-        //   calculatedValue
-        // });
+        console.log(`Room P&L: Calculated from Room Revenue Total Rooms:`, {
+          totalRooms,
+          days,
+          calculatedValue
+        });
         return calculatedValue;
       }
     }
@@ -1769,11 +1834,11 @@ function getAvailableRooms(year, label) {
     const days = getNoOfDays(year, label);
     const fallbackValue = rooms * days;
     
-    // console.log(`Room P&L: Using fallback calculation for available rooms:`, {
-    //   rooms,
-    //   days,
-    //   fallbackValue
-    // });
+    console.log(`Room P&L: Using fallback calculation for available rooms:`, {
+      rooms,
+      days,
+      fallbackValue
+    });
     
     return fallbackValue;
   } catch (error) {
@@ -1790,17 +1855,32 @@ function getAvailableRoomsTotal(year) {
   return labels.reduce((sum, label) => sum + getNumber(getAvailableRooms(year, label)), 0);
 }
 
+function getAvailableRoomsPercentage(year, label) {
+  try {
+    const monthValue = getAvailableRooms(year, label);
+    const yearTotal = getAvailableRoomsTotal(year);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating available rooms percentage:', error);
+    return 0;
+  }
+}
+
 function getSoldRooms(year, label) {
   try {
     // Get from F&B page - Number of rooms sold (excl.) row (note: lowercase in cache)
     const soldRooms = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Number of rooms sold (excl.)', year, label);
     
-    // console.log(`Room P&L: Sold Rooms cache lookup for ${year}/${label}:`, {
-    //   projectName: projectName.value,
-    //   cacheKey: 'Number of rooms sold (excl.)',
-    //   cachedValue: soldRooms,
-    //   cacheExists: soldRooms !== undefined && soldRooms !== null
-    // });
+    console.log(`Room P&L: Sold Rooms cache lookup for ${year}/${label}:`, {
+      projectName: projectName.value,
+      cacheKey: 'Number of rooms sold (excl.)',
+      cachedValue: soldRooms,
+      cacheExists: soldRooms !== undefined && soldRooms !== null
+    });
     
     if (soldRooms !== undefined && soldRooms !== null) {
       return getNumber(soldRooms);
@@ -1811,21 +1891,21 @@ function getSoldRooms(year, label) {
     if (occupancy !== undefined && occupancy !== null) {
       const availableRooms = getAvailableRooms(year, label);
       const calculatedSoldRooms = Math.round((getNumber(occupancy) / 100) * availableRooms);
-      // console.log(`Room P&L: Calculated sold rooms from occupancy:`, {
-      //   occupancy,
-      //   availableRooms,
-      //   calculatedSoldRooms
-      // });
+      console.log(`Room P&L: Calculated sold rooms from occupancy:`, {
+        occupancy,
+        availableRooms,
+        calculatedSoldRooms
+      });
       return calculatedSoldRooms;
     }
     
     // Default fallback: Use 75% occupancy as placeholder
     const availableRooms = getAvailableRooms(year, label);
     const placeholderSoldRooms = Math.round(availableRooms * 0.75);
-    // console.log(`Room P&L: Using placeholder 75% occupancy for sold rooms:`, {
-    //   availableRooms,
-    //   placeholderSoldRooms
-    // });
+    console.log(`Room P&L: Using placeholder 75% occupancy for sold rooms:`, {
+      availableRooms,
+      placeholderSoldRooms
+    });
     return placeholderSoldRooms;
   } catch (error) {
     console.error('Error fetching sold rooms:', error);
@@ -1836,6 +1916,21 @@ function getSoldRooms(year, label) {
 function getSoldRoomsTotal(year) {
   const labels = getColumnLabelsForYear(year);
   return labels.reduce((sum, label) => sum + getNumber(getSoldRooms(year, label)), 0);
+}
+
+function getSoldRoomsPercentage(year, label) {
+  try {
+    const monthValue = getSoldRooms(year, label);
+    const yearTotal = getSoldRoomsTotal(year);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating sold rooms percentage:', error);
+    return 0;
+  }
 }
 
 function getOccupancyPercentage(year, label) {
@@ -1872,6 +1967,21 @@ function getOccupancyPercentageTotal(year) {
   return 0;
 }
 
+function getOccupancyPercentagePercentage(year, label) {
+  try {
+    const monthValue = getOccupancyPercentage(year, label);
+    const yearTotal = getOccupancyPercentageTotal(year);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating occupancy percentage percentage:', error);
+    return 0;
+  }
+}
+
 function getNumberOfGuests(year, label) {
   try {
     // Get from F&B page - Number of guests row
@@ -1893,6 +2003,21 @@ function getNumberOfGuestsTotal(year) {
   return labels.reduce((sum, label) => sum + getNumber(getNumberOfGuests(year, label)), 0);
 }
 
+function getNumberOfGuestsPercentage(year, label) {
+  try {
+    const monthValue = getNumberOfGuests(year, label);
+    const yearTotal = getNumberOfGuestsTotal(year);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating number of guests percentage:', error);
+    return 0;
+  }
+}
+
 function getNumberOfCovers(year, label) {
   try {
     // Get from F&B page - Total Covers row
@@ -1912,6 +2037,21 @@ function getNumberOfCovers(year, label) {
 function getNumberOfCoversTotal(year) {
   const labels = getColumnLabelsForYear(year);
   return labels.reduce((sum, label) => sum + getNumber(getNumberOfCovers(year, label)), 0);
+}
+
+function getNumberOfCoversPercentage(year, label) {
+  try {
+    const monthValue = getNumberOfCovers(year, label);
+    const yearTotal = getNumberOfCoversTotal(year);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating number of covers percentage:', error);
+    return 0;
+  }
 }
 
 function getAverageFnbSpent(year, label) {
@@ -1936,6 +2076,21 @@ function getAverageFnbSpentTotal(year) {
   return totalSpent > 0 ? totalSpent / labels.length : 0;
 }
 
+function getAverageFnbSpentPercentage(year, label) {
+  try {
+    const monthValue = getAverageFnbSpent(year, label);
+    const yearTotal = getAverageFnbSpentTotal(year);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating average F&B spent percentage:', error);
+    return 0;
+  }
+}
+
 function getAverageRoomRate(year, label) {
   try {
     // Get from F&B page - Average Room Rate row
@@ -1956,6 +2111,21 @@ function getAverageRoomRateTotal(year) {
   const labels = getColumnLabelsForYear(year);
   const totalRate = labels.reduce((sum, label) => sum + getNumber(getAverageRoomRate(year, label)), 0);
   return totalRate > 0 ? totalRate / labels.length : 0;
+}
+
+function getAverageRoomRatePercentage(year, label) {
+  try {
+    const monthValue = getAverageRoomRate(year, label);
+    const yearTotal = getAverageRoomRateTotal(year);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating average room rate percentage:', error);
+    return 0;
+  }
 }
 
 function getRevPerAvailableRoom(year, label) {
@@ -1987,6 +2157,21 @@ function getRevPerAvailableRoomTotal(year) {
   const labels = getColumnLabelsForYear(year);
   const totalRev = labels.reduce((sum, label) => sum + getNumber(getRevPerAvailableRoom(year, label)), 0);
   return totalRev > 0 ? totalRev / labels.length : 0;
+}
+
+function getRevPerAvailableRoomPercentage(year, label) {
+  try {
+    const monthValue = getRevPerAvailableRoom(year, label);
+    const yearTotal = getRevPerAvailableRoomTotal(year);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating revenue per available room percentage:', error);
+    return 0;
+  }
 }
 
 // Data availability checking functions
@@ -2178,14 +2363,21 @@ const payrollLocationsManagement = computed(() => {
     const page = 'Payroll';
     const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const locs = new Set();
+    
+    console.log(`Room P&L: Looking for payroll management data in page "${page}"`);
+    console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
+    
     Object.keys(pageData).forEach((rowCode) => {
       const parsed = parseMonthlySalaryRowCode(rowCode);
       if (parsed && isManagementPositionName(parsed.position) && parsed.location) {
         locs.add(parsed.location);
       }
     });
+    
+    console.log(`Room P&L: Found ${locs.size} management locations:`, Array.from(locs));
     return Array.from(locs);
   } catch (e) {
+    console.error('Room P&L: Error discovering payroll management locations:', e);
     return [];
   }
 });
@@ -2196,14 +2388,21 @@ const payrollLocationsNonManagement = computed(() => {
     const page = 'Payroll';
     const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const locs = new Set();
+    
+    console.log(`Room P&L: Looking for payroll non-management data in page "${page}"`);
+    console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
+    
     Object.keys(pageData).forEach((rowCode) => {
       const parsed = parseMonthlySalaryRowCode(rowCode);
       if (parsed && !isManagementPositionName(parsed.position) && parsed.location) {
         locs.add(parsed.location);
       }
     });
+    
+    console.log(`Room P&L: Found ${locs.size} non-management locations:`, Array.from(locs));
     return Array.from(locs);
   } catch (e) {
+    console.error('Room P&L: Error discovering payroll non-management locations:', e);
     return [];
   }
 });
@@ -2236,6 +2435,21 @@ function getPayrollMonthlySalaryTotal(year, location, group) {
     const labels = getColumnLabelsForYear(year);
     return labels.reduce((acc, lab) => acc + getNumber(getPayrollMonthlySalaryByLocation(year, lab, location, group)), 0);
   } catch (e) {
+    return 0;
+  }
+}
+
+function getPayrollMonthlySalaryPercentage(year, label, location, group) {
+  try {
+    const monthValue = getPayrollMonthlySalaryByLocation(year, label, location, group);
+    const yearTotal = getPayrollMonthlySalaryTotal(year, location, group);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating payroll monthly salary percentage:', error);
     return 0;
   }
 }
@@ -2289,6 +2503,21 @@ function getTotalPayrollYear(year) {
   }
 }
 
+function getTotalPayrollPercentage(year, label) {
+  try {
+    const monthValue = getTotalPayroll(year, label);
+    const monthRevenue = getTotalRoomsRevenue(year, label);
+    
+    if (monthRevenue > 0) {
+      return Number(((monthValue / monthRevenue) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating total payroll percentage:', error);
+    return 0;
+  }
+}
+
 // Discover room revenue segments from cache for the current project
 const roomRevenueSegments = computed(() => {
   try {
@@ -2296,14 +2525,21 @@ const roomRevenueSegments = computed(() => {
     const page = 'Market Segmentation';
     const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const segments = new Set();
+    
+    console.log(`Room P&L: Looking for market segmentation data in page "${page}"`);
+    console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
+    
     Object.keys(pageData).forEach((rowCode) => {
       if (rowCode.startsWith('Room Revenue:')) {
         const name = rowCode.replace('Room Revenue:', '').trim();
         if (name) segments.add(name);
       }
     });
+    
+    console.log(`Room P&L: Found ${segments.size} market segments:`, Array.from(segments));
     return Array.from(segments);
   } catch (e) {
+    console.error('Room P&L: Error discovering room revenue segments:', e);
     return [];
   }
 });
@@ -2338,6 +2574,21 @@ function getSegmentRevenueTotal(year, segmentName) {
   } catch (e) {
     const labels = getColumnLabelsForYear(year);
     return labels.reduce((sum, label) => sum + getNumber(getSegmentRevenue(year, label, segmentName)), 0);
+  }
+}
+
+function getSegmentRevenuePercentage(year, label, segmentName) {
+  try {
+    const monthValue = getSegmentRevenue(year, label, segmentName);
+    const yearTotal = getTotalRoomsRevenueTotal(year);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating segment revenue percentage:', error);
+    return 0;
   }
 }
 
@@ -2462,14 +2713,21 @@ const roomTypePackages = computed(() => {
     const page = 'Room Revenue Assumptions';
     const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const types = new Set();
+    
+    console.log(`Room P&L: Looking for room type packages in page "${page}"`);
+    console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
+    
     Object.keys(pageData).forEach((rowCode) => {
       if (rowCode.startsWith('Room Type:')) {
         const name = rowCode.replace('Room Type:', '').trim();
         if (name) types.add(name);
       }
     });
+    
+    console.log(`Room P&L: Found ${types.size} room type packages:`, Array.from(types));
     return Array.from(types);
   } catch (e) {
+    console.error('Room P&L: Error discovering room type packages:', e);
     return [];
   }
 });
@@ -2504,6 +2762,21 @@ function getRoomTypeRevenueTotal(year, typeName) {
   } catch (e) {
     const labels = getColumnLabelsForYear(year);
     return labels.reduce((sum, label) => sum + getNumber(getRoomTypeRevenue(year, label, typeName)), 0);
+  }
+}
+
+function getRoomTypeRevenuePercentage(year, label, typeName) {
+  try {
+    const monthValue = getRoomTypeRevenue(year, label, typeName);
+    const yearTotal = getTotalRoomsRevenueTotal(year);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating room type revenue percentage:', error);
+    return 0;
   }
 }
 
@@ -2550,6 +2823,21 @@ function getTotalRoomsRevenueTotal(year) {
   }
   const labels = getColumnLabelsForYear(year);
   return labels.reduce((sum, label) => sum + getNumber(getTotalRoomsRevenue(year, label)), 0);
+}
+
+function getTotalRoomsRevenuePercentage(year, label) {
+  try {
+    const monthValue = getTotalRoomsRevenue(year, label);
+    const yearTotal = getTotalRoomsRevenueTotal(year);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating total rooms revenue percentage:', error);
+    return 0;
+  }
 }
 
 // Data availability checking functions for revenue
@@ -2711,6 +2999,21 @@ function getPayrollRelatedTotal(year, benefitType) {
   }
 }
 
+function getPayrollRelatedPercentage(year, label, benefitType) {
+  try {
+    const monthValue = getPayrollRelatedValue(year, label, benefitType);
+    const yearTotal = getPayrollRelatedTotal(year, benefitType);
+    
+    if (yearTotal > 0) {
+      return Number(((monthValue / yearTotal) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating payroll related percentage:', error);
+    return 0;
+  }
+}
+
 // Check if payroll related data exists for a specific benefit type
 function hasPayrollRelatedData(benefitType) {
   if (!props.visibleYears || props.visibleYears.length === 0) return false;
@@ -2768,6 +3071,21 @@ function getBonusTotal(year) {
   }
 }
 
+function getBonusPercentage(year, label) {
+  try {
+    const monthValue = getBonusValue(year, label);
+    const monthRevenue = getTotalRoomsRevenue(year, label);
+    
+    if (monthRevenue > 0) {
+      return Number(((monthValue / monthRevenue) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating bonus percentage:', error);
+    return 0;
+  }
+}
+
 // Get total payroll related expenses for a specific year and period
 function getTotalPayrollRelatedExpenses(year, label) {
   try {
@@ -2809,6 +3127,21 @@ function getTotalPayrollRelatedExpensesYear(year) {
   }
 }
 
+function getTotalPayrollRelatedExpensesPercentage(year, label) {
+  try {
+    const monthValue = getTotalPayrollRelatedExpenses(year, label);
+    const monthRevenue = getTotalRoomsRevenue(year, label);
+    
+    if (monthRevenue > 0) {
+      return Number(((monthValue / monthRevenue) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating total payroll related expenses percentage:', error);
+    return 0;
+  }
+}
+
 // Get total expenses for a specific year and period (sum of all expense components)
 function getTotalExpenses(year, label) {
   try {
@@ -2844,6 +3177,21 @@ function getTotalExpensesYear(year) {
   }
 }
 
+function getTotalExpensesPercentage(year, label) {
+  try {
+    const monthValue = getTotalExpenses(year, label);
+    const monthRevenue = getTotalRoomsRevenue(year, label);
+    
+    if (monthRevenue > 0) {
+      return Number(((monthValue / monthRevenue) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating total expenses percentage:', error);
+    return 0;
+  }
+}
+
 // Get departmental income (loss) for a specific year and period
 function getDepartmentalIncome(year, label) {
   try {
@@ -2865,6 +3213,21 @@ function getDepartmentalIncomeYear(year) {
     return labels.reduce((sum, label) => sum + getNumber(getDepartmentalIncome(year, label)), 0);
   } catch (error) {
     console.error('Error calculating departmental income for year:', error);
+    return 0;
+  }
+}
+
+function getDepartmentalIncomePercentage(year, label) {
+  try {
+    const monthValue = getDepartmentalIncome(year, label);
+    const monthRevenue = getTotalRoomsRevenue(year, label);
+    
+    if (monthRevenue > 0) {
+      return Number(((monthValue / monthRevenue) * 100).toFixed(2));
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error calculating departmental income percentage:', error);
     return 0;
   }
 }
