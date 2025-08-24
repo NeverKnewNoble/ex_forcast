@@ -173,11 +173,11 @@ export function extractFieldOptionsFromData(expenseData) {
 }
 
 // Get amount for a specific expense, year, and month/quarter
-export function getAmountForExpense(expenseData, expense, year, label, displayMode = "monthly") {
+export function getAmountForExpense(expenseData, expense, year, label, displayMode = "monthly", department = null) {
   if (displayMode === "quarterly" && quarterToMonths[label]) {
     // First, check if the quarterly label itself exists in the data (e.g., "Jan-Mar")
     const quarterlyEntries = expenseData?.[year]?.[label] || [];
-    const quarterlyFound = quarterlyEntries.find(e => e.expense === expense);
+    const quarterlyFound = quarterlyEntries.find(e => e.expense === expense && (!department || e.department === department));
     if (quarterlyFound) {
       return parseFloat(quarterlyFound.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
@@ -186,24 +186,24 @@ export function getAmountForExpense(expenseData, expense, year, label, displayMo
     let total = 0;
     for (const month of quarterToMonths[label]) {
       const entries = expenseData?.[year]?.[month] || [];
-      const found = entries.find(e => e.expense === expense);
+      const found = entries.find(e => e.expense === expense && (!department || e.department === department));
       if (found) total += parseFloat(found.amount) || 0;
     }
     return total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   } else {
     // Monthly mode (or fallback)
     const entries = expenseData?.[year]?.[label] || [];
-    const found = entries.find(e => e.expense === expense);
+    const found = entries.find(e => e.expense === expense && (!department || e.department === department));
     return found ? parseFloat(found.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00";
   }
 }
 
 // Calculate total for a specific expense and year
-export function calculateTotalForExpense(expenseData, expense, year, displayMode, getColumnLabelsForYear) {
+export function calculateTotalForExpense(expenseData, expense, year, displayMode, getColumnLabelsForYear, department = null) {
   const months = getColumnLabelsForYear(year)
   let total = 0
   for (const month of months) {
-    const rawAmount = getAmountForExpense(expenseData, expense, year, month, displayMode)
+    const rawAmount = getAmountForExpense(expenseData, expense, year, month, displayMode, department)
     const amt = parseFloat(rawAmount.toString().replace(/,/g, ''))
     if (!isNaN(amt)) total += amt
   }
@@ -225,11 +225,12 @@ export function getExpensesGroupedByDepartmentAndLocation(expenseData, visibleYe
     
     const locationMap = departmentMap.get(department)
     if (!locationMap.has(location)) {
-      locationMap.set(location, new Set())
+      locationMap.set(location, new Map()) // Use Map instead of Set for better deduplication
     }
     
     // Add default expense with a flag to identify it
-    locationMap.get(location).add({
+    // Use expense name as key to prevent duplicates
+    locationMap.get(location).set(defaultExpense.expense, {
       expense: defaultExpense.expense,
       isDefault: true,
       costType: defaultExpense.cost_type,
@@ -253,17 +254,22 @@ export function getExpensesGroupedByDepartmentAndLocation(expenseData, visibleYe
           
           const locationMap = departmentMap.get(department)
           if (!locationMap.has(location)) {
-            locationMap.set(location, new Set())
+            locationMap.set(location, new Map()) // Use Map instead of Set for better deduplication
           }
           
           // Add existing expense with a flag to identify it
-          locationMap.get(location).add({
-            expense: entry.expense,
-            isDefault: false,
-            costType: entry['cost_type'] || '',
-            code: entry.code || '',
-            rootType: entry['root type'] || ''
-          })
+          // Use expense name as key to prevent duplicates
+          // Only add if it doesn't exist, or if this is a default expense (which should take precedence)
+          const existingExpense = locationMap.get(location).get(entry.expense)
+          if (!existingExpense || existingExpense.isDefault === false) {
+            locationMap.get(location).set(entry.expense, {
+              expense: entry.expense,
+              isDefault: false,
+              costType: entry['cost_type'] || '',
+              code: entry.code || '',
+              rootType: entry['root type'] || ''
+            })
+          }
         })
       }
     })
@@ -278,9 +284,9 @@ export function getExpensesGroupedByDepartmentAndLocation(expenseData, visibleYe
       locations: []
     }
     
-    for (const [location, expensesSet] of locationMap) {
-      // Convert Set to Array and sort by default status (defaults first) then alphabetically
-      const expensesArray = Array.from(expensesSet).sort((a, b) => {
+    for (const [location, expensesMap] of locationMap) {
+      // Convert Map values to Array and sort by default status (defaults first) then alphabetically
+      const expensesArray = Array.from(expensesMap.values()).sort((a, b) => {
         // Default expenses come first
         if (a.isDefault && !b.isDefault) return -1
         if (!a.isDefault && b.isDefault) return 1
