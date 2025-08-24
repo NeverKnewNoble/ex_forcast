@@ -58,7 +58,7 @@ function findExpenseDetails(expenseData, expense, year, month) {
 }
 
 //! Helper function to check if an expense is a default expense
-function isDefaultExpense(expense, defaultExpenses) {
+function isDefaultExpense(expense, defaultExpenses, department = null) {
   // Ensure defaultExpenses is an array and has the some method
   if (!Array.isArray(defaultExpenses) || typeof defaultExpenses.some !== 'function') {
     console.warn('defaultExpenses is not an array:', defaultExpenses);
@@ -66,7 +66,13 @@ function isDefaultExpense(expense, defaultExpenses) {
   }
   
   try {
-    return defaultExpenses.some(de => de.expense === expense);
+    if (department) {
+      // If department is provided, check if there's a default expense that matches both name and department
+      return defaultExpenses.some(de => de.expense === expense && de.department === department);
+    } else {
+      // Fallback to checking by name only (for backward compatibility)
+      return defaultExpenses.some(de => de.expense === expense);
+    }
   } catch (error) {
     console.error('Error checking if expense is default:', error);
     return false;
@@ -74,9 +80,17 @@ function isDefaultExpense(expense, defaultExpenses) {
 }
 
 //! Helper function to get expense details from either default expenses or regular expense data
-function getExpenseDetailsForSaving(expense, year, label, expenseData, defaultExpenses) {
-  // First check if it's a default expense
-  const defaultExpense = defaultExpenses.find(de => de.expense === expense);
+function getExpenseDetailsForSaving(expense, year, label, expenseData, defaultExpenses, department = null) {
+  // First check if it's a default expense, considering department if provided
+  let defaultExpense;
+  if (department) {
+    // If department is provided, find the default expense that matches both name and department
+    defaultExpense = defaultExpenses.find(de => de.expense === expense && de.department === department);
+  } else {
+    // Fallback to finding by name only (for backward compatibility)
+    defaultExpense = defaultExpenses.find(de => de.expense === expense);
+  }
+  
   if (defaultExpense) {
     return {
       department: defaultExpense.department || '',
@@ -119,17 +133,21 @@ export async function saveChanges(changedCells, isSaving, saveError, expenseData
   try {
     const payload = changedCells.value.map(cell => {
       // Find the expense details by searching through the data
-      const details = getExpenseDetailsForSaving(cell.expense, cell.year, cell.label, expenseData.value, defaultExpenses);
+      // Use the department from the cell if available, otherwise fall back to the details lookup
+      const details = getExpenseDetailsForSaving(cell.expense, cell.year, cell.label, expenseData.value, defaultExpenses, cell.department);
       
-      // Check if this is a default expense
-      const isDefault = isDefaultExpense(cell.expense, defaultExpenses);
+      // Check if this is a default expense, considering the department
+      const isDefault = isDefaultExpense(cell.expense, defaultExpenses, cell.department);
+      
+      // Use the department from the cell if available, otherwise use the details lookup
+      const finalDepartment = cell.department || details.department;
       
       return {
         year: cell.year,
         month: cell.label,
         expense: cell.expense,
         amount: parseFloat(cell.newValue),
-        department: details.department,
+        department: finalDepartment,
         department_location: details.department_location,
         cost_type: details.cost_type,
         hospitality_category: details.hospitality_category,
@@ -139,6 +157,8 @@ export async function saveChanges(changedCells, isSaving, saveError, expenseData
     
     // Debug logging to see what's being sent
     console.log('Saving expense changes with payload:', payload);
+    console.log('Changed cells with department info:', changedCells.value);
+    console.log('Default expenses for reference:', defaultExpenses);
     
     const response = await fetch("/api/method/ex_forcast.api.expense_estimate.upsert_expense_items", {
       method: "POST",

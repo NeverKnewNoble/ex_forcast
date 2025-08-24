@@ -94,26 +94,53 @@ export function cleanAmountValue(index, addExpenseForm) {
   row.amount = numValue;
 }
 
+// Helper function to determine if an expense should be displayed as a percentage
+function isPercentageExpense(expenseName) {
+  const percentageExpenses = [
+    'Cost of Beverage sales',
+    'Cost of Food sales'
+  ];
+  return percentageExpenses.includes(expenseName);
+}
+
 // Handler for cell edits
-export function handleCellEdit({ year, label, expense, event, originalExpenseData, changedCells, expenseData, isSaved }) {
+export function handleCellEdit({ year, label, expense, event, originalExpenseData, changedCells, expenseData, isSaved, department = null }) {
   let newValue = event.target.innerText.replace(/,/g, '').trim();
-  if (newValue === '') newValue = '0.00';
-  const numValue = parseFloat(newValue) || 0;
-  newValue = numValue.toFixed(2);
+  
+  // Handle percentage inputs for percentage expenses
+  if (isPercentageExpense(expense)) {
+    // Remove % symbol if present
+    newValue = newValue.replace(/%/g, '').trim();
+    if (newValue === '') newValue = '0.00';
+    
+    // Convert percentage to decimal (e.g., 25 -> 0.25)
+    const numValue = parseFloat(newValue) || 0;
+    newValue = (numValue / 100).toFixed(4); // Store as decimal with 4 decimal places for precision
+  } else {
+    // Regular currency handling
+    if (newValue === '') newValue = '0.00';
+    const numValue = parseFloat(newValue) || 0;
+    newValue = numValue.toFixed(2);
+  }
+  
   let original = '0.00';
   const entries = originalExpenseData.value?.[year]?.[label] || [];
-  const found = entries.find(e => e.expense === expense);
+  const found = entries.find(e => e.expense === expense && (!department || e.department === department));
   if (found) original = parseFloat(found.amount).toFixed(2);
   if (newValue !== original) {
     isSaved.value = false;
     const idx = changedCells.value.findIndex(c => c.year === year && c.label === label && c.expense === expense);
     if (idx !== -1) {
       changedCells.value[idx].newValue = newValue;
+      // Update department if it wasn't set before
+      if (department && !changedCells.value[idx].department) {
+        changedCells.value[idx].department = department;
+      }
     } else {
-      changedCells.value.push({ year, label, expense, newValue });
+      changedCells.value.push({ year, label, expense, newValue, department });
     }
     const dataEntries = expenseData.value?.[year]?.[label] || [];
-    const dataFound = dataEntries.find(e => e.expense === expense);
+    const dataFound = dataEntries.find(e => e.expense === expense && (!department || e.department === department));
     if (dataFound) {
       dataFound.amount = parseFloat(newValue);
     }
@@ -126,21 +153,22 @@ export function handleCellEdit({ year, label, expense, event, originalExpenseDat
 // Handler for cell input (real-time formatting)
 export function handleCellInput({ year, label, expense, event }) {
   let value = event.target.innerText;
-  value = value.replace(/[^\d.]/g, '');
-  const parts = value.split('.');
-  if (parts.length > 2) {
-    value = parts[0] + '.' + parts.slice(1).join('');
-  }
-  const shouldFormat = !value.includes('.') || (parts.length === 2 && parts[1].length === 2);
-  if (shouldFormat) {
+  
+  if (isPercentageExpense(expense)) {
+    // For percentage expenses, allow only numbers and decimal point
+    value = value.replace(/[^\d.]/g, '');
+    const parts = value.split('.');
+    if (parts.length > 2) {
+      value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    // Limit decimal places to 2 for percentages
     if (parts.length === 2 && parts[1].length > 2) {
       value = parts[0] + '.' + parts[1].substring(0, 2);
     }
+    
+    // Format as percentage during typing
     const numValue = parseFloat(value) || 0;
-    const formattedValue = numValue.toLocaleString('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    });
+    const formattedValue = numValue.toFixed(2);
     if (formattedValue !== event.target.innerText) {
       event.target.innerText = formattedValue;
       const range = document.createRange();
@@ -152,8 +180,36 @@ export function handleCellInput({ year, label, expense, event }) {
       selection.addRange(range);
     }
   } else {
-    if (value !== event.target.innerText) {
-      event.target.innerText = value;
+    // Regular currency handling
+    value = value.replace(/[^\d.]/g, '');
+    const parts = value.split('.');
+    if (parts.length > 2) {
+      value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    const shouldFormat = !value.includes('.') || (parts.length === 2 && parts[1].length === 2);
+    if (shouldFormat) {
+      if (parts.length === 2 && parts[1].length > 2) {
+        value = parts[0] + '.' + parts[1].substring(0, 2);
+      }
+      const numValue = parseFloat(value) || 0;
+      const formattedValue = numValue.toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      });
+      if (formattedValue !== event.target.innerText) {
+        event.target.innerText = formattedValue;
+        const range = document.createRange();
+        const textNode = event.target.firstChild || event.target;
+        range.setStart(textNode, textNode.textContent.length);
+        range.collapse(true);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    } else {
+      if (value !== event.target.innerText) {
+        event.target.innerText = value;
+      }
     }
   }
 }
@@ -161,8 +217,17 @@ export function handleCellInput({ year, label, expense, event }) {
 // Handler for cell focus (show raw value for editing)
 export function handleCellFocus({ year, label, expense, event }) {
   let value = event.target.innerText;
-  const rawValue = value.replace(/,/g, '');
-  event.target.innerText = rawValue;
+  
+  if (isPercentageExpense(expense)) {
+    // For percentage expenses, show the percentage value (e.g., 25.00% -> 25.00)
+    const rawValue = value.replace(/%/g, '');
+    event.target.innerText = rawValue;
+  } else {
+    // For regular expenses, show the raw value without commas
+    const rawValue = value.replace(/,/g, '');
+    event.target.innerText = rawValue;
+  }
+  
   const range = document.createRange();
   const selection = window.getSelection();
   range.selectNodeContents(event.target);
@@ -175,7 +240,7 @@ export function calculateDepartmentMonthTotal(expenseData, departmentGroup, year
   let total = 0;
   for (const locationGroup of departmentGroup.locations) {
     for (const expense of locationGroup.expenses) {
-      const rawAmount = getAmountForExpense(expenseData, expense, year, label, displayMode);
+      const rawAmount = getAmountForExpense(expenseData, expense, year, label, displayMode, departmentGroup.department);
       const amt = parseFloat(rawAmount.toString().replace(/,/g, ''));
       if (!isNaN(amt)) total += amt;
     }
@@ -190,7 +255,7 @@ export function calculateDepartmentTotal(expenseData, departmentGroup, year, dis
   for (const locationGroup of departmentGroup.locations) {
     for (const expense of locationGroup.expenses) {
       for (const month of months) {
-        const rawAmount = getAmountForExpense(expenseData, expense, year, month, displayMode);
+        const rawAmount = getAmountForExpense(expenseData, expense, year, month, displayMode, null);
         const amt = parseFloat(rawAmount.toString().replace(/,/g, ''));
         if (!isNaN(amt)) total += amt;
       }

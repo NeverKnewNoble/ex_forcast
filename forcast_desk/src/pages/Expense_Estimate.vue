@@ -357,22 +357,22 @@
                                   class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
                                   @input="handleCellInput({ year, label, expense, event: $event })"
                                   @focus="handleCellFocus({ year, label, expense, event: $event })"
-                                  @blur="handleCellEditWrapper({ year, label, expense, event: $event })"
+                                  @blur="handleCellEditWrapper({ year, label, expense, event: $event, department: departmentGroup.department })"
                                 >
                                   <span class="font-mono text-xs">
-                                    {{ year === 'Default' ? '0.00' : getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode) }}
+                                    {{ year === 'Default' ? (isPercentageExpense(expense) ? '0.00%' : '0.00') : formatExpenseValue(getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode, departmentGroup.department), expense) }}
                                   </span>
                                 </td>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
                                   <span class="font-mono text-xs text-violet-700">
-                                    {{ year === 'Default' ? '0.00' : calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
+                                    {{ year === 'Default' ? (isPercentageExpense(expense) ? '0.00%' : '0.00') : formatExpenseValue(calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal, departmentGroup.department), expense) }}
                                   </span>
                                 </td>
                               </template>
                               <template v-else>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
                                   <span class="font-mono text-xs text-violet-700">
-                                    {{ year === 'Default' ? '0.00' : calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal) }}
+                                    {{ year === 'Default' ? (isPercentageExpense(expense) ? '0.00%' : '0.00') : formatExpenseValue(calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal, departmentGroup.department), expense) }}
                                   </span>
                                 </td>
                               </template>
@@ -1152,7 +1152,7 @@ function clearYearSelection() {
   isSaved.value = false;
 }
 
-function handleCellEditWrapper({ year, label, expense, event }) {
+function handleCellEditWrapper({ year, label, expense, event, department }) {
   handleCellEdit({
     year,
     label,
@@ -1161,7 +1161,8 @@ function handleCellEditWrapper({ year, label, expense, event }) {
     originalExpenseData,
     changedCells,
     expenseData,
-    isSaved
+    isSaved,
+    department
   });
 }
 
@@ -1270,24 +1271,28 @@ function exportTableData() {
     csvContent += headers.join(",") + "\n";
     
     // Add data rows
-    groupedExpenses.value.forEach(categoryGroup => {
-      categoryGroup.expenses.forEach(expense => {
-        const row = [
-          getExpenseDetailsLocal(expense).code,
-          expense,
-          getExpenseDetailsLocal(expense).costType
-        ];
-        
-        visibleYears.value.forEach(year => {
-          if (!isYearCollapsed(year)) {
-            getColumnLabelsForYearLocal(year).forEach(label => {
-              row.push(getAmountForExpense(expenseData.value, expense, year, label, advancedModes.value[year] || displayMode.value));
-            });
-          }
-          row.push(calculateTotalForExpense(expenseData.value, expense, year, advancedModes.value[year] || displayMode.value, getColumnLabelsForYearLocal));
+    groupedExpenses.value.forEach(departmentGroup => {
+      departmentGroup.locations.forEach(locationGroup => {
+        locationGroup.expenses.forEach(expense => {
+          const row = [
+            getExpenseDetailsLocal(expense).code,
+            expense,
+            getExpenseDetailsLocal(expense).costType
+          ];
+          
+          visibleYears.value.forEach(year => {
+            if (!isYearCollapsed(year)) {
+              getColumnLabelsForYearLocal(year).forEach(label => {
+                const amount = getAmountForExpense(expenseData.value, expense, year, label, advancedModes.value[year] || displayMode.value, departmentGroup.department);
+                row.push(formatExpenseValue(amount, expense));
+              });
+            }
+            const total = calculateTotalForExpense(expenseData.value, expense, year, advancedModes.value[year] || displayMode.value, getColumnLabelsForYearLocal, departmentGroup.department);
+            row.push(formatExpenseValue(total, expense));
+          });
+          
+          csvContent += row.join(",") + "\n";
         });
-        
-        csvContent += row.join(",") + "\n";
       });
     });
     
@@ -1399,6 +1404,26 @@ function openSettings() {
 
 function closeSettings() {
   showSettingsModal.value = false;
+}
+
+// Helper function to determine if an expense should be displayed as a percentage
+function isPercentageExpense(expenseName) {
+  const percentageExpenses = [
+    'Cost of Beverage sales',
+    'Cost of Food sales'
+  ];
+  return percentageExpenses.includes(expenseName);
+}
+
+// Helper function to format expense value as percentage or currency
+function formatExpenseValue(value, expenseName) {
+  if (isPercentageExpense(expenseName)) {
+    // Convert decimal to percentage (e.g., 0.25 -> 25.00%)
+    const percentage = (parseFloat(value) * 100).toFixed(2);
+    return `${percentage}%`;
+  }
+  // Return as currency (existing behavior)
+  return value;
 }
 </script>
 
