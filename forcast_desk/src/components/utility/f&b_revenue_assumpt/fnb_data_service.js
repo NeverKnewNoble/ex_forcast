@@ -139,6 +139,33 @@ export function convertServerDataToFrontendFormat(serverData) {
 //   console.log('Converting server data to frontend format:', serverData);
   const frontendData = {};
   
+  function normalizeSection(section) {
+    if (!section || typeof section !== 'string') return section;
+    const s = section.trim();
+    // Normalize common variants
+    if (/^breakfast\s*revenue$/i.test(s)) return 'Breakfast Revenue';
+    if (/^lunch\s*revenue$/i.test(s)) return 'Lunch Revenue';
+    if (/^dinner\s*revenue$/i.test(s)) return 'Dinner Revenue';
+    if (/^total$/i.test(s)) return 'Total';
+    return s;
+  }
+
+  function normalizeType(type) {
+    if (!type || typeof type !== 'string') return type;
+    const t = type.trim();
+    // Normalize breakfast keys
+    if (/^average\s*check\s*breakfast$/i.test(t)) return 'Average check breakfast';
+    if (/^avg\s*check\s*breakfast$/i.test(t)) return 'Average check breakfast';
+    if (/^breakfast\s*covers$/i.test(t)) return 'Breakfast Covers';
+    if (/^breakfast\s*revenue$/i.test(t)) return 'Breakfast Revenue';
+    // Normalize food/beverage totals
+    if (/^total\s*food\s*revenue$/i.test(t)) return 'Total Food Revenue';
+    if (/^total\s*beverage\s*revenue$/i.test(t)) return 'Total Beverage Revenue';
+    if (/^total\s*cover$/i.test(t)) return 'Total Cover';
+    if (/^total\s*revenue$/i.test(t)) return 'Total Revenue';
+    return t;
+  }
+
   if (!serverData || typeof serverData !== 'object') {
     console.warn('Server data is not a valid object:', serverData);
     return frontendData;
@@ -168,8 +195,8 @@ export function convertServerDataToFrontendFormat(serverData) {
         // Create row key in the format expected by frontend (without label)
         const rowKey = JSON.stringify({
           restaurant: item.restaurant,
-          section: item.cover_category,
-          type: item.cover_detail
+          section: normalizeSection(item.cover_category),
+          type: normalizeType(item.cover_detail)
         });
         
         // Initialize nested structure if needed

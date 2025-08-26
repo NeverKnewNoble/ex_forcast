@@ -196,16 +196,7 @@ def upsert_expense_items(changes, project=None):
                     },
                     "name"
                 )
-                # If not found with exact match, try to find by expense name only
-                if not child:
-                    child = frappe.db.get_value(
-                        "Expense Items",
-                        {
-                            "parent": parent,
-                            "default_expense": expense_name,
-                        },
-                        "name"
-                    )
+                # No fallback search - we need exact department match for default expenses
             else:
                 child = frappe.db.get_value(
                     "Expense Items",
@@ -217,16 +208,7 @@ def upsert_expense_items(changes, project=None):
                     },
                     "name"
                 )
-                # If not found with exact match, try to find by expense name only
-                if not child:
-                    child = frappe.db.get_value(
-                        "Expense Items",
-                        {
-                            "parent": parent,
-                            "expense_name": expense_name,
-                        },
-                        "name"
-                    )
+                # No fallback search - we need exact department match for regular expenses
 
             if child:
                 # Update amount only

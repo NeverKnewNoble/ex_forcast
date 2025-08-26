@@ -1659,6 +1659,10 @@ function loadProjectSettings() {
   if (!project || !project.project_name) {
     // Clear settings if no project selected
     totalNumberOfRooms.value = 0;
+    vatByYear.value = {};
+    breakfastByYear.value = {};
+    exchangeRateByYear.value = {};
+    serviceChargeByYear.value = {};
     return;
   }
 
@@ -1670,6 +1674,38 @@ function loadProjectSettings() {
   } else {
     // If no stored value, calculate from room packages
     totalNumberOfRooms.value = calculateTotalRoomCount(roomPackages.value, roomData.value);
+  }
+
+  // Load VAT by year for this project
+  try {
+    const storedVat = localStorage.getItem(getProjectKey('vatByYear'));
+    vatByYear.value = storedVat ? JSON.parse(storedVat) : {};
+  } catch (e) {
+    vatByYear.value = {};
+  }
+
+  // Load Breakfast allocation by year for this project
+  try {
+    const storedBreakfast = localStorage.getItem(getProjectKey('breakfastByYear'));
+    breakfastByYear.value = storedBreakfast ? JSON.parse(storedBreakfast) : {};
+  } catch (e) {
+    breakfastByYear.value = {};
+  }
+
+  // Load Exchange rate by year for this project
+  try {
+    const storedExchange = localStorage.getItem(getProjectKey('exchangeRateByYear'));
+    exchangeRateByYear.value = storedExchange ? JSON.parse(storedExchange) : {};
+  } catch (e) {
+    exchangeRateByYear.value = {};
+  }
+
+  // Load Service charge by year for this project
+  try {
+    const storedService = localStorage.getItem(getProjectKey('serviceChargeByYear'));
+    serviceChargeByYear.value = storedService ? JSON.parse(storedService) : {};
+  } catch (e) {
+    serviceChargeByYear.value = {};
   }
 }
 
@@ -2218,23 +2254,23 @@ function handleMarketSegmentCellEditWrapper({ year, label, segment, field, event
 
 import MarketSegmentationTables from '@/components/ui/MarketSegmentationTables.vue';
 
-// Persist VAT and Breakfast allocation to localStorage
+// Persist VAT and Breakfast allocation to localStorage (project-scoped)
 watch(vatByYear, (newValue) => {
-  localStorage.setItem('vatByYear', JSON.stringify(newValue));
+  localStorage.setItem(getProjectKey('vatByYear'), JSON.stringify(newValue));
 }, { deep: true });
 
 watch(breakfastByYear, (newValue) => {
-  localStorage.setItem('breakfastByYear', JSON.stringify(newValue));
+  localStorage.setItem(getProjectKey('breakfastByYear'), JSON.stringify(newValue));
 }, { deep: true });
 
-// Persist Exchange Rate to localStorage
+// Persist Exchange Rate to localStorage (project-scoped)
 watch(exchangeRateByYear, (newValue) => {
-  localStorage.setItem('exchangeRateByYear', JSON.stringify(newValue));
+  localStorage.setItem(getProjectKey('exchangeRateByYear'), JSON.stringify(newValue));
 }, { deep: true });
 
-// Persist Service Charge to localStorage
+// Persist Service Charge to localStorage (project-scoped)
 watch(serviceChargeByYear, (newValue) => {
-  localStorage.setItem('serviceChargeByYear', JSON.stringify(newValue));
+  localStorage.setItem(getProjectKey('serviceChargeByYear'), JSON.stringify(newValue));
 }, { deep: true });
 
 const sidebarCollapsed = ref(false);

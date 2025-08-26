@@ -1059,6 +1059,9 @@ watch(() => props.marketSegmentData, (newData) => {
     if (calculationCache.cache[project]?.[PAGE_KEY]) {
       calculationCache.cache[project][PAGE_KEY]['Total Occupied Room'] = {};
       calculationCache.cache[project][PAGE_KEY]['Total Occupied Room Year'] = {};
+      // Clear ADR Total cache since it depends on market segment data
+      calculationCache.cache[project][PAGE_KEY]['ADR Total'] = {};
+      calculationCache.cache[project][PAGE_KEY]['ADR Total Year'] = {};
     }
     
 
@@ -1591,6 +1594,14 @@ function getServiceChargeTotal(year) {
 }
 
 function getADRTotal(year, label) {
+  // Cache lookup for ADR Total (weighted average)
+  const project = getProjectName();
+  const cacheKey = 'ADR Total';
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, label);
+  if (cacheVal && cacheVal > 0) {
+    return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  
   // Total Room Revenue (excluding OTHER ROOMS REVENUE)
   let totalRevenue = 0;
   let totalOccupied = 0;
@@ -1601,11 +1612,28 @@ function getADRTotal(year, label) {
     totalRevenue += adr * roomNights;
     totalOccupied += roomNights;
   }
-  if (!totalOccupied) return '0.00';
-  return (totalRevenue / totalOccupied).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  
+  if (!totalOccupied) {
+    // Cache 0 value to avoid recalculation
+    calculationCache.setValue(project, PAGE_KEY, cacheKey, year, label, 0);
+    return '0.00';
+  }
+  
+  const weightedADR = totalRevenue / totalOccupied;
+  // Cache the calculated weighted ADR
+  calculationCache.setValue(project, PAGE_KEY, cacheKey, year, label, weightedADR);
+  return weightedADR.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function getADRTotalYear(year) {
+  // Cache lookup for ADR Total Year (weighted average across all periods)
+  const project = getProjectName();
+  const cacheKey = 'ADR Total Year';
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, 'ALL');
+  if (cacheVal && cacheVal > 0) {
+    return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  
   let totalRevenue = 0;
   let totalOccupied = 0;
   for (const segment of marketSegments.value) {
@@ -1617,8 +1645,17 @@ function getADRTotalYear(year) {
       totalOccupied += roomNights;
     }
   }
-  if (!totalOccupied) return '0.00';
-  return (totalRevenue / totalOccupied).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  
+  if (!totalOccupied) {
+    // Cache 0 value to avoid recalculation
+    calculationCache.setValue(project, PAGE_KEY, cacheKey, year, 'ALL', 0);
+    return '0.00';
+  }
+  
+  const weightedADR = totalRevenue / totalOccupied;
+  // Cache the calculated weighted ADR for the year
+  calculationCache.setValue(project, PAGE_KEY, cacheKey, year, 'ALL', weightedADR);
+  return weightedADR.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 // --- REVPAR Calculation Helpers ---
@@ -1678,6 +1715,9 @@ function refreshCache() {
   if (calculationCache.cache[project]?.[PAGE_KEY]) {
     calculationCache.cache[project][PAGE_KEY]['Total Available Rooms'] = {};
     calculationCache.cache[project][PAGE_KEY]['Total Available Rooms Year'] = {};
+    // Clear ADR Total cache since it depends on market segment data
+    calculationCache.cache[project][PAGE_KEY]['ADR Total'] = {};
+    calculationCache.cache[project][PAGE_KEY]['ADR Total Year'] = {};
   }
   
   // Force a re-render
