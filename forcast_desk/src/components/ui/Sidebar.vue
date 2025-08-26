@@ -1,10 +1,12 @@
 <template>
-  <aside :class="['flex-shrink-0 flex-col min-h-screen transition-all duration-200 ease-in-out border border-r-violet-400 bg-white text-gray-800 shadow', is_expanded ? 'w-64' : 'w-16']">
+  <aside :class="['flex-shrink-0 flex-col min-h-screen transition-all duration-200 ease-in-out border border-r-violet-400 bg-white text-gray-800 shadow', is_expanded ? 'w-64' : 'w-16']" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
     <!-- Logo -->
     <div class="p-4 justify-center">
       <img v-if="!is_expanded" :src="logoURL" alt="Ex Forecast" class="w-8 mx-auto" />
 	  <img v-if="is_expanded" :src="logoURL2" alt="Ex Forecast" class="w-[140px] mx-auto" />
     </div>
+
+    
 
     <!-- Toggle -->
     <div class="flex justify-center px-2">
@@ -17,13 +19,36 @@
       </button>
     </div>
 
+    <!-- Auto expand toggle under Welcome user -->
+    <div v-if="is_expanded" class="px-3 mt-2">
+      <div class="flex items-center group relative">
+        <label for="auto-expand" class="text-sm mr-3 select-none cursor-pointer">Auto</label>
+        <button
+          id="auto-expand"
+          type="button"
+          class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 bg-gray-200"
+          :class="autoExpandSidebar ? 'bg-violet-500' : 'bg-gray-200'"
+          @click="autoExpandSidebar = !autoExpandSidebar"
+          :aria-checked="autoExpandSidebar"
+          role="switch"
+          :title="autoExpandSidebar ? 'Enabled' : 'Disabled'"
+        >
+          <span
+            class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform"
+            :class="autoExpandSidebar ? 'translate-x-5' : 'translate-x-1'"
+          />
+        </button>
+        <span class="ml-2 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity absolute left-full top-1/2 -translate-y-1/2 whitespace-nowrap bg-white border border-gray-200 px-2 py-1 rounded shadow z-10">Automatically expand on hover</span>
+      </div>
+    </div>
+
     <!-- Menu Heading -->
     <h3 v-if="is_expanded" class="text-gray-500 uppercase text-sm px-4 pt-4">Menu</h3>
 
     <!-- Menu Links -->
 	<div class="mt-2 flex-1 space-y-1">
 		<template v-for="item in filteredMenuItems" :key="item.text">
-    <div v-if="item.children" class="relative">
+    <div v-if="item.children" class="relative" @mouseenter="onParentEnter(item.text)" @mouseleave="onParentLeave(item.text)">
       <button
         @click="toggleMenuExpand(item.text)"
         class="flex items-center w-full space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white"
@@ -183,6 +208,24 @@ const ToggleMenu = () => {
   localStorage.setItem("is_expanded", is_expanded.value)
 }
 
+// Auto expand state
+const autoExpandSidebar = ref(localStorage.getItem('autoExpandSidebar') === 'true')
+watch(autoExpandSidebar, (newVal) => {
+  localStorage.setItem('autoExpandSidebar', String(newVal))
+})
+
+// Hover handlers for auto expand
+const handleMouseEnter = () => {
+  if (autoExpandSidebar.value) {
+    is_expanded.value = true
+  }
+}
+const handleMouseLeave = () => {
+  if (autoExpandSidebar.value) {
+    is_expanded.value = false
+  }
+}
+
 const menuItems = [
   { text: "Home", route: "/", icon: Home },
   { text: "Dashboard", route: "/dashboard", icon: LayoutDashboard  },
@@ -214,6 +257,18 @@ const menuItems = [
 const expandedMenus = ref({})
 const toggleMenuExpand = (text) => {
   expandedMenus.value[text] = !expandedMenus.value[text]
+}
+
+// Auto open/close parent groups on hover when auto is enabled
+const onParentEnter = (text) => {
+  if (autoExpandSidebar.value) {
+    expandedMenus.value[text] = true
+  }
+}
+const onParentLeave = (text) => {
+  if (autoExpandSidebar.value) {
+    expandedMenus.value[text] = false
+  }
 }
 
 const hospitalityExperience = ref(
@@ -266,6 +321,13 @@ watch(selectedProject, async (project) => {
 
 
 const filteredMenuItems = computed(() => {
+  // If no project is selected, only show Home and Dashboard
+  if (!selectedProject.value || !selectedProject.value.project_name) {
+    return menuItems.filter(item => 
+      item.text === "Home" || item.text === "Dashboard"
+    )
+  }
+
   // Recursively filter children if needed
   function filterItems(items) {
     return items

@@ -541,10 +541,16 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
         return averageCheckBreakfast.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
       
-      // For non-default breakfast outlets, use user input value
-      const userRaw = fnbData?.[rowKeyObj.restaurant]?.[rowKeyObj.section]?.[rowType]?.[year]?.[label];
+      // For non-default breakfast outlets, use user input value stored under the structured row key
+      const avgCheckBreakfastRowKey = JSON.stringify({
+        restaurant: rowKeyObj.restaurant,
+        section: rowKeyObj.section,
+        type: rowKeyObj.type
+      });
+      const userRaw = fnbData?.[avgCheckBreakfastRowKey]?.[year]?.[label];
       if (userRaw !== undefined && userRaw !== null && userRaw !== "") {
-        return userRaw.toString();
+        const num = parseFloat(userRaw.toString().replace(/,/g, '')) || 0;
+        return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
       
       // Default fallback

@@ -1,4 +1,4 @@
-<template>
+272.00<template>
     <div class="flex ">
       <Sidebar @open-settings="openSettings" />
   
@@ -1584,6 +1584,102 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
 
   // Patch getFnbCellValue for 'Number of Rooms Sold (excl.)' row
   function getFnbCellValue(fnbData, row, year, label, totalRooms) {
+    // Handle Default Breakfast Outlet auto-calculations for Breakfast section rows
+    try {
+      const parsed = JSON.parse(row);
+      if (parsed && parsed.section === 'Breakfast Revenue') {
+        const defOutlet = localStorage.getItem(getProjectKey('defaultBreakfastOutlet'));
+        if (defOutlet && defOutlet === parsed.restaurant) {
+          // Compute rooms available (days * total rooms)
+          let days = 0;
+          if (typeof getDaysInMonth === 'function') {
+            if (label === 'Jan-Mar' || label === 'Apr-Jun' || label === 'Jul-Sep' || label === 'Oct-Dec') {
+              const quarterMonths = {
+                'Jan-Mar': ['Jan', 'Feb', 'Mar'],
+                'Apr-Jun': ['Apr', 'May', 'Jun'],
+                'Jul-Sep': ['Jul', 'Aug', 'Sep'],
+                'Oct-Dec': ['Oct', 'Nov', 'Dec']
+              };
+              const months = quarterMonths[label];
+              for (const m of months) days += getDaysInMonth(year, m);
+            } else {
+              days = getDaysInMonth(year, label);
+            }
+          }
+          const roomsValue = totalRooms?.value || totalRooms || 0;
+          const roomsAvailable = days * roomsValue;
+          // Double occupancy from modal settings
+          const dob = parseFloat((doubleOccupancyByYear.value?.[year] ?? 0)) || 0;
+          // Breakfast Covers (Default Outlet) = Number of guests
+          if (parsed.type === 'Breakfast Covers') {
+            const guestsVal = getFnbCellValue(fnbData, 'Number of guests', year, label, totalRooms?.value || totalRooms);
+            const covers = parseFloat((guestsVal ?? '0').toString().replace(/,/g, '')) || 0;
+            return covers.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          }
+          // Average check breakfast: if present in data use it; else 0.00 (left editable elsewhere)
+          if (parsed.type === 'Average check breakfast') {
+            const val = fnbData?.[row]?.[year]?.[label];
+            if (val !== undefined && val !== null && val !== '') {
+              return val.toString();
+            }
+            // Auto-calculate: Breakfast Allocation (USD) × Exchange Rate for Default Breakfast Outlet
+            const breakfastAllocationStr = localStorage.getItem(getProjectKey('breakfastByYear'));
+            const breakfastAllocation = breakfastAllocationStr ? (JSON.parse(breakfastAllocationStr)[year] || 0) : 0;
+            const exchangeRateStr = localStorage.getItem(getProjectKey('exchangeRateByYear'));
+            const exchangeRate = exchangeRateStr ? (JSON.parse(exchangeRateStr)[year] || 1) : 1;
+            const calculatedValue = breakfastAllocation * exchangeRate;
+            if (selectedProject.value && selectedProject.value.project_name) {
+              calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Average check breakfast', year, label, calculatedValue);
+            }
+            return calculatedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          }
+          // Breakfast Revenue = Breakfast Covers × Average check breakfast (default outlet)
+          if (parsed.type === 'Breakfast Revenue') {
+            // Get Breakfast Covers for this outlet/year/label
+            const coversKey = JSON.stringify({ restaurant: parsed.restaurant, section: parsed.section, type: 'Breakfast Covers' });
+            const coversRaw = fnbData?.[coversKey]?.[year]?.[label];
+            let covers = parseFloat((coversRaw ?? '0').toString().replace(/,/g, '')) || 0;
+            if (!covers) {
+              // Fallback to Number of guests (since default outlet Breakfast Covers mirrors Number of guests)
+              const guestsVal = getFnbCellValue(fnbData, 'Number of guests', year, label, totalRooms?.value || totalRooms);
+              covers = parseFloat((guestsVal ?? '0').toString().replace(/,/g, '')) || 0;
+            }
+            // Average check breakfast: prefer saved value; fallback to Breakfast Allocation × Exchange Rate
+            const avgKey = JSON.stringify({ restaurant: parsed.restaurant, section: parsed.section, type: 'Average check breakfast' });
+            const avgRaw = fnbData?.[avgKey]?.[year]?.[label];
+            let avgCheck = parseFloat((avgRaw ?? '0').toString().replace(/,/g, '')) || 0;
+            if (!avgCheck) {
+              const breakfastAllocationStr = localStorage.getItem(getProjectKey('breakfastByYear'));
+              const breakfastAllocation = breakfastAllocationStr ? (JSON.parse(breakfastAllocationStr)[year] || 0) : 0;
+              const exchangeRateStr = localStorage.getItem(getProjectKey('exchangeRateByYear'));
+              const exchangeRate = exchangeRateStr ? (JSON.parse(exchangeRateStr)[year] || 1) : 1;
+              avgCheck = breakfastAllocation * exchangeRate;
+            }
+            const revenue = covers * avgCheck;
+            if (selectedProject.value && selectedProject.value.project_name) {
+              calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Breakfast Revenue', year, label, revenue);
+            }
+            return revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          }
+        }
+        // Non-default breakfast outlets: auto-calc Breakfast Revenue = Breakfast Covers × Average check breakfast
+        if (parsed.type === 'Breakfast Revenue') {
+          const coversKey = JSON.stringify({ restaurant: parsed.restaurant, section: parsed.section, type: 'Breakfast Covers' });
+          const avgKey = JSON.stringify({ restaurant: parsed.restaurant, section: parsed.section, type: 'Average check breakfast' });
+          const coversRaw = fnbData?.[coversKey]?.[year]?.[label];
+          const avgRaw = fnbData?.[avgKey]?.[year]?.[label];
+          const covers = parseFloat((coversRaw ?? '0').toString().replace(/,/g, '')) || 0;
+          const avg = parseFloat((avgRaw ?? '0').toString().replace(/,/g, '')) || 0;
+          const revenue = covers * avg;
+          if (selectedProject.value && selectedProject.value.project_name) {
+            calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Breakfast Revenue', year, label, revenue);
+          }
+          return revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+      }
+    } catch (e) {
+      // not a structured row key; continue
+    }
     if (row === "Number of rooms") {
       // Return the total rooms value
       const roomsValue = totalRooms?.value || totalRooms || 0;
@@ -1796,7 +1892,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     }
     
     if (row === "Number of guests") {
-      // Calculate: Double occupancy × Number of rooms available
+      // Calculate: Double occupancy × Number of Rooms Sold (excl.)
       // Get double occupancy value (reactive)
       let doubleOccupancy = 0;
       const doubleOccupancyValue = doubleOccupancyByYear.value[year];
@@ -1804,32 +1900,15 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         doubleOccupancy = parseFloat(doubleOccupancyValue);
       }
       
-      // Get number of rooms available
-      let roomsAvailable = 0;
-      if (typeof getDaysInMonth === 'function' && totalRooms) {
-        let days = 0;
-        if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
-          // Quarterly mode - sum up days for all 3 months in the quarter
-          const quarterMonths = {
-            "Jan-Mar": ["Jan", "Feb", "Mar"],
-            "Apr-Jun": ["Apr", "May", "Jun"],
-            "Jul-Sep": ["Jul", "Aug", "Sep"],
-            "Oct-Dec": ["Oct", "Nov", "Dec"]
-          };
-          const months = quarterMonths[label];
-          for (const month of months) {
-            days += getDaysInMonth(year, month);
-          }
-        } else {
-          // Monthly mode - get days for single month
-          days = getDaysInMonth(year, label);
-        }
-        const roomsValue = totalRooms?.value || totalRooms || 0;
-        roomsAvailable = days * roomsValue;
+      // Get number of rooms sold (excl.) from the same row
+      let roomsSold = 0;
+      const roomsSoldValue = getFnbCellValue(fnbData, "Number of Rooms Sold (excl.)", year, label, totalRooms);
+      if (roomsSoldValue && roomsSoldValue !== "0") {
+        roomsSold = parseFloat(roomsSoldValue.toString().replace(/,/g, '')) || 0;
       }
       
       // Calculate number of guests
-      const numberOfGuests = doubleOccupancy * roomsAvailable;
+      const numberOfGuests = doubleOccupancy * roomsSold;
       if (selectedProject.value && selectedProject.value.project_name) {
         calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Number of guests', year, label, numberOfGuests);
       }
@@ -1837,72 +1916,23 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     }
     
     if (row === "Average Room Rate") {
-      // Use the exact same calculation as the Market Segmentation table's ADR row
-      // This replicates the getADRTotal function from MarketSegmentationTables.vue
-      let totalRevenue = 0;
-      let totalOccupied = 0;
-      
-      if (marketSegmentData.value && year && label) {
-        // Sum all segments except OTHER ROOMS REVENUE
-        for (const seg of MARKET_SEGMENTS) {
-          if (seg.segment_category === "OTHER ROOMS REVENUE") continue;
-          
-          let roomRate = 0;
-          let roomNights = 0;
-          
-          if (label === "Jan-Mar" || label === "Apr-Jun" || label === "Jul-Sep" || label === "Oct-Dec") {
-            // Quarterly mode - aggregate data from all 3 months in the quarter
-            const quarterMonths = {
-              "Jan-Mar": ["Jan", "Feb", "Mar"],
-              "Apr-Jun": ["Apr", "May", "Jun"],
-              "Jul-Sep": ["Jul", "Aug", "Sep"],
-              "Oct-Dec": ["Oct", "Nov", "Dec"]
-            };
-            const months = quarterMonths[label];
-            
-            // Sum up room rates and room nights for all months in the quarter
-            for (const month of months) {
-              const monthRoomRate = parseFloat(marketSegmentData.value?.[year]?.[seg.market_segment]?.[month]?.room_rate || 0);
-              const monthRoomNights = Number(marketSegmentData.value?.[year]?.[seg.market_segment]?.[month]?.room_nights || 0);
-              
-              // For room rate, we'll use the average (since it's typically consistent)
-              roomRate += monthRoomRate;
-              roomNights += monthRoomNights;
-            }
-            
-            // Average the room rate across the quarter
-            roomRate = roomRate / 3;
-          } else {
-            // Monthly mode - get data for single month
-            roomRate = parseFloat(marketSegmentData.value?.[year]?.[seg.market_segment]?.[label]?.room_rate || 0);
-            roomNights = Number(marketSegmentData.value?.[year]?.[seg.market_segment]?.[label]?.room_nights || 0);
+      // Use the cached ADR Total values from Market Segmentation page
+      // This ensures consistency and performance by using pre-calculated values
+      if (selectedProject.value && selectedProject.value.project_name) {
+        const project = selectedProject.value.project_name;
+        const cacheKey = 'ADR Total';
+        const cachedADR = calculationCache.getValue(project, 'Market Segmentation', cacheKey, year, label);
+        
+        if (cachedADR && cachedADR > 0) {
+          // Use the cached ADR Total value from Market Segmentation
+          if (selectedProject.value && selectedProject.value.project_name) {
+            calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Average Room Rate', year, label, cachedADR);
           }
-          
-          if (roomRate > 0 && roomNights > 0) {
-            // Calculate ADR for this segment using the same formula as Market Segmentation table
-            // Get VAT, Breakfast, Exchange Rate for the year (default values if not set)
-            const VAT = parseFloat(localStorage.getItem('vatByYear') ? JSON.parse(localStorage.getItem('vatByYear'))[year] : 1) || 1;
-            const Breakfast_Rate = parseFloat(localStorage.getItem('breakfastByYear') ? JSON.parse(localStorage.getItem('breakfastByYear'))[year] : 0) || 0;
-            const exchange_rate = parseFloat(localStorage.getItem('exchangeRateByYear') ? JSON.parse(localStorage.getItem('exchangeRateByYear'))[year] : 1) || 1;
-            
-            // Calculate ADR using the same formula as Market Segmentation table
-            const adr = ((roomRate * (1 + VAT / 100)) + Breakfast_Rate) * exchange_rate;
-            totalRevenue += adr * roomNights;
-            totalOccupied += roomNights;
-          }
+          return cachedADR.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
       }
       
-      // If we have market segment data with occupied rooms, calculate weighted average ADR
-      if (totalOccupied > 0) {
-        const adr = totalRevenue / totalOccupied;
-        if (selectedProject.value && selectedProject.value.project_name) {
-          calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Average Room Rate', year, label, adr);
-        }
-        return adr.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      }
-      
-      // If no market segment data available, fall back to user input
+      // Fallback: If no cached value available, fall back to user input
       const userRaw = fnbData?.[row]?.[year]?.[label];
       if (userRaw !== undefined && userRaw !== null && userRaw !== "") {
         return userRaw.toString();
@@ -1941,23 +1971,124 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
 
 
     // fallback to original logic for other rows
-    // Add debug for Total Cover row
+    // Compute Total Cover explicitly for default breakfast outlet:
+    // Total Cover = Breakfast Covers + Lunch Monthly Cover + Dinner Monthly Cover
     try {
       const rowKeyObj = JSON.parse(row);
-      if (rowKeyObj && rowKeyObj.type === 'Total Cover') {
-        const defaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+      if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Cover') {
+        const defaultBreakfastOutlet = localStorage.getItem(getProjectKey('defaultBreakfastOutlet'));
         if (defaultBreakfastOutlet === rowKeyObj.restaurant) {
-          // For default breakfast outlet, log all input values
-          const days = typeof getDaysInMonth === 'function' ? getDaysInMonth(year, label) : 0;
-          const totalRoomsValue = totalRooms?.value || totalRooms || 0; // Handle both ref and direct value
-          const roomsAvailable = days * totalRoomsValue;
-          const doubleOccupancyValue = doubleOccupancyByYear.value?.[year];
-          let doubleOccupancy = 0;
-          if (doubleOccupancyValue !== undefined && doubleOccupancyValue !== null) {
-            doubleOccupancy = parseFloat(doubleOccupancyValue);
-          }
-          const breakfastCovers = doubleOccupancy * roomsAvailable;
+          const breakfastCoversKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast Covers' });
+          const lunchMonthlyCoverKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Monthly Cover' });
+          const dinnerMonthlyCoverKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Dinner Revenue', type: 'Monthly Cover' });
+
+          const breakfastCoversVal = getFnbCellValue(fnbData, breakfastCoversKey, year, label, totalRooms?.value || totalRooms);
+          const lunchCoversVal = getFnbCellValue(fnbData, lunchMonthlyCoverKey, year, label, totalRooms?.value || totalRooms);
+          const dinnerCoversVal = getFnbCellValue(fnbData, dinnerMonthlyCoverKey, year, label, totalRooms?.value || totalRooms);
+
+          const breakfastCovers = parseFloat((breakfastCoversVal ?? '0').toString().replace(/,/g, '')) || 0;
+          const lunchCovers = parseFloat((lunchCoversVal ?? '0').toString().replace(/,/g, '')) || 0;
+          const dinnerCovers = parseFloat((dinnerCoversVal ?? '0').toString().replace(/,/g, '')) || 0;
+
+          const totalCover = breakfastCovers + lunchCovers + dinnerCovers;
+          return totalCover.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
+      }
+    } catch (e) {
+      // Not a structured row key, skip
+    }
+
+    // Compute Total Food Revenue explicitly for default breakfast outlet:
+    // Total Food Revenue = Breakfast Revenue + Lunch food revenue + Dinner food revenue
+    try {
+      const rowKeyObj = JSON.parse(row);
+      if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Food Revenue') {
+        const defaultBreakfastOutlet = localStorage.getItem(getProjectKey('defaultBreakfastOutlet'));
+        if (defaultBreakfastOutlet === rowKeyObj.restaurant) {
+          const breakfastRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast Revenue' });
+          const lunchFoodRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Lunch food revenue' });
+          const dinnerFoodRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Dinner Revenue', type: 'Dinner food revenue' });
+
+          const breakfastRevenueVal = getFnbCellValue(fnbData, breakfastRevenueKey, year, label, totalRooms?.value || totalRooms);
+          const lunchFoodRevenueVal = getFnbCellValue(fnbData, lunchFoodRevenueKey, year, label, totalRooms?.value || totalRooms);
+          const dinnerFoodRevenueVal = getFnbCellValue(fnbData, dinnerFoodRevenueKey, year, label, totalRooms?.value || totalRooms);
+
+          const breakfastRevenue = parseFloat((breakfastRevenueVal ?? '0').toString().replace(/,/g, '')) || 0;
+          const lunchFoodRevenue = parseFloat((lunchFoodRevenueVal ?? '0').toString().replace(/,/g, '')) || 0;
+          const dinnerFoodRevenue = parseFloat((dinnerFoodRevenueVal ?? '0').toString().replace(/,/g, '')) || 0;
+
+          const totalFoodRevenue = breakfastRevenue + lunchFoodRevenue + dinnerFoodRevenue;
+          return totalFoodRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+      }
+    } catch (e) {
+      // Not a structured row key, skip
+    }
+
+    // Compute Total Food Revenue for all restaurants (including non-default):
+    // Total Food Revenue = Breakfast Revenue + Lunch food revenue + Dinner food revenue
+    try {
+      const rowKeyObj = JSON.parse(row);
+      if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Food Revenue') {
+        const breakfastRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast Revenue' });
+        const lunchFoodRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Lunch food revenue' });
+        const dinnerFoodRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Dinner Revenue', type: 'Dinner food revenue' });
+
+        const breakfastRevenueVal = getFnbCellValue(fnbData, breakfastRevenueKey, year, label, totalRooms?.value || totalRooms);
+        const lunchFoodRevenueVal = getFnbCellValue(fnbData, lunchFoodRevenueKey, year, label, totalRooms?.value || totalRooms);
+        const dinnerFoodRevenueVal = getFnbCellValue(fnbData, dinnerFoodRevenueKey, year, label, totalRooms?.value || totalRooms);
+
+        const breakfastRevenue = parseFloat((breakfastRevenueVal ?? '0').toString().replace(/,/g, '')) || 0;
+        const lunchFoodRevenue = parseFloat((lunchFoodRevenueVal ?? '0').toString().replace(/,/g, '')) || 0;
+        const dinnerFoodRevenue = parseFloat((dinnerFoodRevenueVal ?? '0').toString().replace(/,/g, '')) || 0;
+
+        const totalFoodRevenue = breakfastRevenue + lunchFoodRevenue + dinnerFoodRevenue;
+        return totalFoodRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+    } catch (e) {
+      // Not a structured row key, skip
+    }
+
+    // Compute Total Beverage Revenue for all restaurants:
+    // Total Beverage Revenue = Breakfast beverage revenue + Lunch beverage revenue + Dinner beverage revenue
+    try {
+      const rowKeyObj = JSON.parse(row);
+      if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Beverage Revenue') {
+        const breakfastBeverageKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast beverage revenue' });
+        const lunchBeverageKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Lunch beverage revenue' });
+        const dinnerBeverageKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Dinner Revenue', type: 'Dinner beverage revenue' });
+
+        const breakfastBeverageVal = getFnbCellValue(fnbData, breakfastBeverageKey, year, label, totalRooms?.value || totalRooms);
+        const lunchBeverageVal = getFnbCellValue(fnbData, lunchBeverageKey, year, label, totalRooms?.value || totalRooms);
+        const dinnerBeverageVal = getFnbCellValue(fnbData, dinnerBeverageKey, year, label, totalRooms?.value || totalRooms);
+
+        const breakfastBeverage = parseFloat((breakfastBeverageVal ?? '0').toString().replace(/,/g, '')) || 0;
+        const lunchBeverage = parseFloat((lunchBeverageVal ?? '0').toString().replace(/,/g, '')) || 0;
+        const dinnerBeverage = parseFloat((dinnerBeverageVal ?? '0').toString().replace(/,/g, '')) || 0;
+
+        const totalBeverageRevenue = breakfastBeverage + lunchBeverage + dinnerBeverage;
+        return totalBeverageRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+    } catch (e) {
+      // Not a structured row key, skip
+    }
+
+    // Compute Total Revenue for all restaurants:
+    // Total Revenue = Total Food Revenue + Total Beverage Revenue
+    try {
+      const rowKeyObj = JSON.parse(row);
+      if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Revenue') {
+        const totalFoodRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Total', type: 'Total Food Revenue' });
+        const totalBeverageRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Total', type: 'Total Beverage Revenue' });
+
+        const totalFoodRevenueVal = getFnbCellValue(fnbData, totalFoodRevenueKey, year, label, totalRooms?.value || totalRooms);
+        const totalBeverageRevenueVal = getFnbCellValue(fnbData, totalBeverageRevenueKey, year, label, totalRooms?.value || totalRooms);
+
+        const totalFoodRevenue = parseFloat((totalFoodRevenueVal ?? '0').toString().replace(/,/g, '')) || 0;
+        const totalBeverageRevenue = parseFloat((totalBeverageRevenueVal ?? '0').toString().replace(/,/g, '')) || 0;
+
+        const totalRevenue = totalFoodRevenue + totalBeverageRevenue;
+        return totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
     } catch (e) {
       // Not a structured row key, skip
@@ -1991,19 +2122,19 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   function isRestaurantRowAutoCalculated(restaurant, section, row) {
     // Check if this is Breakfast Covers for the default breakfast outlet
     if (row === 'Breakfast Covers' && section === 'Breakfast Revenue') {
-      const defaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+      const defaultBreakfastOutlet = localStorage.getItem(getProjectKey('defaultBreakfastOutlet'));
       return defaultBreakfastOutlet === restaurant;
     }
     
     // Check if this is Breakfast Revenue for the default breakfast outlet
     if (row === 'Breakfast Revenue' && section === 'Breakfast Revenue') {
-      const defaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+      const defaultBreakfastOutlet = localStorage.getItem(getProjectKey('defaultBreakfastOutlet'));
       return defaultBreakfastOutlet === restaurant;
     }
     
     // Check if this is Average check breakfast for the default breakfast outlet
     if (row === 'Average check breakfast' && section === 'Breakfast Revenue') {
-      const defaultBreakfastOutlet = localStorage.getItem('defaultBreakfastOutlet');
+      const defaultBreakfastOutlet = localStorage.getItem(getProjectKey('defaultBreakfastOutlet'));
       return defaultBreakfastOutlet === restaurant;
     }
     
@@ -2368,7 +2499,19 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     
 
     if (row === "Average Room Rate") {
-      // Calculate weighted average room rate for the year
+      // Use the cached ADR Total Year values from Market Segmentation page for yearly totals
+      if (selectedProject.value && selectedProject.value.project_name) {
+        const project = selectedProject.value.project_name;
+        const cacheKey = 'ADR Total Year';
+        const cachedADRYear = calculationCache.getValue(project, 'Market Segmentation', cacheKey, year, 'ALL');
+        
+        if (cachedADRYear && cachedADRYear > 0) {
+          // Use the cached ADR Total Year value from Market Segmentation
+          return cachedADRYear.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+      }
+      
+      // Fallback: Calculate weighted average room rate for the year if no cached value
       let totalRevenue = 0;
       let totalOccupied = 0;
       
@@ -2480,7 +2623,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     // Clear default breakfast outlet if it was this restaurant
     if (defaultBreakfastOutlet.value === restaurant.name) {
       defaultBreakfastOutlet.value = "";
-      localStorage.removeItem('defaultBreakfastOutlet');
+      localStorage.removeItem(getProjectKey('defaultBreakfastOutlet'));
     }
     
     // Mark as unsaved
@@ -2522,7 +2665,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
       // Clear default breakfast outlet if it no longer exists
       if (defaultBreakfastOutlet.value && !currentRestaurantNames.includes(defaultBreakfastOutlet.value)) {
         defaultBreakfastOutlet.value = "";
-        localStorage.removeItem('defaultBreakfastOutlet');
+        localStorage.removeItem(getProjectKey('defaultBreakfastOutlet'));
       }
       
       // Mark as unsaved

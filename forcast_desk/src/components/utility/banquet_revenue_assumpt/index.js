@@ -92,9 +92,41 @@ export function getAmountForBanquet(banquetData, code, year, label, displayMode 
 export function calculateTotalForBanquet(banquetData, code, year, displayMode, getColumnLabelsForYear) {
   const months = getColumnLabelsForYear(year);
   let total = 0.00;
-  for (const month of months) {
-    total += getAmountForBanquet(banquetData, code, year, month, displayMode);
+  
+  // For calculated fields, we need to calculate the total by summing individual month/quarter calculations
+  if (['food', 'liquor', 'soft_drinks', 'hall_space_charges', 'gross', 'net_amount', 'amount_per_event', 'amount_per_pax', 'avg_pax_per_event'].includes(code)) {
+    for (const month of months) {
+      // Get the row data for this month/quarter to calculate the field value
+      const row = getBanquetRowData(banquetData, year, month);
+      
+      switch (code) {
+        case 'food':
+          total += calcFood(row); break;
+        case 'liquor':
+          total += calcLiquor(row); break;
+        case 'soft_drinks':
+          total += calcSoftDrinks(row); break;
+        case 'hall_space_charges':
+          total += calcHallSpaceCharges(row); break;
+        case 'gross':
+          total += calcGross(row, []); break;
+        case 'net_amount':
+          total += calcNetAmount(row, []); break;
+        case 'amount_per_event':
+          total += calcAmountPerEvent(row); break;
+        case 'amount_per_pax':
+          total += calcAmountPerPax(row); break;
+        case 'avg_pax_per_event':
+          total += calcAvgPaxPerEvent(row); break;
+      }
+    }
+  } else {
+    // For manual fields, use the existing logic
+    for (const month of months) {
+      total += getAmountForBanquet(banquetData, code, year, month, displayMode);
+    }
   }
+  
   return total;
 }
 

@@ -332,14 +332,14 @@
                                 </td>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
                                   <span class="font-mono text-xs text-violet-700" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
-                                    {{ formatBanquetValue(field.code, calculateTotalForBanquet(banquetData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
+                                    {{ formatBanquetValue(field.code, calculateBanquetTotal(banquetData, field.code, year, advancedModes[year] || displayMode)) }}
                                   </span>
                                 </td>
                               </template>
                               <template v-else>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
                                   <span class="font-mono text-xs text-violet-700" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
-                                    {{ formatBanquetValue(field.code, calculateTotalForBanquet(banquetData, field.code, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal)) }}
+                                    {{ formatBanquetValue(field.code, calculateBanquetTotal(banquetData, field.code, year, advancedModes[year] || displayMode)) }}
                                   </span>
                                 </td>
                               </template>
@@ -948,6 +948,18 @@
         value = getAmountForBanquet(banquetData, fieldCode, year, label, displayMode);
     }
     return value;
+  }
+
+  // Helper function to calculate totals by summing individual cell values
+  function calculateBanquetTotal(banquetData, fieldCode, year, displayMode) {
+    const labels = getColumnLabelsForYearLocal(year);
+    let total = 0;
+    
+    for (const label of labels) {
+      total += getBanquetCellValue(banquetData, fieldCode, year, label, displayMode);
+    }
+    
+    return total;
   }
 
   async function deleteBanquetDetail(field) {
