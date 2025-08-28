@@ -48,5 +48,6 @@ export function AverageDailyRateCalculation(room_rate, VAT, Breakfast_Rate, exch
     } else {
         const result = ((room_rate *(1 + VAT / 100)) + Breakfast_Rate) * exchange_rate;
         return result;
+        // return Math.round(result);
     }
 };

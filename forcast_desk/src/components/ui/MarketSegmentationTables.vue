@@ -1507,11 +1507,11 @@ function getCalculatedRoomRevenue(segment, year, label) {
   if (cached && cached > 0) {
     return cached.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
-  // Get ADR for this segment and month
+  // Get ADR from Average Daily Rate table for this segment and month
   const adr = parseFloat(getADRValue(segment, year, label).replace(/,/g, ''));
-  // Get room nights for this segment and month
+  // Get room nights from Room Nights table for this segment and month
   const roomNights = Number(props.marketSegmentData?.[year]?.[segment.market_segment]?.[label]?.room_nights || 0);
-  // Calculate Room Revenue = ADR * Room Nights
+  // Calculate Room Revenue = ADR (from ADR table) * Room Nights (from Room Nights table)
   const roomRevenue = adr * roomNights;
   // Cache only if > 0
   if (roomRevenue > 0) {
@@ -1530,8 +1530,11 @@ function getCalculatedRoomRevenueTotal(segment, year) {
   }
   let total = 0;
   for (const label of props.getColumnLabelsForYearLocal(year)) {
+    // Get ADR from Average Daily Rate table for this segment and month
     const adr = parseFloat(getADRValue(segment, year, label).replace(/,/g, ''));
+    // Get room nights from Room Nights table for this segment and month
     const roomNights = Number(props.marketSegmentData?.[year]?.[segment.market_segment]?.[label]?.room_nights || 0);
+    // Calculate Room Revenue = ADR (from ADR table) * Room Nights (from Room Nights table)
     total += adr * roomNights;
   }
   if (total > 0) {
