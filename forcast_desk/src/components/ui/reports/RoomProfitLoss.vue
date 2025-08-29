@@ -938,7 +938,7 @@
             </tr>
 
             <!-- NSSIT Row -->
-            <tr class="bg-white border-b border-blue-200">
+            <tr v-if="hasPayrollRelatedData('NSSIT')" class="bg-white border-b border-blue-200">
               <td class="px-3 py-2 border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   NSSIT
@@ -967,7 +967,7 @@
             </tr>
 
             <!-- Vacation Row -->
-            <tr class="bg-white border-b border-blue-200">
+            <tr v-if="hasPayrollRelatedData('Vacation')" class="bg-white border-b border-blue-200">
               <td class="px-3 py-2 border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   Vacation
@@ -996,7 +996,7 @@
             </tr>
 
             <!-- Relocation Row -->
-            <tr class="bg-white border-b border-blue-200">
+            <tr v-if="hasPayrollRelatedData('Relocation')" class="bg-white border-b border-blue-200">
               <td class="px-3 py-2 border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   Relocation
@@ -1025,7 +1025,7 @@
             </tr>
 
             <!-- Severence & Indemnity Row -->
-            <tr class="bg-white border-b border-blue-200">
+            <tr v-if="hasPayrollRelatedData('Severence & Indemnity')" class="bg-white border-b border-blue-200">
               <td class="px-3 py-2 border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   Severence & Indemnity
@@ -1036,7 +1036,7 @@
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'severence-cell-' + year + '-' + label">
                     <td class="px-2 py-1 text-right border border-blue-200 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Severence & Indemnity')) }}</span>
-                    </td>
+                  </td>
                     <td class="px-2 py-1 text-right border border-blue-200 bg-white">
                       
                     </td>
@@ -1054,7 +1054,7 @@
             </tr>
 
             <!-- Other Row -->
-            <tr class="bg-white border-b border-blue-200">
+            <tr v-if="hasPayrollRelatedData('Other')" class="bg-white border-b border-blue-200">
               <td class="px-3 py-2 border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   Other
@@ -1083,7 +1083,7 @@
             </tr>
 
             <!-- Medical Row -->
-            <tr class="bg-white border-b border-blue-200">
+            <tr v-if="hasPayrollRelatedData('Medical')" class="bg-white border-b border-blue-200">
               <td class="px-3 py-2 border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   Medical
@@ -1112,7 +1112,7 @@
             </tr>
 
             <!-- Uniforms Row -->
-            <tr class="bg-white border-b border-blue-200">
+            <tr v-if="hasPayrollRelatedData('Uniforms')" class="bg-white border-b border-blue-200">
               <td class="px-3 py-2 border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   Uniforms
@@ -1141,7 +1141,7 @@
             </tr>
 
             <!-- Employee Meal Row -->
-            <tr class="bg-white border-b border-blue-200">
+            <tr v-if="hasPayrollRelatedData('Employee Meal')" class="bg-white border-b border-blue-200">
               <td class="px-3 py-2 border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   Employee Meal
@@ -1170,7 +1170,7 @@
             </tr>
 
             <!-- Transport Row -->
-            <tr class="bg-white border-b border-blue-200">
+            <tr v-if="hasPayrollRelatedData('Transport')" class="bg-white border-b border-blue-200">
               <td class="px-3 py-2 border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   Transport
@@ -1199,7 +1199,7 @@
             </tr>
 
             <!-- Telephone Row -->
-            <tr class="bg-white border-b border-blue-200">
+            <tr v-if="hasPayrollRelatedData('Telephone')" class="bg-white border-b border-blue-200">
               <td class="px-3 py-2 border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   Telephone
@@ -1228,7 +1228,7 @@
             </tr>
 
             <!-- Air Ticket Row -->
-            <tr class="bg-white border-b border-blue-200">
+            <tr v-if="hasPayrollRelatedData('Air Ticket')" class="bg-white border-b border-blue-200">
               <td class="px-3 py-2 border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   Air Ticket
@@ -1251,13 +1251,13 @@
                 <template v-else>
                   <td class="px-2 py-1 text-right border border-blue-200 font-semibold bg-blue-50">
                     <span class="font-mono text-xs text-blue-700">{{ formatMoney(getPayrollRelatedTotal(year, 'Air Ticket')) }}</span>
-                  </td>
+  </td>
                 </template>
               </template>
             </tr>
 
             <!-- Other Benefits Row -->
-            <tr class="bg-white border-b border-blue-200">
+            <tr v-if="hasPayrollRelatedData('Other Benefits')" class="bg-white border-b border-blue-200">
               <td class="px-3 py-2 border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   Other Benefits
@@ -1336,7 +1336,7 @@
             </tr>
 
             <!-- Bonus Details Row -->
-            <tr class="bg-white border-b border-blue-200">
+            <tr v-if="hasBonusData()" class="bg-white border-b border-blue-200">
               <td class="px-3 py-2 border-r border-blue-200">
                 <div class="flex items-center gap-1">
                   Bonus Details
@@ -3230,6 +3230,21 @@ function getDepartmentalIncomePercentage(year, label) {
     console.error('Error calculating departmental income percentage:', error);
     return 0;
   }
+}
+
+// Check if bonus data exists for any visible years and periods
+function hasBonusData() {
+  if (!props.visibleYears || props.visibleYears.length === 0) return false;
+  
+  for (const year of props.visibleYears) {
+    const labels = getColumnLabelsForYear(year);
+    for (const label of labels) {
+      if (getBonusValue(year, label) > 0) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 </script>
