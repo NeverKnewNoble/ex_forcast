@@ -61,13 +61,12 @@ export class PayrollDataConstructor {
               transformedData[year][transformedRow.id] = {};
             }
             
+            // Build minimal reactive structure. Salary per-month is derived from row.salary * count
             transformedData[year][transformedRow.id] = {
-              salary: item.salary || 0,
               unique_id: item.unique_id,
-              count: item.monthly_count && Object.keys(item.monthly_count).length > 0 
-                ? item.monthly_count 
-                : {},
-              salary: {}
+              count: item.monthly_count && Object.keys(item.monthly_count).length > 0
+                ? item.monthly_count
+                : {}
             };
           }
         });

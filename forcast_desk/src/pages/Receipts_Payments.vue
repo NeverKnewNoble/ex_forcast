@@ -1639,9 +1639,19 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   function normalizeDepartmentKey(rawName) {
     if (!rawName || typeof rawName !== 'string') return 'rooms';
     const name = rawName.trim().toLowerCase();
-    if (name === 'rooms') return 'rooms';
-    if (name === 'food and beverage' || name === 'f & b' || name === 'f&b') return 'fnb';
-    if (name === 'other operating departments' || name === 'ood') return 'ood';
+    // Rooms variants
+    if (name === 'rooms' || name.includes('room')) return 'rooms';
+    // F&B variants
+    if (
+      name === 'food and beverage' ||
+      name === 'f & b' ||
+      name === 'f&b' ||
+      name.includes('beverage')
+    ) return 'fnb';
+    // Banquet variants
+    if (name === 'banquet' || name === 'banquets' || name.includes('banquet')) return 'banquet';
+    // OOD variants
+    if (name === 'other operating departments' || name.includes('other operating') || name === 'ood') return 'ood';
     // Generic slug: keep spaces to allow bracket access in template; ensure stable key
     return name;
   }
@@ -1940,9 +1950,11 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     if (key === 'fnb') {
       return getFnbMonthlyRevenueFromCache(year, label);
     }
-    if (key === 'other operating departments' || key === 'banquet' || key === 'banquets') {
+    // Banquet specific mapping
+    if (key === 'banquet' || key === 'banquets') {
       return getBanquetMonthlyRevenueFromCache(year, label);
     }
+    // OOD includes "Other Operating Departments"
     if (key === 'ood' || key === 'other operating departments') {
       return getOODMonthlyRevenueFromCache(year, label);
     }
@@ -1958,9 +1970,11 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     if (key === 'fnb') {
       return getFnbYearTotalFromCache(year);
     }
-    if (key === 'other operating departments' || key === 'banquet' || key === 'banquets') {
+    // Banquet specific mapping
+    if (key === 'banquet' || key === 'banquets') {
       return getBanquetYearTotalFromCache(year);
     }
+    // OOD includes "Other Operating Departments"
     if (key === 'ood' || key === 'other operating departments') {
       return getOODYearTotalFromCache(year);
     }

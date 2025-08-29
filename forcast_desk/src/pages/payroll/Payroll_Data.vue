@@ -1554,10 +1554,24 @@ const deletedPayrollRows = ref(new Set()); // Track deleted payroll rows for res
     return (name || '').toString().trim().toLowerCase();
   }
 
+  // Normalize helper for composite keys to avoid duplicates due to case/spacing
+  function normalizeValue(value) {
+    return (value || '').toString().trim().toLowerCase();
+  }
+
+  function makeCompositeKey(department, departmentLocation, position, designation) {
+    return [
+      normalizeValue(department),
+      normalizeValue(departmentLocation),
+      normalizeValue(position),
+      normalizeValue(designation)
+    ].join('__');
+  }
+
   const payrollRowsSource = computed(() => {
     const rows = Array.isArray(payrollRows.value) ? [...payrollRows.value] : [];
     const keySet = new Set(
-      rows.map(r => `${r.department}__${r.departmentLocation}__${r.position}__${r.designation}`)
+      rows.map(r => makeCompositeKey(r.department, r.departmentLocation, r.position, r.designation))
     );
     const selectedSet = new Set((projectDepartments.value || []).map(normalizeDepartmentName));
 
@@ -1566,7 +1580,7 @@ const deletedPayrollRows = ref(new Set()); // Track deleted payroll rows for res
         const dept = d.department;
         if (!dept) return;
         if (selectedSet.size && !selectedSet.has(normalizeDepartmentName(dept))) return; // only for selected depts
-        const key = `${dept}__${d.department_location || ''}__${d.position || ''}__${d.designation || ''}`;
+        const key = makeCompositeKey(dept, d.department_location || '', d.position || '', d.designation || '');
         if (keySet.has(key)) return; // skip if already present in live data
 
         const idSafe = key.replace(/\s+/g, '_');
@@ -2483,10 +2497,22 @@ function restoreOriginal() {
 
   // Table Salary Handlers (using robust pattern like monthly cells)
   function handleTableSalaryInput(row, event) {
-    let value = event.target.textContent.replace(/[^0-9.]/g, '');
-    row.salary = value;
+    // Store cursor position before any changes
+    const cursorPosition = window.getSelection().getRangeAt(0).startOffset;
     
-    // Trigger reactive update for monthly salary cells
+    // Get the raw value and store it temporarily without triggering reactivity
+    let value = event.target.textContent.replace(/[^0-9.]/g, '');
+    
+    // Temporarily disable reactivity by storing in a non-reactive property
+    if (!row._tempSalary) {
+      row._tempSalary = row.salary;
+    }
+    row._tempSalary = value;
+    
+    // Don't update row.salary during input to prevent cursor jumping
+    // The actual update will happen on blur
+    
+    // Trigger reactive update for monthly salary cells (but don't update the main salary)
     if (visibleYears.value.length > 0) {
       const year = visibleYears.value[0];
       if (!payrollData.value[year]) {
@@ -2498,6 +2524,22 @@ function restoreOriginal() {
       // Add a timestamp to force reactivity
       payrollData.value[year][row.id]._lastUpdate = Date.now();
     }
+    
+    // Restore cursor position after a brief delay to ensure DOM is stable
+    nextTick(() => {
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const textNode = range.startContainer;
+        if (textNode.nodeType === Node.TEXT_NODE) {
+          const newPosition = Math.min(cursorPosition, textNode.length);
+          range.setStart(textNode, newPosition);
+          range.setEnd(textNode, newPosition);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      }
+    });
   }
 
   function handleTableSalaryFocus(row, event) {
@@ -2515,8 +2557,11 @@ function restoreOriginal() {
   }
 
   function handleTableSalaryBlur(row, event) {
-    // Get the raw value from the cell content
-    let rawValue = event.target.textContent.replace(/[^0-9.]/g, '');
+    // Use the temporary salary value if available, otherwise get from cell content
+    let rawValue = row._tempSalary || event.target.textContent.replace(/[^0-9.]/g, '');
+    
+    // Clear the temporary value
+    delete row._tempSalary;
     
     // If the raw value is empty or invalid, use the original salary
     if (!rawValue || rawValue === '') {
@@ -2534,6 +2579,36 @@ function restoreOriginal() {
       event.target.textContent = formatMoney(value);
       // Mark as unsaved
       isSaved.value = false;
+      
+      // Track salary change so it persists on save (handles default and non-default rows)
+      if (visibleYears.value.length > 0) {
+        const year = visibleYears.value[0];
+        
+        // If this is a default row, promote it to live rows so the save pipeline can persist it
+        if (row._isDefault) {
+          const exists = payrollRows.value.find(r => r.id === row.id);
+          if (!exists) {
+            payrollRows.value.push({ ...row });
+          }
+        }
+        
+        const changeData = {
+          rowId: row.id,
+          fieldType: 'salary',
+          year,
+          month: null,
+          newValue: value,
+          isOverride: false
+        };
+        const existingIdx = changedCells.value.findIndex(
+          c => c.rowId === row.id && c.fieldType === 'salary' && c.year === year && (c.month === null || c.month === undefined)
+        );
+        if (existingIdx >= 0) {
+          changedCells.value[existingIdx] = changeData;
+        } else {
+          changedCells.value.push(changeData);
+        }
+      }
       
       // Trigger reactive update for monthly salary cells
       if (visibleYears.value.length > 0) {

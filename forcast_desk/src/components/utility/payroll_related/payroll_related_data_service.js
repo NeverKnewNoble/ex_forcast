@@ -310,5 +310,44 @@ export function getPayrollRelatedChangesForAPI() {
     }
   });
   
+  // Merge unchanged existing values so saves are additive, not destructive
+  Object.values(changesByYear).forEach(yearBundle => {
+    const year = yearBundle.year;
+    const existing = payrollRelatedData.value?.[year] || {};
+
+    // Merge payroll_taxes per rowId (currently only tax_percentage)
+    if (yearBundle.payroll_taxes) {
+      Object.keys(yearBundle.payroll_taxes).forEach(rowId => {
+        const existingRow = existing.payroll_taxes?.[rowId] || {};
+        yearBundle.payroll_taxes[rowId] = {
+          ...existingRow,
+          ...yearBundle.payroll_taxes[rowId]
+        };
+      });
+    }
+
+    // Merge supplementary_pay per rowId (vacation, relocation, severence_indemnity, other)
+    if (yearBundle.supplementary_pay) {
+      Object.keys(yearBundle.supplementary_pay).forEach(rowId => {
+        const existingRow = existing.supplementary_pay?.[rowId] || {};
+        yearBundle.supplementary_pay[rowId] = {
+          ...existingRow,
+          ...yearBundle.supplementary_pay[rowId]
+        };
+      });
+    }
+
+    // Merge employee_benefits per rowId (medical, uniforms, employee_meal, transport, telephone, air_ticket, other)
+    if (yearBundle.employee_benefits) {
+      Object.keys(yearBundle.employee_benefits).forEach(rowId => {
+        const existingRow = existing.employee_benefits?.[rowId] || {};
+        yearBundle.employee_benefits[rowId] = {
+          ...existingRow,
+          ...yearBundle.employee_benefits[rowId]
+        };
+      });
+    }
+  });
+
   return Object.values(changesByYear);
 } 
