@@ -301,9 +301,15 @@
                   <!-- Table 1: Available Beds -->
                   <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
                     <div class="bg-gradient-to-r from-violet-600 to-violet-700 text-white px-6 py-4">
-                      <h2 class="text-xl font-bold flex items-center gap-2"><BedDouble class="w-5 h-5" /> Available Beds</h2>
-                      <p class="text-violet-100 text-sm font-semibold">Note: Auto Calculated</p>
-                      <p class="text-violet-100 text-sm">Number of rooms available (No. of days for the month x Room package count)</p>
+                      <div class="flex items-center gap-2">
+                        <h2 class="text-xl font-bold flex items-center gap-2"><BedDouble class="w-5 h-5" /> Available Beds</h2> 
+                        <div class="bg-violet-500 text-white text-xs px-2 py-1 rounded-full font-bold flex items-center gap-1">
+                        <Calculator class="w-3 h-3" />
+                        Auto Calculated
+                        </div>
+                      </div>
+
+                      <p class="text-violet-100 text-sm mt-1">Number of rooms available (No. of days for the month x Room package count)</p>
                     </div>
                     <div class="overflow-x-auto">
                       <div class="min-w-full w-max">
@@ -664,8 +670,19 @@
                   <!-- Table 4: Revenue -->
                   <div class="bg-white rounded-lg border border-orange-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
                     <div class="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-4">
-                      <h2 class="text-xl font-bold flex items-center gap-2"><Calculator class="w-5 h-5" /> Revenue</h2>
-                      <p class="text-orange-100 text-sm">Calculated revenue (Available Beds × Occupied Beds % × Rate)</p>
+                      <div class="flex-col items-center gap-2">
+                        <div class="flex items-center gap-2">
+                          <Calculator class="w-5 h-5" />
+                          <h2 class="text-xl font-bold">Revenue</h2>
+                          <div class="bg-orange-500 text-white font-bold text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                            <Calculator class="w-3 h-3" />
+                            Auto Calculated
+                          </div>
+                        </div>
+                        <div class="flex items-center mt-1">
+                          <span class="text-orange-100 text-sm">Calculated revenue (Available Beds × Occupied Beds % × Rate)</span>
+                        </div>
+                      </div>
                     </div>
                     <div class="overflow-x-auto">
                       <div class="min-w-full w-max">

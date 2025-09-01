@@ -613,6 +613,38 @@
   // Watch for changes in banquetData to ensure calculated fields update
   watch(banquetData, (newData, oldData) => {
     // console.log('banquetData changed:', newData);
+    
+    // Clear calculation cache when banquet data changes to ensure consistency
+    if (selectedProject.value && selectedProject.value.project_name) {
+      const project = selectedProject.value.project_name;
+      const cacheKeys = [
+        'Food', 'Liquor', 'Soft Drinks', 'Hall Space Charges', 'Gross', 'Net Amount',
+        'Amount Per Event', 'Amount Per Pax', 'Avg Pax Per Event',
+        'Tobacco', 'Non F&B', 'Others'
+      ];
+      
+      cacheKeys.forEach(baseKey => {
+        if (calculationCache.cache[project]?.['Banquet Revenue Assumptions']?.[baseKey]) {
+          delete calculationCache.cache[project]['Banquet Revenue Assumptions'][baseKey];
+        }
+      });
+      
+      // Also clear any custom field caches
+      if (calculationCache.cache[project]?.['Banquet Revenue Assumptions']) {
+        Object.keys(calculationCache.cache[project]['Banquet Revenue Assumptions']).forEach(key => {
+          if (key.toLowerCase().includes('outside') || 
+              key.toLowerCase().includes('catering') ||
+              key.toLowerCase().includes('tobacco') ||
+              key.toLowerCase().includes('non') ||
+              key.toLowerCase().includes('fnb') ||
+              key.toLowerCase().includes('others') ||
+              // Clear any other custom banquet detail caches
+              customBanquetFields.value.some(f => f.code === key)) {
+            delete calculationCache.cache[project]['Banquet Revenue Assumptions'][key];
+          }
+        });
+      }
+    }
   }, { deep: true, immediate: true });
   
   
@@ -847,6 +879,39 @@
   
   // Refresh table functionality - reload entire page
   function refreshTable() {
+    // Clear calculation cache for current project before refresh
+    if (selectedProject.value && selectedProject.value.project_name) {
+      const project = selectedProject.value.project_name;
+      if (calculationCache.cache[project]?.['Banquet Revenue Assumptions']) {
+        // Clear all cached calculations
+        const cacheKeys = [
+          'Food', 'Liquor', 'Soft Drinks', 'Hall Space Charges', 'Gross', 'Net Amount',
+          'Amount Per Event', 'Amount Per Pax', 'Avg Pax Per Event',
+          'Tobacco', 'Non F&B', 'Others'
+        ];
+        
+        cacheKeys.forEach(baseKey => {
+          if (calculationCache.cache[project]['Banquet Revenue Assumptions'][baseKey]) {
+            delete calculationCache.cache[project]['Banquet Revenue Assumptions'][baseKey];
+          }
+        });
+        
+        // Clear custom field caches
+        Object.keys(calculationCache.cache[project]['Banquet Revenue Assumptions']).forEach(key => {
+          if (key.toLowerCase().includes('outside') || 
+              key.toLowerCase().includes('catering') ||
+              key.toLowerCase().includes('tobacco') ||
+              key.toLowerCase().includes('non') ||
+              key.toLowerCase().includes('fnb') ||
+              key.toLowerCase().includes('others') ||
+              // Clear any other custom banquet detail caches
+              customBanquetFields.value.some(f => f.code === key)) {
+            delete calculationCache.cache[project]['Banquet Revenue Assumptions'][key];
+          }
+        });
+      }
+    }
+    
     // Set flag to show success alert after reload
     localStorage.setItem('showRefreshSuccess', 'true');
     // Reload the entire page
@@ -916,36 +981,91 @@
       year,
       label
     };
+    
+    // Check cache first for calculated fields
+    if (['food', 'liquor', 'soft_drinks', 'hall_space_charges', 'gross', 'net_amount', 'amount_per_event', 'amount_per_pax', 'avg_pax_per_event'].includes(fieldCode)) {
+      if (context.projectName && context.calculationCache) {
+        const cached = context.calculationCache.getValue(context.projectName, 'Banquet Revenue Assumptions', fieldCode, context.year, context.label);
+        if (cached !== undefined && cached !== null && cached > 0) {
+          return cached;
+        }
+      }
+    }
+    
     let value;
     switch (fieldCode) {
       case 'food':
-        value = calcFood(row); break;
+        value = calcFood(row);
+        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Food', context.year, context.label, value);
+        }
+        break;
       case 'liquor':
-        value = calcLiquor(row); break;
+        value = calcLiquor(row);
+        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Liquor', context.year, context.label, value);
+        }
+        break;
       case 'soft_drinks':
-        value = calcSoftDrinks(row); break;
+        value = calcSoftDrinks(row);
+        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Soft Drinks', context.year, context.label, value);
+        }
+        break;
       case 'hall_space_charges':
-        value = calcHallSpaceCharges(row); break;
+        value = calcHallSpaceCharges(row);
+        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Hall Space Charges', context.year, context.label, value);
+        }
+        break;
       case 'gross':
         value = calcGross(row, allFieldCodes);
-        if (context.projectName && context.calculationCache && context.year && context.label) {
+        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
           context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Gross', context.year, context.label, value);
         }
         break;
       case 'net_amount':
         value = calcNetAmount(row, allFieldCodes);
-        if (context.projectName && context.calculationCache && context.year && context.label) {
+        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
           context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Net Amount', context.year, context.label, value);
         }
         break;
       case 'amount_per_event':
-        value = calcAmountPerEvent(row); break;
+        value = calcAmountPerEvent(row);
+        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Amount Per Event', context.year, context.label, value);
+        }
+        break;
       case 'amount_per_pax':
-        value = calcAmountPerPax(row); break;
+        value = calcAmountPerPax(row);
+        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Amount Per Pax', context.year, context.label, value);
+        }
+        break;
       case 'avg_pax_per_event':
-        value = calcAvgPaxPerEvent(row); break;
+        value = calcAvgPaxPerEvent(row);
+        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Avg Pax Per Event', context.year, context.label, value);
+        }
+        break;
       default:
         value = getAmountForBanquet(banquetData, fieldCode, year, label, displayMode);
+        // Cache custom fields like Outside Service Food Catering, Outside Service Beverage Catering,
+        // Tobacco, Non F&B, Others, and any other banquet details
+        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+          // Check if this is a field that should be cached
+          if (['outside_service_food_catering', 'outside_service_beverage_catering', 'tobacco', 'non_fnb', 'others'].includes(fieldCode) || 
+              fieldCode.toLowerCase().includes('outside') || 
+              fieldCode.toLowerCase().includes('catering') ||
+              fieldCode.toLowerCase().includes('tobacco') ||
+              fieldCode.toLowerCase().includes('non') ||
+              fieldCode.toLowerCase().includes('fnb') ||
+              fieldCode.toLowerCase().includes('others') ||
+              // Cache any other custom banquet details
+              customBanquetFields.value.some(f => f.code === fieldCode)) {
+            context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', fieldCode, context.year, context.label, value);
+          }
+        }
     }
     return value;
   }

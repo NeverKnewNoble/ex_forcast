@@ -1305,6 +1305,28 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
       if (hasChanges && isSaved.value) {
         isSaved.value = false;
       }
+      
+      // Clear restaurant-specific calculation cache when F&B data changes
+      if (selectedProject.value && selectedProject.value.project_name) {
+        const project = selectedProject.value.project_name;
+        const cacheKeys = [
+          'Total Cover',
+          'Total Food Revenue', 
+          'Total Beverage Revenue',
+          'Total Revenue'
+        ];
+        
+        cacheKeys.forEach(baseKey => {
+          if (calculationCache.cache[project]?.['F&B Revenue Assumptions']?.[baseKey]) {
+            // Clear all restaurant-specific cache entries for this key
+            Object.keys(calculationCache.cache[project]['F&B Revenue Assumptions'][baseKey]).forEach(restaurantKey => {
+              if (restaurantKey.includes(':')) {
+                delete calculationCache.cache[project]['F&B Revenue Assumptions'][baseKey][restaurantKey];
+              }
+            });
+          }
+        });
+      }
     }
   }, { deep: true });
   
@@ -1500,6 +1522,30 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   
   // Refresh table functionality - reload entire page
   function refreshTable() {
+    // Clear calculation cache for current project
+    if (selectedProject.value && selectedProject.value.project_name) {
+      const project = selectedProject.value.project_name;
+      if (calculationCache.cache[project]?.['F&B Revenue Assumptions']) {
+        // Clear all restaurant-specific cache entries
+        const cacheKeys = [
+          'Total Cover',
+          'Total Food Revenue', 
+          'Total Beverage Revenue',
+          'Total Revenue'
+        ];
+        
+        cacheKeys.forEach(baseKey => {
+          if (calculationCache.cache[project]['F&B Revenue Assumptions'][baseKey]) {
+            Object.keys(calculationCache.cache[project]['F&B Revenue Assumptions'][baseKey]).forEach(restaurantKey => {
+              if (restaurantKey.includes(':')) {
+                delete calculationCache.cache[project]['F&B Revenue Assumptions'][baseKey][restaurantKey];
+              }
+            });
+          }
+        });
+      }
+    }
+    
     // Set flag to show success alert after reload
     localStorage.setItem('showRefreshSuccess', 'true');
     // Reload the entire page
@@ -1584,6 +1630,11 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
 
   // Patch getFnbCellValue for 'Number of Rooms Sold (excl.)' row
   function getFnbCellValue(fnbData, row, year, label, totalRooms) {
+    // Debug logging for restaurant total calculations
+    if (typeof row === 'string' && row.includes('"type":"Total')) {
+      console.log('🔍 getFnbCellValue called for:', { row, year, label });
+    }
+    
     // Handle Default Breakfast Outlet auto-calculations for Breakfast section rows
     try {
       const parsed = JSON.parse(row);
@@ -1978,6 +2029,16 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
       if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Cover') {
         const defaultBreakfastOutlet = localStorage.getItem(getProjectKey('defaultBreakfastOutlet'));
         if (defaultBreakfastOutlet === rowKeyObj.restaurant) {
+          // Check cache first for individual restaurant Total Cover
+          if (selectedProject.value && selectedProject.value.project_name) {
+            const project = selectedProject.value.project_name;
+            const cacheKey = `Total Cover:${rowKeyObj.restaurant}`;
+            const cached = calculationCache.getValue(project, 'F&B Revenue Assumptions', cacheKey, year, label);
+            if (cached && cached > 0) {
+              return cached.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+          }
+
           const breakfastCoversKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast Covers' });
           const lunchMonthlyCoverKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Monthly Cover' });
           const dinnerMonthlyCoverKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Dinner Revenue', type: 'Monthly Cover' });
@@ -1991,6 +2052,17 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
           const dinnerCovers = parseFloat((dinnerCoversVal ?? '0').toString().replace(/,/g, '')) || 0;
 
           const totalCover = breakfastCovers + lunchCovers + dinnerCovers;
+          
+          // Cache the individual restaurant Total Cover
+          if (selectedProject.value && selectedProject.value.project_name) {
+            const project = selectedProject.value.project_name;
+            const cacheKey = `Total Cover:${rowKeyObj.restaurant}`;
+            console.log('🔍 Caching Total Cover:', { project, cacheKey, year, label, totalCover });
+            calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalCover);
+          } else {
+            console.log('❌ Cannot cache - no project selected:', { selectedProject: selectedProject.value });
+          }
+          
           return totalCover.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
       }
@@ -2005,6 +2077,16 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
       if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Food Revenue') {
         const defaultBreakfastOutlet = localStorage.getItem(getProjectKey('defaultBreakfastOutlet'));
         if (defaultBreakfastOutlet === rowKeyObj.restaurant) {
+          // Check cache first for individual restaurant Total Food Revenue
+          if (selectedProject.value && selectedProject.value.project_name) {
+            const project = selectedProject.value.project_name;
+            const cacheKey = `Total Food Revenue:${rowKeyObj.restaurant}`;
+            const cached = calculationCache.getValue(project, 'F&B Revenue Assumptions', cacheKey, year, label);
+            if (cached && cached > 0) {
+              return cached.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+          }
+
           const breakfastRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast Revenue' });
           const lunchFoodRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Lunch food revenue' });
           const dinnerFoodRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Dinner Revenue', type: 'Dinner food revenue' });
@@ -2018,6 +2100,17 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
           const dinnerFoodRevenue = parseFloat((dinnerFoodRevenueVal ?? '0').toString().replace(/,/g, '')) || 0;
 
           const totalFoodRevenue = breakfastRevenue + lunchFoodRevenue + dinnerFoodRevenue;
+          
+          // Cache the individual restaurant Total Food Revenue
+          if (selectedProject.value && selectedProject.value.project_name) {
+            const project = selectedProject.value.project_name;
+            const cacheKey = `Total Food Revenue:${rowKeyObj.restaurant}`;
+            console.log('🔍 Caching Total Food Revenue:', { project, cacheKey, year, label, totalFoodRevenue });
+            calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalFoodRevenue);
+          } else {
+            console.log('❌ Cannot cache Total Food Revenue - no project selected:', { selectedProject: selectedProject.value });
+          }
+          
           return totalFoodRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
       }
@@ -2030,6 +2123,16 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     try {
       const rowKeyObj = JSON.parse(row);
       if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Food Revenue') {
+        // Check cache first for individual restaurant Total Food Revenue
+        if (selectedProject.value && selectedProject.value.project_name) {
+          const project = selectedProject.value.project_name;
+          const cacheKey = `Total Food Revenue:${rowKeyObj.restaurant}`;
+          const cached = calculationCache.getValue(project, 'F&B Revenue Assumptions', cacheKey, year, label);
+          if (cached && cached > 0) {
+            return cached.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          }
+        }
+
         const breakfastRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast Revenue' });
         const lunchFoodRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Lunch food revenue' });
         const dinnerFoodRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Dinner Revenue', type: 'Dinner food revenue' });
@@ -2043,6 +2146,17 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         const dinnerFoodRevenue = parseFloat((dinnerFoodRevenueVal ?? '0').toString().replace(/,/g, '')) || 0;
 
         const totalFoodRevenue = breakfastRevenue + lunchFoodRevenue + dinnerFoodRevenue;
+        
+        // Cache the individual restaurant Total Food Revenue
+        if (selectedProject.value && selectedProject.value.project_name) {
+          const project = selectedProject.value.project_name;
+          const cacheKey = `Total Food Revenue:${rowKeyObj.restaurant}`;
+          console.log('🔍 Caching Total Food Revenue (all restaurants):', { project, cacheKey, year, label, totalFoodRevenue });
+          calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalFoodRevenue);
+        } else {
+          console.log('❌ Cannot cache Total Food Revenue (all restaurants) - no project selected:', { selectedProject: selectedProject.value });
+        }
+        
         return totalFoodRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
     } catch (e) {
@@ -2054,6 +2168,16 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     try {
       const rowKeyObj = JSON.parse(row);
       if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Beverage Revenue') {
+        // Check cache first for individual restaurant Total Beverage Revenue
+        if (selectedProject.value && selectedProject.value.project_name) {
+          const project = selectedProject.value.project_name;
+          const cacheKey = `Total Beverage Revenue:${rowKeyObj.restaurant}`;
+          const cached = calculationCache.getValue(project, 'F&B Revenue Assumptions', cacheKey, year, label);
+          if (cached && cached > 0) {
+            return cached.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          }
+        }
+
         const breakfastBeverageKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast beverage revenue' });
         const lunchBeverageKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Lunch beverage revenue' });
         const dinnerBeverageKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Dinner Revenue', type: 'Dinner beverage revenue' });
@@ -2067,6 +2191,17 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         const dinnerBeverage = parseFloat((dinnerBeverageVal ?? '0').toString().replace(/,/g, '')) || 0;
 
         const totalBeverageRevenue = breakfastBeverage + lunchBeverage + dinnerBeverage;
+        
+        // Cache the individual restaurant Total Beverage Revenue
+        if (selectedProject.value && selectedProject.value.project_name) {
+          const project = selectedProject.value.project_name;
+          const cacheKey = `Total Beverage Revenue:${rowKeyObj.restaurant}`;
+          console.log('🔍 Caching Total Beverage Revenue:', { project, cacheKey, year, label, totalBeverageRevenue });
+          calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalBeverageRevenue);
+        } else {
+          console.log('❌ Cannot cache Total Beverage Revenue - no project selected:', { selectedProject: selectedProject.value });
+        }
+        
         return totalBeverageRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
     } catch (e) {
@@ -2078,6 +2213,16 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     try {
       const rowKeyObj = JSON.parse(row);
       if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Revenue') {
+        // Check cache first for individual restaurant Total Revenue
+        if (selectedProject.value && selectedProject.value.project_name) {
+          const project = selectedProject.value.project_name;
+          const cacheKey = `Total Revenue:${rowKeyObj.restaurant}`;
+          const cached = calculationCache.getValue(project, 'F&B Revenue Assumptions', cacheKey, year, label);
+          if (cached && cached > 0) {
+            return cached.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          }
+        }
+
         const totalFoodRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Total', type: 'Total Food Revenue' });
         const totalBeverageRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Total', type: 'Total Beverage Revenue' });
 
@@ -2088,6 +2233,17 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         const totalBeverageRevenue = parseFloat((totalBeverageRevenueVal ?? '0').toString().replace(/,/g, '')) || 0;
 
         const totalRevenue = totalFoodRevenue + totalBeverageRevenue;
+        
+        // Cache the individual restaurant Total Revenue
+        if (selectedProject.value && selectedProject.value.project_name) {
+          const project = selectedProject.value.project_name;
+          const cacheKey = `Total Revenue:${rowKeyObj.restaurant}`;
+          console.log('🔍 Caching Total Revenue:', { project, cacheKey, year, label, totalRevenue });
+          calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalRevenue);
+        } else {
+          console.log('❌ Cannot cache Total Revenue - no project selected:', { selectedProject: selectedProject.value });
+        }
+        
         return totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
     } catch (e) {

@@ -80,7 +80,7 @@
           <tbody class="text-gray-700 bg-white text-sm">
             <!-- Statistics Divider -->
             <tr class="bg-green-800 border-b-2 border-green-900">
-              <td colspan="2" class="px-3 py-3 font-bold text-white border-r border-green-700">
+              <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length + 1), 0)" class="px-3 py-3 font-bold text-white border-r border-green-700">
                 <div class="flex items-center gap-2">
                   Statistics
                 </div>
@@ -350,7 +350,7 @@
 
             <!-- Divider -->
             <tr class="bg-green-800 border-b-2 border-green-900">
-              <td colspan="2" class="px-3 py-3 font-bold text-white border-r border-green-700">
+              <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length + 1), 0)" class="px-3 py-3 font-bold text-white border-r border-green-700">
                 <div class="flex items-center">Revenue</div>
               </td>
               <template v-for="year in visibleYears" :key="'revenue-divider-' + year">
@@ -366,7 +366,7 @@
 
             <!-- Food Revenue Sub-header -->
             <tr class="bg-green-600 border-b border-green-700">
-              <td colspan="2" class="px-3 py-2 font-semibold text-white border-r border-green-700">
+              <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length + 1), 0)" class="px-3 py-2 font-semibold text-white border-r border-green-700">
                 <div class="flex items-center gap-2">
                   <Utensils class="w-4 h-4" />
                   Food Revenue
@@ -383,23 +383,310 @@
               </template>
             </tr>
 
-            <!-- TOTAL F&B REVENUE -->
+
+
+            <!-- Individual Restaurant Food Revenue Rows -->
+            <template v-for="restaurant in getRestaurantList()" :key="'food-revenue-' + restaurant">
+              <tr class="bg-green-100 border-b border-green-200">
+                <td class="px-3 py-2 font-medium border-r border-green-200">
+                  <div class="flex items-center gap-1 text-green-800">{{ restaurant.name || restaurant }}</div>
+                </td>
+                <template v-for="year in visibleYears" :key="'food-revenue-' + restaurant + '-' + year">
+                  <template v-if="!isYearCollapsed(year)">
+                    <td v-for="label in getColumnLabelsForYear(year)" :key="'food-revenue-cell-' + restaurant + '-' + year + '-' + label" class="px-2 py-1 text-right border border-green-200 bg-green-100">
+                      <span class="font-mono text-xs text-green-700">{{ formatMoney(getRestaurantFoodRevenue(restaurant, year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                      <span class="font-mono text-xs text-green-800">{{ formatMoney(getRestaurantFoodRevenueYear(restaurant, year)) }}</span>
+                    </td>
+                  </template>
+                  <template v-else>
+                    <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                      <span class="font-mono text-xs text-green-800">{{ formatMoney(getRestaurantFoodRevenueYear(restaurant, year)) }}</span>
+                    </td>
+                  </template>
+                </template>
+              </tr>
+            </template>
+
+            <!-- Banquet Food Row -->
+            <tr class="bg-green-100 border-b border-green-200">
+              <td class="px-3 py-2 font-medium border-r border-green-200">
+                <div class="flex items-center gap-1 text-green-800">Banquet Food</div>
+              </td>
+              <template v-for="year in visibleYears" :key="'banquet-food-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td v-for="label in getColumnLabelsForYear(year)" :key="'banquet-food-cell-' + year + '-' + label" class="px-2 py-1 text-right border border-green-200 bg-green-100">
+                    <span class="font-mono text-xs text-green-700">{{ formatMoney(getBanquetFoodRevenue(year, label)) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                    <span class="font-mono text-xs text-green-800">{{ formatMoney(getBanquetFoodRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                    <span class="font-mono text-xs text-green-800">{{ formatMoney(getBanquetFoodRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Outside Catering Food Row -->
+            <tr class="bg-green-100 border-b border-green-200">
+              <td class="px-3 py-2 font-medium border-r border-green-200">
+                <div class="flex items-center gap-1 text-green-800">Outside Catering Food</div>
+              </td>
+              <template v-for="year in visibleYears" :key="'outside-catering-food-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td v-for="label in getColumnLabelsForYear(year)" :key="'outside-catering-food-cell-' + year + '-' + label" class="px-2 py-1 text-right border border-green-200 bg-green-100">
+                    <span class="font-mono text-xs text-green-700">{{ formatMoney(getOutsideCateringFoodRevenue(year, label)) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                    <span class="font-mono text-xs text-green-800">{{ formatMoney(getOutsideCateringFoodRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                    <span class="font-mono text-xs text-green-800">{{ formatMoney(getOutsideCateringFoodRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Total Food Revenue Row -->
             <tr class="bg-green-500 border-b-2 border-green-600">
               <td class="px-3 py-2 font-bold border-r border-green-600">
-                <div class="flex items-center gap-1 text-white">TOTAL F&B REVENUE</div>
+                <div class="flex items-center gap-1 text-white">Total Food Revenue</div>
               </td>
-              <template v-for="year in visibleYears" :key="'total-fnb-revenue-' + year">
+              <template v-for="year in visibleYears" :key="'total-food-revenue-' + year">
                 <template v-if="!isYearCollapsed(year)">
-                  <td v-for="label in getColumnLabelsForYear(year)" :key="'total-fnb-revenue-cell-' + year + '-' + label" class="px-2 py-1 text-right border border-green-600 font-semibold bg-green-500">
-                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalFnbRevenue(year, label)) }}</span>
+                  <td v-for="label in getColumnLabelsForYear(year)" :key="'total-food-revenue-cell-' + year + '-' + label" class="px-2 py-1 text-right border border-green-600 font-semibold bg-green-500">
+                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalFoodRevenue(year, label)) }}</span>
                   </td>
                   <td class="px-2 py-1 text-right border border-green-600 font-bold bg-green-500">
-                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalFnbRevenueYear(year)) }}</span>
+                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalFoodRevenueYear(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
                   <td class="px-2 py-1 text-right border border-green-600 font-bold bg-green-500">
-                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalFnbRevenueYear(year)) }}</span>
+                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalFoodRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Empty Row between Food and Beverage -->
+            <tr class="bg-gray-100 border-b border-gray-200">
+              <td class="px-3 py-2 border-r border-gray-200">
+                <div class="flex items-center gap-1"></div>
+              </td>
+              <template v-for="year in visibleYears" :key="'empty-food-bev-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td v-for="label in getColumnLabelsForYear(year)" :key="'empty-food-bev-cell-' + year + '-' + label" class="px-2 py-1 text-center border border-gray-200 bg-gray-100"></td>
+                  <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100"></td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100"></td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Beverage Revenue Sub-header -->
+            <tr class="bg-green-600 border-b border-green-700">
+              <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length + 1), 0)" class="px-3 py-2 font-semibold text-white border-r border-green-700">
+                <div class="flex items-center gap-2">
+                  <Coffee class="w-4 h-4" />
+                  Beverage Revenue
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'beverage-revenue-header-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td v-for="label in getColumnLabelsForYear(year)" :key="'beverage-revenue-header-cell-' + year + '-' + label" class="px-1 py-1 text-center border border-green-600 bg-green-600"></td>
+                  <td class="px-1 py-1 text-center border border-green-600 bg-green-600"></td>
+                </template>
+                <template v-else>
+                  <td class="px-1 py-1 text-center border border-green-600 bg-green-600"></td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Individual Restaurant Beverage Revenue Rows -->
+            <template v-for="restaurant in getRestaurantList()" :key="'beverage-revenue-' + restaurant">
+              <tr class="bg-green-100 border-b border-green-200">
+                <td class="px-3 py-2 font-medium border-r border-green-200">
+                  <div class="flex items-center gap-1 text-green-800">{{ restaurant.name || restaurant }}</div>
+                </td>
+                <template v-for="year in visibleYears" :key="'beverage-revenue-' + restaurant + '-' + year">
+                  <template v-if="!isYearCollapsed(year)">
+                    <td v-for="label in getColumnLabelsForYear(year)" :key="'beverage-revenue-cell-' + restaurant + '-' + year + '-' + label" class="px-2 py-1 text-right border border-green-200 bg-green-100">
+                      <span class="font-mono text-xs text-green-700">{{ formatMoney(getRestaurantBeverageRevenue(restaurant, year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                      <span class="font-mono text-xs text-green-800">{{ formatMoney(getRestaurantBeverageRevenueYear(restaurant, year)) }}</span>
+                    </td>
+                  </template>
+                  <template v-else>
+                    <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                      <span class="font-mono text-xs text-green-800">{{ formatMoney(getRestaurantBeverageRevenueYear(restaurant, year)) }}</span>
+                    </td>
+                  </template>
+                </template>
+              </tr>
+            </template>
+
+            <!-- Banquet Beverage Row -->
+            <tr class="bg-green-100 border-b border-green-200">
+              <td class="px-3 py-2 font-medium border-r border-green-200">
+                <div class="flex items-center gap-1 text-green-800">Banquet Beverage</div>
+              </td>
+              <template v-for="year in visibleYears" :key="'banquet-beverage-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td v-for="label in getColumnLabelsForYear(year)" :key="'banquet-beverage-cell-' + year + '-' + label" class="px-2 py-1 text-right border border-green-200 bg-green-100">
+                    <span class="font-mono text-xs text-green-700">{{ formatMoney(getBanquetBeverageRevenue(year, label)) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                    <span class="font-mono text-xs text-green-800">{{ formatMoney(getBanquetBeverageRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                    <span class="font-mono text-xs text-green-800">{{ formatMoney(getBanquetBeverageRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Outside Catering Beverage Row -->
+            <tr class="bg-green-100 border-b border-green-200">
+              <td class="px-3 py-2 font-medium border-r border-green-200">
+                <div class="flex items-center gap-1 text-green-800">Outside Catering Beverage</div>
+              </td>
+              <template v-for="year in visibleYears" :key="'outside-catering-beverage-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td v-for="label in getColumnLabelsForYear(year)" :key="'outside-catering-beverage-cell-' + year + '-' + label" class="px-2 py-1 text-right border border-green-200 bg-green-100">
+                    <span class="font-mono text-xs text-green-700">{{ formatMoney(getOutsideCateringBeverageRevenue(year, label)) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                    <span class="font-mono text-xs text-green-800">{{ formatMoney(getOutsideCateringBeverageRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                    <span class="font-mono text-xs text-green-800">{{ formatMoney(getOutsideCateringBeverageRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Total Beverage Revenue Row -->
+            <tr class="bg-green-500 border-b-2 border-green-600">
+              <td class="px-3 py-2 font-bold border-r border-green-600">
+                <div class="flex items-center gap-1 text-white">Total Beverage Revenue</div>
+              </td>
+              <template v-for="year in visibleYears" :key="'total-beverage-revenue-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td v-for="label in getColumnLabelsForYear(year)" :key="'total-beverage-revenue-cell-' + year + '-' + label" class="px-2 py-1 text-right border border-green-600 font-semibold bg-green-500">
+                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalBeverageRevenue(year, label)) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-green-600 font-bold bg-green-500">
+                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalBeverageRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-green-600 font-bold bg-green-500">
+                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalBeverageRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- TOTAL FOOD & BEVERAGE Row -->
+            <tr class="bg-green-700 border-b-2 border-green-800">
+              <td class="px-3 py-2 font-bold border-r border-green-800">
+                <div class="flex items-center gap-1 text-white">TOTAL FOOD & BEVERAGE</div>
+              </td>
+              <template v-for="year in visibleYears" :key="'total-fnb-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td v-for="label in getColumnLabelsForYear(year)" :key="'total-fnb-cell-' + year + '-' + label" class="px-2 py-1 text-right border border-green-800 font-semibold bg-green-700">
+                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalFoodAndBeverageRevenue(year, label)) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-green-800 font-bold bg-green-700">
+                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalFoodAndBeverageRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-green-800 font-bold bg-green-700">
+                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalFoodAndBeverageRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Empty Row before Other Revenue -->
+            <tr class="bg-gray-100 border-b border-gray-200">
+              <td class="px-3 py-2 border-r border-gray-200">
+                <div class="flex items-center gap-1"></div>
+              </td>
+              <template v-for="year in visibleYears" :key="'empty-before-other-revenue-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td v-for="label in getColumnLabelsForYear(year)" :key="'empty-before-other-revenue-cell-' + year + '-' + label" class="px-2 py-1 text-center border border-gray-200 bg-gray-100"></td>
+                  <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100"></td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-center border border-gray-200 bg-gray-100"></td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Other Revenue Section Header -->
+            <tr class="bg-green-600 border-b border-green-700">
+              <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length + 1), 0)" class="px-3 py-2 font-semibold text-white border-r border-green-700">
+                <div class="flex items-center gap-1">
+                  <DollarSign class="w-4 h-4" />
+                  Other Revenue
+                </div>
+              </td>
+            </tr>
+
+            <!-- Function Room Rental Row -->
+            <tr class="bg-green-100 border-b border-green-200">
+              <td class="px-3 py-2 font-medium border-r border-green-200">
+                <div class="flex items-center gap-1 text-green-800">Function Room Rental</div>
+              </td>
+              <template v-for="year in visibleYears" :key="'function-room-rental-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td v-for="label in getColumnLabelsForYear(year)" :key="'function-room-rental-cell-' + year + '-' + label" class="px-2 py-1 text-right border border-green-200 bg-green-100">
+                    <span class="font-mono text-xs text-green-700">{{ formatMoney(getFunctionRoomRentalRevenue(year, label)) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                    <span class="font-mono text-xs text-green-800">{{ formatMoney(getFunctionRoomRentalRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                    <span class="font-mono text-xs text-green-800">{{ formatMoney(getFunctionRoomRentalRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Miscellaneous Other Revenue Row -->
+            <tr class="bg-green-100 border-b border-green-200">
+              <td class="px-3 py-2 font-medium border-r border-green-200">
+                <div class="flex items-center gap-1 text-green-800">Miscellaneous Other Revenue</div>
+              </td>
+              <template v-for="year in visibleYears" :key="'misc-other-revenue-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <td v-for="label in getColumnLabelsForYear(year)" :key="'misc-other-revenue-cell-' + year + '-' + label" class="px-2 py-1 text-right border border-green-200 bg-green-100">
+                    <span class="font-mono text-xs text-green-700">{{ formatMoney(getMiscellaneousOtherRevenue(year, label)) }}</span>
+                  </td>
+                  <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                    <span class="font-mono text-xs text-green-800">{{ formatMoney(getMiscellaneousOtherRevenueYear(year)) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-green-200 font-semibold bg-green-200">
+                    <span class="font-mono text-xs text-green-800">{{ formatMoney(getMiscellaneousOtherRevenueYear(year)) }}</span>
                   </td>
                 </template>
               </template>
@@ -411,18 +698,23 @@
   </div>
 </template>
 
+
+
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import { selectedProject } from '@/components/utility/dashboard/projectService.js';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+import { getRestaurants } from '@/components/utility/f&b_revenue_assumpt/get_restaurants.js';
 import { 
   ChevronDown, 
   ChevronRight, 
   BookOpen,
   Building2,
-  Utensils
+  DollarSign,
+  Utensils,
+  Coffee
 } from 'lucide-vue-next';
 
 // Props
@@ -854,6 +1146,433 @@ function hasRevPerRoomData() {
     }
   }
   return false;
+}
+
+// Restaurant-specific revenue functions
+const restaurants = ref([]);
+
+// Load restaurants from the API
+onMounted(async () => {
+  try {
+    if (selectedProject.value?.project_name) {
+      const restaurantList = await getRestaurants(selectedProject.value.project_name);
+      restaurants.value = restaurantList;
+      console.log('🍽️ Loaded restaurants from API:', restaurantList);
+      
+      // Log each restaurant to see the structure
+      restaurantList.forEach((restaurant, index) => {
+        console.log(`Restaurant ${index + 1}:`, restaurant);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading restaurants:', error);
+    restaurants.value = [];
+  }
+});
+
+// Watch for project changes to reload restaurants
+watch(selectedProject, async (newProject) => {
+  if (newProject?.project_name) {
+    try {
+      const restaurantList = await getRestaurants(newProject.project_name);
+      restaurants.value = restaurantList;
+      console.log('Reloaded restaurants for new project:', restaurantList);
+    } catch (error) {
+      console.error('Error reloading restaurants for new project:', error);
+      restaurants.value = [];
+    }
+  }
+});
+
+function getRestaurantList() {
+  return restaurants.value;
+}
+
+function getRestaurantFoodRevenue(restaurant, year, label) {
+  try {
+    // Get restaurant name (handle both object and string)
+    const restaurantName = restaurant.name || restaurant;
+    
+    // Based on the cache structure you showed, the key format is:
+    // "Total Food Revenue:Fine Dining" for the cacheKey
+    const cacheKey = `Total Food Revenue:${restaurantName}`;
+    
+    console.log(`🔍 Looking for food revenue: ${cacheKey} for ${year} ${label}`);
+    
+    // Try to get from the calculation cache using the proper page and row structure
+    const val = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', cacheKey, year, label);
+    
+    if (val !== undefined && val !== null) {
+      console.log(`✅ Found food revenue for ${restaurantName}: ${val}`);
+      return getNumber(val);
+    }
+    
+    // Fallback: try to get from the restaurant-specific row structure
+    const rowData = {
+      restaurant: restaurantName,
+      section: 'Total',
+      type: 'Total Food Revenue'
+    };
+    
+    const fallbackVal = calculationCache.getValue(
+      projectName.value, 
+      'F&B Revenue Assumptions', 
+      JSON.stringify(rowData), 
+      year, 
+      label
+    );
+    
+    if (fallbackVal !== undefined && fallbackVal !== null) {
+      console.log(`✅ Found food revenue (fallback) for ${restaurantName}: ${fallbackVal}`);
+      return getNumber(fallbackVal);
+    }
+    
+    console.log(`❌ No food revenue data found for ${restaurantName} in ${year} ${label}`);
+    return 0;
+  } catch (error) {
+    console.error(`Error getting food revenue for ${restaurant}:`, error);
+    return 0;
+  }
+}
+function getRestaurantFoodRevenueYear(restaurant, year) {
+  const labels = getColumnLabelsForYear(year);
+  return labels.reduce((sum, label) => sum + getNumber(getRestaurantFoodRevenue(restaurant, year, label)), 0);
+}
+
+function getRestaurantBeverageRevenue(restaurant, year, label) {
+  try {
+    // Get restaurant name (handle both object and string)
+    const restaurantName = restaurant.name || restaurant;
+    
+    // Based on the cache structure you showed, the key format is:
+    // "Total Beverage Revenue:Fine Dining" for the cacheKey
+    const cacheKey = `Total Beverage Revenue:${restaurantName}`;
+    
+    console.log(`🔍 Looking for beverage revenue: ${cacheKey} for ${year} ${label}`);
+    
+    // Try to get from the calculation cache using the proper page and row structure
+    const val = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', cacheKey, year, label);
+    
+    if (val !== undefined && val !== null) {
+      console.log(`✅ Found beverage revenue for ${restaurantName}: ${val}`);
+      return getNumber(val);
+    }
+    
+    // Fallback: try to get from the restaurant-specific row structure
+    const rowData = {
+      restaurant: restaurantName,
+      section: 'Total',
+      type: 'Total Beverage Revenue'
+    };
+    
+    const fallbackVal = calculationCache.getValue(
+      projectName.value, 
+      'F&B Revenue Assumptions', 
+      JSON.stringify(rowData), 
+      year, 
+      label
+    );
+    
+    if (fallbackVal !== undefined && fallbackVal !== null) {
+      console.log(`✅ Found beverage revenue (fallback) for ${restaurantName}: ${val}`);
+      return getNumber(fallbackVal);
+    }
+    
+    console.log(`❌ No beverage revenue data found for ${restaurantName} in ${year} ${label}`);
+    return 0;
+  } catch (error) {
+    console.error(`Error getting beverage revenue for ${restaurant}:`, error);
+    return 0;
+  }
+}
+function getRestaurantBeverageRevenueYear(restaurant, year) {
+  const labels = getColumnLabelsForYear(year);
+  return labels.reduce((sum, label) => sum + getNumber(getRestaurantBeverageRevenue(restaurant, year, label)), 0);
+}
+
+// Hardcoded Food Revenue functions
+function getBanquetFoodRevenue(year, label) {
+  try {
+    // Get from Banquet Revenue Assumptions page cache
+    // Based on your cache logs, this uses the exact row code: "Food"
+    const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'Food', year, label);
+    
+    if (val !== undefined && val !== null) {
+      console.log(`✅ Found banquet food revenue: ${val} for ${year} ${label}`);
+      return getNumber(val);
+    }
+    
+    console.log(`❌ No banquet food revenue data found for ${year} ${label}`);
+    return 0;
+  } catch (error) {
+    console.error(`Error getting banquet food revenue for ${year} ${label}:`, error);
+    return 0;
+  }
+}
+
+function getBanquetFoodRevenueYear(year) {
+  const labels = getColumnLabelsForYear(year);
+  return labels.reduce((sum, label) => sum + getNumber(getBanquetFoodRevenue(year, label)), 0);
+}
+
+function getOutsideCateringFoodRevenue(year, label) {
+  try {
+    // Get from Banquet Revenue Assumptions page cache
+    // Try common row codes for outside catering food revenue
+    const possibleRowCodes = [
+      'outside_service_food_catering',
+      'outside_catering_food',
+      'catering_food',
+      'outside_food_service',
+      'external_catering_food'
+    ];
+    
+    for (const rowCode of possibleRowCodes) {
+      const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', rowCode, year, label);
+      if (val !== undefined && val !== null) {
+        console.log(`✅ Found outside catering food revenue from ${rowCode}: ${val} for ${year} ${label}`);
+        return getNumber(val);
+      }
+    }
+    
+    console.log(`❌ No outside catering food revenue data found for ${year} ${label}`);
+    return 0;
+  } catch (error) {
+    console.error(`Error getting outside catering food revenue for ${year} ${label}:`, error);
+    return 0;
+  }
+}
+
+function getOutsideCateringFoodRevenueYear(year) {
+  const labels = getColumnLabelsForYear(year);
+  return labels.reduce((sum, label) => sum + getNumber(getOutsideCateringFoodRevenue(year, label)), 0);
+}
+
+// Hardcoded Beverage Revenue functions
+function getBanquetBeverageRevenue(year, label) {
+  try {
+    // Get from Banquet Revenue Assumptions page cache
+    // Sum up Liquor + Soft Drinks for the month
+    const liquorValue = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'Liquor', year, label);
+    const softDrinksValue = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'Soft Drinks', year, label);
+    
+    const liquor = getNumber(liquorValue) || 0;
+    const softDrinks = getNumber(softDrinksValue) || 0;
+    const total = liquor + softDrinks;
+    
+    if (liquor > 0 || softDrinks > 0) {
+      console.log(`✅ Found banquet beverage revenue for ${year} ${label}: Liquor: ${liquor}, Soft Drinks: ${softDrinks}, Total: ${total}`);
+      return total;
+    }
+    
+    console.log(`❌ No banquet beverage revenue data found for ${year} ${label}`);
+    return 0;
+  } catch (error) {
+    console.error(`Error getting banquet beverage revenue for ${year} ${label}:`, error);
+    return 0;
+  }
+}
+
+function getBanquetBeverageRevenueYear(year) {
+  const labels = getColumnLabelsForYear(year);
+  return labels.reduce((sum, label) => sum + getNumber(getBanquetBeverageRevenue(year, label)), 0);
+}
+
+function getOutsideCateringBeverageRevenue(year, label) {
+  try {
+    // Get from Banquet Revenue Assumptions page cache
+    // Based on your cache logs, this uses the exact row code: "outside_service_beverage_catering"
+    const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'outside_service_beverage_catering', year, label);
+    
+    if (val !== undefined && val !== null) {
+      console.log(`✅ Found outside catering beverage revenue: ${val} for ${year} ${label}`);
+      return getNumber(val);
+    }
+    
+    console.log(`❌ No outside catering beverage revenue data found for ${year} ${label}`);
+    return 0;
+  } catch (error) {
+    console.error(`Error getting outside catering beverage revenue for ${year} ${label}:`, error);
+    return 0;
+  }
+}
+
+function getOutsideCateringBeverageRevenueYear(year) {
+  const labels = getColumnLabelsForYear(year);
+  return labels.reduce((sum, label) => sum + getNumber(getOutsideCateringBeverageRevenue(year, label)), 0);
+}
+
+// Other Revenue functions
+function getFunctionRoomRentalRevenue(year, label) {
+  try {
+    // Get from Banquet Revenue Assumptions page cache
+    // Based on your cache logs, this uses the exact row code: "Hall Space Charges"
+    const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'Hall Space Charges', year, label);
+    
+    if (val !== undefined && val !== null) {
+      console.log(`✅ Found function room rental revenue: ${val} for ${year} ${label}`);
+      return getNumber(val);
+    }
+    
+    console.log(`❌ No function room rental revenue data found for ${year} ${label}`);
+    return 0;
+  } catch (error) {
+    console.error(`Error getting function room rental revenue for ${year} ${label}:`, error);
+    return 0;
+  }
+}
+
+function getFunctionRoomRentalRevenueYear(year) {
+  const labels = getColumnLabelsForYear(year);
+  return labels.reduce((sum, label) => sum + getNumber(getFunctionRoomRentalRevenue(year, label)), 0);
+}
+
+function getMiscellaneousOtherRevenue(year, label) {
+  try {
+    // Get from Banquet Revenue Assumptions page cache
+    // Sum up Tobacco + non_fnb + Others for the month
+    const tobaccoValue = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'tobacco', year, label);
+    const nonFnbValue = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'non_fnb', year, label);
+    const othersValue = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'others', year, label);
+    
+    const tobacco = getNumber(tobaccoValue) || 0;
+    const nonFnb = getNumber(nonFnbValue) || 0;
+    const others = getNumber(othersValue) || 0;
+    
+    // Try to find any additional banquet detail rows that might exist
+    const additionalRowCodes = [
+      'additional_revenue',
+      'extra_revenue',
+      'supplementary_revenue',
+      'additional_income',
+      'extra_income'
+    ];
+    
+    let additionalTotal = 0;
+    for (const rowCode of additionalRowCodes) {
+      const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', rowCode, year, label);
+      if (val !== undefined && val !== null) {
+        const additionalValue = getNumber(val) || 0;
+        additionalTotal += additionalValue;
+        console.log(`✅ Found additional revenue from ${rowCode}: ${additionalValue} for ${year} ${label}`);
+      }
+    }
+    
+    const total = tobacco + nonFnb + others + additionalTotal;
+    
+    if (total > 0) {
+      console.log(`✅ Found miscellaneous other revenue for ${year} ${label}: Tobacco: ${tobacco}, non_fnb: ${nonFnb}, Others: ${others}, Additional: ${additionalTotal}, Total: ${total}`);
+      return total;
+    }
+    
+    console.log(`❌ No miscellaneous other revenue data found for ${year} ${label}`);
+    return 0;
+  } catch (error) {
+    console.error(`Error getting miscellaneous other revenue for ${year} ${label}:`, error);
+    return 0;
+  }
+}
+
+function getMiscellaneousOtherRevenueYear(year) {
+  const labels = getColumnLabelsForYear(year);
+  return labels.reduce((sum, label) => sum + getNumber(getMiscellaneousOtherRevenue(year, label)), 0);
+}
+
+// Total Food Revenue functions
+function getTotalFoodRevenue(year, label) {
+  try {
+    const restaurantList = getRestaurantList();
+    let total = 0;
+    
+    for (const restaurant of restaurantList) {
+      const revenue = getRestaurantFoodRevenue(restaurant, year, label);
+      total += getNumber(revenue);
+    }
+    
+    return total;
+  } catch (error) {
+    console.error(`Error calculating total food revenue for ${year} ${label}:`, error);
+    return 0;
+  }
+}
+
+function getTotalFoodRevenueYear(year) {
+  try {
+    const labels = getColumnLabelsForYear(year);
+    let yearTotal = 0;
+    
+    for (const label of labels) {
+      const monthTotal = getTotalFoodRevenue(year, label);
+      yearTotal += getNumber(monthTotal);
+    }
+    
+    return yearTotal;
+  } catch (error) {
+    console.error(`Error calculating total food revenue for year ${year}:`, error);
+    return 0;
+  }
+}
+
+// Total Beverage Revenue functions
+function getTotalBeverageRevenue(year, label) {
+  try {
+    const restaurantList = getRestaurantList();
+    let total = 0;
+    
+    for (const restaurant of restaurantList) {
+      const revenue = getRestaurantBeverageRevenue(restaurant, year, label);
+      total += getNumber(revenue);
+    }
+    
+    return total;
+  } catch (error) {
+    console.error(`Error calculating total beverage revenue for ${year} ${label}:`, error);
+    return 0;
+  }
+}
+
+function getTotalBeverageRevenueYear(year) {
+  try {
+    const labels = getColumnLabelsForYear(year);
+    let yearTotal = 0;
+    
+    for (const label of labels) {
+      const monthTotal = getTotalBeverageRevenue(year, label);
+      yearTotal += getNumber(monthTotal);
+    }
+    
+    return yearTotal;
+  } catch (error) {
+    console.error(`Error calculating total beverage revenue for year ${year}:`, error);
+    return 0;
+  }
+}
+
+// Total Food & Beverage Revenue functions
+function getTotalFoodAndBeverageRevenue(year, label) {
+  try {
+    const foodRevenue = getTotalFoodRevenue(year, label);
+    const beverageRevenue = getTotalBeverageRevenue(year, label);
+    const total = getNumber(foodRevenue) + getNumber(beverageRevenue);
+    
+    return total;
+  } catch (error) {
+    console.error(`Error calculating total food & beverage revenue for ${year} ${label}:`, error);
+    return 0;
+  }
+}
+
+function getTotalFoodAndBeverageRevenueYear(year) {
+  try {
+    const foodYearTotal = getTotalFoodRevenueYear(year);
+    const beverageYearTotal = getTotalBeverageRevenueYear(year);
+    const yearTotal = getNumber(foodYearTotal) + getNumber(beverageYearTotal);
+    
+    return yearTotal;
+  } catch (error) {
+    console.error(`Error calculating total food & beverage revenue for year ${year}:`, error);
+    return 0;
+  }
 }
 </script>
 

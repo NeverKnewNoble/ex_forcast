@@ -24,7 +24,7 @@ export class UnifiedCacheService {
     try {
       await this.loadProjectCache()
       this.isInitialized.value = true
-      console.log('[CACHE] Service initialized successfully')
+      // console.log('[CACHE] Service initialized successfully')
     } catch (error) {
       console.error('[CACHE] Initialization failed:', error)
       this.errorState.value = error.message
@@ -119,7 +119,7 @@ export class UnifiedCacheService {
         // Clear all cache
         this.cache.value = {}
         this.clearAllStorage()
-        console.log('[CACHE CLEAR] All cache cleared')
+        // console.log('[CACHE CLEAR] All cache cleared')
         return
       }
       
@@ -127,7 +127,7 @@ export class UnifiedCacheService {
         // Clear all cache for a project
         delete this.cache.value[projectId]
         this.clearProjectStorage(projectId)
-        console.log('[CACHE CLEAR] Project cache cleared:', projectId)
+        // console.log('[CACHE CLEAR] Project cache cleared:', projectId)
         return
       }
       
@@ -136,7 +136,7 @@ export class UnifiedCacheService {
         if (this.cache.value[projectId]) {
           delete this.cache.value[projectId][pageId]
           this.clearPageStorage(projectId, pageId)
-          console.log('[CACHE CLEAR] Page cache cleared:', { projectId, pageId })
+          // console.log('[CACHE CLEAR] Page cache cleared:', { projectId, pageId })
         }
         return
       }
@@ -146,7 +146,7 @@ export class UnifiedCacheService {
         if (this.cache.value[projectId]?.[pageId]) {
           delete this.cache.value[projectId][pageId][rowCode]
           this.clearRowStorage(projectId, pageId, rowCode)
-          console.log('[CACHE CLEAR] Row cache cleared:', { projectId, pageId, rowCode })
+          // console.log('[CACHE CLEAR] Row cache cleared:', { projectId, pageId, rowCode })
         }
         return
       }
@@ -155,7 +155,7 @@ export class UnifiedCacheService {
       if (this.cache.value[projectId]?.[pageId]?.[rowCode]?.[year]) {
         delete this.cache.value[projectId][pageId][rowCode][year]
         this.clearYearStorage(projectId, pageId, rowCode, year)
-        console.log('[CACHE CLEAR] Year cache cleared:', { projectId, pageId, rowCode, year })
+        // console.log('[CACHE CLEAR] Year cache cleared:', { projectId, pageId, rowCode, year })
       }
     } catch (error) {
       console.error('[CACHE] Error clearing cache:', error)
@@ -180,10 +180,10 @@ export class UnifiedCacheService {
       if (stored) {
         const parsed = JSON.parse(stored)
         this.cache.value = parsed
-        console.log('[CACHE] Loaded from storage:', storageKey)
+        // console.log('[CACHE] Loaded from storage:', storageKey)
       } else {
         this.cache.value = {}
-        console.log('[CACHE] No stored cache found for project:', project.project_name)
+        // console.log('[CACHE] No stored cache found for project:', project.project_name)
       }
     } catch (error) {
       console.error('[CACHE] Error loading project cache:', error)

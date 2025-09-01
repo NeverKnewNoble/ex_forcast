@@ -809,6 +809,7 @@
                                     <td
                                       contenteditable="true"
                                       class="px-2 py-1 text-right border border-green-200 bg-green-50 font-mono"
+                                      style="direction: ltr; text-align: right; unicode-bidi: plaintext;"
                                       @input="e => { sanitizeNumberInput(e); handleHealthClubCellInput({ year, label, field: field.code, event: e }); }"
                                       @focus="handleOODCellFocus({ year, label, field: field.code, event: $event })"
                                       @blur="handleCellEditWrapper({ year, label, field: field.code, event: $event })"
@@ -823,6 +824,7 @@
                                   <td
                                     contenteditable="true"
                                     class="px-2 py-1 text-right border border-green-200 bg-green-50 font-mono"
+                                    style="direction: ltr; text-align: right; unicode-bidi: plaintext;"
                                     @input="e => { sanitizeNumberInput(e); handleHealthClubCellInput({ year, label: 'Forecast', field: field.code, event: e }); }"
                                     @focus="handleOODCellFocus({ year, label: 'Forecast', field: field.code, event: $event })"
                                     @blur="handleCellEditWrapper({ year, label: 'Forecast', field: field.code, event: $event })"
@@ -909,6 +911,7 @@
                                             ? 'bg-green-100 hover:bg-green-200 font-semibold'
                                             : 'hover:bg-green-50'
                                         ]"
+                                        style="direction: ltr; text-align: right; unicode-bidi: plaintext;"
                                         @input="e => { sanitizeNumberInput(e); handleHealthClubCellInput({ year, label, field: field.code, event: e }); }"
                                         @focus="handleOODCellFocus({ year, label, field: field.code, event: $event })"
                                         @blur="handleCellEditWrapper({ year, label, field: field.code, event: $event })"
@@ -942,6 +945,7 @@
                                         ? 'bg-green-100 hover:bg-green-200 font-semibold'
                                         : 'hover:bg-green-50'
                                     ]"
+                                    style="direction: ltr; text-align: right; unicode-bidi: plaintext;"
                                     @input="e => { sanitizeNumberInput(e); handleHealthClubCellInput({ year, label: 'Forecast', field: field.code, event: e }); }"
                                     @focus="handleOODCellFocus({ year, label: 'Forecast', field: field.code, event: $event })"
                                     @blur="handleCellEditWrapper({ year, label: 'Forecast', field: field.code, event: $event })"
@@ -976,6 +980,7 @@
                                         ? 'bg-green-100 font-semibold'
                                         : 'bg-green-50'
                                     ]"
+                                    style="direction: ltr; text-align: right; unicode-bidi: plaintext;"
                                     @input="e => { sanitizeNumberInput(e); handleHealthClubCellInput({ year, label: 'Forecast', field: field.code, event: e }); }"
                                     @focus="handleOODCellFocus({ year, label: 'Forecast', field: field.code, event: $event })"
                                     @blur="handleCellEditWrapper({ year, label: 'Forecast', field: field.code, event: $event })"
