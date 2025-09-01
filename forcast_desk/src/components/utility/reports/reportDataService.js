@@ -20,12 +20,12 @@ class ReportDataService {
    */
   debugCache(projectName) {
     try {
-      console.log('[REPORT SERVICE DEBUG] Inspecting cache for project:', projectName)
+      // console.log('[REPORT SERVICE DEBUG] Inspecting cache for project:', projectName)
       
       const cache = this.calculationCache.cache[projectName] || {}
       const pages = Object.keys(cache)
       
-      console.log('[REPORT SERVICE DEBUG] Available pages:', pages)
+      // console.log('[REPORT SERVICE DEBUG] Available pages:', pages)
       
       const inspection = {}
       
@@ -58,7 +58,7 @@ class ReportDataService {
         })
       })
       
-      console.log('[REPORT SERVICE DEBUG] Cache inspection:', inspection)
+      // console.log('[REPORT SERVICE DEBUG] Cache inspection:', inspection)
       return inspection
       
     } catch (error) {
@@ -75,7 +75,7 @@ class ReportDataService {
    */
   async getReportData(projectName, years) {
     try {
-      console.log('[REPORT SERVICE] Loading unified data for project:', projectName, 'years:', years)
+      // console.log('[REPORT SERVICE] Loading unified data for project:', projectName, 'years:', years)
       
       // Debug: Inspect what's actually cached
       const cacheInspection = this.debugCache(projectName)
@@ -179,7 +179,7 @@ class ReportDataService {
         ? Math.round((populatedDataPoints / totalDataPoints) * 100) 
         : 0
 
-      console.log('[REPORT SERVICE] Data loading complete. Completeness:', data.metadata.dataCompleteness + '%')
+      // console.log('[REPORT SERVICE] Data loading complete. Completeness:', data.metadata.dataCompleteness + '%')
       
       return data
 
@@ -198,7 +198,7 @@ class ReportDataService {
    */
   async getReportSpecificData(reportType, projectName, years) {
     try {
-      console.log('[REPORT SERVICE] Loading specific data for report:', reportType)
+      // console.log('[REPORT SERVICE] Loading specific data for report:', reportType)
       
       const data = {}
       

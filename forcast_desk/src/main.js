@@ -35,7 +35,7 @@ app.use(pinia);
 
 // Initialize unified cache service
 unifiedCacheService.initialize().then(() => {
-  console.log('[MAIN] Cache service initialized')
+  // console.log('[MAIN] Cache service initialized')
 }).catch(error => {
   console.error('[MAIN] Failed to initialize cache service:', error)
 })

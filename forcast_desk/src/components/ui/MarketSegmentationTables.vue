@@ -136,6 +136,7 @@
                             @input="handleRoomNightsCellInput({ year, label, segment, event: $event })"
                             @focus="handleRoomNightsCellFocus({ event: $event })"
                             @blur="handleRoomNightsCellEditWrapper({ year, label, segment, event: $event })"
+                            @keydown="allowOnlyNumbers"
                           >
                             {{ getMarketSegmentValue(marketSegmentData, segment, year, label, 'room_nights') }}
                           </div>
@@ -158,7 +159,15 @@
                 </template>
                 <!-- After all segment rows, add the Total Occupied Room row -->
                 <tr class="bg-violet-200 font-bold text-violet-900">
-                  <td class="px-4 py-3 border-r border-violet-200">Total Occupied Room</td>
+                  <td class="px-4 py-3 border-r border-violet-200">
+                    <div class="flex items-center justify-between">
+                      <span>Total Occupied Room</span>
+                      <div class="bg-violet-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                        <Calculator class="w-3 h-3" />
+                        AUTO
+                      </div>
+                    </div>
+                  </td>
                   <template v-for="year in visibleYears" :key="'total-roomnights-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <td
@@ -185,7 +194,15 @@
                 </tr>
                 <!-- Add the Total Available Rooms row -->
                 <tr class="bg-violet-200 font-bold text-violet-900">
-                  <td class="px-4 py-3 border-r border-violet-200">Total Available Rooms</td>
+                  <td class="px-4 py-3 border-r border-violet-200">
+                    <div class="flex items-center justify-between">
+                      <span>Total Available Rooms</span>
+                      <div class="bg-violet-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                        <Calculator class="w-3 h-3" />
+                        AUTO
+                      </div>
+                    </div>
+                  </td>
                   <template v-for="year in visibleYears" :key="'total-available-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <td
@@ -212,7 +229,15 @@
                 </tr>
                 <!-- Add the Occupancy (%) row -->
                 <tr class="bg-violet-200 font-bold text-violet-900">
-                  <td class="px-4 py-3 border-r border-violet-200">Occupancy (%)</td>
+                  <td class="px-4 py-3 border-r border-violet-200">
+                    <div class="flex items-center justify-between">
+                      <span>Occupancy (%)</span>
+                      <div class="bg-violet-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                        <Calculator class="w-3 h-3" />
+                        AUTO
+                      </div>
+                    </div>
+                  </td>
                   <template v-for="year in visibleYears" :key="'occupancy-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <td
@@ -334,6 +359,7 @@
                             @input="handleRoomRateCellInput({ year, label, segment, event: $event })"
                             @focus="handleRoomRateCellFocus({ event: $event })"
                             @blur="handleRoomRateCellEditWrapper({ year, label, segment, event: $event })"
+                            @keydown="allowOnlyNumbers"
                           >
                             {{ getMarketSegmentValue(marketSegmentData, segment, year, label, 'room_rate') }}
                           </div>
@@ -362,8 +388,20 @@
       <!-- Table 3: Average Daily Rate -->
       <div class="bg-white rounded-lg border border-blue-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4">
-          <h2 class="text-xl font-bold flex items-center gap-2"><Calculator class="w-5 h-5" />Average Daily Rate</h2>
-          <p class="text-blue-100 text-sm">Average daily rate by market segment</p>
+          <div class="flex-col items-center ">
+            <div class="flex items-center gap-2">
+              <Calculator class="w-5 h-5" />
+              <h2 class="text-xl font-bold">Average Daily Rate</h2>
+              <div class="bg-blue-500 text-white font-bold text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                <Calculator class="w-3 h-3" />
+                Auto Calculated
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-blue-100 text-sm">Average daily rate by market segment</span>
+
+            </div>
+          </div>
         </div>
         <div class="overflow-x-auto">
           <div class="min-w-full w-max">
@@ -465,7 +503,15 @@
                 </template>
                 <!-- Add ADR row -->
                 <tr class="bg-blue-200 font-bold text-blue-900">
-                  <td class="px-4 py-3 border-r border-blue-200">ADR</td>
+                  <td class="px-4 py-3 border-r border-blue-200">
+                    <div class="flex items-center justify-between">
+                      <span>ADR</span>
+                      <div class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                        <Calculator class="w-3 h-3" />
+                        AUTO
+                      </div>
+                    </div>
+                  </td>
                   <template v-for="year in visibleYears" :key="'adr-total-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <td
@@ -492,7 +538,15 @@
                 </tr>
                 <!-- Add REVPAR row -->
                 <tr class="bg-blue-200 font-bold text-blue-900">
-                  <td class="px-4 py-3 border-r border-blue-200">REVPAR</td>
+                  <td class="px-4 py-3 border-r border-blue-200">
+                    <div class="flex items-center justify-between">
+                      <span>REVPAR</span>
+                      <div class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                        <Calculator class="w-3 h-3" />
+                        AUTO
+                      </div>
+                    </div>
+                  </td>
                   <template v-for="year in visibleYears" :key="'revpar-total-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <td
@@ -523,10 +577,22 @@
         </div>
       </div>
       <!-- Table 4: Room Revenue -->
-      <div class="bg-white rounded-lg border border-orange-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
+              <div class="bg-white rounded-lg border border-orange-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
         <div class="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-4">
-          <h2 class="text-xl font-bold flex items-center gap-2"><Calculator class="w-5 h-5" /> Room Revenue</h2>
-          <p class="text-orange-100 text-sm">Room revenue by market segment</p>
+          <div class="flex-col items-center ">
+            <div class="flex items-center gap-2">
+              <Calculator class="w-5 h-5" />
+              <h2 class="text-xl font-bold">Room Revenue</h2>
+              <div class="bg-orange-500 text-white font-bold text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                <Calculator class="w-3 h-3" />
+                Auto Calculated
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-orange-100 text-sm">Room revenue by market segment</span>
+
+            </div>
+          </div>
         </div>
         <div class="overflow-x-auto">
           <div class="min-w-full w-max">
@@ -628,7 +694,15 @@
                 </template>
                 <!-- Add Total Room Revenue row -->
                 <tr class="bg-orange-200 font-bold text-orange-900">
-                  <td class="px-4 py-3 border-r border-orange-200">Total Room Revenue</td>
+                  <td class="px-4 py-3 border-r border-orange-200">
+                    <div class="flex items-center justify-between">
+                      <span>Total Room Revenue</span>
+                      <div class="bg-orange-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                        <Calculator class="w-3 h-3" />
+                        AUTO
+                      </div>
+                    </div>
+                  </td>
                   <template v-for="year in visibleYears" :key="'total-roomrevenue-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <td
@@ -682,7 +756,15 @@
                 </tr>
                 <!-- Add Total Revenue row (Room Revenue + Service Charge) -->
                 <tr class="bg-orange-300 font-bold text-orange-900">
-                  <td class="px-4 py-3 border-r border-orange-200">Total Rooms Revenue Including SC</td>
+                  <td class="px-4 py-3 border-r border-orange-200">
+                    <div class="flex items-center justify-between">
+                      <span>Total Rooms Revenue Including SC</span>
+                      <div class="bg-orange-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                        <Calculator class="w-3 h-3" />
+                        AUTO
+                      </div>
+                    </div>
+                  </td>
                   <template v-for="year in visibleYears" :key="'total-revenue-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <td
@@ -969,6 +1051,7 @@ import { getMarketSegmentList } from '@/components/utility/room_revenue_assumpt.
 import alertService from '@/components/ui/ui_utility/alertService.js';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
 import { selectedProject } from '@/components/utility/dashboard/projectService.js';
+import { allowOnlyNumbers } from '@/components/utility/payroll/index.js';
 
 const props = defineProps({
   visibleYears: Array,
@@ -1388,15 +1471,15 @@ function getTotalAvailableRooms(year, label) {
   }
   
   // Debug logging - uncomment to troubleshoot
-  console.log('Total Available Rooms Debug:', {
-    year,
-    label,
-    totalRooms,
-    project,
-    fromCache: calculationCache.getValue(project, 'Room Revenue Assumptions', 'Total Rooms', year, label),
-    fromProp: props.totalNumberOfRooms,
-    cacheKeys: Object.keys(calculationCache.cache[project]?.[PAGE_KEY] || {})
-  });
+  // console.log('Total Available Rooms Debug:', {
+  //   year,
+  //   label,
+  //   totalRooms,
+  //   project,
+  //   fromCache: calculationCache.getValue(project, 'Room Revenue Assumptions', 'Total Rooms', year, label),
+  //   fromProp: props.totalNumberOfRooms,
+  //   cacheKeys: Object.keys(calculationCache.cache[project]?.[PAGE_KEY] || {})
+  // });
   
   // If totalRooms is still 0, return 0
   if (totalRooms === 0) {

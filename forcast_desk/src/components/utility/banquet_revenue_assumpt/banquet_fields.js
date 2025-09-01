@@ -13,10 +13,10 @@ export const BANQUET_FIELDS = [
   { code: 'liquor', label: 'Liquor' },
   { code: 'soft_drinks', label: 'Soft Drinks' },
   { code: 'hall_space_charges', label: 'Hall/Space Charges' },
+  { code: 'outside_service_food_catering', label: 'Outside Service Food Catering' },
+  { code: 'outside_service_beverage_catering', label: 'Outside Service Beverage Catering' }, 
   { code: 'tobacco', label: 'Tobacco' },
   { code: 'non_fnb', label: 'Non F&B' },
-  { code: 'outside_service_food_catering', label: 'Outside Service Food Catering' },
-  { code: 'outside_service_beverage_catering', label: 'Outside Service Beverage Catering' },
   { code: 'others', label: 'Others' },
   
   { code: 'gross', label: 'Gross' },
