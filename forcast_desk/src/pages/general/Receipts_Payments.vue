@@ -13,11 +13,11 @@
             <!-- Collapse/Expand Button -->
             <button 
               @click="sidebarCollapsed = !sidebarCollapsed" 
-              class="mb-4 flex items-center gap-2 px-2 py-1 bg-violet-100 hover:bg-violet-200 rounded transition-all"
+              class="mb-4 flex items-center gap-2 px-2 py-1 bg-violet-100 hover:bg-violet-200 rounded transition-all dark:bg-violet-900/30 dark:hover:bg-violet-800/40"
             >
-              <ChevronLeft v-if="!sidebarCollapsed" class="w-5 h-5 text-violet-700" />
-              <ChevronRight v-else class="w-5 h-5 text-violet-700" />
-              <span v-if="!sidebarCollapsed" class="text-violet-700 text-sm font-medium">Collapse</span>
+              <ChevronLeft v-if="!sidebarCollapsed" class="w-5 h-5 text-violet-700 dark:text-white" />
+              <ChevronRight v-else class="w-5 h-5 text-violet-700 dark:text-white" />
+              <span v-if="!sidebarCollapsed" class="text-violet-700 text-sm font-medium dark:text-white">Collapse</span>
             </button>
   
             <transition name="fade">
@@ -298,8 +298,8 @@
                         </tr>
   
                         <!-- Revenue Sub-section -->
-                        <tr class="bg-violet-100 border-b border-violet-200">
-                          <td colspan="2" class="px-3 py-2 font-semibold text-violet-800 border-r border-violet-200">
+                        <tr class="bg-violet-100 border-b border-violet-200 dark:bg-violet-800/30 dark:border-violet-700">
+                          <td colspan="2" class="px-3 py-2 font-semibold text-violet-800 border-r border-violet-200 dark:border-violet-700">
                             <div class="flex items-center gap-2">
                               Revenue
                             </div>
@@ -309,19 +309,19 @@
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
                                 :key="'dept-revenue-subheader-cell-' + deptIndex + '-' + year + '-' + label"
-                                class="px-1 py-1 text-center border border-violet-200 bg-violet-100"
+                                class="px-1 py-1 text-center border border-violet-200 bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30"
                               ></td>
-                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-100"></td>
+                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30"></td>
                             </template>
                             <template v-else>
-                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-100"></td>
+                              <td class="px-1 py-1 text-center border border-violet-200 bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30"></td>
                             </template>
                           </template>
                         </tr>
   
                         <!-- Total monthly Department Revenue -->
-                        <tr class="bg-violet-50 border-b border-violet-200">
-                          <td colspan="2" class="px-3 py-2 font-medium border-r border-violet-200">
+                        <tr class="bg-violet-50 border-b border-violet-200 dark:bg-violet-900/20 dark:border-violet-700">
+                          <td colspan="2" class="px-3 py-2 font-medium border-r border-violet-200 dark:border-violet-700">
                             <div class="flex items-center gap-1">
                               Total monthly {{ department }} Revenue
                             </div>
@@ -331,16 +331,16 @@
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
                                 :key="'dept-revenue-cell-' + deptIndex + '-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
+                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50 dark:border-violet-700 dark:bg-violet-900/20"
                               >
                                 <span class="font-mono text-xs">{{ formatMoney(getDepartmentMonthlyRevenue(department, year, label)) }}</span>
                               </td>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
+                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
                                 <span class="font-mono text-xs text-violet-700">{{ formatMoney(getDepartmentYearTotal(department, year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
+                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
                                 <span class="font-mono text-xs text-violet-700">{{ formatMoney(getDepartmentYearTotal(department, year)) }}</span>
                               </td>
                             </template>
@@ -348,13 +348,13 @@
                         </tr>
   
                         <!-- Collection - 80% in the month of Revenue -->
-                        <tr class="bg-violet-50 border-b border-violet-200">
-                          <td class="px-3 py-2 font-medium border-r border-violet-200">
+                        <tr class="bg-violet-50 border-b border-violet-200 dark:bg-violet-900/20 dark:border-violet-700">
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 dark:border-violet-700">
                             <div class="flex items-center gap-1">
                               Collection- {{ collectionPercentages[getDeptKey(department)].month.toFixed(0) }}% in the month of Revenue
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" 
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 dark:border-violet-700 text-violet-900 hover:bg-violet-100 focus:bg-white dark:text-white dark:hover:bg-violet-800/30 dark:focus:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" 
                           contenteditable="true" 
                           @keypress="allowOnlyNumbers($event)" 
                           @input="updateCollectionPercentage(getDeptKey(department), 'month', $event)" 
@@ -369,16 +369,16 @@
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
                                 :key="'dept-collection-80-cell-' + deptIndex + '-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
+                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50 dark:border-violet-700 dark:bg-violet-900/20"
                               >
                                 <span class="font-mono text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'sameMonth')) }}</span>
                               </td>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
+                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
                                 <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'sameMonth')) }}</span>
                               </td>
                             </template>
                             <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
+                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
                                 <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'sameMonth')) }}</span>
                               </td>
                             </template>
@@ -386,13 +386,13 @@
                         </tr>
   
                         <!-- Collection - 15% in the month following Revenue -->
-                        <tr class="bg-violet-50 border-b border-violet-200">
-                          <td class="px-3 py-2 font-medium border-r border-violet-200">
+                        <tr class="bg-violet-50 border-b border-violet-200 dark:bg-violet-900/20 dark:border-violet-700">
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 dark:border-violet-700">
                             <div class="flex items-center gap-1">
                               Collection- {{ collectionPercentages[getDeptKey(department)].following.toFixed(0) }}% in the month following Revenue
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" 
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 dark:border-violet-700 text-violet-900 hover:bg-violet-100 focus:bg-white dark:text-white dark:hover:bg-violet-800/30 dark:focus:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" 
                           contenteditable="true" 
                           @keypress="allowOnlyNumbers($event)" 
                           @input="updateCollectionPercentage(getDeptKey(department), 'following', $event)" 
@@ -407,16 +407,16 @@
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
                                 :key="'dept-collection-15-cell-' + deptIndex + '-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-200 bg-violet-100"
+                                class="px-2 py-1 text-right border border-violet-200 bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30"
                               >
                                 <span class="font-mono text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'following')) }}</span>
                               </td>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
+                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
                                 <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'following')) }}</span>
                               </td>
                             </template>
                             <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
+                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
                                 <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'following')) }}</span>
                               </td>
                             </template>
@@ -424,13 +424,13 @@
                         </tr>
   
                         <!-- Collection - 5% in the Second month following Revenue -->
-                        <tr class="bg-violet-50 border-b border-violet-200">
-                          <td class="px-3 py-2 font-medium border-r border-violet-200">
+                        <tr class="bg-violet-50 border-b border-violet-200 dark:bg-violet-900/20 dark:border-violet-700">
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 dark:border-violet-700">
                             <div class="flex items-center gap-1">
                               Collection- {{ collectionPercentages[getDeptKey(department)].second.toFixed(0) }}% in the Second month following Revenue
                             </div>
                           </td>
-                          <td class="px-3 py-2 font-medium border-r border-violet-200 text-violet-900 hover:bg-violet-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" 
+                          <td class="px-3 py-2 font-medium border-r border-violet-200 dark:border-violet-700 text-violet-900 hover:bg-violet-100 focus:bg-white dark:text-white dark:hover:bg-violet-800/30 dark:focus:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200" 
                           contenteditable="true" 
                           @keypress="allowOnlyNumbers($event)" 
                           @input="updateCollectionPercentage(getDeptKey(department), 'second', $event)" 
@@ -445,16 +445,16 @@
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
                                 :key="'dept-collection-5-cell-' + deptIndex + '-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50"
+                                class="px-2 py-1 text-right border border-violet-200 bg-violet-50 dark:border-violet-700 dark:bg-violet-900/20"
                               >
                                 <span class="font-mono text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'second')) }}</span>
                               </td>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
+                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
                                 <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'second')) }}</span>
                               </td>
                             </template>
                             <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100">
+                              <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
                                 <span class="font-mono text-xs text-violet-700">0.00</span>
                               </td>
                             </template>

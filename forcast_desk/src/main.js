@@ -53,3 +53,18 @@ app.component('Card', Card)
 app.component('Input', Input)
 
 app.mount('#app')
+
+// Apply dark mode based on saved user setting
+try {
+  const savedUserSettings = localStorage.getItem('userSettings')
+  const dark = savedUserSettings ? (JSON.parse(savedUserSettings).darkMode === true) : false
+  const root = document.documentElement
+  if (dark) root.classList.add('dark'); else root.classList.remove('dark')
+  // Listen for settings updates from SettingsModal
+  window.addEventListener('settings-updated', (e) => {
+    if (!e || !e.detail) return
+    if (e.detail.key === 'darkMode') {
+      if (e.detail.value) root.classList.add('dark'); else root.classList.remove('dark')
+    }
+  })
+} catch (e) {}

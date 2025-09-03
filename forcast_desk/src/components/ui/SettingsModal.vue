@@ -16,14 +16,14 @@
         <!-- Content -->
         <div class="flex h-full">
           <!-- Sidebar -->
-          <div class="w-64 bg-gray-50 border-r border-violet-200 overflow-y-auto">
+          <div class="w-64 bg-gray-50 border-r border-violet-200 overflow-y-auto dark:bg-gray-800 dark:border-gray-700">
             <div class="p-4">
               <nav class="space-y-2">
                 <button v-for="section in settingsSections" :key="section.id" @click="activeSection = section.id"
-                  class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all duration-200 group"
-                  :class="[activeSection === section.id ? 'bg-violet-100 text-violet-700 border border-violet-200 shadow-sm' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800']">
-                  <component :is="section.icon" class="w-5 h-5" />
-                  <span class="font-medium">{{ section.title }}</span>
+                  class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all duration-200 group dark:text-white"
+                  :class="[activeSection === section.id ? 'bg-violet-100 text-violet-700 border border-violet-200 shadow-sm dark:bg-violet-900 dark:text-white dark:border-violet-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white']">
+                  <component :is="section.icon" class="w-5 h-5 dark:text-white" />
+                  <span class="font-medium dark:text-white">{{ section.title }}</span>
                 </button>
               </nav>
             </div>
@@ -95,7 +95,7 @@
                           <p class="font-medium text-gray-800">Dark Mode</p>
                           <p class="text-sm text-gray-600">Switch to dark theme</p>
                         </div>
-                        <button @click="userSettings.darkMode = !userSettings.darkMode" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400" :class="userSettings.darkMode ? 'bg-violet-500' : 'bg-gray-200'">
+                        <button @click="toggleDarkMode" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400" :class="userSettings.darkMode ? 'bg-violet-500' : 'bg-gray-200'">
                           <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform" :class="userSettings.darkMode ? 'translate-x-5' : 'translate-x-1'" />
                         </button>
                       </div>
@@ -106,6 +106,26 @@
                         </div>
                         <button @click="userSettings.autoLogout = !userSettings.autoLogout" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400" :class="userSettings.autoLogout ? 'bg-violet-500' : 'bg-gray-200'">
                           <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform" :class="userSettings.autoLogout ? 'translate-x-5' : 'translate-x-1'" />
+                        </button>
+                      </div>
+                      <!-- Hospitality Experience -->
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <p class="font-medium text-gray-800">Hospitality Experience</p>
+                          <p class="text-sm text-gray-600">Enhance recommendations with your industry experience.</p>
+                        </div>
+                        <button @click="toggleHospitalityExperience" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400" :class="hospitalityExperience ? 'bg-violet-500' : 'bg-gray-200'">
+                          <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform" :class="hospitalityExperience ? 'translate-x-5' : 'translate-x-1'" />
+                        </button>
+                      </div>
+                      <!-- Auto Expand Sidebar -->
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <p class="font-medium text-gray-800">Auto Expand Sidebar</p>
+                          <p class="text-sm text-gray-600">Automatically expand the sidebar on hover.</p>
+                        </div>
+                        <button @click="toggleAutoExpandSidebar" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400" :class="autoExpandSidebar ? 'bg-violet-500' : 'bg-gray-200'">
+                          <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform" :class="autoExpandSidebar ? 'translate-x-5' : 'translate-x-1'" />
                         </button>
                       </div>
                     </div>
@@ -397,6 +417,38 @@ const userSettings = ref({
   darkMode: false,
   autoLogout: true
 })
+
+// New reactive states for moved toggles
+const hospitalityExperience = ref(localStorage.getItem('hospitalityExperience') === null ? true : localStorage.getItem('hospitalityExperience') === 'true')
+const autoExpandSidebar = ref(localStorage.getItem('autoExpandSidebar') === 'true')
+
+function toggleHospitalityExperience() {
+  hospitalityExperience.value = !hospitalityExperience.value
+  localStorage.setItem('hospitalityExperience', String(hospitalityExperience.value))
+  try {
+    window.dispatchEvent(new CustomEvent('settings-updated', { detail: { key: 'hospitalityExperience', value: hospitalityExperience.value } }))
+  } catch (e) {}
+}
+
+function toggleAutoExpandSidebar() {
+  autoExpandSidebar.value = !autoExpandSidebar.value
+  localStorage.setItem('autoExpandSidebar', String(autoExpandSidebar.value))
+  try {
+    window.dispatchEvent(new CustomEvent('settings-updated', { detail: { key: 'autoExpandSidebar', value: autoExpandSidebar.value } }))
+  } catch (e) {}
+}
+
+function toggleDarkMode() {
+  userSettings.value.darkMode = !userSettings.value.darkMode
+  try {
+    const saved = localStorage.getItem('userSettings')
+    const merged = saved ? { ...JSON.parse(saved), darkMode: userSettings.value.darkMode } : { darkMode: userSettings.value.darkMode }
+    localStorage.setItem('userSettings', JSON.stringify(merged))
+  } catch (e) {}
+  try {
+    window.dispatchEvent(new CustomEvent('settings-updated', { detail: { key: 'darkMode', value: userSettings.value.darkMode } }))
+  } catch (e) {}
+}
 
 const isLoadingUserDetails = ref(false)
 

@@ -8,10 +8,10 @@
           <!-- Left Sidebar - Filters and Controls -->
           <div :class="['bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 min-h-screen flex flex-col shadow-sm transition-all duration-300', sidebarCollapsed ? 'w-14 p-2' : 'w-80 p-6']">
             <!-- Collapse/Expand Button -->
-            <button @click="sidebarCollapsed = !sidebarCollapsed" class="mb-4 flex items-center gap-2 px-2 py-1 bg-violet-100 hover:bg-violet-200 rounded transition-all">
-              <ChevronLeft v-if="!sidebarCollapsed" class="w-5 h-5 text-violet-700" />
-              <ChevronRight v-else class="w-5 h-5 text-violet-700" />
-              <span v-if="!sidebarCollapsed" class="text-violet-700 text-sm font-medium">Collapse</span>
+            <button @click="sidebarCollapsed = !sidebarCollapsed" class="mb-4 flex items-center gap-2 px-2 py-1 bg-violet-100 hover:bg-violet-200 rounded transition-all dark:bg-violet-900/30 dark:hover:bg-violet-800/40">
+              <ChevronLeft v-if="!sidebarCollapsed" class="w-5 h-5 text-violet-700 dark:text-white" />
+              <ChevronRight v-else class="w-5 h-5 text-violet-700 dark:text-white" />
+              <span v-if="!sidebarCollapsed" class="text-violet-700 text-sm font-medium dark:text-white">Collapse</span>
             </button>
             <transition name="fade">
                 <div v-show="!sidebarCollapsed">

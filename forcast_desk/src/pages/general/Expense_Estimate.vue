@@ -8,10 +8,10 @@
         <!-- Left Sidebar - Filters and Controls -->
         <div :class="['bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 min-h-screen flex flex-col shadow-sm transition-all duration-300', sidebarCollapsed ? 'w-14 p-2' : 'w-80 p-6']">
           <!-- Collapse/Expand Button -->
-          <button @click="sidebarCollapsed = !sidebarCollapsed" class="mb-4 flex items-center gap-2 px-2 py-1 bg-violet-100 hover:bg-violet-200 rounded transition-all">
-            <ChevronLeft v-if="!sidebarCollapsed" class="w-5 h-5 text-violet-700" />
-            <ChevronRight v-else class="w-5 h-5 text-violet-700" />
-            <span v-if="!sidebarCollapsed" class="text-violet-700 text-sm font-medium">Collapse</span>
+          <button @click="sidebarCollapsed = !sidebarCollapsed" class="mb-4 flex items-center gap-2 px-2 py-1 bg-violet-100 hover:bg-violet-200 rounded transition-all dark:bg-violet-900/30 dark:hover:bg-violet-800/40">
+            <ChevronLeft v-if="!sidebarCollapsed" class="w-5 h-5 text-violet-700 dark:text-white" />
+            <ChevronRight v-else class="w-5 h-5 text-violet-700 dark:text-white" />
+            <span v-if="!sidebarCollapsed" class="text-violet-700 text-sm font-medium dark:text-white">Collapse</span>
           </button>
           <transition name="fade">
               <div v-show="!sidebarCollapsed">
@@ -86,7 +86,7 @@
             <div class="flex gap-2 mt-3">
               <button 
                 @click="refreshTable"
-                class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white border border-violet-200 text-violet-700 rounded-lg hover:bg-violet-50 transition-all text-sm font-medium"
+                class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white border border-violet-200 text-violet-700 dark:text-violet-300 rounded-lg hover:bg-violet-50 transition-all text-sm font-medium"
               >
                 <RefreshCw class="w-4 h-4" />
                 Refresh
@@ -143,7 +143,7 @@
                   </button>
                   <button 
                     @click="showAdvanced = true" 
-                    class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
+                    class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white border border-violet-500 text-violet-700 dark:text-violet-300 rounded-lg hover:bg-violet-50 transition-all duration-200 text-sm font-medium"
                   >
                     <Settings class="w-4 h-4" />
                     Advanced
@@ -225,7 +225,7 @@
                           v-for="year in (visibleYears.length > 0 ? visibleYears : ['Default'])"
                           :key="'header-' + year"
                           :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
-                          class="px-2 py-2 text-center border-x-2 border-white cursor-pointer select-none hover:bg-violet-700 transition-all duration-200 group text-sm"
+                          class="px-2 py-2 text-center border-x-2 border-white cursor-pointer select-none hover:bg-violet-700 transition-all duration-200 group text-sm dark:border-gray-700 dark:text-white"
                           @click="toggleCollapse(year)"
                           title="Click to collapse/expand"
                         >
@@ -300,10 +300,10 @@
                         <!-- Location Groups -->
                         <template v-for="locationGroup in departmentGroup.locations" :key="'location-' + locationGroup.location">
                           <!-- Location Header Row -->
-                          <tr class="bg-gradient-to-r from-violet-100 to-violet-200 border-b border-violet-300">
-                            <td colspan="3" class="px-6 py-2 font-semibold text-violet-700 border-r border-violet-300">
+                          <tr class="bg-gradient-to-r from-violet-100 to-violet-200 border-b border-violet-300 dark:from-violet-800/40 dark:to-violet-700/40 dark:border-violet-600">
+                            <td colspan="3" class="px-6 py-2 font-semibold text-violet-700 dark:text-white border-r border-violet-300 dark:border-violet-600">
                               <div class="flex items-center gap-2">
-                                <MapPin class="w-3 h-3" />
+                                <MapPin class="w-3 h-3 dark:text-white" />
                                 {{ locationGroup.location }}
                               </div>
                             </td>
@@ -312,12 +312,12 @@
                                 <td
                                   v-for="label in getColumnLabelsForYearLocal(year)"
                                   :key="'location-cell-' + year + '-' + label"
-                                  class="px-1 py-1 text-center border border-violet-300 bg-violet-100"
+                                  class="px-1 py-1 text-center border border-violet-300 bg-violet-100 dark:border-violet-600 dark:bg-violet-800/30"
                                 ></td>
-                                <td class="px-1 py-1 text-center border border-violet-300 bg-violet-100"></td>
+                                <td class="px-1 py-1 text-center border border-violet-300 bg-violet-100 dark:border-violet-600 dark:bg-violet-800/30"></td>
                               </template>
                               <template v-else>
-                                <td class="px-1 py-1 text-center border border-violet-300 bg-violet-100"></td>
+                                <td class="px-1 py-1 text-center border border-violet-300 bg-violet-100 dark:border-violet-600 dark:bg-violet-800/30"></td>
                               </template>
                             </template>
                           </tr>
@@ -326,15 +326,15 @@
                            <tr
                             v-for="expense in getVisibleExpenses(locationGroup.expenses)"
                             :key="'expense-' + expense"
-                            class="even:bg-gray-50 hover:bg-violet-50 transition-all duration-200 border-b border-gray-100"
+                            class="even:bg-gray-50 hover:bg-violet-50 transition-all duration-200 border-b border-gray-100 dark:even:bg-gray-800 dark:hover:bg-violet-900/20 dark:border-gray-700"
                           >
-                            <td class="px-8 py-2 font-medium border-r border-violet-200 text-gray-600">
+                            <td class="px-8 py-2 font-medium border-r border-violet-200 text-gray-600 dark:text-gray-300 dark:border-violet-700">
                               <div class="flex items-center gap-1">
                                 <Hash class="w-2 h-2 text-gray-400" />
                                 {{ getExpenseDetailsLocal(expense).code }}
                               </div>
                             </td>
-                             <td class="px-3 py-2 font-medium border-r border-violet-200">
+                             <td class="px-3 py-2 font-medium border-r border-violet-200 dark:border-violet-700">
                               <div class="flex items-center justify-between gap-2">
                                 <span>{{ expense }}</span>
                                 <button @click="deleteExpense(expense)" class="text-red-600 hover:text-red-700" title="Delete expense">
@@ -354,7 +354,7 @@
                                   v-for="label in getColumnLabelsForYearLocal(year)"
                                   :key="'cell-' + year + '-' + label"
                                   contenteditable="true"
-                                  class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
+                                  class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 focus:bg-white dark:border-violet-700 dark:hover:bg-violet-900/20 dark:focus:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
                                   @input="handleCellInput({ year, label, expense, event: $event })"
                                   @focus="handleCellFocus({ year, label, expense, event: $event })"
                                   @blur="handleCellEditWrapper({ year, label, expense, event: $event, department: departmentGroup.department })"
@@ -363,15 +363,15 @@
                                     {{ year === 'Default' ? (isPercentageExpense(expense) ? '0.00%' : '0.00') : formatExpenseValue(getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode, departmentGroup.department), expense) }}
                                   </span>
                                 </td>
-                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
-                                  <span class="font-mono text-xs text-violet-700">
+                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-700 dark:bg-violet-900/20">
+                                  <span class="font-mono text-xs text-violet-700 dark:text-violet-300">
                                     {{ year === 'Default' ? (isPercentageExpense(expense) ? '0.00%' : '0.00') : formatExpenseValue(calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal, departmentGroup.department), expense) }}
                                   </span>
                                 </td>
                               </template>
                               <template v-else>
-                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50">
-                                  <span class="font-mono text-xs text-violet-700">
+                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-700 dark:bg-violet-900/20">
+                                  <span class="font-mono text-xs text-violet-700 dark:text-violet-300">
                                     {{ year === 'Default' ? (isPercentageExpense(expense) ? '0.00%' : '0.00') : formatExpenseValue(calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal, departmentGroup.department), expense) }}
                                   </span>
                                 </td>
@@ -393,20 +393,20 @@
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
                                 :key="'department-total-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900"
+                                class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900 dark:border-violet-600 dark:bg-violet-800/30 dark:text-violet-200"
                               >
                                 <span class="font-mono text-xs">
                                   {{ year === 'Default' ? '0.00' : calculateDepartmentMonthTotal(expenseData, departmentGroup, year, label, advancedModes[year] || displayMode) }}
                                 </span>
                               </td>
-                              <td class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900">
+                              <td class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900 dark:border-violet-600 dark:bg-violet-800/30 dark:text-violet-200">
                                 <span class="font-mono text-xs">
                                   {{ year === 'Default' ? '0.00' : calculateDepartmentTotal(expenseData, departmentGroup, year, advancedModes[year] || displayMode) }}
                                 </span>
                               </td>
                             </template>
                             <template v-else>
-                              <td class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900">
+                              <td class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900 dark:border-violet-600 dark:bg-violet-800/30 dark:text-violet-200">
                                 <span class="font-mono text-xs">
                                   {{ year === 'Default' ? '0.00' : calculateDepartmentTotal(expenseData, departmentGroup, year, advancedModes[year] || displayMode) }}
                                 </span>
@@ -747,6 +747,7 @@
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
+import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
 import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign, Loader2, AlertCircle, Building2, Save, Filter, Building, MapPin, RotateCcw } from 'lucide-vue-next';
 import alertService from "@/components/ui/ui_utility/alertService.js";
@@ -865,6 +866,9 @@ const yearSettingsStore = useYearSettingsStore();
 const { fromYear, toYear, advancedModes } = storeToRefs(yearSettingsStore);
 const { setFromYear, setToYear, setAdvancedModes, clearYearSettings, getFilteredToYears } = yearSettingsStore;
 
+// Calculation cache for storing expense calculations
+const calculationCache = useCalculationCache();
+
 // Computed properties
 const visibleYears = computed(() => {
   const yearsArr = getVisibleYears(fromYear.value, toYear.value);
@@ -978,6 +982,11 @@ watch(selectedProject, async (newProject, oldProject) => {
       
       // Reload expense data for the new project (for cell values)
       expenseData.value = await loadExpenseData();
+      
+      // Cache the expense data for other components to use
+      if (!expenseData.value.status && selectedProject.value?.project_name) {
+        cacheExpenseData(expenseData.value, selectedProject.value.project_name);
+      }
       
       // Handle the response based on its structure
       if (!expenseData.value.status) {
@@ -1189,6 +1198,14 @@ const submitAddExpenseWrapper = async () => {
         allExpensesData.value = allExpensesResult.expenses;
       }
       
+      // Reload and cache expense data after adding new expense
+      if (selectedProject.value?.project_name) {
+        expenseData.value = await loadExpenseData();
+        if (!expenseData.value.status) {
+          cacheExpenseData(expenseData.value, selectedProject.value.project_name);
+        }
+      }
+      
       // Reload default expenses
       const defaultExpensesResult = await loadDefaultExpensesForProject();
       if (defaultExpensesResult.status === 'success') {
@@ -1208,6 +1225,11 @@ const submitAddExpenseWrapper = async () => {
 // Wrapper function for saveChanges
 const saveChangesWrapper = async () => {
   await saveChanges(changedCells, isSaving, saveError, expenseData, originalExpenseData, isSaved, loadExpenseData, defaultExpenses.value);
+  
+  // Cache the updated expense data after saving
+  if (selectedProject.value?.project_name && !expenseData.value.status) {
+    cacheExpenseData(expenseData.value, selectedProject.value.project_name);
+  }
 };
 
 
@@ -1251,6 +1273,52 @@ function confirmNavigation() {
 onUnmounted(() => {
   window.removeEventListener('beforeunload', handleBeforeUnload);
 });
+
+// Cache expense data for other components to use
+function cacheExpenseData(expenseData, projectName) {
+  try {
+    if (!expenseData || !projectName) return;
+    
+    // Clear existing cache for this project's expenses
+    calculationCache.clearCache(projectName, 'Expense Assumptions');
+    
+    // Cache expense amounts by department, expense name, year, and month
+    for (const [year, months] of Object.entries(expenseData)) {
+      for (const [month, entries] of Object.entries(months)) {
+        entries.forEach(entry => {
+          if (entry.expense && entry.amount && entry.department) {
+            const amount = parseFloat(entry.amount);
+            if (amount > 0) {
+              // Cache with project, page, rowCode (expense name), year, month, and amount
+              calculationCache.setValue(
+                projectName,
+                'Expense Assumptions',
+                entry.expense,
+                year,
+                month,
+                amount
+              );
+              
+              // Also cache by department for easier filtering
+              calculationCache.setValue(
+                projectName,
+                `Expense Assumptions:${entry.department}`,
+                entry.expense,
+                year,
+                month,
+                amount
+              );
+            }
+          }
+        });
+      }
+    }
+    
+    console.log(`[EXPENSE CACHE] Cached ${Object.keys(expenseData).length} years of expense data for project: ${projectName}`);
+  } catch (error) {
+    console.error('Error caching expense data:', error);
+  }
+}
 
 // Export table data functionality
 function exportTableData() {

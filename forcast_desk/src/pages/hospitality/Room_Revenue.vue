@@ -8,10 +8,10 @@
           <!-- Left Sidebar - Filters and Controls -->
           <div :class="['bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 min-h-screen flex flex-col shadow-sm transition-all duration-300', sidebarCollapsed ? 'w-14 p-2' : 'w-80 p-6']">
             <!-- Collapse/Expand Button -->
-            <button @click="sidebarCollapsed = !sidebarCollapsed" class="mb-4 flex items-center gap-2 px-2 py-1 bg-violet-100 hover:bg-violet-200 rounded transition-all">
-              <ChevronLeft v-if="!sidebarCollapsed" class="w-5 h-5 text-violet-700" />
-              <ChevronRight v-else class="w-5 h-5 text-violet-700" />
-              <span v-if="!sidebarCollapsed" class="text-violet-700 text-sm font-medium">Collapse</span>
+            <button @click="sidebarCollapsed = !sidebarCollapsed" class="mb-4 flex items-center gap-2 px-2 py-1 bg-violet-100 hover:bg-violet-200 rounded transition-all dark:bg-violet-900/30 dark:hover:bg-violet-800/40">
+              <ChevronLeft v-if="!sidebarCollapsed" class="w-5 h-5 text-violet-700 dark:text-white" />
+              <ChevronRight v-else class="w-5 h-5 text-violet-700 dark:text-white" />
+              <span v-if="!sidebarCollapsed" class="text-violet-700 text-sm font-medium dark:text-white">Collapse</span>
             </button>
             <transition name="fade">
               <div v-show="!sidebarCollapsed">
@@ -355,16 +355,16 @@
                               <tr
                               v-for="roomType in visibleRoomTypes"
                               :key="'available-' + roomType"
-                              class="even:bg-violet-50 hover:bg-violet-100 transition"
+                              class="even:bg-violet-50 hover:bg-violet-100 transition dark:even:bg-violet-900/20 dark:hover:bg-violet-800/30"
                             >
-                              <td class="px-4 py-3 font-medium border-r border-violet-200 flex items-center justify-between">
+                              <td class="px-4 py-3 font-medium border-r border-violet-200 flex items-center justify-between dark:border-violet-600 dark:text-gray-200">
                                 <div class="flex items-center justify-between w-full">
                                   <span>{{ roomType }}</span>
                                   <!-- <span class="px-2 py-1 mx-1 bg-white text-violet-500 border border-violet-500 text-xs font-medium rounded-full">Auto</span> -->
                                 </div>
                                 <button
                                   @click="removeRoomPackage(roomType)"
-                                  class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors dark:hover:bg-red-900/20"
                                   title="Remove package"
                                 >
                                   <X class="w-3 h-3" />
@@ -375,45 +375,45 @@
                                   <td
                                     v-for="label in getColumnLabelsForYearLocal(year)"
                                     :key="'available-cell-' + year + '-' + label + '-' + roomType"
-                                    class="px-2 py-2 text-right border border-violet-200 bg-gray-50"
+                                    class="px-2 py-2 text-right border border-violet-200 bg-gray-50 dark:border-violet-600 dark:bg-gray-800"
                                   >
                                     <span class="font-mono text-xs">{{ getAvailableBeds(roomData, roomType, year, label, advancedModes[year] || displayMode, filteredRoomPackages) }}</span>
                                   </td>
-                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
-                                    <span class="font-mono text-xs text-violet-700">
-                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
-                                    </span>
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30">
+                                    <span class="font-mono text-xs text-violet-700 dark:text-violet-200">
+                                       {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
+                                     </span>
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
-                                    <span class="font-mono text-xs text-violet-700">
-                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
-                                    </span>
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30">
+                                    <span class="font-mono text-xs text-violet-700 dark:text-violet-200">
+                                       {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
+                                     </span>
                                   </td>
                                 </template>
                               </template>
                             </tr>
                           </tbody>
                           <!-- Total Row -->
-                          <tfoot class="bg-violet-100 border-t-2 border-violet-300">
-                            <tr class="font-bold text-violet-900">
-                              <td class="px-4 py-3 border-r border-violet-200">Total</td>
+                          <tfoot class="bg-violet-100 border-t-2 border-violet-300 dark:bg-violet-800/30 dark:border-violet-600">
+                            <tr class="font-bold text-violet-900 dark:text-violet-200">
+                              <td class="px-4 py-3 border-r border-violet-200 dark:border-violet-600">Total</td>
                               <template v-for="year in visibleYears" :key="'available-total-' + year">
                                 <template v-if="!isYearCollapsed(year)">
                                   <td
                                     v-for="label in getColumnLabelsForYearLocal(year)"
                                     :key="'available-total-cell-' + year + '-' + label"
-                                    class="px-2 py-2 text-right border border-violet-200 font-bold"
+                                    class="px-2 py-2 text-right border border-violet-200 font-bold dark:border-violet-600"
                                   >
                                     {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
                                   </td>
-                                  <td class="px-2 py-2 text-right border border-violet-200 font-bold text-violet-800">
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-bold text-violet-800 dark:border-violet-600 dark:text-violet-200">
                                     {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-2 text-right border border-violet-200 font-bold text-violet-800">
+                                  <td class="px-2 py-2 text-right border border-violet-200 font-bold text-violet-800 dark:border-violet-600 dark:text-violet-200">
                                     {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
                                   </td>
                                 </template>
@@ -475,13 +475,13 @@
                               <tr
                               v-for="roomType in visibleRoomTypes"
                               :key="'occupied-' + roomType"
-                              class="even:bg-blue-50 hover:bg-blue-100 transition"
+                              class="even:bg-blue-50 hover:bg-blue-100 transition dark:even:bg-blue-900/20 dark:hover:bg-blue-800/30"
                             >
-                              <td class="px-4 py-3 font-medium border-r border-blue-200 flex items-center justify-between">
+                              <td class="px-4 py-3 font-medium border-r border-blue-200 flex items-center justify-between dark:border-blue-600 dark:text-gray-200">
                                 <span>{{ roomType }}</span>
                                 <button
                                   @click="removeRoomPackage(roomType)"
-                                  class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors dark:hover:bg-red-900/20"
                                   title="Remove package"
                                 >
                                   <X class="w-3 h-3" />
@@ -492,49 +492,49 @@
                                   <td
                                     v-for="label in getColumnLabelsForYearLocal(year)"
                                     :key="'occupied-cell-' + year + '-' + label + '-' + roomType"
-                                    contenteditable="true"
-                                    class="px-2 py-2 text-right border border-blue-200 hover:bg-blue-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                     contenteditable="true"
+                                    class="px-2 py-2 text-right border border-blue-200 hover:bg-blue-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:border-blue-600 dark:hover:bg-blue-900/20 dark:focus:bg-gray-700"
                                     @input="handleRoomCellInput({ year, label, roomType, field: 'occupied_beds', event: $event })"
                                     @focus="handleRoomCellFocus({ year, label, roomType, field: 'occupied_beds', event: $event })"
                                     @blur="handleRoomCellEditWrapper({ year, label, roomType, field: 'occupied_beds', event: $event })"
                                   >
                                     <span class="font-mono text-xs">{{ getOccupiedBeds(roomData, roomType, year, label, advancedModes[year] || displayMode) }}</span>
                                   </td>
-                                  <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50">
-                                    <span class="font-mono text-xs text-blue-700">
-                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
-                                    </span>
+                                  <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50 dark:border-blue-600 dark:bg-blue-800/30">
+                                    <span class="font-mono text-xs text-blue-700 dark:text-blue-200">
+                                       {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
+                                     </span>
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50">
-                                    <span class="font-mono text-xs text-blue-700">
-                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
-                                    </span>
+                                  <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50 dark:border-blue-600 dark:bg-blue-800/30">
+                                    <span class="font-mono text-xs text-blue-700 dark:text-blue-200">
+                                       {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
+                                     </span>
                                   </td>
                                 </template>
                               </template>
                             </tr>
                           </tbody>
                           <!-- Total Row -->
-                          <tfoot class="bg-blue-100 border-t-2 border-blue-300">
-                            <tr class="font-bold text-blue-900">
-                              <td class="px-4 py-3 border-r border-blue-200">Total</td>
+                          <tfoot class="bg-blue-100 border-t-2 border-blue-300 dark:bg-blue-800/30 dark:border-blue-600">
+                            <tr class="font-bold text-blue-900 dark:text-blue-200">
+                              <td class="px-4 py-3 border-r border-blue-200 dark:border-blue-600">Total</td>
                               <template v-for="year in visibleYears" :key="'occupied-total-' + year">
                                 <template v-if="!isYearCollapsed(year)">
                                   <td
                                     v-for="label in getColumnLabelsForYearLocal(year)"
                                     :key="'occupied-total-cell-' + year + '-' + label"
-                                    class="px-2 py-2 text-right border border-blue-200 font-bold"
+                                    class="px-2 py-2 text-right border border-blue-200 font-bold dark:border-blue-600"
                                   >
                                     {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
                                   </td>
-                                  <td class="px-2 py-2 text-right border border-blue-200 font-bold text-blue-800">
+                                  <td class="px-2 py-2 text-right border border-blue-200 font-bold text-blue-800 dark:border-blue-600 dark:text-blue-200">
                                     {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-2 text-right border border-blue-200 font-bold text-blue-800">
+                                  <td class="px-2 py-2 text-right border border-blue-200 font-bold text-blue-800 dark:border-blue-600 dark:text-blue-200">
                                     {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
                                   </td>
                                 </template>
@@ -596,13 +596,13 @@
                               <tr
                               v-for="roomType in visibleRoomTypes"
                               :key="'rate-' + roomType"
-                              class="even:bg-green-50 hover:bg-green-100 transition"
+                              class="even:bg-green-50 hover:bg-green-100 transition dark:even:bg-green-900/20 dark:hover:bg-green-800/30"
                             >
-                              <td class="px-4 py-3 font-medium border-r border-green-200 flex items-center justify-between">
+                              <td class="px-4 py-3 font-medium border-r border-green-200 flex items-center justify-between dark:border-green-600 dark:text-gray-200">
                                 <span>{{ roomType }}</span>
                                 <button
                                   @click="removeRoomPackage(roomType)"
-                                  class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors dark:hover:bg-red-900/20"
                                   title="Remove package"
                                 >
                                   <X class="w-3 h-3" />
@@ -613,49 +613,49 @@
                                   <td
                                     v-for="label in getColumnLabelsForYearLocal(year)"
                                     :key="'rate-cell-' + year + '-' + label + '-' + roomType"
-                                    contenteditable="true"
-                                    class="px-2 py-2 text-right border border-green-200 hover:bg-green-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                                     contenteditable="true"
+                                    class="px-2 py-2 text-right border border-green-200 hover:bg-green-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent transition-all duration-200 dark:border-green-600 dark:hover:bg-green-900/20 dark:focus:bg-gray-700"
                                     @input="handleRoomCellInput({ year, label, roomType, field: 'rate', event: $event })"
                                     @focus="handleRoomCellFocus({ year, label, roomType, field: 'rate', event: $event })"
                                     @blur="handleRoomCellEditWrapper({ year, label, roomType, field: 'rate', event: $event })"
                                   >
                                     <span class="font-mono text-xs">{{ getRate(roomData, roomType, year, label, advancedModes[year] || displayMode) }}</span>
                                   </td>
-                                  <td class="px-2 py-2 text-right border border-green-200 font-semibold bg-green-50">
-                                    <span class="font-mono text-xs text-green-700">
-                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
-                                    </span>
+                                  <td class="px-2 py-2 text-right border border-green-200 font-semibold bg-green-50 dark:border-green-600 dark:bg-green-800/30">
+                                    <span class="font-mono text-xs text-green-700 dark:text-green-200">
+                                       {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
+                                     </span>
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-2 text-right border border-green-200 font-semibold bg-green-50">
-                                    <span class="font-mono text-xs text-green-700">
-                                      {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
-                                    </span>
+                                  <td class="px-2 py-2 text-right border border-green-200 font-semibold bg-green-50 dark:border-green-600 dark:bg-green-800/30">
+                                    <span class="font-mono text-xs text-green-700 dark:text-green-200">
+                                       {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
+                                     </span>
                                   </td>
                                 </template>
                               </template>
                             </tr>
                           </tbody>
                           <!-- Total Row -->
-                          <tfoot class="bg-green-100 border-t-2 border-green-300">
-                            <tr class="font-bold text-green-900">
-                              <td class="px-4 py-3 border-r border-green-200">Total</td>
+                          <tfoot class="bg-green-100 border-t-2 border-green-300 dark:bg-green-800/30 dark:border-green-600">
+                            <tr class="font-bold text-green-900 dark:text-green-200">
+                              <td class="px-4 py-3 border-r border-green-200 dark:border-green-600">Total</td>
                               <template v-for="year in visibleYears" :key="'rate-total-' + year">
                                 <template v-if="!isYearCollapsed(year)">
                                   <td
                                     v-for="label in getColumnLabelsForYearLocal(year)"
                                     :key="'rate-total-cell-' + year + '-' + label"
-                                    class="px-2 py-2 text-right border border-green-200 font-bold"
+                                    class="px-2 py-2 text-right border border-green-200 font-bold dark:border-green-600"
                                   >
                                     {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
                                   </td>
-                                  <td class="px-2 py-2 text-right border border-green-200 font-bold text-green-800">
+                                  <td class="px-2 py-2 text-right border border-green-200 font-bold text-green-800 dark:border-green-600 dark:text-green-200">
                                     {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-2 text-right border border-green-200 font-bold text-green-800">
+                                  <td class="px-2 py-2 text-right border border-green-200 font-bold text-green-800 dark:border-green-600 dark:text-green-200">
                                     {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
                                   </td>
                                 </template>
@@ -728,13 +728,13 @@
                               <tr
                               v-for="roomType in visibleRoomTypes"
                               :key="'revenue-' + roomType"
-                              class="even:bg-orange-50 hover:bg-orange-100 transition"
+                              class="even:bg-orange-50 hover:bg-orange-100 transition dark:even:bg-orange-900/20 dark:hover:bg-orange-800/30"
                             >
-                              <td class="px-4 py-3 font-medium border-r border-orange-200 flex items-center justify-between">
+                              <td class="px-4 py-3 font-medium border-r border-orange-200 flex items-center justify-between dark:border-orange-600 dark:text-gray-200">
                                 <span>{{ roomType }}</span>
                                 <button
                                   @click="removeRoomPackage(roomType)"
-                                  class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  class="ml-2 p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors dark:hover:bg-red-900/20"
                                   title="Remove package"
                                 >
                                   <X class="w-3 h-3" />
@@ -745,18 +745,18 @@
                                   <td
                                     v-for="label in getColumnLabelsForYearLocal(year)"
                                     :key="'revenue-cell-' + year + '-' + label + '-' + roomType"
-                                    class="px-2 py-2 text-right border border-orange-200 font-semibold hover:bg-orange-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-                                  >
-                                    <span class="font-mono text-xs">{{ calculateRevenue(roomData, roomType, year, label, advancedModes[year] || displayMode, roomPackages) }}</span>
-                                  </td>
-                                  <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800 bg-orange-50">
+                                    class="px-2 py-2 text-right border border-orange-200 font-semibold hover:bg-orange-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent transition-all duration-200 dark:border-orange-600 dark:hover:bg-orange-900/20 dark:focus:bg-gray-700"
+                                   >
+                                     <span class="font-mono text-xs">{{ calculateRevenue(roomData, roomType, year, label, advancedModes[year] || displayMode, roomPackages) }}</span>
+                                   </td>
+                                  <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800 bg-orange-50 dark:border-orange-600 dark:bg-orange-800/30 dark:text-orange-200">
                                     <span class="font-mono text-xs">
                                       {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'revenue', filteredRoomPackages) }}
                                     </span>
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800 bg-orange-50">
+                                  <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800 bg-orange-50 dark:border-orange-600 dark:bg-orange-800/30 dark:text-orange-200">
                                     <span class="font-mono text-xs">
                                       {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'revenue', filteredRoomPackages) }}
                                     </span>
@@ -766,24 +766,24 @@
                             </tr>
                           </tbody>
                           <!-- Total Row -->
-                          <tfoot class="bg-orange-100 border-t-2 border-orange-300">
-                            <tr class="font-bold text-orange-900">
-                              <td class="px-4 py-3 border-r border-orange-200">Total</td>
+                          <tfoot class="bg-orange-100 border-t-2 border-orange-300 dark:bg-orange-800/30 dark:border-orange-600">
+                            <tr class="font-bold text-orange-900 dark:text-orange-200">
+                              <td class="px-4 py-3 border-r border-orange-200 dark:border-orange-600">Total</td>
                               <template v-for="year in visibleYears" :key="'revenue-total-' + year">
                                 <template v-if="!isYearCollapsed(year)">
                                   <td
                                     v-for="label in getColumnLabelsForYearLocal(year)"
                                     :key="'revenue-total-cell-' + year + '-' + label"
-                                    class="px-2 py-2 text-right border border-orange-200 font-bold"
+                                    class="px-2 py-2 text-right border border-orange-200 font-bold dark:border-orange-600"
                                   >
                                     {{ calculateMonthlyTotal(roomData, year, label, advancedModes[year] || displayMode, 'revenue', filteredRoomPackages) }}
                                   </td>
-                                  <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800">
+                                  <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800 dark:border-orange-600 dark:text-orange-200">
                                     {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'revenue', filteredRoomPackages) }}
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800">
+                                  <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800 dark:border-orange-600 dark:text-orange-200">
                                     {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'revenue', filteredRoomPackages) }}
                                   </td>
                                 </template>
