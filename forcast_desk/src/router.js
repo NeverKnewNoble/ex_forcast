@@ -8,76 +8,81 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('@/pages/Home.vue'),
+    component: () => import('@/pages/general/Home.vue'),
   },
   {
     name: 'Login',
     path: '/account/login',
-    component: () => import('@/pages/Login.vue'),
+    component: () => import('@/pages/system/Login.vue'),
   },
   {
     name: 'Reset',
     path: '/reset',
-    component: () => import('@/pages/Reset.vue'),
+    component: () => import('@/pages/system/Reset.vue'),
   },
   {
     name: 'Dashboard',
     path: '/dashboard',
-    component: () => import('@/pages/Dashboard.vue'),
+    component: () => import('@/pages/general/Dashboard.vue'),
   },
   {
     name: 'Expense_Estimate',
     path: '/expense_estimate',
-    component: () => import('@/pages/Expense_Estimate.vue'),
+    component: () => import('@/pages/general/Expense_Estimate.vue'),
   },
   {
     name: 'Room_Revenue',
     path: '/room_revenue_assumptions',
-    component: () => import('@/pages/Room_Revenue.vue'),
+    component: () => import('@/pages/hospitality/Room_Revenue.vue'),
     meta: { requiresDepartment: 'Rooms' }
   },
   {
     name: 'F&B_Revenue_Assumptions',
     path: '/f&b_revenue_assumptions',
-    component: () => import('@/pages/F&B_Revenue_Assumpt.vue'),
+    component: () => import('@/pages/hospitality/F&B_Revenue_Assumpt.vue'),
     meta: { requiresDepartment: 'Food And Beverage' }
   },
   {
     name: 'Banquet_Revenue',
     path: '/banquet_revenue',
-    component: () => import('@/pages/Banquet_Revenue.vue'),
+    component: () => import('@/pages/hospitality/Banquet_Revenue.vue'),
     meta: { requiresDepartment: 'Banquet' }
   },
   {
     name: 'OOD_Data',
     path: '/ood_data_input',
-    component: () => import('@/pages/OOD_Data.vue'),
+    component: () => import('@/pages/hospitality/OOD_Data.vue'),
     meta: { requiresDepartment: 'Other Operating Departments' }
   },
   {
     name: 'Payroll_Data',
     path: '/payroll_data',
-    component: () => import('@/pages/payroll/Payroll_Data.vue'),
+    component: () => import('@/pages/general/payroll/Payroll_Data.vue'),
   },
   {
     name: 'Payroll_Related',
     path: '/payroll_related',
-    component: () => import('@/pages/payroll/Payroll_Related.vue'),
+    component: () => import('@/pages/general/payroll/Payroll_Related.vue'),
   },
   {
     name: 'Bonus',
     path: '/bonus',
-    component: () => import('@/pages/payroll/Bonus.vue'),
+    component: () => import('@/pages/general/payroll/Bonus.vue'),
   },
   {
     name: 'Receipts & Payments',
     path: '/receipts_payments',
-    component: () => import('@/pages/Receipts_Payments.vue'),
+    component: () => import('@/pages/general/Receipts_Payments.vue'),
   },
   {
     name: 'Reports',
     path: '/reports',
-    component: () => import('@/pages/Reports.vue'),
+    component: () => import('@/pages/general/Reports.vue'),
+  },
+  {
+    name: 'Construction_Budget',
+    path: '/construction_budget',
+    component: () => import('@/pages/non-hospitality/construction_budget_revenue.vue'),
   },
 
 ]
@@ -108,6 +113,23 @@ router.beforeEach(async (to, from, next) => {
   } else {
     // Enforce department-based access if route requires a department
     const requiredDept = to.meta?.requiresDepartment
+    // Enforce hospitality experience flag for hospitality pages
+    const hospitalityDisabled = (localStorage.getItem('hospitalityExperience') === null)
+      ? false === false && false // placeholder no-op to keep syntax; logic below handles default
+      : localStorage.getItem('hospitalityExperience') !== 'true'
+    const hospitalityRoutes = new Set([
+      '/room_revenue_assumptions',
+      '/f&b_revenue_assumptions',
+      '/banquet_revenue',
+      '/ood_data_input'
+    ])
+    const isHospitalityRoute = hospitalityRoutes.has(to.path)
+    // Default behavior: if key is absent we treat hospitalityExperience as enabled (true)
+    const stored = localStorage.getItem('hospitalityExperience')
+    const hospitalityEnabled = stored === null ? true : stored === 'true'
+    if (isHospitalityRoute && !hospitalityEnabled) {
+      return next({ name: 'Home' })
+    }
     if (requiredDept) {
       try {
         // Determine current project

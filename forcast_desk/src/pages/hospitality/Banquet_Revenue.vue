@@ -8,10 +8,10 @@
           <!-- Left Sidebar - Filters and Controls -->
           <div :class="['bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 min-h-screen flex flex-col shadow-sm transition-all duration-300', sidebarCollapsed ? 'w-14 p-2' : 'w-80 p-6']">
             <!-- Collapse/Expand Button -->
-            <button @click="sidebarCollapsed = !sidebarCollapsed" class="mb-4 flex items-center gap-2 px-2 py-1 bg-violet-100 hover:bg-violet-200 rounded transition-all">
-              <ChevronLeft v-if="!sidebarCollapsed" class="w-5 h-5 text-violet-700" />
-              <ChevronRight v-else class="w-5 h-5 text-violet-700" />
-              <span v-if="!sidebarCollapsed" class="text-violet-700 text-sm font-medium">Collapse</span>
+            <button @click="sidebarCollapsed = !sidebarCollapsed" class="mb-4 flex items-center gap-2 px-2 py-1 bg-violet-100 hover:bg-violet-200 rounded transition-all dark:bg-violet-900/30 dark:hover:bg-violet-800/40">
+              <ChevronLeft v-if="!sidebarCollapsed" class="w-5 h-5 text-violet-700 dark:text-white" />
+              <ChevronRight v-else class="w-5 h-5 text-violet-700 dark:text-white" />
+              <span v-if="!sidebarCollapsed" class="text-violet-700 text-sm font-medium dark:text-white">Collapse</span>
             </button>
             <transition name="fade">
                 <div v-show="!sidebarCollapsed">
@@ -222,7 +222,7 @@
               </div>
   
               <!-- Modern Table Container -->
-              <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
+              <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px] dark:bg-gray-800 dark:border-gray-600">
                 <div class="overflow-x-auto max-w-[100%] md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
                   <div class="min-w-full w-max">
                     <table class="w-full">
@@ -282,21 +282,21 @@
                           </template>
                         </tr>
                       </thead>
-                      <tbody class="text-gray-700 bg-white text-sm">
+                      <tbody class="text-gray-700 bg-white text-sm dark:text-gray-200 dark:bg-gray-800">
                         <template v-for="(field, idx) in computedBanquetFields" :key="field.code">
                           <tr
                             :class="[
-                              'transition-all duration-200 border-b border-gray-100',
-                              (['gross','net_amount'].includes(field.code)) ? 'bg-violet-700 text-white font-bold' : 'even:bg-gray-50 hover:bg-violet-50',
+                              'transition-all duration-200 border-b border-gray-100 dark:border-gray-700',
+                              (['gross','net_amount'].includes(field.code)) ? 'bg-violet-700 text-white font-bold' : 'even:bg-gray-50 hover:bg-violet-50 dark:even:bg-[#151823] dark:hover:bg-[#1d2230]',
                             ]"
                           >
-                            <td class="px-3 py-2 font-medium border-r border-violet-200 flex items-center justify-between" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : 'text-gray-600'">
+                            <td class="px-3 py-2 font-medium border-r border-violet-200 flex items-center justify-between dark:border-violet-600" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : 'text-gray-600 dark:text-gray-200'">
                               <span>{{ field.label }}</span>
                               <div class="flex items-center gap-1">
-                                <span v-if="['food','liquor','soft_drinks','hall_space_charges','gross','net_amount','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)" class="px-2 py-0.5 rounded bg-violet-100 text-violet-700 text-[10px] font-semibold border border-violet-200 align-middle whitespace-nowrap">
+                                <span v-if="['food','liquor','soft_drinks','hall_space_charges','gross','net_amount','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)" class="px-2 py-0.5 rounded bg-violet-100 text-violet-700 text-[10px] font-semibold border border-violet-200 align-middle whitespace-nowrap dark:bg-violet-800/30 dark:text-violet-200 dark:border-violet-600">
                                   Auto
                                 </span>
-                                <span v-if="customBanquetFields.some(f => f.code === field.code)" class="px-2 py-0.5 rounded bg-green-100 text-green-700 text-[10px] font-semibold border border-green-200 align-middle whitespace-nowrap">
+                                <span v-if="customBanquetFields.some(f => f.code === field.code)" class="px-2 py-0.5 rounded bg-green-100 text-green-700 text-[10px] font-semibold border border-green-200 align-middle whitespace-nowrap dark:bg-green-800/30 dark:text-green-200 dark:border-green-600">
                                   Custom
                                 </span>
                                 <button v-if="!['gross','net_amount','advance_bal','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)" @click="deleteBanquetDetail(field)" class="ml-2 text-red-500 hover:text-red-700" title="Delete">
@@ -310,7 +310,7 @@
                                   v-if="['food','liquor','soft_drinks','hall_space_charges','gross','net_amount','amount_per_event','amount_per_pax','avg_pax_per_event'].includes(field.code)"
                                   v-for="label in getColumnLabelsForYearLocal(year)"
                                   :key="'cell-' + year + '-' + label"
-                                  class="px-2 py-1 text-right border border-violet-200 bg-gray-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200 font-semibold select-none"
+                                  class="px-2 py-1 text-right border border-violet-200 bg-gray-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200 font-semibold select-none dark:border-violet-600 dark:bg-gray-800"
                                   :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : ''"
                                 >
                                   <span class="font-mono text-xs">
@@ -322,7 +322,7 @@
                                   v-for="label in getColumnLabelsForYearLocal(year)"
                                   :key="'cell-editable-' + year + '-' + label"
                                   contenteditable="true"
-                                  class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
+                                  class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200 dark:border-violet-600 dark:hover:bg-violet-900/20 dark:focus:bg-gray-700"
                                   :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : ''"
                                   @input="handleBanquetCellInput({ year, label, expense: field.code, event: $event, banquetData })"
                                   @focus="handleBanquetCellFocus({ year, label, expense: field.code, event: $event })"
@@ -330,15 +330,15 @@
                                 >
                                   <span class="font-mono text-xs">{{ formatBanquetValue(field.code, getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
                                 </td>
-                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
-                                  <span class="font-mono text-xs text-violet-700" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
+                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
+                                  <span class="font-mono text-xs text-violet-700 dark:text-violet-200" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
                                     {{ formatBanquetValue(field.code, calculateBanquetTotal(banquetData, field.code, year, advancedModes[year] || displayMode)) }}
                                   </span>
                                 </td>
                               </template>
                               <template v-else>
-                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
-                                  <span class="font-mono text-xs text-violet-700" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
+                                <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
+                                  <span class="font-mono text-xs text-violet-700 dark:text-violet-200" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
                                     {{ formatBanquetValue(field.code, calculateBanquetTotal(banquetData, field.code, year, advancedModes[year] || displayMode)) }}
                                   </span>
                                 </td>
@@ -346,12 +346,12 @@
                             </template>
                           </tr>
                           <tr v-if="field.code === 'avg_hall_space_charges_check'">
-                            <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1), 0)" class="h-10 font-bold text-xl text-violet-700 bg-violet-200 border px-2 py-2 m-0">
+                            <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1), 0)" class="h-10 font-bold text-xl text-violet-700 bg-violet-200 border px-2 py-2 m-0 dark:text-violet-200 dark:bg-violet-800/50 dark:border-violet-600">
                               Details
                             </td>
                           </tr>
                           <tr v-if="field.code === 'net_amount'">
-                            <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1), 0)" class="h-10 font-bold text-xl text-violet-700 bg-violet-200 border px-2 py-2 m-0">
+                            <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1), 0)" class="h-10 font-bold text-xl text-violet-700 bg-violet-200 border px-2 py-2 m-0 dark:text-violet-200 dark:bg-violet-800/50 dark:border-violet-600">
                               Statistics 
                             </td>
                           </tr>

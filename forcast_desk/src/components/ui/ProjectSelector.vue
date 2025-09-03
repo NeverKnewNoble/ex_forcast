@@ -6,7 +6,7 @@
       <div class="relative min-w-[200px]">
         <button
           @click="toggleDropdown"
-          class="w-full flex items-center justify-between px-4 py-2 bg-white/80 backdrop-blur-xl border border-violet-200/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group"
+          class="w-full flex items-center justify-between px-4 py-2 bg-white/80 backdrop-blur-xl border border-violet-200/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group dark:bg-gray-800/80 dark:border-gray-600/50"
           :class="{ 'ring-2 ring-violet-400/50': isDropdownOpen }"
         >
           <div class="flex items-center space-x-3">
@@ -14,16 +14,16 @@
               <FolderOpen class="w-4 h-4 text-white" />
             </div>
             <div class="text-left">
-              <p class="text-sm font-medium text-gray-700">
+              <p class="text-sm font-medium text-gray-700 dark:text-white">
                 {{ selectedProject ? selectedProject.project_name : 'Select Project' }}
               </p>
-              <p class="text-xs text-gray-500">
+              <p class="text-xs text-gray-500 dark:text-gray-300">
                 {{ selectedProject ? 'Active Project' : 'No project selected' }}
               </p>
             </div>
           </div>
           <ChevronDown 
-            class="w-4 h-4 text-gray-400 transition-transform duration-200"
+            class="w-4 h-4 text-gray-400 dark:text-gray-300 transition-transform duration-200"
             :class="{ 'rotate-180': isDropdownOpen }"
           />
         </button>
@@ -31,24 +31,24 @@
         <!-- Dropdown Menu -->
         <div
           v-if="isDropdownOpen"
-          class="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl border border-violet-200/50 rounded-xl shadow-2xl z-50 max-h-60 overflow-y-auto"
+          class="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl border border-violet-200/50 rounded-xl shadow-2xl z-50 max-h-60 overflow-y-auto dark:bg-gray-800/95 dark:border-gray-600/50"
         >
           <div class="p-2">
             <div
               v-for="project in projects"
               :key="project.name"
               @click="selectProject(project)"
-              class="flex items-center space-x-3 p-3 rounded-lg hover:bg-violet-50/80 cursor-pointer transition-colors duration-200 group"
-              :class="{ 'bg-violet-100/80': selectedProject?.name === project.name }"
+              class="flex items-center space-x-3 p-3 rounded-lg hover:bg-violet-50/80 cursor-pointer transition-colors duration-200 group dark:hover:bg-gray-700/80"
+              :class="{ 'bg-violet-100/80 dark:bg-gray-700/80': selectedProject?.name === project.name }"
             >
               <div class="w-8 h-8 bg-gradient-to-r from-violet-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <FolderOpen class="w-4 h-4 text-white" />
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-800 truncate">
+                <p class="text-sm font-medium text-gray-800 dark:text-white truncate">
                   {{ project.project_name }}
                 </p>
-                <p class="text-xs text-gray-500 truncate">
+                <p class="text-xs text-gray-500 dark:text-gray-300 truncate">
                   {{ project.project_description }}
                 </p>
               </div>
@@ -61,16 +61,16 @@
             <!-- No projects message -->
             <div
               v-if="projects.length === 0 && !isLoading"
-              class="p-4 text-center text-gray-500"
+              class="p-4 text-center text-gray-500 dark:text-gray-400"
             >
-              <FolderOpen class="w-8 h-8 mx-auto mb-2 text-gray-300" />
+              <FolderOpen class="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-gray-500" />
               <p class="text-sm">No projects available</p>
             </div>
             
             <!-- Loading state -->
             <div
               v-if="isLoading"
-              class="p-4 text-center text-gray-500"
+              class="p-4 text-center text-gray-500 dark:text-gray-400"
             >
               <div class="animate-spin w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full mx-auto mb-2"></div>
               <p class="text-sm">Loading projects...</p>
@@ -96,7 +96,7 @@
       @click="closeCreateModal"
     >
       <div
-        class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-violet-200/50 p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto"
+        class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-violet-200/50 p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto dark:bg-gray-800/95 dark:border-gray-600/50"
         @click.stop
       >
         <!-- Modal Header -->
@@ -106,15 +106,15 @@
               <Plus class="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 class="text-lg font-bold text-gray-800">Create New Project</h3>
-              <p class="text-sm text-gray-500">Step {{ getCurrentStepNumber() }} of {{ getTotalSteps() }}</p>
+              <h3 class="text-lg font-bold text-gray-800 dark:text-white">Create New Project</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-300">Step {{ getCurrentStepNumber() }} of {{ getTotalSteps() }}</p>
             </div>
           </div>
           <button
             @click="closeCreateModal"
-            class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors duration-200"
+            class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center transition-colors duration-200"
           >
-            <X class="w-5 h-5 text-gray-400" />
+            <X class="w-5 h-5 text-gray-400 dark:text-gray-300" />
           </button>
         </div>
 

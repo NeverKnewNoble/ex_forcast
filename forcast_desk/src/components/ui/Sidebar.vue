@@ -1,5 +1,5 @@
 <template>
-  <aside :class="['flex-shrink-0 flex-col min-h-screen transition-all duration-200 ease-in-out border border-r-violet-400 bg-white text-gray-800 shadow', is_expanded ? 'w-64' : 'w-16']" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
+  <aside :class="['flex-shrink-0 flex-col min-h-screen transition-all duration-300 ease-in-out border border-r-violet-400 bg-white text-gray-800 shadow dark:bg-black dark:text-white dark:border-violet-900/30', is_expanded ? 'w-64' : 'w-16']" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
     <!-- Logo -->
     <div class="p-4 justify-center">
       <img v-if="!is_expanded" :src="logoURL" alt="Ex Forecast" class="w-8 mx-auto" />
@@ -10,40 +10,19 @@
 
     <!-- Toggle -->
     <div class="flex justify-center px-2">
-      <span v-if="is_expanded" class="font-bold mr-6 text-[16px]">Welcome, {{ session.user }}</span>
-      <button v-if="!is_expanded" @click="ToggleMenu" class="transition-transform duration-200 hover:text-violet-400">
+      <span v-if="is_expanded" class="font-bold mr-6 text-[16px] dark:text-white">Welcome, {{ session.user }}</span>
+      <button v-if="!is_expanded" @click="ToggleMenu" class="transition-transform duration-200 hover:text-violet-400 dark:text-white dark:hover:text-violet-300">
         <CircleArrowRight />
       </button>
-	  <button v-if="is_expanded" @click="ToggleMenu" class="transition-transform duration-200 hover:text-violet-400">
+	  <button v-if="is_expanded" @click="ToggleMenu" class="transition-transform duration-200 hover:text-violet-400 dark:text-white dark:hover:text-violet-300">
         <CircleArrowLeft />
       </button>
     </div>
 
-    <!-- Auto expand toggle under Welcome user -->
-    <div v-if="is_expanded" class="px-3 mt-2">
-      <div class="flex items-center group relative">
-        <label for="auto-expand" class="text-sm mr-3 select-none cursor-pointer">Auto</label>
-        <button
-          id="auto-expand"
-          type="button"
-          class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 bg-gray-200"
-          :class="autoExpandSidebar ? 'bg-violet-500' : 'bg-gray-200'"
-          @click="autoExpandSidebar = !autoExpandSidebar"
-          :aria-checked="autoExpandSidebar"
-          role="switch"
-          :title="autoExpandSidebar ? 'Enabled' : 'Disabled'"
-        >
-          <span
-            class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform"
-            :class="autoExpandSidebar ? 'translate-x-5' : 'translate-x-1'"
-          />
-        </button>
-        <span class="ml-2 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity absolute left-full top-1/2 -translate-y-1/2 whitespace-nowrap bg-white border border-gray-200 px-2 py-1 rounded shadow z-10">Automatically expand on hover</span>
-      </div>
-    </div>
+    
 
     <!-- Menu Heading -->
-    <h3 v-if="is_expanded" class="text-gray-500 uppercase text-sm px-4 pt-4">Menu</h3>
+    <h3 v-if="is_expanded" class="text-gray-500 uppercase text-sm px-4 pt-4 dark:text-white">Menu</h3>
 
     <!-- Menu Links -->
 	<div class="mt-2 flex-1 space-y-1">
@@ -51,15 +30,15 @@
     <div v-if="item.children" class="relative" @mouseenter="onParentEnter(item.text)" @mouseleave="onParentLeave(item.text)">
       <button
         @click="toggleMenuExpand(item.text)"
-        class="flex items-center w-full space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white"
+        class="flex items-center w-full space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white dark:text-white"
         :class="[{ 'justify-center': !is_expanded }]"
       >
-        <component :is="item.icon" class="w-6 h-6" />
-        <span v-if="is_expanded" class="text-sm flex-1 text-left">{{ item.text }}</span>
+        <component :is="item.icon" class="w-6 h-6 dark:text-white" />
+        <span v-if="is_expanded" class="text-sm flex-1 text-left dark:text-white">{{ item.text }}</span>
         <component
           v-if="is_expanded"
           :is="expandedMenus[item.text] ? ChevronUp : ChevronDown"
-          class="w-4 h-4 ml-auto"
+          class="w-4 h-4 ml-auto dark:text-white"
         />
       </button>
       
@@ -69,41 +48,41 @@
           v-for="child in item.children"
           :key="child.text"
           :to="child.route"
-          class="flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white"
+          class="flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white dark:text-white"
           :class="[
             $route.path === child.route
               ? 'bg-violet-600 border-r-4 border-violet-800 text-white font-semibold'
               : ''
           ]"
         >
-          <component :is="child.icon" class="w-5 h-5" />
-          <span class="text-sm">{{ child.text }}</span>
+          <component :is="child.icon" class="w-5 h-5 dark:text-white" />
+          <span class="text-sm dark:text-white">{{ child.text }}</span>
         </router-link>
       </div>
       
       <!-- Popup for minimized sidebar -->
       <div 
         v-if="expandedMenus[item.text] && !is_expanded" 
-        class="absolute left-full top-0 ml-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-48"
+        class="absolute left-full top-0 ml-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-48 dark:bg-black dark:border-[#1F2430] dark:shadow-black/40 dark:text-white transition-all duration-200 ease-in-out"
       >
         <div class="p-2">
-          <div class="text-xs font-semibold text-gray-500 px-3 py-2 border-b border-gray-100">
+          <div class="text-xs font-semibold text-gray-500 px-3 py-2 border-b border-gray-100 dark:text-white dark:border-[#1F2430]">
             {{ item.text }}
           </div>
           <router-link
             v-for="child in item.children"
             :key="child.text"
             :to="child.route"
-            class="flex items-center space-x-3 px-3 py-2 rounded transition hover:bg-violet-500 hover:text-white text-sm"
+            class="flex items-center space-x-3 px-3 py-2 rounded transition hover:bg-violet-500 hover:text-white text-sm dark:hover:bg-violet-600 dark:text-white"
             :class="[
               $route.path === child.route
                 ? 'bg-violet-600 text-white font-semibold'
-                : 'text-gray-700'
+                : ''
             ]"
             @click="expandedMenus[item.text] = false"
           >
-            <component :is="child.icon" class="w-4 h-4" />
-            <span>{{ child.text }}</span>
+            <component :is="child.icon" class="w-4 h-4 dark:text-white" />
+            <span class="dark:text-white">{{ child.text }}</span>
           </router-link>
         </div>
       </div>
@@ -112,27 +91,27 @@
       v-else-if="!item.action"
       :to="item.route"
       :class="[
-        'flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white',
+        'flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white dark:text-white',
         { 'justify-center': !is_expanded },
         $route.path === item.route
           ? 'bg-violet-600 border-r-4 border-violet-800 text-white font-semibold'
           : ''
       ]"
     >
-      <component :is="item.icon" class="w-6 h-6" />
-      <span v-if="is_expanded" class="text-sm">{{ item.text }}</span>
+      <component :is="item.icon" class="w-6 h-6 dark:text-white" />
+      <span v-if="is_expanded" class="text-sm dark:text-white">{{ item.text }}</span>
     </router-link>
     
     <button
       v-else
       @click="handleItemAction(item.action)"
       :class="[
-        'flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white w-full',
+        'flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white w-full dark:text-white',
         { 'justify-center': !is_expanded }
       ]"
     >
-      <component :is="item.icon" class="w-6 h-6" />
-      <span v-if="is_expanded" class="text-sm">{{ item.text }}</span>
+      <component :is="item.icon" class="w-6 h-6 dark:text-white" />
+      <span v-if="is_expanded" class="text-sm dark:text-white">{{ item.text }}</span>
     </button>
   </template>
 </div>
@@ -141,27 +120,7 @@
     <div class="mt-auto pb-4 px-4">
 
       <hr v-if="is_expanded" class="my-3 border-t border-gray-200" />
-      <div v-if="is_expanded" class="flex flex-col mt-2">
-        <div class="flex items-center group relative">
-          <label for="hospitality-experience" class="text-sm mr-3 select-none cursor-pointer">Hospitality Experience</label>
-          <button
-            type="button"
-            class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 bg-gray-200"
-            :class="hospitalityExperience ? 'bg-violet-500' : 'bg-gray-200'"
-            @click="hospitalityExperience = !hospitalityExperience"
-            :aria-checked="hospitalityExperience"
-            role="switch"
-            :title="hospitalityExperience ? 'Enabled' : 'Disabled'"
-          >
-            <span
-              class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform"
-              :class="hospitalityExperience ? 'translate-x-5' : 'translate-x-1'"
-            />
-          </button>
-          <span class="ml-2 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity absolute left-full top-1/2 -translate-y-1/2 whitespace-nowrap bg-white border border-gray-200 px-2 py-1 rounded shadow z-10">Toggle your hospitality experience preference</span>
-        </div>
-        <span class="text-xs text-gray-500 mt-1 ml-1">Enhance recommendations with your industry experience.</span>
-      </div>
+      
     </div>
 
   </aside>
@@ -192,6 +151,7 @@ import {
   Ellipsis,
   BookOpen,
   Building2,
+  Hammer,
   ReceiptText,
   Sheet,
   ChartNoAxesCombined,
@@ -214,15 +174,21 @@ watch(autoExpandSidebar, (newVal) => {
   localStorage.setItem('autoExpandSidebar', String(newVal))
 })
 
-// Hover handlers for auto expand
+// Hover handlers for auto expand with smooth transitions
 const handleMouseEnter = () => {
   if (autoExpandSidebar.value) {
-    is_expanded.value = true
+    // Add a small delay to prevent flickering
+    setTimeout(() => {
+      is_expanded.value = true
+    }, 50)
   }
 }
 const handleMouseLeave = () => {
   if (autoExpandSidebar.value) {
-    is_expanded.value = false
+    // Add a small delay to prevent flickering
+    setTimeout(() => {
+      is_expanded.value = false
+    }, 100)
   }
 }
 
@@ -238,6 +204,7 @@ const menuItems = [
       { text: "F&B Revenue Assumptions", route: "/f&b_revenue_assumptions", icon: UtensilsCrossed },
       { text: "Banquet Revenue Assumptions", route: "/banquet_revenue", icon: HandPlatter},
       { text: "OOD Revenue Assumptions", route: "/ood_data_input", icon: Building2},
+      { text: "Construction Budget", route: "/construction_budget", icon: Hammer},
     ]
   },
   {
@@ -256,18 +223,38 @@ const menuItems = [
 
 const expandedMenus = ref({})
 const toggleMenuExpand = (text) => {
+  // If opening a menu, close all others first
+  if (!expandedMenus.value[text]) {
+    Object.keys(expandedMenus.value).forEach(key => {
+      if (key !== text) {
+        expandedMenus.value[key] = false
+      }
+    })
+  }
   expandedMenus.value[text] = !expandedMenus.value[text]
 }
 
 // Auto open/close parent groups on hover when auto is enabled
 const onParentEnter = (text) => {
   if (autoExpandSidebar.value) {
-    expandedMenus.value[text] = true
+    // Close all other menus first to prevent overlap
+    Object.keys(expandedMenus.value).forEach(key => {
+      if (key !== text) {
+        expandedMenus.value[key] = false
+      }
+    })
+    // Small delay for smooth transition
+    setTimeout(() => {
+      expandedMenus.value[text] = true
+    }, 50)
   }
 }
 const onParentLeave = (text) => {
   if (autoExpandSidebar.value) {
-    expandedMenus.value[text] = false
+    // Small delay to prevent flickering
+    setTimeout(() => {
+      expandedMenus.value[text] = false
+    }, 100)
   }
 }
 
@@ -294,10 +281,41 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  const handler = (event) => {
+    const detail = event && event.detail ? event.detail : null
+    if (!detail) return
+    if (detail.key === 'autoExpandSidebar') {
+      autoExpandSidebar.value = detail.value
+    }
+    if (detail.key === 'hospitalityExperience') {
+      hospitalityExperience.value = detail.value
+    }
+  }
+  window.addEventListener('settings-updated', handler)
+  // Periodic fallback sync in case events are missed
+  const sync = () => {
+    const autoVal = localStorage.getItem('autoExpandSidebar') === 'true'
+    if (autoExpandSidebar.value !== autoVal) autoExpandSidebar.value = autoVal
+    const hospItem = localStorage.getItem('hospitalityExperience')
+    const hospVal = hospItem === null ? true : hospItem === 'true'
+    if (hospitalityExperience.value !== hospVal) hospitalityExperience.value = hospVal
+  }
+  const intervalId = setInterval(sync, 1000)
+  // Store for cleanup
+  window.__sidebarSyncInterval = intervalId
+  window.__sidebarSettingsHandler = handler
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  if (window.__sidebarSettingsHandler) {
+    window.removeEventListener('settings-updated', window.__sidebarSettingsHandler)
+    window.__sidebarSettingsHandler = null
+  }
+  if (window.__sidebarSyncInterval) {
+    clearInterval(window.__sidebarSyncInterval)
+    window.__sidebarSyncInterval = null
+  }
 })
 
 
@@ -341,6 +359,15 @@ const filteredMenuItems = computed(() => {
           if (item.text === 'Revenue') {
             const depts = projectDepartments.value || []
             childrenToFilter = item.children.filter(child => {
+              // Hide hospitality pages if hospitality experience is disabled
+              if (!hospitalityExperience.value && (
+                child.route === '/room_revenue_assumptions' ||
+                child.route === '/f&b_revenue_assumptions' ||
+                child.route === '/banquet_revenue' ||
+                child.route === '/ood_data_input'
+              )) {
+                return false
+              }
               if (child.text.includes('Room Revenue')) {
                 return depts.includes('Rooms')
               }

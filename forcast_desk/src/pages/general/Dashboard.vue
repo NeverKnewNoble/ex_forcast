@@ -2,10 +2,10 @@
   <div class="flex">
     <Sidebar @open-settings="openSettings" />
 
-    <div class="flex-1 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 px-6 py-8 relative overflow-hidden">
+    <div class="flex-1 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:bg-[#0f0f12] dark:from-[#0f0f12] dark:via-[#0f0f12] dark:to-[#0f0f12] px-6 py-8 relative overflow-hidden">
       <!-- Background decorative elements -->
-      <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"></div>
-      <div class="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-indigo-400/10 to-pink-400/10 rounded-full blur-3xl"></div>
+      <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-400/10 to-purple-400/10 rounded-full blur-3xl dark:opacity-10"></div>
+      <div class="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-indigo-400/10 to-pink-400/10 rounded-full blur-3xl dark:opacity-10"></div>
       
       <!-- Header Section -->
       <div class="relative z-10">
@@ -22,7 +22,7 @@
         <div class="mb-8">
           <div 
             v-if="selectedProject" 
-            class="relative overflow-hidden rounded-2xl p-8 bg-gradient-to-r from-violet-600 via-purple-600 to-white shadow-xl border "
+            class="relative overflow-hidden rounded-2xl p-8 bg-gradient-to-r from-violet-600 via-purple-600 to-white shadow-xl border dark:to-violet-700"
           >
             <!-- Animated background elements -->
             <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse"></div>

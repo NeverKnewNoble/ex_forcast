@@ -1,4 +1,5 @@
 module.exports = {
+  darkMode: 'class',
   presets: [require('frappe-ui/src/utils/tailwind.config')],
   content: [
     './index.html',

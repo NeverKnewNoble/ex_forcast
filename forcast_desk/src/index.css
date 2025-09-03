@@ -1,2 +1,60 @@
 @import './assets/Inter/inter.css';
 @import 'frappe-ui/src/style.css';
+
+/* Global dark theme base */
+:root.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  background-color: #0f0f12;
+  color: #E5E7EB;
+}
+
+/* Unified dark surfaces: cards, tables, controls */
+.dark .bg-white { background-color: #151823 !important; }
+.dark .bg-white\/90 { background-color: rgba(21, 24, 35, 0.90) !important; }
+.dark .bg-white\/80 { background-color: rgba(21, 24, 35, 0.80) !important; }
+.dark .bg-white\/70 { background-color: rgba(21, 24, 35, 0.70) !important; }
+.dark .bg-gray-50 { background-color: #111318 !important; }
+.dark .bg-gray-100 { background-color: #151823 !important; }
+.dark .bg-violet-50 { background-color: rgba(139, 92, 246, 0.08) !important; }
+.dark .from-white { --tw-gradient-from: #0f0f12 var(--tw-gradient-from-position); --tw-gradient-to: rgb(15 15 18 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+.dark .to-violet-50 { --tw-gradient-to: rgba(139, 92, 246, 0.06) var(--tw-gradient-to-position); }
+.dark .text-gray-800 { color: #E5E7EB !important; }
+.dark .text-gray-700 { color: #D1D5DB !important; }
+.dark .text-gray-600 { color: #9CA3AF !important; }
+.dark .border-gray-100 { border-color: #1A1F2B !important; }
+.dark .border-gray-200 { border-color: #1F2430 !important; }
+.dark .border-gray-300 { border-color: #283042 !important; }
+.dark .ring-violet-300\/30 { --tw-ring-color: rgba(139, 92, 246, 0.3) !important; }
+.dark .border-violet-200 { border-color: rgba(139, 92, 246, 0.25) !important; }
+.dark .shadow, .dark .shadow-sm, .dark .shadow-lg, .dark .shadow-2xl { box-shadow: 0 10px 30px rgba(0,0,0,0.35) !important; }
+
+/* Inputs/selects */
+.dark select, .dark input, .dark textarea { background-color: #111318 !important; color: #E5E7EB !important; border-color: #283042 !important; }
+.dark select:focus, .dark input:focus, .dark textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(139,92,246,0.25) !important; border-color: rgba(139,92,246,0.4) !important; }
+.dark ::placeholder { color: #9CA3AF !important; opacity: 1; }
+
+/* Table cells with subtle backgrounds */
+.dark .bg-green-50 { background-color: rgba(16, 185, 129, 0.12) !important; }
+.dark .bg-red-50 { background-color: rgba(239, 68, 68, 0.12) !important; }
+.dark .bg-blue-50 { background-color: rgba(59, 130, 246, 0.12) !important; }
+.dark .bg-yellow-50 { background-color: rgba(234, 179, 8, 0.12) !important; }
+
+/* Utility hover fixes */
+.dark .hover\:bg-violet-50:hover { background-color: rgba(139, 92, 246, 0.12) !important; }
+.dark .hover\:bg-gray-100:hover { background-color: #1a1d29 !important; }
+
+/* Readable text colors for dark surfaces */
+.dark .text-black, .dark .text-gray-900 { color: #F3F4F6 !important; }
+.dark .text-gray-800 { color: #E5E7EB !important; }
+.dark .text-gray-700 { color: #D1D5DB !important; }
+.dark a { color: #C4B5FD; }
+
+/* Saturated brand/text colors tuned for dark */
+.dark .text-violet-700, .dark .text-violet-600 { color: #C4B5FD !important; }
+.dark .text-green-700 { color: #86EFAC !important; }
+.dark .text-red-700 { color: #FCA5A5 !important; }
+.dark .text-blue-700 { color: #93C5FD !important; }
+.dark .text-yellow-700 { color: #FDE68A !important; }

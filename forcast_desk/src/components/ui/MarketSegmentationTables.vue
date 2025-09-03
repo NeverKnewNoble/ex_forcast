@@ -5,7 +5,7 @@
         <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
           <Table class="w-3 h-3 text-white" />
         </div>
-        <h2 class="text-lg font-bold text-gray-800">Market Segmentation Overview</h2>
+        <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100">Market Segmentation Overview</h2>
       </div>
       
       <!-- Management Buttons -->
@@ -42,7 +42,7 @@
     </div>
     <div class="space-y-8">
       <!-- Table 1: Room Nights -->
-      <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
+      <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px] dark:bg-gray-800 dark:border-gray-600">
         <div class="bg-gradient-to-r from-violet-600 to-violet-700 text-white px-6 py-4">
           <h2 class="text-xl font-bold flex items-center gap-2"><BedDouble class="w-5 h-5" /> Room Nights</h2>
           <p class="text-violet-100 text-sm">Number of room nights by market segment</p>
@@ -50,13 +50,13 @@
         <div class="overflow-x-auto">
           <div class="min-w-full w-max">
             <table class="w-full">
-              <thead class="bg-gradient-to-r from-violet-50 to-violet-100 text-violet-800 sticky top-0">
+              <thead class="bg-gradient-to-r from-violet-50 to-violet-100 text-violet-800 sticky top-0 dark:from-violet-800/40 dark:to-violet-700/40 dark:text-violet-200">
                 <tr>
-                  <th class="px-4 py-3 text-left font-semibold border-r border-violet-200">Segment</th>
+                  <th class="px-4 py-3 text-left font-semibold border-r border-violet-200 dark:border-violet-600 dark:border-violet-600 dark:text-violet-200">Segment</th>
                   <template v-for="year in visibleYears" :key="'roomnights-header-' + year">
                     <th
                       :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
-                      class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-violet-100 transition group"
+                      class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-violet-100 transition group dark:border-gray-600 dark:hover:bg-violet-800/30 dark:text-violet-200"
                       @click="toggleCollapse(year)"
                       title="Click to collapse/expand"
                     >
@@ -68,31 +68,31 @@
                     </th>
                   </template>
                 </tr>
-                <tr class="bg-violet-100 text-sm">
-                  <th class="px-4 py-2 border-r border-violet-200"></th>
+                <tr class="bg-violet-100 text-sm dark:bg-violet-800/30">
+                  <th class="px-4 py-2 border-r border-violet-200 dark:border-violet-600 dark:border-violet-600"></th>
                   <template v-for="year in visibleYears" :key="'roomnights-months-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <th
                         v-for="label in getColumnLabelsForYearLocal(year)"
                         :key="year + '-roomnights-' + label"
-                        class="px-4 py-2 text-center border border-violet-300 min-w-[110px]"
+                        class="px-4 py-2 text-center border border-violet-300 min-w-[110px] dark:border-violet-600 dark:text-violet-200"
                       >
                         {{ label }}
                       </th>
-                      <th class="px-4 py-2 text-center border border-violet-300 min-w-[120px] font-semibold">Total</th>
+                      <th class="px-4 py-2 text-center border border-violet-300 min-w-[120px] font-semibold dark:border-violet-600 dark:text-violet-200">Total</th>
                     </template>
                     <template v-else>
-                      <th class="px-4 py-2 text-center border border-violet-300 min-w-[120px] font-semibold">Total</th>
+                      <th class="px-4 py-2 text-center border border-violet-300 min-w-[120px] font-semibold dark:border-violet-600 dark:text-violet-200">Total</th>
                     </template>
                   </template>
                 </tr>
               </thead>
-              <tbody class="text-gray-700 bg-white text-sm">
+              <tbody class="text-gray-700 bg-white text-sm dark:text-gray-200 dark:bg-gray-800">
                 <template v-for="category in marketSegmentCategories" :key="'cat-roomnights-' + category">
                   <tr>
                     <td
                       :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1), 0)"
-                      class="bg-violet-50 font-bold text-violet-700 px-4 py-2 border-t border-violet-200"
+                      class="bg-violet-50 font-bold text-violet-700 dark:text-violet-200 px-4 py-2 border-t border-violet-200 dark:bg-violet-800/30 dark:text-violet-200 dark:border-violet-600"
                     >
                       <div class="flex items-center justify-between">
                         <span>{{ category }}</span>
@@ -109,9 +109,9 @@
                   <tr
                     v-for="segment in marketSegments.filter(seg => seg.segment_category === category)"
                     :key="'seg-roomnights-' + segment.market_segment"
-                    class="even:bg-violet-50 hover:bg-violet-100 transition"
+                    class="even:bg-violet-50 hover:bg-violet-100 transition dark:even:bg-violet-900/20 dark:hover:bg-violet-800/30"
                   >
-                    <td class="px-4 py-3 font-medium border-r border-violet-200">
+                    <td class="px-4 py-3 font-medium border-r border-violet-200 dark:border-violet-600 dark:border-violet-600 dark:text-gray-200">
                       <div class="flex items-center justify-between">
                         <span>{{ segment.market_segment }}</span>
                         <button 
@@ -128,7 +128,7 @@
                         <td
                           v-for="label in getColumnLabelsForYearLocal(year)"
                           :key="'roomnights-cell-' + year + '-' + label + '-' + segment.market_segment"
-                          class="px-2 py-2 text-right border border-violet-200 hover:bg-violet-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
+                          class="px-2 py-2 text-right border border-violet-200 hover:bg-violet-50 focus:bg-white dark:border-violet-600 dark:hover:bg-violet-900/20 dark:focus:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
                         >
                           <div
                             contenteditable="true"
@@ -141,15 +141,15 @@
                             {{ getMarketSegmentValue(marketSegmentData, segment, year, label, 'room_nights') }}
                           </div>
                         </td>
-                        <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
-                          <span class="font-mono text-xs text-violet-700">
+                        <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30">
+                          <span class="font-mono text-xs text-violet-700 dark:text-violet-200">
                             {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'room_nights', getColumnLabelsForYearLocal) }}
                           </span>
                         </td>
                       </template>
                       <template v-else>
-                        <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
-                          <span class="font-mono text-xs text-violet-700">
+                        <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30">
+                          <span class="font-mono text-xs text-violet-700 dark:text-violet-200">
                             {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'room_nights', getColumnLabelsForYearLocal) }}
                           </span>
                         </td>
@@ -158,8 +158,8 @@
                   </tr>
                 </template>
                 <!-- After all segment rows, add the Total Occupied Room row -->
-                <tr class="bg-violet-200 font-bold text-violet-900">
-                  <td class="px-4 py-3 border-r border-violet-200">
+                <tr class="bg-violet-200 font-bold text-violet-900 dark:bg-violet-800/40 dark:text-violet-200">
+                  <td class="px-4 py-3 border-r border-violet-200 dark:border-violet-600">
                     <div class="flex items-center justify-between">
                       <span>Total Occupied Room</span>
                       <div class="bg-violet-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
@@ -177,15 +177,15 @@
                       >
                         <span class="font-mono text-xs">{{ getTotalOccupiedRoom(year, label) }}</span>
                       </td>
-                      <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
-                        <span class="font-mono text-xs text-violet-700">
+                      <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30">
+                        <span class="font-mono text-xs text-violet-700 dark:text-violet-200">
                           {{ getTotalOccupiedRoomYear(year) }}
                         </span>
                       </td>
                     </template>
                     <template v-else>
-                      <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
-                        <span class="font-mono text-xs text-violet-700">
+                      <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30">
+                        <span class="font-mono text-xs text-violet-700 dark:text-violet-200">
                           {{ getTotalOccupiedRoomYear(year) }}
                         </span>
                       </td>
@@ -193,8 +193,8 @@
                   </template>
                 </tr>
                 <!-- Add the Total Available Rooms row -->
-                <tr class="bg-violet-200 font-bold text-violet-900">
-                  <td class="px-4 py-3 border-r border-violet-200">
+                <tr class="bg-violet-200 font-bold text-violet-900 dark:bg-violet-800/40 dark:text-violet-200">
+                  <td class="px-4 py-3 border-r border-violet-200 dark:border-violet-600">
                     <div class="flex items-center justify-between">
                       <span>Total Available Rooms</span>
                       <div class="bg-violet-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
@@ -212,15 +212,15 @@
                       >
                         <span class="font-mono text-xs">{{ getTotalAvailableRooms(year, label) }}</span>
                       </td>
-                      <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
-                        <span class="font-mono text-xs text-violet-700">
+                      <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30">
+                        <span class="font-mono text-xs text-violet-700 dark:text-violet-200">
                           {{ getTotalAvailableRoomsYear(year) }}
                         </span>
                       </td>
                     </template>
                     <template v-else>
-                      <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
-                        <span class="font-mono text-xs text-violet-700">
+                      <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30">
+                        <span class="font-mono text-xs text-violet-700 dark:text-violet-200">
                           {{ getTotalAvailableRoomsYear(year) }}
                         </span>
                       </td>
@@ -228,8 +228,8 @@
                   </template>
                 </tr>
                 <!-- Add the Occupancy (%) row -->
-                <tr class="bg-violet-200 font-bold text-violet-900">
-                  <td class="px-4 py-3 border-r border-violet-200">
+                <tr class="bg-violet-200 font-bold text-violet-900 dark:bg-violet-800/40 dark:text-violet-200">
+                  <td class="px-4 py-3 border-r border-violet-200 dark:border-violet-600">
                     <div class="flex items-center justify-between">
                       <span>Occupancy (%)</span>
                       <div class="bg-violet-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
@@ -247,15 +247,15 @@
                       >
                         <span class="font-mono text-xs">{{ getOccupancyPercentage(year, label) }}</span>
                       </td>
-                      <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
-                        <span class="font-mono text-xs text-violet-700">
+                      <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30">
+                        <span class="font-mono text-xs text-violet-700 dark:text-violet-200">
                           {{ getOccupancyPercentageYear(year) }}
                         </span>
                       </td>
                     </template>
                     <template v-else>
-                      <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50">
-                        <span class="font-mono text-xs text-violet-700">
+                      <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30">
+                        <span class="font-mono text-xs text-violet-700 dark:text-violet-200">
                           {{ getOccupancyPercentageYear(year) }}
                         </span>
                       </td>
@@ -268,7 +268,7 @@
         </div>
       </div>
       <!-- Table 2: Room Rate -->
-      <div class="bg-white rounded-lg border border-green-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
+      <div class="bg-white rounded-lg border border-green-200 dark:border-green-600 dark:bg-gray-800 dark:border-gray-600 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
         <div class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4">
           <h2 class="text-xl font-bold flex items-center gap-2"><DollarSign class="w-5 h-5" /> Room Rate <span class="text-xl font-bold">(USD)</span></h2>
           <p class="text-green-100 text-sm">Room rate by market segment</p>
@@ -276,13 +276,13 @@
         <div class="overflow-x-auto">
           <div class="min-w-full w-max">
             <table class="w-full">
-              <thead class="bg-gradient-to-r from-green-50 to-green-100 text-green-800 sticky top-0">
+              <thead class="bg-gradient-to-r from-green-50 to-green-100 text-green-800 dark:from-green-800/40 dark:to-green-700/40 dark:text-green-200 sticky top-0">
                 <tr>
-                  <th class="px-4 py-3 text-left font-semibold border-r border-green-200">Segment</th>
+                  <th class="px-4 py-3 text-left font-semibold border-r border-green-200 dark:border-green-600">Segment</th>
                   <template v-for="year in visibleYears" :key="'roomrate-header-' + year">
                     <th
                       :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
-                      class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-green-100 transition group"
+                      class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-green-100 dark:bg-green-800/30 transition group"
                       @click="toggleCollapse(year)"
                       title="Click to collapse/expand"
                     >
@@ -294,29 +294,29 @@
                     </th>
                   </template>
                 </tr>
-                <tr class="bg-green-100 text-sm">
-                  <th class="px-4 py-2 border-r border-green-200"></th>
+                <tr class="bg-green-100 dark:bg-green-800/30 text-sm">
+                  <th class="px-4 py-2 border-r border-green-200 dark:border-green-600"></th>
                   <template v-for="year in visibleYears" :key="'roomrate-months-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <th
                         v-for="label in getColumnLabelsForYearLocal(year)"
                         :key="year + '-roomrate-' + label"
-                        class="px-4 py-2 text-center border border-green-300 min-w-[110px]"
+                        class="px-4 py-2 text-center border border-green-300 dark:border-green-600 min-w-[110px]"
                       >
                         {{ label }}
                       </th>
-                      <th class="px-4 py-2 text-center border border-green-300 min-w-[120px] font-semibold">Total</th>
+                      <th class="px-4 py-2 text-center border border-green-300 dark:border-green-600 min-w-[120px] font-semibold">Total</th>
                     </template>
                     <template v-else>
-                      <th class="px-4 py-2 text-center border border-green-300 min-w-[120px] font-semibold">Total</th>
+                      <th class="px-4 py-2 text-center border border-green-300 dark:border-green-600 min-w-[120px] font-semibold">Total</th>
                     </template>
                   </template>
                 </tr>
               </thead>
-              <tbody class="text-gray-700 bg-white text-sm">
+              <tbody class="text-gray-700 bg-white text-sm dark:text-gray-200 dark:bg-gray-800">
                 <template v-for="category in marketSegmentCategories" :key="'cat-rate-' + category">
                   <tr>
-                    <td :colspan="1 + visibleYears.length * (isYearCollapsed(visibleYears[0]) ? 1 : getColumnLabelsForYearLocal(visibleYears[0]).length + 1)" class="bg-green-50 font-bold text-green-700 px-4 py-2 border-t border-green-200">
+                    <td :colspan="1 + visibleYears.length * (isYearCollapsed(visibleYears[0]) ? 1 : getColumnLabelsForYearLocal(visibleYears[0]).length + 1)" class="bg-green-50 dark:bg-green-900/20 font-bold text-green-700 dark:text-green-200 px-4 py-2 border-t border-green-200 dark:border-green-600">
                       <div class="flex items-center justify-between">
                         <span>{{ category }}</span>
                         <button 
@@ -332,9 +332,9 @@
                   <tr
                     v-for="segment in marketSegments.filter(seg => seg.segment_category === category)"
                     :key="'seg-rate-' + segment.market_segment"
-                    class="even:bg-green-50 hover:bg-green-100 transition"
+                    class="even:bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:bg-green-800/30 transition"
                   >
-                    <td class="px-4 py-3 font-medium border-r border-green-200">
+                    <td class="px-4 py-3 font-medium border-r border-green-200 dark:border-green-600">
                       <div class="flex items-center justify-between">
                         <span>{{ segment.market_segment }}</span>
                         <button 
@@ -351,7 +351,7 @@
                         <td
                           v-for="label in getColumnLabelsForYearLocal(year)"
                           :key="'roomrate-cell-' + year + '-' + label + '-' + segment.market_segment"
-                          class="px-2 py-2 text-right border border-green-200 hover:bg-green-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                          class="px-2 py-2 text-right border border-green-200 dark:border-green-600 hover:bg-green-50 dark:bg-green-900/20 focus:bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                         >
                           <div
                             contenteditable="true"
@@ -364,15 +364,15 @@
                             {{ getMarketSegmentValue(marketSegmentData, segment, year, label, 'room_rate') }}
                           </div>
                         </td>
-                        <td class="px-2 py-2 text-right border border-green-200 font-semibold bg-green-50">
-                          <span class="font-mono text-xs text-green-700">
+                        <td class="px-2 py-2 text-right border border-green-200 dark:border-green-600 font-semibold bg-green-50 dark:bg-green-900/20">
+                          <span class="font-mono text-xs text-green-700 dark:text-green-200">
                             {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'room_rate', getColumnLabelsForYearLocal) }}
                           </span>
                         </td>
                       </template>
                       <template v-else>
-                        <td class="px-2 py-2 text-right border border-green-200 font-semibold bg-green-50">
-                          <span class="font-mono text-xs text-green-700">
+                        <td class="px-2 py-2 text-right border border-green-200 dark:border-green-600 font-semibold bg-green-50 dark:bg-green-900/20">
+                          <span class="font-mono text-xs text-green-700 dark:text-green-200">
                             {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'room_rate', getColumnLabelsForYearLocal) }}
                           </span>
                         </td>
@@ -386,13 +386,13 @@
         </div>
       </div>
       <!-- Table 3: Average Daily Rate -->
-      <div class="bg-white rounded-lg border border-blue-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
+      <div class="bg-white rounded-lg border border-blue-200 dark:border-blue-600 dark:bg-gray-800 dark:border-gray-600 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4">
           <div class="flex-col items-center ">
             <div class="flex items-center gap-2">
               <Calculator class="w-5 h-5" />
               <h2 class="text-xl font-bold">Average Daily Rate</h2>
-              <div class="bg-blue-500 text-white font-bold text-xs px-2 py-1 rounded-full flex items-center gap-1">
+              <div class="bg-blue-50 dark:bg-blue-900/200 text-white font-bold text-xs px-2 py-1 rounded-full flex items-center gap-1">
                 <Calculator class="w-3 h-3" />
                 Auto Calculated
               </div>
@@ -406,13 +406,13 @@
         <div class="overflow-x-auto">
           <div class="min-w-full w-max">
             <table class="w-full">
-              <thead class="bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 sticky top-0">
+              <thead class="bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 dark:text-blue-200 dark:from-blue-800/40 dark:to-blue-700/40 dark:text-blue-200 sticky top-0">
                 <tr>
-                  <th class="px-4 py-3 text-left font-semibold border-r border-blue-200">Segment</th>
+                  <th class="px-4 py-3 text-left font-semibold border-r border-blue-200 dark:border-blue-600">Segment</th>
                   <template v-for="year in visibleYears" :key="'adr-header-' + year">
                     <th
                       :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
-                      class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-blue-100 transition group"
+                      class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-blue-100 dark:bg-blue-800/30 transition group"
                       @click="toggleCollapse(year)"
                       title="Click to collapse/expand"
                     >
@@ -424,29 +424,29 @@
                     </th>
                   </template>
                 </tr>
-                <tr class="bg-blue-100 text-sm">
-                  <th class="px-4 py-2 border-r border-blue-200"></th>
+                <tr class="bg-blue-100 dark:bg-blue-800/30 text-sm">
+                  <th class="px-4 py-2 border-r border-blue-200 dark:border-blue-600"></th>
                   <template v-for="year in visibleYears" :key="'adr-months-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <th
                         v-for="label in getColumnLabelsForYearLocal(year)"
                         :key="year + '-adr-' + label"
-                        class="px-4 py-2 text-center border border-blue-300 min-w-[110px]"
+                        class="px-4 py-2 text-center border border-blue-300 dark:border-blue-600 min-w-[110px]"
                       >
                         {{ label }}
                       </th>
-                      <th class="px-4 py-2 text-center border border-blue-300 min-w-[120px] font-semibold">Total</th>
+                      <th class="px-4 py-2 text-center border border-blue-300 dark:border-blue-600 min-w-[120px] font-semibold">Total</th>
                     </template>
                     <template v-else>
-                      <th class="px-4 py-2 text-center border border-blue-300 min-w-[120px] font-semibold">Total</th>
+                      <th class="px-4 py-2 text-center border border-blue-300 dark:border-blue-600 min-w-[120px] font-semibold">Total</th>
                     </template>
                   </template>
                 </tr>
               </thead>
-              <tbody class="text-gray-700 bg-white text-sm">
+              <tbody class="text-gray-700 bg-white text-sm dark:text-gray-200 dark:bg-gray-800">
                 <template v-for="category in marketSegmentCategories" :key="'cat-adr-' + category">
                   <tr>
-                    <td :colspan="1 + visibleYears.length * (isYearCollapsed(visibleYears[0]) ? 1 : getColumnLabelsForYearLocal(visibleYears[0]).length + 1)" class="bg-blue-50 font-bold text-blue-700 px-4 py-2 border-t border-blue-200">
+                    <td :colspan="1 + visibleYears.length * (isYearCollapsed(visibleYears[0]) ? 1 : getColumnLabelsForYearLocal(visibleYears[0]).length + 1)" class="bg-blue-50 dark:bg-blue-900/20 font-bold text-blue-700 dark:text-blue-200 px-4 py-2 border-t border-blue-200 dark:border-blue-600">
                       <div class="flex items-center justify-between">
                         <span>{{ category }}</span>
                         <button 
@@ -462,9 +462,9 @@
                   <tr
                     v-for="segment in marketSegments.filter(seg => seg.segment_category === category)"
                     :key="'seg-adr-' + segment.market_segment"
-                    class="even:bg-blue-50 hover:bg-blue-100 transition"
+                    class="even:bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:bg-blue-800/30 transition"
                   >
-                    <td class="px-4 py-3 font-medium border-r border-blue-200">
+                    <td class="px-4 py-3 font-medium border-r border-blue-200 dark:border-blue-600">
                       <div class="flex items-center justify-between">
                         <span>{{ segment.market_segment }}</span>
                         <button 
@@ -481,19 +481,19 @@
                         <td
                           v-for="label in getColumnLabelsForYearLocal(year)"
                           :key="'adr-cell-' + year + '-' + label + '-' + segment.market_segment"
-                          class="px-2 py-2 text-right border border-blue-200 bg-blue-50"
+                          class="px-2 py-2 text-right border border-blue-200 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/20"
                         >
                           <span class="font-mono text-xs">{{ getADRValue(segment, year, label) }}</span>
                         </td>
-                        <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50">
-                          <span class="font-mono text-xs text-blue-700">
+                        <td class="px-2 py-2 text-right border border-blue-200 dark:border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                          <span class="font-mono text-xs text-blue-700 dark:text-blue-200">
                             {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'average_daily_rate', getColumnLabelsForYearLocal) }}
                           </span>
                         </td>
                       </template>
                       <template v-else>
-                        <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50">
-                          <span class="font-mono text-xs text-blue-700">
+                        <td class="px-2 py-2 text-right border border-blue-200 dark:border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                          <span class="font-mono text-xs text-blue-700 dark:text-blue-200">
                             {{ calculateMarketSegmentTotal(marketSegmentData, segment, year, 'average_daily_rate', getColumnLabelsForYearLocal) }}
                           </span>
                         </td>
@@ -502,8 +502,8 @@
                   </tr>
                 </template>
                 <!-- Add ADR row -->
-                <tr class="bg-blue-200 font-bold text-blue-900">
-                  <td class="px-4 py-3 border-r border-blue-200">
+                <tr class="bg-blue-200 font-bold text-blue-900 dark:bg-blue-800/40 dark:text-white">
+                  <td class="px-4 py-3 border-r border-blue-200 dark:border-blue-600">
                     <div class="flex items-center justify-between">
                       <span>ADR</span>
                       <div class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
@@ -517,19 +517,19 @@
                       <td
                         v-for="label in getColumnLabelsForYearLocal(year)"
                         :key="'adr-total-cell-' + year + '-' + label"
-                        class="px-2 py-2 text-right border border-blue-200"
+                        class="px-2 py-2 text-right border border-blue-200 dark:border-blue-600"
                       >
                         <span class="font-mono text-xs">{{ getADRTotal(year, label) }}</span>
                       </td>
-                      <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50">
-                        <span class="font-mono text-xs text-blue-700">
+                      <td class="px-2 py-2 text-right border border-blue-200 dark:border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                        <span class="font-mono text-xs text-blue-700 dark:text-blue-200">
                           {{ getADRTotalYear(year) }}
                         </span>
                       </td>
                     </template>
                     <template v-else>
-                      <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50">
-                        <span class="font-mono text-xs text-blue-700">
+                      <td class="px-2 py-2 text-right border border-blue-200 dark:border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                        <span class="font-mono text-xs text-blue-700 dark:text-blue-200">
                           {{ getADRTotalYear(year) }}
                         </span>
                       </td>
@@ -537,8 +537,8 @@
                   </template>
                 </tr>
                 <!-- Add REVPAR row -->
-                <tr class="bg-blue-200 font-bold text-blue-900">
-                  <td class="px-4 py-3 border-r border-blue-200">
+                <tr class="bg-blue-200 font-bold text-blue-900 dark:bg-blue-800/40 dark:text-white">
+                  <td class="px-4 py-3 border-r border-blue-200 dark:border-blue-600">
                     <div class="flex items-center justify-between">
                       <span>REVPAR</span>
                       <div class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
@@ -552,19 +552,19 @@
                       <td
                         v-for="label in getColumnLabelsForYearLocal(year)"
                         :key="'revpar-total-cell-' + year + '-' + label"
-                        class="px-2 py-2 text-right border border-blue-200"
+                        class="px-2 py-2 text-right border border-blue-200 dark:border-blue-600"
                       >
                         <span class="font-mono text-xs">{{ getREVPARTotal(year, label) }}</span>
                       </td>
-                      <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50">
-                        <span class="font-mono text-xs text-blue-700">
+                      <td class="px-2 py-2 text-right border border-blue-200 dark:border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                        <span class="font-mono text-xs text-blue-700 dark:text-blue-200">
                           {{ getREVPARTotalYear(year) }}
                         </span>
                       </td>
                     </template>
                     <template v-else>
-                      <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50">
-                        <span class="font-mono text-xs text-blue-700">
+                      <td class="px-2 py-2 text-right border border-blue-200 dark:border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                        <span class="font-mono text-xs text-blue-700 dark:text-blue-200">
                           {{ getREVPARTotalYear(year) }}
                         </span>
                       </td>
@@ -577,13 +577,13 @@
         </div>
       </div>
       <!-- Table 4: Room Revenue -->
-              <div class="bg-white rounded-lg border border-orange-200 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
+              <div class="bg-white rounded-lg border border-orange-200 dark:border-orange-600 dark:bg-gray-800 dark:border-gray-600 shadow-sm overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
         <div class="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-4">
           <div class="flex-col items-center ">
             <div class="flex items-center gap-2">
               <Calculator class="w-5 h-5" />
               <h2 class="text-xl font-bold">Room Revenue</h2>
-              <div class="bg-orange-500 text-white font-bold text-xs px-2 py-1 rounded-full flex items-center gap-1">
+              <div class="bg-orange-50 dark:bg-orange-900/200 text-white font-bold text-xs px-2 py-1 rounded-full flex items-center gap-1">
                 <Calculator class="w-3 h-3" />
                 Auto Calculated
               </div>
@@ -597,13 +597,13 @@
         <div class="overflow-x-auto">
           <div class="min-w-full w-max">
             <table class="w-full">
-              <thead class="bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 sticky top-0">
+              <thead class="bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 dark:text-orange-200 dark:from-orange-800/40 dark:to-orange-700/40 dark:text-orange-200 sticky top-0">
                 <tr>
-                  <th class="px-4 py-3 text-left font-semibold border-r border-orange-200">Segment</th>
+                  <th class="px-4 py-3 text-left font-semibold border-r border-orange-200 dark:border-orange-600">Segment</th>
                   <template v-for="year in visibleYears" :key="'revenue-header-' + year">
                     <th
                       :colspan="isYearCollapsed(year) ? 1 : getColumnLabelsForYearLocal(year).length + 1"
-                      class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-orange-100 transition group"
+                      class="px-4 py-3 text-center border-x-2 border-white cursor-pointer select-none hover:bg-orange-100 dark:bg-orange-800/30 transition group"
                       @click="toggleCollapse(year)"
                       title="Click to collapse/expand"
                     >
@@ -615,29 +615,29 @@
                     </th>
                   </template>
                 </tr>
-                <tr class="bg-orange-100 text-sm">
-                  <th class="px-4 py-2 border-r border-orange-200"></th>
+                <tr class="bg-orange-100 dark:bg-orange-800/30 text-sm">
+                  <th class="px-4 py-2 border-r border-orange-200 dark:border-orange-600"></th>
                   <template v-for="year in visibleYears" :key="'revenue-months-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <th
                         v-for="label in getColumnLabelsForYearLocal(year)"
                         :key="year + '-revenue-' + label"
-                        class="px-4 py-2 text-center border border-orange-300 min-w-[110px]"
+                        class="px-4 py-2 text-center border border-orange-300 dark:border-orange-600 min-w-[110px]"
                       >
                         {{ label }}
                       </th>
-                      <th class="px-4 py-2 text-center border border-orange-300 min-w-[120px] font-semibold">Total</th>
+                      <th class="px-4 py-2 text-center border border-orange-300 dark:border-orange-600 min-w-[120px] font-semibold">Total</th>
                     </template>
                     <template v-else>
-                      <th class="px-4 py-2 text-center border border-orange-300 min-w-[120px] font-semibold">Total</th>
+                      <th class="px-4 py-2 text-center border border-orange-300 dark:border-orange-600 min-w-[120px] font-semibold">Total</th>
                     </template>
                   </template>
                 </tr>
               </thead>
-              <tbody class="text-gray-700 bg-white text-sm">
+              <tbody class="text-gray-700 bg-white text-sm dark:text-gray-200 dark:bg-gray-800">
                 <template v-for="category in marketSegmentCategories" :key="'cat-revenue-' + category">
                   <tr>
-                    <td :colspan="1 + visibleYears.length * (isYearCollapsed(visibleYears[0]) ? 1 : getColumnLabelsForYearLocal(visibleYears[0]).length + 1)" class="bg-orange-50 font-bold text-orange-700 px-4 py-2 border-t border-orange-200">
+                    <td :colspan="1 + visibleYears.length * (isYearCollapsed(visibleYears[0]) ? 1 : getColumnLabelsForYearLocal(visibleYears[0]).length + 1)" class="bg-orange-50 dark:bg-orange-900/20 font-bold text-orange-700 dark:text-orange-200 px-4 py-2 border-t border-orange-200 dark:border-orange-600">
                       <div class="flex items-center justify-between">
                         <span>{{ category }}</span>
                         <button 
@@ -653,9 +653,9 @@
                   <tr
                     v-for="segment in marketSegments.filter(seg => seg.segment_category === category)"
                     :key="'seg-revenue-' + segment.market_segment"
-                    class="even:bg-orange-50 hover:bg-orange-100 transition"
+                    class="even:bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:bg-orange-800/30 transition"
                   >
-                    <td class="px-4 py-3 font-medium border-r border-orange-200">
+                    <td class="px-4 py-3 font-medium border-r border-orange-200 dark:border-orange-600">
                       <div class="flex items-center justify-between">
                         <span>{{ segment.market_segment }}</span>
                         <button 
@@ -672,19 +672,19 @@
                         <td
                           v-for="label in getColumnLabelsForYearLocal(year)"
                           :key="'revenue-cell-' + year + '-' + label + '-' + segment.market_segment"
-                          class="px-2 py-2 text-right border border-orange-200 bg-orange-50"
+                          class="px-2 py-2 text-right border border-orange-200 dark:border-orange-600 bg-orange-50 dark:bg-orange-900/20"
                         >
                           <span class="font-mono text-xs">{{ getCalculatedRoomRevenue(segment, year, label) }}</span>
                         </td>
-                        <td class="px-2 py-2 text-right border border-orange-200 font-semibold bg-orange-50">
-                          <span class="font-mono text-xs text-orange-700">
+                        <td class="px-2 py-2 text-right border border-orange-200 dark:border-orange-600 font-semibold bg-orange-50 dark:bg-orange-900/20">
+                          <span class="font-mono text-xs text-orange-700 dark:text-orange-200">
                             {{ getCalculatedRoomRevenueTotal(segment, year) }}
                           </span>
                         </td>
                       </template>
                       <template v-else>
-                        <td class="px-2 py-2 text-right border border-orange-200 font-semibold bg-orange-50">
-                          <span class="font-mono text-xs text-orange-700">
+                        <td class="px-2 py-2 text-right border border-orange-200 dark:border-orange-600 font-semibold bg-orange-50 dark:bg-orange-900/20">
+                          <span class="font-mono text-xs text-orange-700 dark:text-orange-200">
                             {{ getCalculatedRoomRevenueTotal(segment, year) }}
                           </span>
                         </td>
@@ -693,8 +693,8 @@
                   </tr>
                 </template>
                 <!-- Add Total Room Revenue row -->
-                <tr class="bg-orange-200 font-bold text-orange-900">
-                  <td class="px-4 py-3 border-r border-orange-200">
+                <tr class="bg-orange-200 dark:bg-orange-800/40 font-bold text-orange-900 dark:text-orange-200">
+                  <td class="px-4 py-3 border-r border-orange-200 dark:border-orange-600">
                     <div class="flex items-center justify-between">
                       <span>Total Room Revenue</span>
                       <div class="bg-orange-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
@@ -708,19 +708,19 @@
                       <td
                         v-for="label in getColumnLabelsForYearLocal(year)"
                         :key="'total-roomrevenue-cell-' + year + '-' + label"
-                        class="px-2 py-2 text-right border border-orange-200"
+                        class="px-2 py-2 text-right border border-orange-200 dark:border-orange-600"
                       >
                         <span class="font-mono text-xs">{{ getTotalRoomRevenue(year, label) }}</span>
                       </td>
-                      <td class="px-2 py-2 text-right border border-orange-200 font-semibold bg-orange-50">
-                        <span class="font-mono text-xs text-orange-700">
+                      <td class="px-2 py-2 text-right border border-orange-200 dark:border-orange-600 font-semibold bg-orange-50 dark:bg-orange-900/20">
+                        <span class="font-mono text-xs text-orange-700 dark:text-orange-200">
                           {{ getTotalRoomRevenueYear(year) }}
                         </span>
                       </td>
                     </template>
                     <template v-else>
-                      <td class="px-2 py-2 text-right border border-orange-200 font-semibold bg-orange-50">
-                        <span class="font-mono text-xs text-orange-700">
+                      <td class="px-2 py-2 text-right border border-orange-200 dark:border-orange-600 font-semibold bg-orange-50 dark:bg-orange-900/20">
+                        <span class="font-mono text-xs text-orange-700 dark:text-orange-200">
                           {{ getTotalRoomRevenueYear(year) }}
                         </span>
                       </td>
@@ -728,26 +728,26 @@
                   </template>
                 </tr>
                 <!-- Add Service Charge row -->
-                <tr class="bg-orange-200 font-bold text-orange-900">
-                  <td class="px-4 py-3 border-r border-orange-200">Service Charge</td>
+                <tr class="bg-orange-200 dark:bg-orange-800/40 font-bold text-orange-900 dark:text-orange-200">
+                  <td class="px-4 py-3 border-r border-orange-200 dark:border-orange-600">Service Charge</td>
                   <template v-for="year in visibleYears" :key="'service-charge-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <td
                         v-for="label in getColumnLabelsForYearLocal(year)"
                         :key="'service-charge-cell-' + year + '-' + label"
-                        class="px-2 py-2 text-right border border-orange-200"
+                        class="px-2 py-2 text-right border border-orange-200 dark:border-orange-600"
                       >
                         <span class="font-mono text-xs">{{ getServiceChargeValue(year, label) }}</span>
                       </td>
-                      <td class="px-2 py-2 text-right border border-orange-200 font-semibold bg-orange-50">
-                        <span class="font-mono text-xs text-orange-700">
+                      <td class="px-2 py-2 text-right border border-orange-200 dark:border-orange-600 font-semibold bg-orange-50 dark:bg-orange-900/20">
+                        <span class="font-mono text-xs text-orange-700 dark:text-orange-200">
                           {{ getServiceChargeTotal(year) }}
                         </span>
                       </td>
                     </template>
                     <template v-else>
-                      <td class="px-2 py-2 text-right border border-orange-200 font-semibold bg-orange-50">
-                        <span class="font-mono text-xs text-orange-700">
+                      <td class="px-2 py-2 text-right border border-orange-200 dark:border-orange-600 font-semibold bg-orange-50 dark:bg-orange-900/20">
+                        <span class="font-mono text-xs text-orange-700 dark:text-orange-200">
                           {{ getServiceChargeTotal(year) }}
                         </span>
                       </td>
@@ -755,8 +755,8 @@
                   </template>
                 </tr>
                 <!-- Add Total Revenue row (Room Revenue + Service Charge) -->
-                <tr class="bg-orange-300 font-bold text-orange-900">
-                  <td class="px-4 py-3 border-r border-orange-200">
+                <tr class="bg-orange-300 dark:bg-orange-800/50 font-bold text-orange-900 dark:text-orange-200">
+                  <td class="px-4 py-3 border-r border-orange-200 dark:border-orange-600">
                     <div class="flex items-center justify-between">
                       <span>Total Rooms Revenue Including SC</span>
                       <div class="bg-orange-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
@@ -770,19 +770,19 @@
                       <td
                         v-for="label in getColumnLabelsForYearLocal(year)"
                         :key="'total-revenue-cell-' + year + '-' + label"
-                        class="px-2 py-2 text-right border border-orange-200"
+                        class="px-2 py-2 text-right border border-orange-200 dark:border-orange-600"
                       >
                         <span class="font-mono text-xs">{{ getTotalRevenue(year, label) }}</span>
                       </td>
-                      <td class="px-2 py-2 text-right border border-orange-200 font-semibold bg-orange-50">
-                        <span class="font-mono text-xs text-orange-700">
+                      <td class="px-2 py-2 text-right border border-orange-200 dark:border-orange-600 font-semibold bg-orange-50 dark:bg-orange-900/20">
+                        <span class="font-mono text-xs text-orange-700 dark:text-orange-200">
                           {{ getTotalRevenueYear(year) }}
                         </span>
                       </td>
                     </template>
                     <template v-else>
-                      <td class="px-2 py-2 text-right border border-orange-200 font-semibold bg-orange-50">
-                        <span class="font-mono text-xs text-orange-700">
+                      <td class="px-2 py-2 text-right border border-orange-200 dark:border-orange-600 font-semibold bg-orange-50 dark:bg-orange-900/20">
+                        <span class="font-mono text-xs text-orange-700 dark:text-orange-200">
                           {{ getTotalRevenueYear(year) }}
                         </span>
                       </td>
@@ -803,7 +803,7 @@
       v-if="showAddCategoryModal"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
     >
-      <div class="bg-white rounded-2xl shadow-2xl border border-violet-100 w-[95%] max-w-md p-0 overflow-hidden">
+      <div class="bg-white rounded-2xl shadow-2xl border border-violet-100 w-[95%] max-w-md p-0 overflow-hidden dark:bg-gray-800 dark:border-gray-600">
         <!-- Modal Header -->
         <div class="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-violet-600 to-violet-700">
           <div class="flex items-center gap-3">
@@ -821,12 +821,12 @@
         <!-- Modal Body -->
         <div class="p-6">
           <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Category Name</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200 dark:text-gray-200">Category Name</label>
             <input
               v-model="newCategoryName"
               type="text"
               placeholder="Enter category name"
-              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white"
+              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:focus:border-violet-400"
               @keyup.enter="handleAddCategory"
             />
             <p v-if="categoryError" class="mt-2 text-sm text-red-600">{{ categoryError }}</p>
@@ -834,10 +834,10 @@
         </div>
 
         <!-- Modal Footer -->
-        <div class="flex justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-violet-100">
+        <div class="flex justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-violet-100 dark:bg-gray-700 dark:border-gray-600">
           <button
             @click="showAddCategoryModal = false"
-            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 transition-all font-medium"
           >
             Cancel
           </button>
@@ -858,7 +858,7 @@
       v-if="showAddSegmentModal"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
     >
-      <div class="bg-white rounded-2xl shadow-2xl border border-green-100 w-[95%] max-w-md p-0 overflow-hidden">
+      <div class="bg-white rounded-2xl shadow-2xl border border-green-100 dark:bg-gray-800 dark:border-gray-600 w-[95%] max-w-md p-0 overflow-hidden">
         <!-- Modal Header -->
         <div class="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
           <div class="flex items-center gap-3">
@@ -876,7 +876,7 @@
         <!-- Modal Body -->
         <div class="p-6">
           <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Segment Name</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200">Segment Name</label>
             <input
               v-model="newSegmentName"
               type="text"
@@ -886,7 +886,7 @@
             />
           </div>
           <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-200">Category</label>
             <select
               v-model="selectedCategoryForSegment"
               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all bg-white"
@@ -904,7 +904,7 @@
         <div class="flex justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-green-100">
           <button
             @click="showAddSegmentModal = false"
-            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 transition-all font-medium"
           >
             Cancel
           </button>
@@ -925,7 +925,7 @@
       v-if="showRemoveCategoryModal"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
     >
-      <div class="bg-white rounded-2xl shadow-2xl border border-red-100 w-[95%] max-w-md p-0 overflow-hidden">
+      <div class="bg-white rounded-2xl shadow-2xl border border-red-100 dark:bg-gray-800 dark:border-gray-600 w-[95%] max-w-md p-0 overflow-hidden">
         <!-- Modal Header -->
         <div class="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-red-600 to-red-700">
           <div class="flex items-center gap-3">
@@ -956,7 +956,7 @@
         <div class="flex justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-red-100">
           <button
             @click="showRemoveCategoryModal = false"
-            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 transition-all font-medium"
           >
             Cancel
           </button>
@@ -977,7 +977,7 @@
       v-if="showRemoveSegmentModal"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
     >
-      <div class="bg-white rounded-2xl shadow-2xl border border-red-100 w-[95%] max-w-md p-0 overflow-hidden">
+      <div class="bg-white rounded-2xl shadow-2xl border border-red-100 dark:bg-gray-800 dark:border-gray-600 w-[95%] max-w-md p-0 overflow-hidden">
         <!-- Modal Header -->
         <div class="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-red-600 to-red-700">
           <div class="flex items-center gap-3">
@@ -1008,7 +1008,7 @@
         <div class="flex justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-red-100">
           <button
             @click="showRemoveSegmentModal = false"
-            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all font-medium"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 transition-all font-medium"
           >
             Cancel
           </button>

@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { session } from '../data/session'
+import { session } from '../../data/session'
 
 function submit(e: Event) {
   const form = e.target as HTMLFormElement

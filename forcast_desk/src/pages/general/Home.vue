@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full min-h-screen bg-gradient-to-br from-violet-50 via-white to-violet-100 text-gray-800 relative overflow-hidden">
+  <div class="w-full min-h-screen bg-gradient-to-br from-violet-50 via-white to-violet-100 text-gray-800 relative overflow-hidden dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 dark:text-gray-100">
     <!-- Background Pattern -->
     <div class="absolute inset-0 bg-pattern opacity-40"></div>
     
@@ -24,9 +24,9 @@
             Ex Forecast
           </h1>
           
-          <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in-up delay-200">
+          <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in-up delay-200 dark:text-gray-300">
             Transform your business decisions with AI-powered forecasting insights. 
-            <span class="text-violet-600 font-semibold">Predict the future, shape your success.</span>
+            <span class="text-violet-600 font-semibold dark:text-violet-400">Predict the future, shape your success.</span>
           </p>
 
           <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up delay-300">
@@ -40,7 +40,7 @@
 
           <button
             @click="session.logout.submit()"
-              class="px-8 py-4 text-violet-600 font-semibold bg-white border-2 border-violet-200 rounded-full hover:bg-violet-50 hover:border-violet-300 transform hover:scale-105 transition-all duration-300 flex items-center gap-3"
+              class="px-8 py-4 text-violet-600 font-semibold bg-white border-2 border-violet-200 rounded-full hover:bg-violet-50 hover:border-violet-300 transform hover:scale-105 transition-all duration-300 flex items-center gap-3 dark:text-violet-400 dark:bg-gray-800 dark:border-violet-600 dark:hover:bg-gray-700 dark:hover:border-violet-500"
           >
               <LogOut class="w-5 h-5" />
             <span>Logout</span>
@@ -51,13 +51,13 @@
     </section>
 
     <!-- Features Section -->
-    <section class="relative z-10 py-20 bg-white/50 backdrop-blur-sm">
+    <section class="relative z-10 py-20 bg-white/50 backdrop-blur-sm dark:bg-gray-800/50">
       <div class="max-w-6xl mx-auto px-4">
         <div class="text-center mb-16 animate-fade-in-up">
-          <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            Why Choose <span class="text-violet-600">Ex Forecast</span>
+          <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4 dark:text-gray-100">
+            Why Choose <span class="text-violet-600 dark:text-violet-400">Ex Forecast</span>
           </h2>
-          <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto dark:text-gray-300">
             Powerful features designed to revolutionize your forecasting experience
           </p>
         </div>
@@ -67,8 +67,8 @@
             <div class="feature-icon">
               <BarChart3 class="w-8 h-8" />
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-3">Real-Time Analytics</h3>
-            <p class="text-gray-600 leading-relaxed">
+            <h3 class="text-xl font-bold text-gray-800 mb-3 dark:text-gray-100 dark:text-gray-100">Real-Time Analytics</h3>
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed dark:text-gray-300 dark:text-gray-300">
               Monitor key metrics and trends with beautiful, interactive dashboards updated in real-time.
             </p>
           </div>
@@ -77,8 +77,8 @@
             <div class="feature-icon">
               <Zap class="w-8 h-8" />
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-3">Lightning Fast</h3>
-            <p class="text-gray-600 leading-relaxed">
+            <h3 class="text-xl font-bold text-gray-800 mb-3 dark:text-gray-100">Lightning Fast</h3>
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed dark:text-gray-300">
               Get instant insights with our optimized platform that processes data at lightning speed.
             </p>
           </div>
@@ -87,8 +87,8 @@
             <div class="feature-icon">
               <Shield class="w-8 h-8" />
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-3">Enterprise Security</h3>
-            <p class="text-gray-600 leading-relaxed">
+            <h3 class="text-xl font-bold text-gray-800 mb-3 dark:text-gray-100">Enterprise Security</h3>
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed dark:text-gray-300">
               Bank-level security ensures your data is protected with encryption and compliance standards.
             </p>
           </div>
@@ -97,8 +97,8 @@
             <div class="feature-icon">
               <Users class="w-8 h-8" />
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-3">Team Collaboration</h3>
-            <p class="text-gray-600 leading-relaxed">
+            <h3 class="text-xl font-bold text-gray-800 mb-3 dark:text-gray-100">Team Collaboration</h3>
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed dark:text-gray-300">
               Share insights and collaborate seamlessly with your team across departments and locations.
             </p>
           </div>
@@ -107,8 +107,8 @@
             <div class="feature-icon">
               <TrendingUp class="w-8 h-8" />
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-3">Predictive Insights</h3>
-            <p class="text-gray-600 leading-relaxed">
+            <h3 class="text-xl font-bold text-gray-800 mb-3 dark:text-gray-100">Predictive Insights</h3>
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed dark:text-gray-300">
               Identify patterns and trends before they happen with our advanced predictive analytics.
             </p>
           </div>
@@ -117,8 +117,8 @@
             <div class="feature-icon">
               <Database class="w-8 h-8" />
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-3">Data Integration</h3>
-            <p class="text-gray-600 leading-relaxed">
+            <h3 class="text-xl font-bold text-gray-800 mb-3 dark:text-gray-100">Data Integration</h3>
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed dark:text-gray-300">
               Seamlessly connect and integrate with your existing data sources and business tools.
             </p>
           </div>
@@ -127,13 +127,13 @@
     </section>
 
     <!-- People's Experience Section -->
-    <section class="relative z-10 py-20 bg-gradient-to-br from-violet-50 to-purple-50">
+    <section class="relative z-10 py-20 bg-gradient-to-br from-violet-50 to-purple-50 dark:from-gray-800 dark:to-gray-700">
       <div class="max-w-6xl mx-auto px-4">
         <div class="text-center mb-16 animate-fade-in-up">
-          <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            What Our <span class="text-violet-600">Users Say</span>
+          <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4 dark:text-gray-100">
+            What Our <span class="text-violet-600 dark:text-violet-400">Users Say</span>
           </h2>
-          <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto dark:text-gray-300">
             Join thousands of satisfied users who have transformed their business with Ex Forecast
           </p>
         </div>
@@ -145,11 +145,11 @@
                 S
               </div>
               <div>
-                <h4 class="font-semibold text-gray-800">Sarah Johnson</h4>
-                <p class="text-sm text-gray-500">CEO, TechFlow Inc.</p>
+                <h4 class="font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100">Sarah Johnson</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400">CEO, TechFlow Inc.</p>
               </div>
             </div>
-            <p class="text-gray-600 leading-relaxed">
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed dark:text-gray-300">
               "Ex Forecast has revolutionized how we make business decisions. The AI insights are incredibly accurate and have helped us increase our revenue by 40%."
             </p>
             <div class="flex text-yellow-400 mt-4">
@@ -167,11 +167,11 @@
                 M
               </div>
               <div>
-                <h4 class="font-semibold text-gray-800">Michael Chen</h4>
-                <p class="text-sm text-gray-500">Data Scientist, DataCorp</p>
+                <h4 class="font-semibold text-gray-800 dark:text-gray-100">Michael Chen</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Data Scientist, DataCorp</p>
               </div>
             </div>
-            <p class="text-gray-600 leading-relaxed">
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed dark:text-gray-300">
               "The real-time analytics and predictive capabilities are outstanding. It's like having a crystal ball for business forecasting."
             </p>
             <div class="flex text-yellow-400 mt-4">
@@ -189,11 +189,11 @@
                 E
               </div>
               <div>
-                <h4 class="font-semibold text-gray-800">Emily Rodriguez</h4>
-                <p class="text-sm text-gray-500">Operations Manager, GrowthCo</p>
+                <h4 class="font-semibold text-gray-800 dark:text-gray-100">Emily Rodriguez</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Operations Manager, GrowthCo</p>
               </div>
             </div>
-            <p class="text-gray-600 leading-relaxed">
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed dark:text-gray-300">
               "The user interface is intuitive and the team collaboration features have improved our workflow significantly."
             </p>
             <div class="flex text-yellow-400 mt-4">
@@ -209,20 +209,20 @@
         <!-- Stats Section -->
         <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div class="stat-card animate-fade-in-up delay-400">
-            <h3 class="text-3xl md:text-4xl font-bold text-violet-600 mb-2">10K+</h3>
-            <p class="text-gray-600">Active Users</p>
+            <h3 class="text-3xl md:text-4xl font-bold text-violet-600 mb-2 dark:text-violet-400 dark:text-violet-400">10K+</h3>
+            <p class="text-gray-600 dark:text-gray-300 dark:text-gray-300">Active Users</p>
           </div>
           <div class="stat-card animate-fade-in-up delay-500">
-            <h3 class="text-3xl md:text-4xl font-bold text-violet-600 mb-2">95%</h3>
-            <p class="text-gray-600">Accuracy Rate</p>
+            <h3 class="text-3xl md:text-4xl font-bold text-violet-600 mb-2 dark:text-violet-400">95%</h3>
+            <p class="text-gray-600 dark:text-gray-300">Accuracy Rate</p>
           </div>
           <div class="stat-card animate-fade-in-up delay-600">
-            <h3 class="text-3xl md:text-4xl font-bold text-violet-600 mb-2">24/7</h3>
-            <p class="text-gray-600">Support Available</p>
+            <h3 class="text-3xl md:text-4xl font-bold text-violet-600 mb-2 dark:text-violet-400">24/7</h3>
+            <p class="text-gray-600 dark:text-gray-300">Support Available</p>
           </div>
           <div class="stat-card animate-fade-in-up delay-700">
-            <h3 class="text-3xl md:text-4xl font-bold text-violet-600 mb-2">50M+</h3>
-            <p class="text-gray-600">Predictions Made</p>
+            <h3 class="text-3xl md:text-4xl font-bold text-violet-600 mb-2 dark:text-violet-400">50M+</h3>
+            <p class="text-gray-600 dark:text-gray-300">Predictions Made</p>
           </div>
         </div>
       </div>
@@ -476,6 +476,11 @@ import {
   animation: fade-in-up 0.8s ease-out forwards;
 }
 
+.dark .feature-card {
+  background: rgba(31, 41, 55, 0.8);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
 .feature-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
@@ -511,6 +516,11 @@ import {
   animation: fade-in-up 0.8s ease-out forwards;
 }
 
+.dark .testimonial-card {
+  background: rgba(31, 41, 55, 0.9);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
 .testimonial-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 30px rgba(139, 92, 246, 0.1);
@@ -526,6 +536,11 @@ import {
   transition: all 0.3s ease;
   opacity: 0;
   animation: fade-in-up 0.8s ease-out forwards;
+}
+
+.dark .stat-card {
+  background: rgba(31, 41, 55, 0.8);
+  border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 .stat-card:hover {
