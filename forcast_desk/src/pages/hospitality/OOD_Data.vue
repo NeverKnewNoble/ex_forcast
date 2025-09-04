@@ -443,7 +443,7 @@
                         <template v-for="year in visibleYears" :key="'rev-inhouse-' + year">
                           <template v-if="!isYearCollapsed(year)">
                             <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'rev-inhouse-' + year + '-' + label"
-                              class="px-2 py-1 text-right text-blue-700 font-mono bg-blue-50 min-w-[110px] border border-blue-300">
+                              class="px-2 py-1 text-right text-blue-700  bg-blue-50 min-w-[110px] border border-blue-300">
                               {{ formatOODValue('revenue_in_house', calculateInHouseRevenueReactive(year, label)) }}
                                   </td>
                                 </template>
@@ -462,7 +462,7 @@
                         <template v-for="year in visibleYears" :key="'rev-outside-' + year">
                           <template v-if="!isYearCollapsed(year)">
                             <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'rev-outside-' + year + '-' + label"
-                              class="px-2 py-1 text-right text-blue-700 font-mono bg-blue-50 min-w-[110px] border border-blue-300">
+                              class="px-2 py-1 text-right text-blue-700  bg-blue-50 min-w-[110px] border border-blue-300">
                               {{ formatOODValue('revenue_outside', calculateOutsideGuestLaundryRevenue(laundryAssumptions, year, label)) }}
                                   </td>
                                 </template>
@@ -476,7 +476,7 @@
                         <template v-for="year in visibleYears" :key="'rev-other-' + year">
                           <template v-if="!isYearCollapsed(year)">
                             <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'rev-other-' + year + '-' + label"
-                              class="px-2 py-1 text-right font-mono text-blue-700 bg-blue-50 min-w-[110px] border border-blue-300"
+                              class="px-2 py-1 text-right  text-blue-700 bg-blue-50 min-w-[110px] border border-blue-300"
                                     contenteditable="true"
                               @input="e => handleContentEditableInput(e, laundryAssumptions.revenue_other, year, label)"
                               @paste="handleContentEditablePaste"
@@ -501,7 +501,7 @@
                         <template v-for="year in visibleYears" :key="'rev-total-' + year">
                           <template v-if="!isYearCollapsed(year)">
                             <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'rev-total-' + year + '-' + label"
-                              class="px-2 py-1 text-right text-blue-700 font-mono bg-blue-50 min-w-[110px] border border-blue-300">
+                              class="px-2 py-1 text-right text-blue-700  bg-blue-50 min-w-[110px] border border-blue-300">
                               {{ formatOODValue('total_laundry_revenue', calculateTotalLaundryRevenue(year, label)) }}
                             </td>
                           </template>
@@ -523,7 +523,7 @@
                         <template v-for="year in visibleYears" :key="'cost-guest-' + year">
                           <template v-if="!isYearCollapsed(year)">
                             <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'cost-guest-' + year + '-' + label"
-                              class="px-2 py-1 text-right text-blue-700 font-mono bg-blue-50 min-w-[110px] border border-blue-300">
+                              class="px-2 py-1 text-right text-blue-700  bg-blue-50 min-w-[110px] border border-blue-300">
                               {{ formatOODValue('guest_laundry_cost', calculateGuestLaundryCostReactive(year, label)) }}
                                   </td>
                                 </template>
@@ -537,7 +537,7 @@
                         <template v-for="year in visibleYears" :key="'cost-other-' + year">
                           <template v-if="!isYearCollapsed(year)">
                             <td v-for="label in getColumnLabelsForYearLocal(year)" :key="'cost-other-' + year + '-' + label"
-                              class="px-2 py-1 text-right font-mono text-blue-700 bg-blue-50 min-w-[110px] border border-blue-300"
+                              class="px-2 py-1 text-right  text-blue-700 bg-blue-50 min-w-[110px] border border-blue-300"
                               contenteditable="true"
                               @input="e => handleContentEditableInput(e, laundryAssumptions.other_laundry_costs, year, label)"
                               @paste="handleContentEditablePaste"
@@ -671,26 +671,26 @@
                               <template v-for="year in visibleYears" :key="'row-' + year + '-' + field.code">
                                 <template v-if="!isYearCollapsed(year)">
                                   <template v-for="label in getColumnLabelsForYearLocal(year)" :key="year + '-' + label">
-                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                       {{ formatOODValue(field.code, calculateTotalClubUseRevenue(healthClubData, year, label)) }}
                                     </td>
-                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                       {{ formatOODValue(field.code + '_pct', calculateTotalClubUseRevenuePct(healthClubData, year, label)) }}
                                     </td>
                                   </template>
                                   <!-- Forecast column for Total Club Use Revenue -->
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code, calculateTotalClubUseRevenue(healthClubData, year, 'Forecast')) }}
                                   </td>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code + '_pct', calculateTotalClubUseRevenuePct(healthClubData, year, 'Forecast')) }}
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code, calculateTotalClubUseRevenue(healthClubData, year, 'Forecast')) }}
                                   </td>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code + '_pct', calculateTotalClubUseRevenuePct(healthClubData, year, 'Forecast')) }}
                                   </td>
                                 </template>
@@ -705,26 +705,26 @@
                               <template v-for="year in visibleYears" :key="'row-' + year + '-' + field.code">
                                 <template v-if="!isYearCollapsed(year)">
                                   <template v-for="label in getColumnLabelsForYearLocal(year)" :key="year + '-' + label">
-                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                       {{ formatOODValue(field.code, calculateTotalTreatmentsOtherServices(healthClubData, year, label)) }}
                                     </td>
-                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                       {{ formatOODValue(field.code + '_pct', calculateTotalTreatmentsOtherServicesPct(healthClubData, year, label)) }}
                                     </td>
                                   </template>
                                   <!-- Forecast column for Total Treatments & Other Services -->
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code, calculateTotalTreatmentsOtherServices(healthClubData, year, 'Forecast')) }}
                                   </td>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code + '_pct', calculateTotalTreatmentsOtherServicesPct(healthClubData, year, 'Forecast')) }}
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code, calculateTotalTreatmentsOtherServices(healthClubData, year, 'Forecast')) }}
                                   </td>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code + '_pct', calculateTotalTreatmentsOtherServicesPct(healthClubData, year, 'Forecast')) }}
                                   </td>
                                 </template>
@@ -739,26 +739,26 @@
                               <template v-for="year in visibleYears" :key="'row-' + year + '-' + field.code">
                                 <template v-if="!isYearCollapsed(year)">
                                   <template v-for="label in getColumnLabelsForYearLocal(year)" :key="year + '-' + label">
-                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                       {{ formatOODValue(field.code, calculateTotalMemberships(healthClubData, year, label)) }}
                                     </td>
-                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                       {{ formatOODValue(field.code + '_pct', calculateTotalMembershipsPct(healthClubData, year, label)) }}
                                     </td>
                                   </template>
                                   <!-- Forecast column for Total Memberships -->
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code, calculateTotalMemberships(healthClubData, year, 'Forecast')) }}
                                   </td>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code + '_pct', calculateTotalMembershipsPct(healthClubData, year, 'Forecast')) }}
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code, calculateTotalMemberships(healthClubData, year, 'Forecast')) }}
                                   </td>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code + '_pct', calculateTotalMembershipsPct(healthClubData, year, 'Forecast')) }}
                                   </td>
                                 </template>
@@ -773,26 +773,26 @@
                               <template v-for="year in visibleYears" :key="'row-' + year + '-' + field.code">
                                 <template v-if="!isYearCollapsed(year)">
                                   <template v-for="label in getColumnLabelsForYearLocal(year)" :key="year + '-' + label">
-                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                       {{ formatOODValue(field.code, calculateTotalHealthClubSpa(healthClubData, year, label)) }}
                                     </td>
-                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                       0.00%
                                     </td>
                                   </template>
                                   <!-- Forecast column for Total Health Club & Spa -->
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code, calculateTotalHealthClubSpa(healthClubData, year, 'Forecast')) }}
                                   </td>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     0.00%
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code, calculateTotalHealthClubSpa(healthClubData, year, 'Forecast')) }}
                                   </td>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     0.00%
                                   </td>
                                 </template>
@@ -808,7 +808,7 @@
                                   <template v-for="label in getColumnLabelsForYearLocal(year)" :key="year + '-' + label">
                                     <td
                                       contenteditable="true"
-                                      class="px-2 py-1 text-right border border-green-200 bg-green-50 font-mono"
+                                      class="px-2 py-1 text-right border border-green-200 bg-green-50 "
                                       style="direction: ltr; text-align: right; unicode-bidi: plaintext;"
                                       @input="e => { sanitizeNumberInput(e); handleHealthClubCellInput({ year, label, field: field.code, event: e }); }"
                                       @focus="handleOODCellFocus({ year, label, field: field.code, event: $event })"
@@ -816,14 +816,14 @@
                                     >
                                       <span>{{ formatOODValue(field.code, getOODCellValue(healthClubData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
                                     </td>
-                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                       0.00%
                                     </td>
                                   </template>
                                   <!-- Forecast column for Service Charge -->
                                   <td
                                     contenteditable="true"
-                                    class="px-2 py-1 text-right border border-green-200 bg-green-50 font-mono"
+                                    class="px-2 py-1 text-right border border-green-200 bg-green-50 "
                                     style="direction: ltr; text-align: right; unicode-bidi: plaintext;"
                                     @input="e => { sanitizeNumberInput(e); handleHealthClubCellInput({ year, label: 'Forecast', field: field.code, event: e }); }"
                                     @focus="handleOODCellFocus({ year, label: 'Forecast', field: field.code, event: $event })"
@@ -831,21 +831,21 @@
                                   >
                                     <span>{{ formatOODValue(field.code, getOODCellValue(healthClubData, field.code, year, 'Forecast', advancedModes[year] || displayMode)) }}</span>
                                   </td>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     0.00%
                                   </td>
                                 </template>
                                 <template v-else>
                                   <td
                                     contenteditable="true"
-                                    class="px-2 py-1 text-right border border-green-200 bg-green-50 font-mono"
+                                    class="px-2 py-1 text-right border border-green-200 bg-green-50 "
                                     @input="e => { sanitizeNumberInput(e); handleHealthClubCellInput({ year, label: 'Forecast', field: field.code, event: e }); }"
                                     @focus="handleOODCellFocus({ year, label: 'Forecast', field: field.code, event: $event })"
                                     @blur="handleCellEditWrapper({ year, label: 'Forecast', field: field.code, event: $event })"
                                   >
                                     <span>{{ formatOODValue(field.code, getOODCellValue(healthClubData, field.code, year, 'Forecast', advancedModes[year] || displayMode)) }}</span>
                                   </td>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     0.00%
                                   </td>
                                 </template>
@@ -860,26 +860,26 @@
                               <template v-for="year in visibleYears" :key="'row-' + year + '-' + field.code">
                                 <template v-if="!isYearCollapsed(year)">
                                   <template v-for="label in getColumnLabelsForYearLocal(year)" :key="year + '-' + label">
-                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                       {{ formatOODValue(field.code, calculateTotalHealthClubRevIncludingSC(healthClubData, year, label)) }}
                                     </td>
-                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                    <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                       0.00%
                                     </td>
                                   </template>
                                   <!-- Forecast column for Total Health Club Rev Including SC -->
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code, calculateTotalHealthClubRevIncludingSC(healthClubData, year, 'Forecast')) }}
                                   </td>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     0.00%
                                   </td>
                                 </template>
                                 <template v-else>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     {{ formatOODValue(field.code, calculateTotalHealthClubRevIncludingSC(healthClubData, year, 'Forecast')) }}
                                   </td>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     0.00%
                                   </td>
                                 </template>
@@ -917,13 +917,13 @@
                                         @blur="handleCellEditWrapper({ year, label, field: field.code, event: $event })"
                                         >
                                         <span :class="[
-                                            'font-mono text-xs',
+                                            ' text-xs',
                                             isTotalField(field.code) ? 'text-green-800 font-semibold' : ''
                                         ]">{{ formatOODValue(field.code, getOODCellValue(healthClubData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
                                     </td>
                                     <td
                                       :class="[
-                                        'px-2 py-1 text-right border border-green-200 outline-none font-mono text-xs',
+                                        'px-2 py-1 text-right border border-green-200 outline-none  text-xs',
                                         isTotalField(field.code)
                                           ? 'bg-green-100 font-semibold'
                                           : 'bg-green-50'
@@ -951,14 +951,14 @@
                                     @blur="handleCellEditWrapper({ year, label: 'Forecast', field: field.code, event: $event })"
                                   >
                                     <span :class="[
-                                        'font-mono text-xs',
+                                        ' text-xs',
                                         isTotalField(field.code) ? 'text-green-800 font-semibold' : ''
                                     ]">{{ formatOODValue(field.code, getOODCellValue(healthClubData, field.code, year, 'Forecast', advancedModes[year] || displayMode)) }}</span>
                                   </td>
                                   <!-- Forecast percentage column -->
                                   <td
                                     :class="[
-                                      'px-2 py-1 text-right border border-green-200 outline-none font-mono text-xs',
+                                      'px-2 py-1 text-right border border-green-200 outline-none  text-xs',
                                       isTotalField(field.code)
                                         ? 'bg-green-100 font-semibold'
                                         : 'bg-green-50'
@@ -975,7 +975,7 @@
                                   <td
                                     contenteditable="true"
                                     :class="[
-                                      'px-2 py-1 text-right border border-green-200 outline-none font-mono text-xs',
+                                      'px-2 py-1 text-right border border-green-200 outline-none  text-xs',
                                       isTotalField(field.code)
                                         ? 'bg-green-100 font-semibold'
                                         : 'bg-green-50'
@@ -987,7 +987,7 @@
                                   >
                                     <span>{{ formatOODValue(field.code, getOODCellValue(healthClubData, field.code, year, 'Forecast', advancedModes[year] || displayMode)) }}</span>
                                   </td>
-                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold font-mono" style="pointer-events: none; opacity: 1;">
+                                  <td class="px-2 py-1 text-right border border-green-200 bg-green-100 font-semibold " style="pointer-events: none; opacity: 1;">
                                     <!-- Only show percentage for SERVICE CHARGE, leave empty for others -->
                                     <template v-if="field.code === 'service_charge'">
                                       <!-- Editable or not depending on your logic -->

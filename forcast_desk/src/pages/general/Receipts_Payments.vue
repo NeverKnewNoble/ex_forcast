@@ -333,15 +333,15 @@
                                 :key="'dept-revenue-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-200 bg-violet-50 dark:border-violet-700 dark:bg-violet-900/20"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getDepartmentMonthlyRevenue(department, year, label)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getDepartmentMonthlyRevenue(department, year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
-                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getDepartmentYearTotal(department, year)) }}</span>
+                                <span class=" text-xs text-violet-700">{{ formatMoney(getDepartmentYearTotal(department, year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
-                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getDepartmentYearTotal(department, year)) }}</span>
+                                <span class=" text-xs text-violet-700">{{ formatMoney(getDepartmentYearTotal(department, year)) }}</span>
                               </td>
                             </template>
                           </template>
@@ -361,7 +361,7 @@
                           @focus="handleCollectionPercentageFocus({ type: getDeptKey(department), period: 'month', event: $event })" 
                           @blur="handleCollectionPercentageEdit({ type: getDeptKey(department), period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ collectionPercentages[getDeptKey(department)].month.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ collectionPercentages[getDeptKey(department)].month.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-collection-80-' + deptIndex + '-' + year">
@@ -371,15 +371,15 @@
                                 :key="'dept-collection-80-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-200 bg-violet-50 dark:border-violet-700 dark:bg-violet-900/20"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'sameMonth')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'sameMonth')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
-                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'sameMonth')) }}</span>
+                                <span class=" text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'sameMonth')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
-                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'sameMonth')) }}</span>
+                                <span class=" text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'sameMonth')) }}</span>
                               </td>
                             </template>
                           </template>
@@ -399,7 +399,7 @@
                           @focus="handleCollectionPercentageFocus({ type: getDeptKey(department), period: 'following', event: $event })" 
                           @blur="handleCollectionPercentageEdit({ type: getDeptKey(department), period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ collectionPercentages[getDeptKey(department)].following.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ collectionPercentages[getDeptKey(department)].following.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-collection-15-' + deptIndex + '-' + year">
@@ -409,15 +409,15 @@
                                 :key="'dept-collection-15-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-200 bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'following')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'following')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
-                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'following')) }}</span>
+                                <span class=" text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'following')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
-                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'following')) }}</span>
+                                <span class=" text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'following')) }}</span>
                               </td>
                             </template>
                           </template>
@@ -437,7 +437,7 @@
                           @focus="handleCollectionPercentageFocus({ type: getDeptKey(department), period: 'second', event: $event })" 
                           @blur="handleCollectionPercentageEdit({ type: getDeptKey(department), period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ collectionPercentages[getDeptKey(department)].second.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ collectionPercentages[getDeptKey(department)].second.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-collection-5-' + deptIndex + '-' + year">
@@ -447,15 +447,15 @@
                                 :key="'dept-collection-5-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-200 bg-violet-50 dark:border-violet-700 dark:bg-violet-900/20"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'second')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'second')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
-                                <span class="font-mono text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'second')) }}</span>
+                                <span class=" text-xs text-violet-700">{{ formatMoney(getCollectionTotal(department, year, 'second')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-100 dark:border-violet-700 dark:bg-violet-800/30">
-                                <span class="font-mono text-xs text-violet-700">0.00</span>
+                                <span class=" text-xs text-violet-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -475,15 +475,15 @@
                                 :key="'dept-cash-inflow-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'cashInflow')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getCollectionValue(department, year, label, 'cashInflow')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">{{ formatMoney(getCollectionTotal(department, year, 'cashInflow')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getCollectionTotal(department, year, 'cashInflow')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class=" text-xs">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -503,15 +503,15 @@
                                 :key="'dept-accounts-receivables-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getARValue(department, year, label)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getARValue(department, year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">{{ formatMoney(getARTotal(department, year)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getARTotal(department, year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-violet-300 bg-violet-200 font-bold text-violet-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class=" text-xs">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -557,15 +557,15 @@
                                 @input="handlePaymentBaseInput(department, 'salary', year, label, $event)"
                                 @blur="handlePaymentBaseBlur(department, 'salary', year, label, $event)"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentBaseValue(department, 'salary', year, label)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentBaseValue(department, 'salary', year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentBaseTotal(department, 'salary', year)) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentBaseTotal(department, 'salary', year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -585,7 +585,7 @@
                           @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'salary', period: 'month', event: $event })" 
                           @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'salary', period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ (paymentPercentages[getDeptKey(department)].salary.month || 0).toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ (paymentPercentages[getDeptKey(department)].salary.month || 0).toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-salary-payment-80-' + deptIndex + '-' + year">
@@ -595,15 +595,15 @@
                                 :key="'dept-salary-payment-80-cell-' + deptIndex + '-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'salary', year, label, 'sameMonth')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'salary', year, label, 'sameMonth')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'salary', year, 'sameMonth')) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'salary', year, 'sameMonth')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -618,7 +618,7 @@
                           </td>
                           <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'salary', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'salary', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'salary', period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].salary.following.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ paymentPercentages[getDeptKey(department)].salary.following.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-salary-payment-15-' + year">
@@ -628,15 +628,15 @@
                                 :key="'dept-' + deptIndex + '-salary-payment-15-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'salary', year, label, 'following')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'salary', year, label, 'following')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'salary', year, 'following')) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'salary', year, 'following')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -651,7 +651,7 @@
                           </td>
                           <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'salary', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'salary', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'salary', period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].salary.second.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ paymentPercentages[getDeptKey(department)].salary.second.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-salary-payment-5-' + year">
@@ -661,15 +661,15 @@
                                 :key="'dept-' + deptIndex + '-salary-payment-5-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'salary', year, label, 'second')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'salary', year, label, 'second')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'salary', year, 'second')) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'salary', year, 'second')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -689,15 +689,15 @@
                                 :key="'dept-' + deptIndex + '-salary-cash-outflow-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'salary', year, label, 'cashOutflow')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'salary', year, label, 'cashOutflow')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentTotal(department, 'salary', year, 'cashOutflow')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentTotal(department, 'salary', year, 'cashOutflow')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class=" text-xs">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -717,15 +717,15 @@
                                 :key="'dept-' + deptIndex + '-salary-payables-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPayablesValue(department, 'salary', year, label)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPayablesValue(department, 'salary', year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">{{ formatMoney(getPayablesTotal(department, 'salary', year)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPayablesTotal(department, 'salary', year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class=" text-xs">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -749,15 +749,15 @@
                                 @input="handlePaymentBaseInput(department, 'bonus', year, label, $event)"
                                 @blur="handlePaymentBaseBlur(department, 'bonus', year, label, $event)"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentBaseValue(department, 'bonus', year, label)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentBaseValue(department, 'bonus', year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentBaseTotal(department, 'bonus', year)) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentBaseTotal(department, 'bonus', year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -772,7 +772,7 @@
                           </td>
                           <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'bonus', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'bonus', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'bonus', period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].bonus.month.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ paymentPercentages[getDeptKey(department)].bonus.month.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-bonus-payment-80-' + year">
@@ -782,15 +782,15 @@
                                 :key="'dept-' + deptIndex + '-bonus-payment-80-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'bonus', year, label, 'sameMonth')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'bonus', year, label, 'sameMonth')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'bonus', year, 'sameMonth')) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'bonus', year, 'sameMonth')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -805,7 +805,7 @@
                           </td>
                           <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'bonus', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'bonus', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'bonus', period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].bonus.following.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ paymentPercentages[getDeptKey(department)].bonus.following.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-bonus-payment-15-' + year">
@@ -815,15 +815,15 @@
                                 :key="'dept-' + deptIndex + '-bonus-payment-15-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'bonus', year, label, 'following')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'bonus', year, label, 'following')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'bonus', year, 'following')) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'bonus', year, 'following')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -838,7 +838,7 @@
                           </td>
                           <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'bonus', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'bonus', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'bonus', period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].bonus.second.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ paymentPercentages[getDeptKey(department)].bonus.second.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-bonus-payment-5-' + year">
@@ -848,15 +848,15 @@
                                 :key="'dept-' + deptIndex + '-bonus-payment-5-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'bonus', year, label, 'second')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'bonus', year, label, 'second')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'bonus', year, 'second')) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'bonus', year, 'second')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -876,15 +876,15 @@
                                 :key="'rooms-bonus-cash-outflow-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'bonus', year, label, 'cashOutflow')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'bonus', year, label, 'cashOutflow')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentTotal(department, 'bonus', year, 'cashOutflow')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentTotal(department, 'bonus', year, 'cashOutflow')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class=" text-xs">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -904,15 +904,15 @@
                                 :key="'rooms-bonus-payables-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPayablesValue(department, 'bonus', year, label)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPayablesValue(department, 'bonus', year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">{{ formatMoney(getPayablesTotal(department, 'bonus', year)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPayablesTotal(department, 'bonus', year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class=" text-xs">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -936,15 +936,15 @@
                                 @input="handlePaymentBaseInput(department, 'payroll', year, label, $event)"
                                 @blur="handlePaymentBaseBlur(department, 'payroll', year, label, $event)"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentBaseValue(department, 'payroll', year, label)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentBaseValue(department, 'payroll', year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentBaseTotal(department, 'payroll', year)) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentBaseTotal(department, 'payroll', year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -959,7 +959,7 @@
                           </td>
                           <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'payroll', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'payroll', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'payroll', period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].payroll.month.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ paymentPercentages[getDeptKey(department)].payroll.month.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-payroll-payment-80-' + year">
@@ -969,15 +969,15 @@
                                 :key="'rooms-payroll-payment-80-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'payroll', year, label, 'sameMonth')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'payroll', year, label, 'sameMonth')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'payroll', year, 'sameMonth')) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'payroll', year, 'sameMonth')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -992,7 +992,7 @@
                           </td>
                           <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'payroll', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'payroll', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'payroll', period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].payroll.following.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ paymentPercentages[getDeptKey(department)].payroll.following.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-payroll-payment-15-' + year">
@@ -1002,15 +1002,15 @@
                                 :key="'rooms-payroll-payment-15-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'payroll', year, label, 'following')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'payroll', year, label, 'following')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'payroll', year, 'following')) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'payroll', year, 'following')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -1025,7 +1025,7 @@
                           </td>
                           <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'payroll', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'payroll', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'payroll', period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].payroll.second.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ paymentPercentages[getDeptKey(department)].payroll.second.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-payroll-payment-5-' + year">
@@ -1035,15 +1035,15 @@
                                 :key="'rooms-payroll-payment-5-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'payroll', year, label, 'second')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'payroll', year, label, 'second')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'payroll', year, 'second')) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'payroll', year, 'second')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -1063,15 +1063,15 @@
                                 :key="'rooms-payroll-cash-outflow-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'payroll', year, label, 'cashOutflow')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'payroll', year, label, 'cashOutflow')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentTotal(department, 'payroll', year, 'cashOutflow')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentTotal(department, 'payroll', year, 'cashOutflow')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class=" text-xs">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -1091,15 +1091,15 @@
                                 :key="'rooms-payroll-payables-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPayablesValue(department, 'payroll', year, label)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPayablesValue(department, 'payroll', year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">{{ formatMoney(getPayablesTotal(department, 'payroll', year)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPayablesTotal(department, 'payroll', year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class=" text-xs">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -1123,15 +1123,15 @@
                                 @input="handlePaymentBaseInput(department, 'expenses', year, label, $event)"
                                 @blur="handlePaymentBaseBlur(department, 'expenses', year, label, $event)"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentBaseValue(department, 'expenses', year, label)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentBaseValue(department, 'expenses', year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentBaseTotal(department, 'expenses', year)) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentBaseTotal(department, 'expenses', year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -1146,7 +1146,7 @@
                           </td>
                           <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'expenses', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'expenses', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'expenses', period: 'month', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].expenses.month.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ paymentPercentages[getDeptKey(department)].expenses.month.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-expenses-payment-80-' + year">
@@ -1156,15 +1156,15 @@
                                 :key="'rooms-expenses-payment-80-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'expenses', year, label, 'sameMonth')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'expenses', year, label, 'sameMonth')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'expenses', year, 'sameMonth')) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'expenses', year, 'sameMonth')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -1179,7 +1179,7 @@
                           </td>
                           <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'expenses', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'expenses', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'expenses', period: 'following', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].expenses.following.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ paymentPercentages[getDeptKey(department)].expenses.following.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-expenses-payment-15-' + year">
@@ -1189,15 +1189,15 @@
                                 :key="'rooms-expenses-payment-15-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'expenses', year, label, 'following')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'expenses', year, label, 'following')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'expenses', year, 'following')) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'expenses', year, 'following')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -1212,7 +1212,7 @@
                           </td>
                           <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'expenses', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'expenses', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'expenses', period: 'second', event: $event })">
                             <div class="flex items-center justify-end gap-1">
-                              <span class="font-mono text-xs">{{ paymentPercentages[getDeptKey(department)].expenses.second.toFixed(2) }}%</span>
+                              <span class=" text-xs">{{ paymentPercentages[getDeptKey(department)].expenses.second.toFixed(2) }}%</span>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-expenses-payment-5-' + year">
@@ -1222,15 +1222,15 @@
                                 :key="'rooms-expenses-payment-5-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-200 bg-red-50"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'expenses', year, label, 'second')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'expenses', year, label, 'second')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'expenses', year, 'second')) }}</span>
+                                <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'expenses', year, 'second')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
-                                <span class="font-mono text-xs text-red-700">0.00</span>
+                                <span class=" text-xs text-red-700">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -1250,15 +1250,15 @@
                                 :key="'rooms-expenses-cash-outflow-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentValue(department, 'expenses', year, label, 'cashOutflow')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'expenses', year, label, 'cashOutflow')) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">{{ formatMoney(getPaymentTotal(department, 'expenses', year, 'cashOutflow')) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPaymentTotal(department, 'expenses', year, 'cashOutflow')) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class=" text-xs">0.00</span>
                               </td>
                             </template>
                           </template>
@@ -1278,15 +1278,15 @@
                                 :key="'rooms-expenses-payables-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
                               >
-                                <span class="font-mono text-xs">{{ formatMoney(getPayablesValue(department, 'expenses', year, label)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPayablesValue(department, 'expenses', year, label)) }}</span>
                               </td>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">{{ formatMoney(getPayablesTotal(department, 'expenses', year)) }}</span>
+                                <span class=" text-xs">{{ formatMoney(getPayablesTotal(department, 'expenses', year)) }}</span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
-                                <span class="font-mono text-xs">0.00</span>
+                                <span class=" text-xs">0.00</span>
                               </td>
                             </template>
                           </template>

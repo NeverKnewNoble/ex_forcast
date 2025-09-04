@@ -358,20 +358,20 @@
                                   </td>
                                   <!-- Salary (Editable, Reactive, row.salary) -->
                                   <td
-                                    class="px-3 py-2 text-right border-r border-violet-200 font-mono text-sm"
+                                    class="px-3 py-2 text-right border-r border-violet-200  text-sm"
                                     :key="row.id + '-salary'"
                                   >
                                     {{ formatMoney(row.salary) }}
                                   </td>
                                   <!-- Count (Editable, Reactive, row.count) -->
                                   <td
-                                    class="px-3 py-2 text-right border-r border-violet-200 font-mono text-sm"
+                                    class="px-3 py-2 text-right border-r border-violet-200  text-sm"
                                   >
                                     {{ row.count }}
                                   </td>
                                   <!-- Bonus Percentage (Editable) -->
                                   <td
-                                    class="px-3 py-2 text-right border-r border-violet-200 font-mono text-sm"
+                                    class="px-3 py-2 text-right border-r border-violet-200  text-sm"
                                     contenteditable="true"
                                     :key="row.id + '-bonus-percentage'"
                                     @input="handleBonusPercentageInput(row, $event, isSaved, visibleYears)"
@@ -379,7 +379,7 @@
                                     @blur="handleBonusPercentageBlur(row, $event, isSaved, visibleYears)"
                                     @keypress="allowOnlyNumbersAndDecimal($event)"
                                   >
-                                    <span class="font-mono text-xs text-violet-700">{{ getBonusPercentage(row) || '0.00' }}%</span>
+                                    <span class=" text-xs text-violet-700">{{ getBonusPercentage(row) || '0.00' }}%</span>
                                   </td>
                                   <!-- Monthly Count cells -->
                                   <template v-if="visibleYears.length > 0">
@@ -388,7 +388,7 @@
                                       :key="'count-cell-' + month + '-' + (getPayrollCellValueLocal(row.id, 'count', visibleYears[0], month) || 0)"
                                       class="px-2 py-1 text-right border border-violet-200 hover:bg-violet-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
                                     >
-                                      <span class="font-mono text-xs">{{ getPayrollCellValueLocal(row.id, 'count', visibleYears[0], month) }}</span>
+                                      <span class=" text-xs">{{ getPayrollCellValueLocal(row.id, 'count', visibleYears[0], month) }}</span>
                                     </td>
                                   </template>
                                   
@@ -398,14 +398,14 @@
                                     :key="'bonus-cell-' + month + '-' + row.id"
                                     class="px-2 py-1 text-right border border-orange-200 bg-orange-50"
                                   >
-                                    <span class="font-mono text-xs text-orange-700">{{ getBonusValue(row, month) || '0.00' }}</span>
+                                    <span class=" text-xs text-orange-700">{{ getBonusValue(row, month) || '0.00' }}</span>
                                   </td>
                                   <!-- Bonus Total cell -->
                                   <td 
                                     class="px-2 py-1 text-right border border-orange-200 bg-orange-50"
                                     :key="row.id + '-bonus-total'"
                                   >
-                                    <span class="font-mono text-xs text-orange-700">{{ getBonusTotal(row) || '0.00' }}</span>
+                                    <span class=" text-xs text-orange-700">{{ getBonusTotal(row) || '0.00' }}</span>
                                   </td>
   
                                 </tr>
@@ -420,10 +420,10 @@
                                   </div>
                                 </td>
                                 <td class="px-3 py-2.5 text-right border-r border-violet-300">
-                                  <span class="font-mono text-sm font-semibold text-violet-900">{{ calculateSubTotalManagementLocal(category, location) }}</span>
+                                  <span class=" text-sm font-semibold text-violet-900">{{ calculateSubTotalManagementLocal(category, location) }}</span>
                                 </td>
                                 <td class="px-3 py-2.5 text-right border-r border-violet-300">
-                                  <span class="font-mono text-sm font-semibold text-violet-900"></span>
+                                  <span class=" text-sm font-semibold text-violet-900"></span>
                                 </td>
                                 
                                 <!-- Monthly Count cells for subtotal -->
@@ -433,7 +433,7 @@
                                     :key="'subtotal-mgmt-count-' + month"
                                     class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
                                   >
-                                    <span class="font-mono text-xs text-violet-900">{{ calculateSubTotalManagementMonthlyCountLocal(category, location, visibleYears[0], month) }}</span>
+                                    <span class=" text-xs text-violet-900">{{ calculateSubTotalManagementMonthlyCountLocal(category, location, visibleYears[0], month) }}</span>
                                   </td>
                                 </template>
                                 
@@ -443,13 +443,13 @@
                                   :key="'subtotal-mgmt-bonus-' + month"
                                   class="px-2 py-1.5 text-right border border-orange-300 bg-gradient-to-r from-orange-100 to-orange-200 font-semibold"
                                 >
-                                  <span class="font-mono text-xs text-orange-900">{{ calculateSubTotalManagementBonusLocal(getPayrollRowsForLocationLocal(category, location), category, location, month) }}</span>
+                                  <span class=" text-xs text-orange-900">{{ calculateSubTotalManagementBonusLocal(getPayrollRowsForLocationLocal(category, location), category, location, month) }}</span>
                                 </td>
                                 <!-- Bonus Total cell for subtotal -->
                                 <td 
                                   class="px-2 py-1.5 text-right border border-orange-300 bg-gradient-to-r from-orange-100 to-orange-200 font-semibold"
                                 >
-                                  <span class="font-mono text-xs text-orange-900">{{ calculateSubTotalManagementBonusTotalLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
+                                  <span class=" text-xs text-orange-900">{{ calculateSubTotalManagementBonusTotalLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                                 </td>
   
                               </tr>
@@ -463,10 +463,10 @@
                                   </div>
                                 </td>
                                 <td class="px-3 py-2.5 text-right border-r border-violet-300">
-                                  <span class="font-mono text-sm font-semibold text-violet-900">{{ calculateSubTotalNonManagementLocal(category, location) }}</span>
+                                  <span class=" text-sm font-semibold text-violet-900">{{ calculateSubTotalNonManagementLocal(category, location) }}</span>
                                 </td>
                                 <td class="px-3 py-2.5 text-right border-r border-violet-300">
-                                  <span class="font-mono text-sm font-semibold text-violet-900"></span>
+                                  <span class=" text-sm font-semibold text-violet-900"></span>
                                 </td>
                                 
                                 <!-- Monthly Count cells for subtotal -->
@@ -476,7 +476,7 @@
                                     :key="'subtotal-nonmgmt-count-' + month"
                                     class="px-2 py-1.5 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-semibold"
                                   >
-                                    <span class="font-mono text-xs text-violet-900">{{ calculateSubTotalNonManagementMonthlyCountLocal(category, location, visibleYears[0], month) }}</span>
+                                    <span class=" text-xs text-violet-900">{{ calculateSubTotalNonManagementMonthlyCountLocal(category, location, visibleYears[0], month) }}</span>
                                   </td>
                                 </template>
                                 
@@ -486,13 +486,13 @@
                                   :key="'subtotal-nonmgmt-bonus-' + month"
                                   class="px-2 py-1.5 text-right border border-orange-300 bg-gradient-to-r from-orange-100 to-orange-200 font-semibold"
                                 >
-                                  <span class="font-mono text-xs text-orange-900">{{ calculateSubTotalNonManagementBonusLocal(getPayrollRowsForLocationLocal(category, location), category, location, month) }}</span>
+                                  <span class=" text-xs text-orange-900">{{ calculateSubTotalNonManagementBonusLocal(getPayrollRowsForLocationLocal(category, location), category, location, month) }}</span>
                                 </td>
                                 <!-- Bonus Total cell for subtotal -->
                                 <td 
                                   class="px-2 py-1.5 text-right border border-orange-300 bg-gradient-to-r from-orange-100 to-orange-200 font-semibold"
                                 >
-                                  <span class="font-mono text-xs text-orange-900">{{ calculateSubTotalNonManagementBonusTotalLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
+                                  <span class=" text-xs text-orange-900">{{ calculateSubTotalNonManagementBonusTotalLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                                 </td>
   
                               </tr>
@@ -506,10 +506,10 @@
                                   </div>
                                 </td>
                                 <td class="px-3 py-3 text-right border-r border-violet-300">
-                                  <span class="font-mono text-sm font-bold text-violet-900">{{ calculateLocationTotalLocal(category, location) }}</span>
+                                  <span class=" text-sm font-bold text-violet-900">{{ calculateLocationTotalLocal(category, location) }}</span>
                                 </td>
                                 <td class="px-3 py-3 text-right border-r border-violet-300">
-                                  <span class="font-mono text-sm font-bold text-violet-900"></span>
+                                  <span class=" text-sm font-bold text-violet-900"></span>
                                 </td>
                                 
                                 <!-- Monthly Count cells for total -->
@@ -519,7 +519,7 @@
                                     :key="'total-count-' + month"
                                     class="px-2 py-2 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-purple-100 font-bold"
                                   >
-                                    <span class="font-mono text-xs text-violet-900">{{ calculateLocationTotalMonthlyCountLocal(category, location, visibleYears[0], month) }}</span>
+                                    <span class=" text-xs text-violet-900">{{ calculateLocationTotalMonthlyCountLocal(category, location, visibleYears[0], month) }}</span>
                                   </td>
                                 </template>
                                 
@@ -529,13 +529,13 @@
                                   :key="'total-bonus-' + month"
                                   class="px-2 py-2 text-right border border-orange-300 bg-gradient-to-r from-orange-100 to-orange-200 font-bold"
                                 >
-                                  <span class="font-mono text-xs text-orange-900">{{ calculateLocationTotalBonusLocal(getPayrollRowsForLocationLocal(category, location), category, location, month) }}</span>
+                                  <span class=" text-xs text-orange-900">{{ calculateLocationTotalBonusLocal(getPayrollRowsForLocationLocal(category, location), category, location, month) }}</span>
                                 </td>
                                 <!-- Bonus Total cell for total -->
                                 <td 
                                   class="px-2 py-2 text-right border border-orange-300 bg-gradient-to-r from-orange-100 to-orange-200 font-bold"
                                 >
-                                  <span class="font-mono text-xs text-orange-900">{{ calculateLocationTotalBonusTotalLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
+                                  <span class=" text-xs text-orange-900">{{ calculateLocationTotalBonusTotalLocal(getPayrollRowsForLocationLocal(category, location), category, location) }}</span>
                                 </td>
   
                               </tr>
@@ -555,10 +555,10 @@
                               </div>
                             </td>
                             <td class="px-3 py-3 text-right border-r border-violet-300">
-                              <span class="font-mono text-sm font-bold text-violet-900">{{ calculateHotelTotalLocal() }}</span>
+                              <span class=" text-sm font-bold text-violet-900">{{ calculateHotelTotalLocal() }}</span>
                             </td>
                             <td class="px-3 py-3 text-right border-r border-violet-300">
-                              <span class="font-mono text-sm font-bold text-violet-900"></span>
+                              <span class=" text-sm font-bold text-violet-900"></span>
                             </td>
                             
                             <!-- Monthly Count cells for hotel total -->
@@ -568,7 +568,7 @@
                                 :key="'hotel-count-' + month"
                                 class="px-2 py-2 text-right border border-violet-300 bg-gradient-to-r from-violet-100 to-indigo-100 font-bold"
                               >
-                                <span class="font-mono text-xs text-violet-900">{{ calculateHotelTotalMonthlyCountLocal(visibleYears[0], month) }}</span>
+                                <span class=" text-xs text-violet-900">{{ calculateHotelTotalMonthlyCountLocal(visibleYears[0], month) }}</span>
                               </td>
                             </template>
                             
@@ -578,13 +578,13 @@
                               :key="'hotel-bonus-' + month"
                               class="px-2 py-2 text-right border border-orange-300 bg-gradient-to-r from-orange-100 to-orange-200 font-bold"
                             >
-                              <span class="font-mono text-xs text-orange-900">{{ safeCalculateHotelTotalBonusLocal(month) }}</span>
+                              <span class=" text-xs text-orange-900">{{ safeCalculateHotelTotalBonusLocal(month) }}</span>
                             </td>
                             <!-- Bonus Total cell for hotel total -->
                             <td 
                               class="px-2 py-2 text-right border border-orange-300 bg-gradient-to-r from-orange-100 to-orange-200 font-bold"
                             >
-                              <span class="font-mono text-xs text-orange-900">{{ safeCalculateHotelTotalBonusTotalLocal() }}</span>
+                              <span class=" text-xs text-orange-900">{{ safeCalculateHotelTotalBonusTotalLocal() }}</span>
                             </td>
   
                           </tr>
@@ -599,10 +599,10 @@
                               </div>
                             </td>
                             <td class="px-3 py-3 text-right border-r border-green-300">
-                              <span class="font-mono text-sm font-bold text-green-900">{{ calculateEmployeeRoomRatioLocal() }}</span>
+                              <span class=" text-sm font-bold text-green-900">{{ calculateEmployeeRoomRatioLocal() }}</span>
                             </td>
                             <td class="px-3 py-3 text-right border-r border-green-300">
-                              <span class="font-mono text-sm font-bold text-green-900"></span>
+                              <span class=" text-sm font-bold text-green-900"></span>
                             </td>
                             
                             <!-- Monthly Count cells for ratio -->
@@ -612,7 +612,7 @@
                                 :key="'ratio-count-' + month"
                                 class="px-2 py-2 text-right border border-green-300 bg-gradient-to-r from-green-100 to-emerald-100 font-bold"
                               >
-                                <span class="font-mono text-xs text-green-900">{{ calculateEmployeeRoomRatioMonthlyLocal(visibleYears[0], month) }}</span>
+                                <span class=" text-xs text-green-900">{{ calculateEmployeeRoomRatioMonthlyLocal(visibleYears[0], month) }}</span>
                               </td>
                             </template>
                             
@@ -622,13 +622,13 @@
                               :key="'ratio-bonus-' + month"
                               class="px-2 py-2 text-right border border-orange-300 bg-gradient-to-r from-orange-100 to-orange-200 font-bold"
                             >
-                              <span class="font-mono text-xs text-orange-900">{{ calculateEmployeeRoomRatioBonusLocal(payrollRows, totalRooms, month) }}</span>
+                              <span class=" text-xs text-orange-900">{{ calculateEmployeeRoomRatioBonusLocal(payrollRows, totalRooms, month) }}</span>
                             </td>
                             <!-- Bonus Total cell for ratio -->
                             <td 
                               class="px-2 py-2 text-right border border-orange-300 bg-gradient-to-r from-orange-100 to-orange-200 font-bold"
                             >
-                              <span class="font-mono text-xs text-orange-900">{{ calculateEmployeeRoomRatioBonusTotalLocal(payrollRows, totalRooms) }}</span>
+                              <span class=" text-xs text-orange-900">{{ calculateEmployeeRoomRatioBonusTotalLocal(payrollRows, totalRooms) }}</span>
                             </td>
   
                           </tr>

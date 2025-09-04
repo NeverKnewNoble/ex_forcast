@@ -1,0 +1,182 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-09-03 16:38:27.868368",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "project_name",
+  "section_break_blwr",
+  "task_name",
+  "description",
+  "column_break_ahhm",
+  "status",
+  "planned_start_date",
+  "actual_start_date",
+  "end_date",
+  "labor_hours",
+  "rate_per_hour",
+  "column_break_euyh",
+  "total_labor_cost",
+  "material_units",
+  "rate_per_unit",
+  "total_material_cost",
+  "travel_cost",
+  "equipmentspace_cost",
+  "section_break_ramc",
+  "miscellaneous_cost",
+  "budget_amount",
+  "column_break_pfso",
+  "actual_cost",
+  "underover_budget"
+ ],
+ "fields": [
+  {
+   "fieldname": "task_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Task Name"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Description"
+  },
+  {
+   "fieldname": "column_break_ahhm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Not Started\nIn Progress\nComplete\nNeeds Review\nApproved\nOverdue\nOn Hold"
+  },
+  {
+   "fieldname": "planned_start_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Planned Start Date"
+  },
+  {
+   "fieldname": "actual_start_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Actual Start Date"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "End Date"
+  },
+  {
+   "fieldname": "labor_hours",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Labor Hours"
+  },
+  {
+   "fieldname": "rate_per_hour",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Rate per Hour"
+  },
+  {
+   "fieldname": "column_break_euyh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_labor_cost",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Labor Cost"
+  },
+  {
+   "fieldname": "material_units",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Material Units"
+  },
+  {
+   "fieldname": "rate_per_unit",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Rate per Unit"
+  },
+  {
+   "fieldname": "total_material_cost",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Material Cost"
+  },
+  {
+   "fieldname": "travel_cost",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Travel Cost"
+  },
+  {
+   "fieldname": "equipmentspace_cost",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Equipment/Space Cost"
+  },
+  {
+   "fieldname": "section_break_ramc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "miscellaneous_cost",
+   "fieldtype": "Currency",
+   "label": "Miscellaneous Cost"
+  },
+  {
+   "fieldname": "budget_amount",
+   "fieldtype": "Currency",
+   "label": "Budget Amount"
+  },
+  {
+   "fieldname": "column_break_pfso",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "actual_cost",
+   "fieldtype": "Currency",
+   "label": "Actual Cost"
+  },
+  {
+   "fieldname": "underover_budget",
+   "fieldtype": "Currency",
+   "label": "Under/Over Budget",
+   "read_only": 1
+  },
+  {
+   "fieldname": "project_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Project Name"
+  },
+  {
+   "fieldname": "section_break_blwr",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-09-03 16:51:58.833810",
+ "modified_by": "Administrator",
+ "module": "Ex Forcast",
+ "name": "Construction Budget Task",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
