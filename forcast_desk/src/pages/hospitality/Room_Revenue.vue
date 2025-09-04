@@ -377,17 +377,17 @@
                                     :key="'available-cell-' + year + '-' + label + '-' + roomType"
                                     class="px-2 py-2 text-right border border-violet-200 bg-gray-50 dark:border-violet-600 dark:bg-gray-800"
                                   >
-                                    <span class="font-mono text-xs">{{ getAvailableBeds(roomData, roomType, year, label, advancedModes[year] || displayMode, filteredRoomPackages) }}</span>
+                                    <span class=" text-xs">{{ getAvailableBeds(roomData, roomType, year, label, advancedModes[year] || displayMode, filteredRoomPackages) }}</span>
                                   </td>
                                   <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30">
-                                    <span class="font-mono text-xs text-violet-700 dark:text-violet-200">
+                                    <span class=" text-xs text-violet-700 dark:text-violet-200">
                                        {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
                                      </span>
                                   </td>
                                 </template>
                                 <template v-else>
                                   <td class="px-2 py-2 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30">
-                                    <span class="font-mono text-xs text-violet-700 dark:text-violet-200">
+                                    <span class=" text-xs text-violet-700 dark:text-violet-200">
                                        {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'available_beds', filteredRoomPackages) }}
                                      </span>
                                   </td>
@@ -498,17 +498,17 @@
                                     @focus="handleRoomCellFocus({ year, label, roomType, field: 'occupied_beds', event: $event })"
                                     @blur="handleRoomCellEditWrapper({ year, label, roomType, field: 'occupied_beds', event: $event })"
                                   >
-                                    <span class="font-mono text-xs">{{ getOccupiedBeds(roomData, roomType, year, label, advancedModes[year] || displayMode) }}</span>
+                                    <span class=" text-xs">{{ getOccupiedBeds(roomData, roomType, year, label, advancedModes[year] || displayMode) }}</span>
                                   </td>
                                   <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50 dark:border-blue-600 dark:bg-blue-800/30">
-                                    <span class="font-mono text-xs text-blue-700 dark:text-blue-200">
+                                    <span class=" text-xs text-blue-700 dark:text-blue-200">
                                        {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
                                      </span>
                                   </td>
                                 </template>
                                 <template v-else>
                                   <td class="px-2 py-2 text-right border border-blue-200 font-semibold bg-blue-50 dark:border-blue-600 dark:bg-blue-800/30">
-                                    <span class="font-mono text-xs text-blue-700 dark:text-blue-200">
+                                    <span class=" text-xs text-blue-700 dark:text-blue-200">
                                        {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'occupied_beds', filteredRoomPackages) }}
                                      </span>
                                   </td>
@@ -619,17 +619,17 @@
                                     @focus="handleRoomCellFocus({ year, label, roomType, field: 'rate', event: $event })"
                                     @blur="handleRoomCellEditWrapper({ year, label, roomType, field: 'rate', event: $event })"
                                   >
-                                    <span class="font-mono text-xs">{{ getRate(roomData, roomType, year, label, advancedModes[year] || displayMode) }}</span>
+                                    <span class=" text-xs">{{ getRate(roomData, roomType, year, label, advancedModes[year] || displayMode) }}</span>
                                   </td>
                                   <td class="px-2 py-2 text-right border border-green-200 font-semibold bg-green-50 dark:border-green-600 dark:bg-green-800/30">
-                                    <span class="font-mono text-xs text-green-700 dark:text-green-200">
+                                    <span class=" text-xs text-green-700 dark:text-green-200">
                                        {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
                                      </span>
                                   </td>
                                 </template>
                                 <template v-else>
                                   <td class="px-2 py-2 text-right border border-green-200 font-semibold bg-green-50 dark:border-green-600 dark:bg-green-800/30">
-                                    <span class="font-mono text-xs text-green-700 dark:text-green-200">
+                                    <span class=" text-xs text-green-700 dark:text-green-200">
                                        {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'rate', filteredRoomPackages) }}
                                      </span>
                                   </td>
@@ -747,17 +747,17 @@
                                     :key="'revenue-cell-' + year + '-' + label + '-' + roomType"
                                     class="px-2 py-2 text-right border border-orange-200 font-semibold hover:bg-orange-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent transition-all duration-200 dark:border-orange-600 dark:hover:bg-orange-900/20 dark:focus:bg-gray-700"
                                    >
-                                     <span class="font-mono text-xs">{{ calculateRevenue(roomData, roomType, year, label, advancedModes[year] || displayMode, roomPackages) }}</span>
+                                     <span class=" text-xs">{{ calculateRevenue(roomData, roomType, year, label, advancedModes[year] || displayMode, roomPackages) }}</span>
                                    </td>
                                   <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800 bg-orange-50 dark:border-orange-600 dark:bg-orange-800/30 dark:text-orange-200">
-                                    <span class="font-mono text-xs">
+                                    <span class=" text-xs">
                                       {{ calculateRoomTypeTotal(roomData, roomType, year, advancedModes[year] || displayMode, 'revenue', filteredRoomPackages) }}
                                     </span>
                                   </td>
                                 </template>
                                 <template v-else>
                                   <td class="px-2 py-2 text-right border border-orange-200 font-bold text-orange-800 bg-orange-50 dark:border-orange-600 dark:bg-orange-800/30 dark:text-orange-200">
-                                    <span class="font-mono text-xs">
+                                    <span class=" text-xs">
                                       {{ calculateGrandTotal(roomData, year, advancedModes[year] || displayMode, 'revenue', filteredRoomPackages) }}
                                     </span>
                                   </td>

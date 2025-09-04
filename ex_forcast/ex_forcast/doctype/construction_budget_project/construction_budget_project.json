@@ -1,25 +1,71 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:CBP-{#####}",
  "creation": "2025-09-03 15:52:01.421363",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_rll7"
+  "project",
+  "section_break_jkgx",
+  "total_budget",
+  "variance",
+  "column_break_zvih",
+  "total_actual",
+  "tasks_tab",
+  "tasks"
  ],
  "fields": [
   {
-   "fieldname": "section_break_rll7",
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Forecast Project"
+  },
+  {
+   "fieldname": "section_break_jkgx",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_budget",
+   "fieldtype": "Currency",
+   "label": "Total Budget",
+   "read_only": 1
+  },
+  {
+   "fieldname": "variance",
+   "fieldtype": "Currency",
+   "label": "Budget Variance"
+  },
+  {
+   "fieldname": "column_break_zvih",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_actual",
+   "fieldtype": "Currency",
+   "label": "Total Actual Cost"
+  },
+  {
+   "fieldname": "tasks_tab",
+   "fieldtype": "Tab Break",
+   "label": "Tasks"
+  },
+  {
+   "fieldname": "tasks",
+   "fieldtype": "Table",
+   "label": "Project Tasks",
+   "options": "Construction Budget Task"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-03 15:52:01.421363",
+ "modified": "2025-09-03 18:10:12.916738",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Construction Budget Project",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

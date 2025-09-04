@@ -359,19 +359,19 @@
                                   @focus="handleCellFocus({ year, label, expense, event: $event })"
                                   @blur="handleCellEditWrapper({ year, label, expense, event: $event, department: departmentGroup.department })"
                                 >
-                                  <span class="font-mono text-xs">
+                                  <span class=" text-xs">
                                     {{ year === 'Default' ? (isPercentageExpense(expense) ? '0.00%' : '0.00') : formatExpenseValue(getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode, departmentGroup.department), expense) }}
                                   </span>
                                 </td>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-700 dark:bg-violet-900/20">
-                                  <span class="font-mono text-xs text-violet-700 dark:text-violet-300">
+                                  <span class=" text-xs text-violet-700 dark:text-violet-300">
                                     {{ year === 'Default' ? (isPercentageExpense(expense) ? '0.00%' : '0.00') : formatExpenseValue(calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal, departmentGroup.department), expense) }}
                                   </span>
                                 </td>
                               </template>
                               <template v-else>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-700 dark:bg-violet-900/20">
-                                  <span class="font-mono text-xs text-violet-700 dark:text-violet-300">
+                                  <span class=" text-xs text-violet-700 dark:text-violet-300">
                                     {{ year === 'Default' ? (isPercentageExpense(expense) ? '0.00%' : '0.00') : formatExpenseValue(calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal, departmentGroup.department), expense) }}
                                   </span>
                                 </td>
@@ -395,19 +395,19 @@
                                 :key="'department-total-cell-' + year + '-' + label"
                                 class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900 dark:border-violet-600 dark:bg-violet-800/30 dark:text-violet-200"
                               >
-                                <span class="font-mono text-xs">
+                                <span class=" text-xs">
                                   {{ year === 'Default' ? '0.00' : calculateDepartmentMonthTotal(expenseData, departmentGroup, year, label, advancedModes[year] || displayMode) }}
                                 </span>
                               </td>
                               <td class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900 dark:border-violet-600 dark:bg-violet-800/30 dark:text-violet-200">
-                                <span class="font-mono text-xs">
+                                <span class=" text-xs">
                                   {{ year === 'Default' ? '0.00' : calculateDepartmentTotal(expenseData, departmentGroup, year, advancedModes[year] || displayMode) }}
                                 </span>
                               </td>
                             </template>
                             <template v-else>
                               <td class="px-2 py-1 text-right border border-violet-400 bg-violet-200 font-bold text-violet-900 dark:border-violet-600 dark:bg-violet-800/30 dark:text-violet-200">
-                                <span class="font-mono text-xs">
+                                <span class=" text-xs">
                                   {{ year === 'Default' ? '0.00' : calculateDepartmentTotal(expenseData, departmentGroup, year, advancedModes[year] || displayMode) }}
                                 </span>
                               </td>

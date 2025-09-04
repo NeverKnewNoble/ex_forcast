@@ -313,7 +313,7 @@
                                   class="px-2 py-1 text-right border border-violet-200 bg-gray-50 outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200 font-semibold select-none dark:border-violet-600 dark:bg-gray-800"
                                   :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : ''"
                                 >
-                                  <span class="font-mono text-xs">
+                                  <span class=" text-xs">
                                     {{ formatBanquetValue(field.code, getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}
                                   </span>
                                 </td>
@@ -328,17 +328,17 @@
                                   @focus="handleBanquetCellFocus({ year, label, expense: field.code, event: $event })"
                                   @blur="handleCellEditWrapper({ year, label, expense: field.code, event: $event })"
                                 >
-                                  <span class="font-mono text-xs">{{ formatBanquetValue(field.code, getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
+                                  <span class=" text-xs">{{ formatBanquetValue(field.code, getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
                                 </td>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
-                                  <span class="font-mono text-xs text-violet-700 dark:text-violet-200" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
+                                  <span class=" text-xs text-violet-700 dark:text-violet-200" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
                                     {{ formatBanquetValue(field.code, calculateBanquetTotal(banquetData, field.code, year, advancedModes[year] || displayMode)) }}
                                   </span>
                                 </td>
                               </template>
                               <template v-else>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
-                                  <span class="font-mono text-xs text-violet-700 dark:text-violet-200" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
+                                  <span class=" text-xs text-violet-700 dark:text-violet-200" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
                                     {{ formatBanquetValue(field.code, calculateBanquetTotal(banquetData, field.code, year, advancedModes[year] || displayMode)) }}
                                   </span>
                                 </td>

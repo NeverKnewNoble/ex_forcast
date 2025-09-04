@@ -141,89 +141,129 @@
 
 
         <!-- Main Table Area -->
-        <div class="flex-1 p-6">
+        <div class="flex-1 p-4 min-w-0">
           <!-- Table Header -->
-          <div class="mb-6">
-            <h2 class="text-3xl font-bold text-gray-900 mb-2">Project Budget</h2>
-            <p class="text-gray-600">User to complete non-shaded cells only.</p>
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
+              <Hammer class="w-3 h-3 text-white" />
+            </div>
+            <h2 class="text-lg font-bold text-gray-800">Project Budgets and Revenue Overview</h2>
+          </div>
+
+          
+          <!-- Empty State or Budget Table -->
+          <div v-if="projects.length === 0" class="bg-white rounded-lg border border-violet-200 shadow-sm p-12">
+            <div class="text-center">
+              <div class="w-24 h-24 bg-gradient-to-br from-violet-100 to-violet-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Hammer class="w-12 h-12 text-violet-600" />
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-2">No Projects Yet</h3>
+              <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                Get started by creating your first construction project. You can add tasks, track budgets, and monitor progress all in one place.
+              </p>
+              <button 
+                @click="addNewProject" 
+                class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-xl hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 font-medium"
+              >
+                <FolderPlus class="w-5 h-5" />
+                Create Your First Project
+              </button>
+            </div>
           </div>
 
           <!-- Budget Table -->
-          <div class="bg-white rounded-lg border border-violet-200 shadow-sm overflow-hidden">
-            <div class="overflow-x-auto">
+          <div v-else class="bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden dark:bg-gray-800 dark:border-gray-600">
+            <div class="overflow-x-auto max-w-[100%] md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
+              <div class="min-w-full w-[2000px]">
+              <!-- <div class="overflow-x-auto"> -->
               <table class="w-full">
                 <!-- Category Headers -->
-                <thead class="bg-gradient-to-r from-violet-600 to-violet-700 text-white">
-                  <tr class="border-b border-violet-400">
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider w-32">Task</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider w-48">Description</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider w-32">Status</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider w-32">Planned Start Date</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider w-32">Actual Start Date</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider w-24">End Date</th>
+                <thead class="bg-violet-500 text-white shadow-lg">
+                  <tr class="border-b border-white/20">
+                    <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-96">Task</th>
+                    <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-[400px]">Description</th>
+                    <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-72">Status</th>
+                    <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-48">Planned Start Date</th>
+                    <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-48">Actual Start Date</th>
+                    <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-40">End Date</th>
                     
                     <!-- Labor Category -->
-                    <th colspan="3" class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider border-l-2 border-r-2 border-white/30">
-                      Labor
+                    <th colspan="3" class="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider border-l-2 border-r-2 border-white/30 bg-violet-500">
+                      <div class="flex items-center justify-center gap-2">
+                        <div class="w-2 h-2 bg-violet-200 rounded-full"></div>
+                        Labor
+                      </div>
                     </th>
                     
                     <!-- Materials Category -->
-                    <th colspan="3" class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider border-l-2 border-r-2 border-white/30">
-                      Materials
+                    <th colspan="3" class="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider border-l-2 border-r-2 border-white/30 bg-violet-500">
+                      <div class="flex items-center justify-center gap-2">
+                        <div class="w-2 h-2 bg-violet-200 rounded-full"></div>
+                        Materials
+                      </div>
                     </th>
                     
                     <!-- Fixed Category -->
-                    <th colspan="3" class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider border-l-2 border-r-2 border-white/30">
-                      Fixed
+                    <th colspan="3" class="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider border-l-2 border-r-2 border-white/30 bg-violet-500">
+                      <div class="flex items-center justify-center gap-2">
+                        <div class="w-2 h-2 bg-violet-200 rounded-full"></div>
+                        Fixed
+                      </div>
                     </th>
                     
                     <!-- Balance Category -->
-                    <th colspan="3" class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider border-l-2 border-r-2 border-white/30">
-                      Balance
+                    <th colspan="3" class="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider border-l-2 border-r-2 border-white/30 bg-violet-500">
+                      <div class="flex items-center justify-center gap-2">
+                        <div class="w-2 h-2 bg-violet-200 rounded-full"></div>
+                        Balance
+                      </div>
                     </th>
                   </tr>
                   
                   <!-- Column Headers -->
-                  <tr class="bg-violet-500/90 text-xs border-b border-violet-300">
-                    <th class="px-4 py-3 text-left font-semibold tracking-wider"></th>
-                    <th class="px-4 py-3 text-left font-semibold tracking-wider"></th>
-                    <th class="px-4 py-3 text-left font-semibold tracking-wider"></th>
-                    <th class="px-4 py-3 text-left font-semibold tracking-wider"></th>
-                    <th class="px-4 py-3 text-left font-semibold tracking-wider"></th>
-                    <th class="px-4 py-3 text-left font-semibold tracking-wider"></th>
+                  <tr class="bg-violet-500 text-white border-b border-white/20">
+                    <th class="px-6 py-3 text-left text-xs font-semibold tracking-wider"></th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold tracking-wider"></th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold tracking-wider"></th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold tracking-wider"></th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold tracking-wider"></th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold tracking-wider"></th>
                     
                     <!-- Labor Columns -->
-                    <th class="px-2 py-3 text-center font-medium border border-violet-300 min-w-[64px]">HR</th>
-                    <th class="px-2 py-3 text-center font-medium border border-violet-300 min-w-[80px]">$/HR</th>
-                    <th class="px-2 py-3 text-center font-medium border border-violet-300 min-w-[96px]">Total Labor</th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold border border-violet-400/30 bg-violet-500/20 w-64">HR</th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold border border-violet-400/30 bg-violet-500/20 w-72">/HR</th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold border border-violet-400/30 bg-violet-500/20 w-56">Total Labor</th>
                     
                     <!-- Materials Columns -->
-                    <th class="px-2 py-3 text-center font-medium border border-violet-300 min-w-[80px]">Units</th>
-                    <th class="px-2 py-3 text-center font-medium border border-violet-300 min-w-[96px]">$/Units</th>
-                    <th class="px-2 py-3 text-center font-medium border border-violet-300 min-w-[112px]">Total Materials</th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold border border-violet-400/30 bg-violet-500/20 w-52">Units</th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold border border-violet-400/30 bg-violet-500/20 w-56">/Units</th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold border border-violet-400/30 bg-violet-500/20 w-60">Total Materials</th>
                     
                     <!-- Fixed Columns -->
-                    <th class="px-2 py-3 text-center font-medium border border-violet-300 min-w-[80px]">Travel</th>
-                    <th class="px-2 py-3 text-center font-medium border border-violet-300 min-w-[96px]">Equipment/Space</th>
-                    <th class="px-2 py-3 text-center font-medium border border-violet-300 min-w-[80px]">Misc.</th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold border border-violet-400/30 bg-violet-500/20 w-52">Travel</th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold border border-violet-400/30 bg-violet-500/20 w-60">Equipment/Space</th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold border border-violet-400/30 bg-violet-500/20 w-52">Misc.</th>
                     
                     <!-- Balance Columns -->
-                    <th class="px-2 py-3 text-center font-medium border border-violet-300 min-w-[80px]">Budget</th>
-                    <th class="px-2 py-3 text-center font-medium border border-violet-300 min-w-[80px]">Actual</th>
-                    <th class="px-2 py-3 text-center font-medium border border-violet-300 min-w-[96px]">Under/Over</th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold border border-violet-400/30 bg-violet-500/20 w-52">Budget</th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold border border-violet-400/30 bg-violet-500/20 w-52">Actual</th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold border border-violet-400/30 bg-violet-500/20 w-56">Under/Over</th>
                   </tr>
                 </thead>
                 
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <template v-for="(project, projectIndex) in projects" :key="`project-${projectIndex}`">
+                <tbody class="bg-white divide-y divide-gray-100">
+                  <template v-for="(project, projectIndex) in projects" :key="`project-${project.id}`">
                     <!-- Project Header Row -->
-                    <tr class="bg-gradient-to-r from-violet-100 to-purple-100 border-b-2 border-violet-200">
-                      <td class="px-4 py-3 text-sm text-violet-900" :colspan="18">
+                    <tr class="bg-gradient-to-r from-slate-50 to-gray-50 border-b-2 border-slate-200 hover:from-slate-100 hover:to-gray-100 transition-all duration-200">
+                      <td class="px-6 py-4 text-sm text-slate-800" :colspan="18">
                         <div class="flex items-center justify-between">
-                          <span class="font-bold">{{ project.name }}</span>
+                          <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"></div>
+                            <span class="font-bold text-lg">{{ project.tasks.length > 0 ? project.tasks[0].project_name : project.name }}</span>
+                          </div>
                           <button
-                            @click="addTaskToProject(projectIndex)"
-                            class="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-md hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-sm"
+                            @click="addTaskToProject(project.id)"
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
                           >
                             <Plus class="w-4 h-4" />
                             Add Task
@@ -233,13 +273,18 @@
                     </tr>
                     
                     <!-- Project Tasks -->
-                    <template v-for="(task, taskIndex) in project.tasks" :key="`task-${projectIndex}-${taskIndex}`">
-                      <tr class="transition-colors duration-200 h-11 align-middle">
+                    <template v-for="(task, taskIndex) in project.tasks" :key="`task-${project.id}-${task.id || taskIndex}`">
+                      <tr class="transition-all duration-200 h-12 align-middle hover:bg-slate-50/50 border-b border-gray-100">
                         <!-- Task Name -->
-                        <td class="px-4 py-3 text-sm">
-                          <div :class="['font-medium', task.isSubtask ? 'pl-6 text-gray-600' : 'text-gray-900']">
-                            {{ task.task }}
-                          </div>
+                        <td class="p-0 text-sm">
+                          <input
+                            v-model="task.task"
+                            type="text"
+                            class="w-full h-full px-4 py-0 border-0 bg-transparent text-sm focus:ring-2 focus:ring-violet-500 focus:bg-white focus:shadow-sm font-medium transition-all duration-200"
+                            :class="task.isSubtask ? 'pl-8 text-gray-600' : 'text-gray-900'"
+                            placeholder="Enter task name"
+                            @input="markAsUnsaved"
+                          />
                         </td>
                         
                         <!-- Description -->
@@ -247,7 +292,7 @@
                           <input
                             v-model="task.description"
                             type="text"
-                            class="w-full h-full px-2 py-0 border border-gray-300 rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                            class="w-full h-full px-4 py-0 border-0 bg-transparent text-sm focus:ring-2 focus:ring-violet-500 focus:bg-white focus:shadow-sm transition-all duration-200"
                             placeholder="Enter description"
                             @input="markAsUnsaved"
                           />
@@ -257,7 +302,7 @@
                         <td class="p-0 text-sm">
                           <select
                             v-model="task.status"
-                            class="w-full h-full px-2 py-0 border border-gray-300 rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                            class="w-full h-full px-4 py-0 border-0 bg-transparent text-sm focus:ring-2 focus:ring-violet-500 focus:bg-white focus:shadow-sm transition-all duration-200"
                             @change="markAsUnsaved"
                           >
                             <option value="Not Started">Not Started</option>
@@ -275,7 +320,7 @@
                           <input
                             v-model="task.plannedStartDate"
                             type="date"
-                            class="w-full h-full px-2 py-0 border border-gray-300 rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                            class="w-full h-full px-2 py-0 border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                             @input="markAsUnsaved"
                           />
                         </td>
@@ -285,7 +330,7 @@
                           <input
                             v-model="task.actualStartDate"
                             type="date"
-                            class="w-full h-full px-2 py-0 border border-gray-300 rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                            class="w-full h-full px-2 py-0 border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                             @input="markAsUnsaved"
                           />
                         </td>
@@ -295,7 +340,7 @@
                           <input
                             v-model="task.endDate"
                             type="date"
-                            class="w-full h-full px-2 py-0 border border-gray-300 rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                            class="w-full h-full px-2 py-0 border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                             @input="markAsUnsaved"
                           />
                         </td>
@@ -306,7 +351,8 @@
                             v-model.number="task.hr"
                             type="number"
                             step="0.1"
-                            class="w-full h-full px-2 py-0 text-right border border-gray-300 rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent font-mono"
+                            @keypress="allowOnlyNumbers($event)"
+                            class="w-full h-full px-2 py-0 text-right border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                             @input="markAsUnsaved"
                           />
                         </td>
@@ -315,11 +361,12 @@
                             v-model.number="task.ratePerHr"
                             type="number"
                             step="0.01"
-                            class="w-full h-full px-2 py-0 text-right border border-gray-300 rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent font-mono"
+                             @keypress="allowOnlyNumbers($event)"
+                            class="w-full h-full px-2 py-0 text-right border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                             @input="markAsUnsaved"
                           />
                         </td>
-                        <td class="px-2 py-3 text-sm font-medium text-violet-50 bg-violet-600 text-right font-mono">
+                        <td class="px-2 py-3 text-sm font-medium text-violet-700 text-right">
                           {{ formatCurrency(task.totalLabor) }}
                         </td>
                         
@@ -329,7 +376,8 @@
                             v-model.number="task.units"
                             type="number"
                             step="0.1"
-                            class="w-full h-full px-2 py-0 text-right border border-gray-300 rounded-none text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+                            @keypress="allowOnlyNumbers($event)"
+                            class="w-full h-full px-2 py-0 text-right border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             @input="markAsUnsaved"
                           />
                         </td>
@@ -338,11 +386,12 @@
                             v-model.number="task.ratePerUnit"
                             type="number"
                             step="0.01"
-                            class="w-full h-full px-2 py-0 text-right border border-gray-300 rounded-none text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+                            @keypress="allowOnlyNumbers($event)"
+                            class="w-full h-full px-2 py-0 text-right border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             @input="markAsUnsaved"
                           />
                         </td>
-                        <td class="px-2 py-3 text-sm font-medium text-blue-50 bg-blue-600 text-right font-mono">
+                        <td class="px-2 py-3 text-sm font-medium text-violet-700 text-right">
                           {{ formatCurrency(task.totalMaterials) }}
                         </td>
                         
@@ -352,7 +401,8 @@
                             v-model.number="task.travel"
                             type="number"
                             step="0.01"
-                            class="w-full h-full px-2 py-0 text-right border border-gray-300 rounded-none text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono"
+                            @keypress="allowOnlyNumbers($event)"
+                            class="w-full h-full px-2 py-0 text-right border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
                             @input="markAsUnsaved"
                           />
                         </td>
@@ -361,7 +411,8 @@
                             v-model.number="task.equipment"
                             type="number"
                             step="0.01"
-                            class="w-full h-full px-2 py-0 text-right border border-gray-300 rounded-none text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono"
+                            @keypress="allowOnlyNumbers($event)"
+                            class="w-full h-full px-2 py-0 text-right border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
                             @input="markAsUnsaved"
                           />
                         </td>
@@ -370,7 +421,8 @@
                             v-model.number="task.misc"
                             type="number"
                             step="0.01"
-                            class="w-full h-full px-2 py-0 text-right border border-gray-300 rounded-none text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono"
+                            @keypress="allowOnlyNumbers($event)"
+                            class="w-full h-full px-2 py-0 text-right border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
                             @input="markAsUnsaved"
                           />
                         </td>
@@ -381,67 +433,74 @@
                             v-model.number="task.budget"
                             type="number"
                             step="0.01"
-                            class="w-full h-full px-2 py-0 text-right border border-gray-300 rounded-none text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono"
+                            @keypress="allowOnlyNumbers($event)"
+                            class="w-full h-full px-2 py-0 text-right border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             @input="markAsUnsaved"
                           />
                         </td>
-                        <td class="px-2 py-3 text-sm font-medium text-orange-50 bg-orange-600 text-right font-mono">
+                        <td class="px-2 py-3 text-sm font-medium text-violet-700 text-right">
                           {{ formatCurrency(task.actual) }}
                         </td>
-                        <td class="px-2 py-3 text-sm font-medium text-right font-mono" :class="task.underOver >= 0 ? 'text-red-50 bg-red-600' : 'text-green-50 bg-green-600'">
+                        <td class="px-2 py-3 text-sm font-medium text-right" :class="task.underOver >= 0 ? 'text-red-50 bg-red-600' : 'text-green-50 bg-green-600'">
                           {{ formatCurrency(task.underOver) }}
                         </td>
                       </tr>
                     </template>
                     
                     <!-- Project Subtotal Row -->
-                    <tr class="border-t-2 border-gray-300 bg-gradient-to-r from-gray-50 to-gray-100 font-bold shadow-sm dark:border-gray-600 dark:from-gray-800 dark:to-gray-700">
-                      <td class="px-4 py-3 text-sm text-gray-800 dark:text-white" :colspan="6">
-                        SUBTOTAL
+                    <tr class="border-t-2 border-slate-300 bg-gradient-to-r from-slate-100 to-gray-100 font-bold shadow-lg">
+                      <td class="px-6 py-4 text-sm text-slate-800 font-bold" :colspan="6">
+                        <div class="flex items-center gap-2">
+                          <div class="w-2 h-2 bg-slate-600 rounded-full"></div>
+                          SUBTOTAL
+                        </div>
                       </td>
-                      <td class="px-2 py-3 text-sm text-violet-900 bg-violet-100 dark:text-violet-200 dark:bg-violet-800/30 text-right font-mono">
+                      <td class="px-4 py-4 text-sm text-blue-800 bg-blue-50/80 border border-blue-200/50">
+                        <!-- Empty cell for HR column -->
+                      </td>
+                      <td class="px-4 py-4 text-sm text-blue-800 bg-blue-50/80 border border-blue-200/50">
+                        <!-- Empty cell for /HR column -->
+                      </td>
+                      <td class="px-4 py-4 text-sm text-blue-800 bg-blue-50/80 border border-blue-200/50 text-right font-semibold">
                         {{ formatCurrency(project.subtotalLabor) }}
                       </td>
-                      <td class="px-2 py-3 text-sm text-violet-900 bg-violet-100 dark:text-violet-200 dark:bg-violet-800/30">
-                        <!-- Empty cell for $/HR column -->
+                      <td class="px-4 py-4 text-sm text-emerald-800 bg-emerald-50/80 border border-emerald-200/50">
+                        <!-- Empty cell for Units column -->
                       </td>
-                      <td class="px-2 py-3 text-sm text-violet-900 bg-violet-100 dark:text-violet-200 dark:bg-violet-800/30 text-right font-mono">
-                        {{ formatCurrency(project.subtotalLabor) }}
+                      <td class="px-4 py-4 text-sm text-emerald-800 bg-emerald-50/80 border border-emerald-200/50">
+                        <!-- Empty cell for /Units column -->
                       </td>
-                      <td class="px-2 py-3 text-sm text-blue-900 bg-blue-100 dark:text-blue-200 dark:bg-blue-800/30 text-right font-mono">
+                      <td class="px-4 py-4 text-sm text-emerald-800 bg-emerald-50/80 border border-emerald-200/50 text-right font-semibold">
                         {{ formatCurrency(project.subtotalMaterials) }}
                       </td>
-                      <td class="px-2 py-3 text-sm text-blue-900 bg-blue-100 dark:text-blue-200 dark:bg-blue-800/30">
-                        <!-- Empty cell for $/Units column -->
-                      </td>
-                      <td class="px-2 py-3 text-sm text-blue-900 bg-blue-100 dark:text-blue-200 dark:bg-blue-800/30 text-right font-mono">
-                        {{ formatCurrency(project.subtotalMaterials) }}
-                      </td>
-                      <td class="px-2 py-3 text-sm text-green-900 bg-green-100 dark:text-green-200 dark:bg-green-800/30 text-right font-mono">
+                      <td class="px-4 py-4 text-sm text-amber-800 bg-amber-50/80 border border-amber-200/50 text-right font-semibold">
                         {{ formatCurrency(project.subtotalTravel) }}
                       </td>
-                      <td class="px-2 py-3 text-sm text-green-900 bg-green-100 dark:text-green-200 dark:bg-green-800/30 text-right font-mono">
+                      <td class="px-4 py-4 text-sm text-amber-800 bg-amber-50/80 border border-amber-200/50 text-right font-semibold">
                         {{ formatCurrency(project.subtotalEquipment) }}
                       </td>
-                      <td class="px-2 py-3 text-sm text-green-900 bg-green-100 dark:text-green-200 dark:bg-green-800/30 text-right font-mono">
+                      <td class="px-4 py-4 text-sm text-amber-800 bg-amber-50/80 border border-amber-200/50 text-right font-semibold">
                         {{ formatCurrency(project.subtotalMisc) }}
                       </td>
-                      <td class="px-2 py-3 text-sm text-orange-900 bg-orange-100 dark:text-orange-200 dark:bg-orange-800/30 text-right font-mono">
+                      <td class="px-4 py-4 text-sm text-purple-800 bg-purple-50/80 border border-purple-200/50 text-right font-semibold">
                         {{ formatCurrency(project.subtotalBudget) }}
                       </td>
-                      <td class="px-2 py-3 text-sm text-orange-900 bg-orange-100 dark:text-orange-200 dark:bg-orange-800/30 text-right font-mono">
+                      <td class="px-4 py-4 text-sm text-purple-800 bg-purple-50/80 border border-purple-200/50 text-right font-semibold">
                         {{ formatCurrency(project.subtotalActual) }}
                       </td>
-                      <td class="px-2 py-3 text-sm font-bold text-right font-mono" :class="project.subtotalUnderOver >= 0 ? 'text-red-900 bg-red-100 dark:text-red-200 dark:bg-red-800/30' : 'text-green-900 bg-green-100 dark:text-green-200 dark:bg-green-800/30'">
+                      <td class="px-4 py-4 text-sm font-bold text-right border border-gray-200/50" :class="project.subtotalUnderOver >= 0 ? 'text-red-800 bg-red-50/80' : 'text-green-800 bg-green-50/80'">
                         {{ formatCurrency(project.subtotalUnderOver) }}
                       </td>
                     </tr>
                   </template>
                 </tbody>
               </table>
+            <!-- </div> -->
+          </div>
             </div>
           </div>
         </div>
+        
       </div>
     </div>
     
@@ -490,6 +549,23 @@ import SettingsModal from "@/components/ui/SettingsModal.vue"
 import alertService from "@/components/ui/ui_utility/alertService.js"
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js'
 import { 
+  constructionBudgetService, 
+  ConstructionBudgetServiceUtils 
+} from '@/components/utility/construction_budget/ConstructionBudgetService.js'
+import { 
+  ConstructionBudgetProject, 
+  ConstructionBudgetTask,
+  ConstructionBudgetUtils 
+} from '@/components/utility/construction_budget/ConstructionBudgetModels.js'
+// import {
+//   allowOnlyNumbers,
+//   ConstructionBudgetUtils,
+//   constructionBudgetService, 
+//   ConstructionBudgetProject, 
+//   ConstructionBudgetTask,
+//   ConstructionBudgetServiceUtils 
+// } from '@/components/utility/construction_budget/index.js'
+import { 
   ChevronLeft, 
   ChevronRight, 
   Hammer, 
@@ -515,194 +591,53 @@ const showSettingsModal = ref(false)
 const showNewProjectModal = ref(false)
 const newProjectName = ref('')
 
-// Sample data structure based on the Excel analysis
-const projects = ref([
-  {
-    name: "PROJECT 1",
-    tasks: [
-      {
-        id: 1,
-        task: "Task",
-        isSubtask: false,
-        description: "",
-        status: "Not Started",
-        plannedStartDate: "",
-        actualStartDate: "",
-        endDate: "",
-        hr: 4,
-        ratePerHr: 40,
-        units: 12,
-        ratePerUnit: 15,
-        travel: 500,
-        equipment: 600,
-        misc: 50,
-        budget: 200
-      },
-      {
-        id: 2,
-        task: "Task",
-        isSubtask: false,
-        description: "",
-        status: "In Progress",
-        plannedStartDate: "",
-        actualStartDate: "",
-        endDate: "",
-        hr: 8,
-        ratePerHr: 15,
-        units: 22,
-        ratePerUnit: 14,
-        travel: 200,
-        equipment: 600,
-        misc: 100,
-        budget: 1500
-      },
-      {
-        id: 3,
-        task: "Task",
-        isSubtask: false,
-        description: "",
-        status: "Complete",
-        plannedStartDate: "",
-        actualStartDate: "",
-        endDate: "",
-        hr: 0,
-        ratePerHr: 0,
-        units: 50,
-        ratePerUnit: 11,
-        travel: 0,
-        equipment: 0,
-        misc: 300,
-        budget: 100
-      }
-    ]
-  },
-  {
-    name: "PROJECT 2",
-    tasks: [
-      {
-        id: 5,
-        task: "Task",
-        isSubtask: false,
-        description: "",
-        status: "Not Started",
-        plannedStartDate: "",
-        actualStartDate: "",
-        endDate: "",
-        hr: 0,
-        ratePerHr: 0,
-        units: 0,
-        ratePerUnit: 0,
-        travel: 0,
-        equipment: 0,
-        misc: 0,
-        budget: 0
-      }
-    ]
-  }
-])
+// Construction budget projects using the service
+const projects = ref([])
 
-// Computed properties for calculations
+// Computed properties for calculations using service
 const totalTasks = computed(() => {
-  return projects.value.reduce((total, project) => total + project.tasks.length, 0)
+  return constructionBudgetService.getTotals().totalTasks
 })
 
 const totalBudget = computed(() => {
-  return projects.value.reduce((total, project) => total + project.subtotalBudget, 0)
+  return constructionBudgetService.getTotals().totalBudget
 })
 
 const totalActual = computed(() => {
-  return projects.value.reduce((total, project) => total + project.subtotalActual, 0)
+  return constructionBudgetService.getTotals().totalActual
 })
 
 const totalVariance = computed(() => {
-  return totalActual.value - totalBudget.value
+  return constructionBudgetService.getTotals().totalVariance
 })
 
-// Add computed properties to each task for real-time calculations
-projects.value.forEach(project => {
-  project.tasks.forEach(task => {
-    // Add computed properties to each task
-    Object.defineProperty(task, 'totalLabor', {
-      get() {
-        return (this.hr || 0) * (this.ratePerHr || 0)
-      }
-    })
+// Data loading and management functions
+const loadData = async (forceReload = false) => {
+  try {
+    isSaving.value = true
+    const currentProject = selectedProject.value?.project_name
     
-    Object.defineProperty(task, 'totalMaterials', {
-      get() {
-        return (this.units || 0) * (this.ratePerUnit || 0)
-      }
-    })
+    // Only fetch from API if we don't have data or if force reload is requested
+    if (forceReload || constructionBudgetService.getAllProjects().length === 0) {
+      await constructionBudgetService.fetchData(currentProject)
+    }
     
-    Object.defineProperty(task, 'actual', {
-      get() {
-        return this.totalLabor + this.totalMaterials + (this.travel || 0) + (this.equipment || 0) + (this.misc || 0)
-      }
-    })
+    projects.value = [...constructionBudgetService.getAllProjects()]
     
-    Object.defineProperty(task, 'underOver', {
-      get() {
-        return this.actual - (this.budget || 0)
-      }
-    })
-  })
-  
-  // Add computed properties to each project for subtotals
-  Object.defineProperty(project, 'subtotalLabor', {
-    get() {
-      return project.tasks.reduce((sum, task) => sum + task.totalLabor, 0)
-    }
-  })
-  
-  Object.defineProperty(project, 'subtotalMaterials', {
-    get() {
-      return project.tasks.reduce((sum, task) => sum + task.totalMaterials, 0)
-    }
-  })
-  
-  Object.defineProperty(project, 'subtotalTravel', {
-    get() {
-      return project.tasks.reduce((sum, task) => sum + (task.travel || 0), 0)
-    }
-  })
-  
-  Object.defineProperty(project, 'subtotalEquipment', {
-    get() {
-      return project.tasks.reduce((sum, task) => sum + (task.equipment || 0), 0)
-    }
-  })
-  
-  Object.defineProperty(project, 'subtotalMisc', {
-    get() {
-      return project.tasks.reduce((sum, task) => sum + (task.misc || 0), 0)
-    }
-  })
-  
-  Object.defineProperty(project, 'subtotalBudget', {
-    get() {
-      return project.tasks.reduce((sum, task) => sum + (task.budget || 0), 0)
-    }
-  })
-  
-  Object.defineProperty(project, 'subtotalActual', {
-    get() {
-      return project.subtotalLabor + project.subtotalMaterials + project.subtotalTravel + project.subtotalEquipment + project.subtotalMisc
-    }
-  })
-  
-  Object.defineProperty(project, 'subtotalUnderOver', {
-    get() {
-      return project.subtotalActual - project.subtotalBudget
-    }
-  })
-})
+    isSaved.value = true
+    saveError.value = ''
+  } catch (error) {
+    console.error('Load data error:', error)
+    saveError.value = error.message
+    alertService.error(`Failed to load data: ${error.message}`)
+  } finally {
+    isSaving.value = false
+  }
+}
 
 // Methods
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(amount || 0)
+  return ConstructionBudgetUtils.formatCurrency(amount)
 }
 
 const markAsUnsaved = () => {
@@ -715,114 +650,43 @@ const saveChanges = async () => {
   saveError.value = ''
   
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // Here you would typically save to your backend
-    console.log('Saving budget data:', projects.value)
-    
+    const currentProject = selectedProject.value?.project_name
+    await constructionBudgetService.saveData(projects.value, currentProject)
     isSaved.value = true
+    alertService.success('Construction budget saved successfully')
   } catch (error) {
-    saveError.value = 'Failed to save changes. Please try again.'
-    console.error('Save error:', error)
+    saveError.value = error.message
+    alertService.error(`Failed to save changes: ${error.message}`)
   } finally {
     isSaving.value = false
   }
 }
 
 const addNewTask = () => {
-  // Add to the first project for simplicity
-  const newTask = {
-    id: Date.now(),
-    task: "Task",
-    isSubtask: false,
-    description: "",
-    status: "Not Started",
-    plannedStartDate: "",
-    actualStartDate: "",
-    endDate: "",
-    hr: 0,
-    ratePerHr: 0,
-    units: 0,
-    ratePerUnit: 0,
-    travel: 0,
-    equipment: 0,
-    misc: 0,
-    budget: 0
+  if (projects.value.length > 0) {
+    const newTask = constructionBudgetService.addTaskToProject(projects.value[0].id)
+    
+    // Update the reactive array to trigger Vue reactivity
+    projects.value = [...constructionBudgetService.getAllProjects()]
+    
+    markAsUnsaved()
   }
-  
-  // Add computed properties to the new task
-  Object.defineProperty(newTask, 'totalLabor', {
-    get() {
-      return (this.hr || 0) * (this.ratePerHr || 0)
-    }
-  })
-  
-  Object.defineProperty(newTask, 'totalMaterials', {
-    get() {
-      return (this.units || 0) * (this.ratePerUnit || 0)
-    }
-  })
-  
-  Object.defineProperty(newTask, 'actual', {
-    get() {
-      return this.totalLabor + this.totalMaterials + (this.travel || 0) + (this.equipment || 0) + (this.misc || 0)
-    }
-  })
-  
-  Object.defineProperty(newTask, 'underOver', {
-    get() {
-      return this.actual - (this.budget || 0)
-    }
-  })
-  
-  projects.value[0].tasks.push(newTask)
-  markAsUnsaved()
 }
 
-const addTaskToProject = (projectIndex) => {
-  const newTask = {
-    id: Date.now(),
-    task: "Task",
-    isSubtask: false,
-    description: "",
-    status: "Not Started",
-    plannedStartDate: "",
-    actualStartDate: "",
-    endDate: "",
-    hr: 0,
-    ratePerHr: 0,
-    units: 0,
-    ratePerUnit: 0,
-    travel: 0,
-    equipment: 0,
-    misc: 0,
-    budget: 0
+const addTaskToProject = (projectId) => {
+  // Find the project by ID to ensure we're adding to the correct project
+  const project = projects.value.find(p => p.id === projectId)
+  
+  if (project) {
+    const newTask = constructionBudgetService.addTaskToProject(projectId)
+    
+    // Update the reactive array to trigger Vue reactivity
+    projects.value = [...constructionBudgetService.getAllProjects()]
+    
+    markAsUnsaved()
+  } else {
+    console.error('Project not found with ID:', projectId)
   }
-
-  Object.defineProperty(newTask, 'totalLabor', {
-    get() {
-      return (this.hr || 0) * (this.ratePerHr || 0)
-    }
-  })
-  Object.defineProperty(newTask, 'totalMaterials', {
-    get() {
-      return (this.units || 0) * (this.ratePerUnit || 0)
-    }
-  })
-  Object.defineProperty(newTask, 'actual', {
-    get() {
-      return this.totalLabor + this.totalMaterials + (this.travel || 0) + (this.equipment || 0) + (this.misc || 0)
-    }
-  })
-  Object.defineProperty(newTask, 'underOver', {
-    get() {
-      return this.actual - (this.budget || 0)
-    }
-  })
-
-  projects.value[projectIndex].tasks.push(newTask)
-  markAsUnsaved()
 }
 
 const addNewProject = () => {
@@ -834,106 +698,11 @@ const addNewProject = () => {
 const confirmCreateProject = () => {
   const projectNumber = projects.value.length + 1
   const nameToUse = (newProjectName.value || '').trim() || `PROJECT ${projectNumber}`
-  const newProject = {
-    name: nameToUse,
-    tasks: [
-      {
-        id: Date.now(),
-        task: "Task",
-        isSubtask: false,
-        description: "",
-        status: "Not Started",
-        plannedStartDate: "",
-        actualStartDate: "",
-        endDate: "",
-        hr: 0,
-        ratePerHr: 0,
-        units: 0,
-        ratePerUnit: 0,
-        travel: 0,
-        equipment: 0,
-        misc: 0,
-        budget: 0
-      }
-    ]
-  }
+  const newProject = constructionBudgetService.createProject(nameToUse)
   
-  // Add computed properties to the new project's task
-  const task = newProject.tasks[0]
-  Object.defineProperty(task, 'totalLabor', {
-    get() {
-      return (this.hr || 0) * (this.ratePerHr || 0)
-    }
-  })
+  // Update the reactive array to trigger Vue reactivity
+  projects.value = [...constructionBudgetService.getAllProjects()]
   
-  Object.defineProperty(task, 'totalMaterials', {
-    get() {
-      return (this.units || 0) * (this.ratePerUnit || 0)
-    }
-  })
-  
-  Object.defineProperty(task, 'actual', {
-    get() {
-      return this.totalLabor + this.totalMaterials + (this.travel || 0) + (this.equipment || 0) + (this.misc || 0)
-    }
-  })
-  
-  Object.defineProperty(task, 'underOver', {
-    get() {
-      return this.actual - (this.budget || 0)
-    }
-  })
-  
-  // Add computed properties to the new project
-  Object.defineProperty(newProject, 'subtotalLabor', {
-    get() {
-      return newProject.tasks.reduce((sum, task) => sum + task.totalLabor, 0)
-    }
-  })
-  
-  Object.defineProperty(newProject, 'subtotalMaterials', {
-    get() {
-      return newProject.tasks.reduce((sum, task) => sum + task.totalMaterials, 0)
-    }
-  })
-  
-  Object.defineProperty(newProject, 'subtotalTravel', {
-    get() {
-      return newProject.tasks.reduce((sum, task) => sum + (task.travel || 0), 0)
-    }
-  })
-  
-  Object.defineProperty(newProject, 'subtotalEquipment', {
-    get() {
-      return newProject.tasks.reduce((sum, task) => sum + (task.equipment || 0), 0)
-    }
-  })
-  
-  Object.defineProperty(newProject, 'subtotalMisc', {
-    get() {
-      return newProject.tasks.reduce((sum, task) => sum + (task.misc || 0), 0)
-    }
-  })
-  
-  Object.defineProperty(newProject, 'subtotalBudget', {
-    get() {
-      return newProject.tasks.reduce((sum, task) => sum + (task.budget || 0), 0)
-    }
-  })
-  
-  Object.defineProperty(newProject, 'subtotalActual', {
-    get() {
-      return newProject.subtotalLabor + newProject.subtotalMaterials + newProject.subtotalTravel + newProject.subtotalEquipment + newProject.subtotalMisc
-    }
-  })
-  
-  Object.defineProperty(newProject, 'subtotalUnderOver', {
-    get() {
-      return newProject.subtotalActual - newProject.subtotalBudget
-    }
-  })
-  
-  projects.value.push(newProject)
   showNewProjectModal.value = false
   newProjectName.value = ''
   markAsUnsaved()
@@ -944,15 +713,31 @@ const cancelNewProject = () => {
   newProjectName.value = ''
 }
 
-const refreshTable = () => {
-  // Simulate refresh - in real app, this would reload data from backend
-  console.log('Refreshing table data...')
+const refreshTable = async () => {
+  try {
+    await loadData(true) // Force reload from API
+    alertService.success('Data refreshed successfully')
+  } catch (error) {
+    alertService.error(`Failed to refresh data: ${error.message}`)
+  }
 }
 
 const exportToExcel = () => {
-  // Simulate export functionality
-  console.log('Exporting to Excel...')
-  // In a real app, you would use a library like xlsx to export the data
+  try {
+    const csvData = constructionBudgetService.exportData('csv')
+    const blob = new Blob([csvData], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `construction_budget_${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    window.URL.revokeObjectURL(url)
+    alertService.success('Data exported successfully')
+  } catch (error) {
+    alertService.error(`Failed to export data: ${error.message}`)
+  }
 }
 
 // Settings modal handlers
@@ -972,6 +757,12 @@ onMounted(async () => {
     // ignore
   }
 
+  // Test API connection first
+  const apiWorking = await constructionBudgetService.testApiConnection()
+
+  // Load construction budget data
+  await loadData()
+
   // Show alert for current project if available
   const currentName = selectedProject?.value?.project_name
   if (currentName) {
@@ -979,11 +770,12 @@ onMounted(async () => {
   }
 })
 
-// React to project changes and show an alert
-watch(selectedProject, (newVal, oldVal) => {
+// React to project changes and reload data
+watch(selectedProject, async (newVal, oldVal) => {
   if (!newVal?.project_name) return
   if (newVal?.project_name !== oldVal?.project_name) {
     alertService.success(`Switched to project: ${newVal.project_name}`)
+    await loadData(true) // Force reload when switching projects
   }
 })
 </script>
