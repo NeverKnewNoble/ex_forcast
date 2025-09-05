@@ -260,7 +260,7 @@
                            <div class="flex items-center gap-3 text-black">
                              <div class="w-3 h-3 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"></div>
                              <input
-                               :value="project.tasks.length > 0 && project.tasks[0].project_name ? project.tasks[0].project_name : project.name"
+                               :value="project.tasks.length > 0 && project.tasks[0].project_name"
                                @input="updateProjectNameInput($event, project)"
                                type="text"
                                class="font-bold text-lg bg-transparent border-0 focus:ring-2 focus:ring-violet-500 focus:bg-white focus:shadow-sm px-2 py-1 rounded transition-all duration-200 min-w-0 flex-1"
@@ -686,6 +686,18 @@ const saveChanges = async () => {
   
   try {
     const currentProject = selectedProject.value?.project_name
+    console.log('Saving with current project:', currentProject)
+    console.log('Projects data being saved:', projects.value)
+    
+    // Log each project's tasks to see their project_name values
+    projects.value.forEach((project, index) => {
+      console.log(`Project ${index + 1} (${project.name}) tasks:`, project.tasks.map(task => ({
+        task: task.task,
+        project_name: task.project_name,
+        id: task.id
+      })))
+    })
+    
     await constructionBudgetService.saveData(projects.value, currentProject)
     isSaved.value = true
     alertService.success('Construction budget saved successfully')
@@ -724,16 +736,62 @@ const addTaskToProject = (projectId) => {
   }
 }
 
-const deleteTask = (projectId, taskId) => {
+const deleteTask = async (projectId, taskId) => {
   if (confirm('Are you sure you want to delete this task?')) {
     try {
+      // If task has an ID, it's saved in the database, so delete it there too
+      if (taskId && taskId !== null && taskId !== undefined) {
+        await deleteTaskFromDatabase(taskId)
+      }
+      
+      // Remove from local project
       constructionBudgetService.removeTaskFromProject(projectId, taskId)
-      projects.value = [...constructionBudgetService.getAllProjects()]
+      
+      // Force reactivity update by creating a new array reference
+      projects.value = constructionBudgetService.getAllProjects().map(project => ({
+        ...project,
+        tasks: [...project.tasks]
+      }))
+      
       markAsUnsaved()
       alertService.success('Task deleted successfully')
     } catch (error) {
       alertService.error(`Failed to delete task: ${error.message}`)
     }
+  }
+}
+
+const deleteTaskFromDatabase = async (taskId) => {
+  try {
+    const response = await fetch(`/api/method/ex_forcast.api.construction_budget_api.delete_construction_budget_task`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        task_id: taskId
+      })
+    })
+    
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`)
+    }
+    
+    const result = await response.json()
+    
+    // Handle nested response structure from Frappe
+    const actualResult = result.message || result
+    
+    // Check if the API returned an error
+    if (!actualResult.success) {
+      throw new Error(actualResult.error || 'Failed to delete task')
+    }
+    
+    return result
+  } catch (error) {
+    console.error('Error deleting task from database:', error)
+    throw error
   }
 }
 

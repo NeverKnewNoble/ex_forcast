@@ -101,16 +101,23 @@ import {
   
         // Convert to API format
         const apiData = projects.map(proj => proj.toApiFormat())
-  
+        
+        console.log('API Data being sent to backend:', apiData)
+        console.log('Project filter:', project)
+
+        const requestBody = {
+          changes: apiData,
+          project: project
+        }
+        
+        console.log('Full request body:', requestBody)
+
         const response = await fetch(`${API_CONFIG.baseUrl}.${API_CONFIG.endpoints.upsert}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            changes: apiData,
-            project: project
-          })
+          body: JSON.stringify(requestBody)
         })
   
         const result = await response.json()
