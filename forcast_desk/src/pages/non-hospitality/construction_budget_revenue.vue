@@ -172,9 +172,9 @@
           </div>
 
           <!-- Budget Table -->
-          <div v-else class="bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden dark:bg-gray-800 dark:border-gray-600">
+          <div v-else class="bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px] dark:bg-gray-800 dark:border-gray-600">
             <div class="overflow-x-auto max-w-[100%] md:max-w-[1800px] lg:max-w-[1800px] xl:max-w-[2000px] 2xl:max-w-[2000px]">
-              <div class="min-w-full w-[2000px]">
+              <div class="min-w-full">
               <!-- <div class="overflow-x-auto"> -->
               <table class="w-full">
                 <!-- Category Headers -->
