@@ -111,7 +111,7 @@
                 <div class="space-y-3">
                   <div class="flex justify-between items-center">
                     <span class="text-sm text-gray-600">Total Projects:</span>
-                    <span class="font-semibold text-violet-600">{{ projects.length }}</span>
+                    <span class="font-semibold text-violet-600">{{ projectsWithTasks.length }}</span>
                   </div>
                   <div class="flex justify-between items-center">
                     <span class="text-sm text-gray-600">Total Tasks:</span>
@@ -152,7 +152,7 @@
 
           
           <!-- Empty State or Budget Table -->
-          <div v-if="projects.length === 0" class="bg-white rounded-lg border border-violet-200 shadow-sm p-12">
+          <div v-if="projectsWithTasks.length === 0" class="bg-white rounded-lg border border-violet-200 shadow-sm p-12">
             <div class="text-center">
               <div class="w-24 h-24 bg-gradient-to-br from-violet-100 to-violet-200 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Hammer class="w-12 h-12 text-violet-600" />
@@ -252,7 +252,7 @@
                 </thead>
                 
                 <tbody class="bg-white divide-y divide-gray-100">
-                  <template v-for="(project, projectIndex) in projects" :key="`project-${project.id}`">
+                  <template v-for="(project, projectIndex) in projectsWithTasks" :key="`project-${project.id}`">
                     <!-- Project Header Row -->
                       <tr class="bg-gradient-to-r from-slate-50 to-gray-50 border-b-2 border-slate-200 hover:from-slate-100 hover:to-gray-100 transition-all duration-200">
                        <td class="px-6 py-4 text-sm text-slate-800" :colspan="18">
@@ -620,21 +620,26 @@ const newProjectName = ref('')
 // Construction budget projects using the service
 const projects = ref([])
 
-// Computed properties for calculations using service
+// Computed properties for calculations using local data
 const totalTasks = computed(() => {
-  return constructionBudgetService.getTotals().totalTasks
+  return projectsWithTasks.value.reduce((sum, project) => sum + project.tasks.length, 0)
 })
 
 const totalBudget = computed(() => {
-  return constructionBudgetService.getTotals().totalBudget
+  return projectsWithTasks.value.reduce((sum, project) => sum + project.subtotalBudget, 0)
 })
 
 const totalActual = computed(() => {
-  return constructionBudgetService.getTotals().totalActual
+  return projectsWithTasks.value.reduce((sum, project) => sum + project.subtotalActual, 0)
 })
 
 const totalVariance = computed(() => {
-  return constructionBudgetService.getTotals().totalVariance
+  return totalActual.value - totalBudget.value
+})
+
+// Filter out projects with no tasks for display
+const projectsWithTasks = computed(() => {
+  return projects.value.filter(project => project.tasks && project.tasks.length > 0)
 })
 
 // Data loading and management functions
@@ -686,18 +691,6 @@ const saveChanges = async () => {
   
   try {
     const currentProject = selectedProject.value?.project_name
-    console.log('Saving with current project:', currentProject)
-    console.log('Projects data being saved:', projects.value)
-    
-    // Log each project's tasks to see their project_name values
-    projects.value.forEach((project, index) => {
-      console.log(`Project ${index + 1} (${project.name}) tasks:`, project.tasks.map(task => ({
-        task: task.task,
-        project_name: task.project_name,
-        id: task.id
-      })))
-    })
-    
     await constructionBudgetService.saveData(projects.value, currentProject)
     isSaved.value = true
     alertService.success('Construction budget saved successfully')
@@ -711,10 +704,11 @@ const saveChanges = async () => {
 
 const addNewTask = () => {
   if (projects.value.length > 0) {
-    const newTask = constructionBudgetService.addTaskToProject(projects.value[0].id)
+    // Add task directly to the first project
+    const newTask = projects.value[0].addTask()
     
-    // Update the reactive array to trigger Vue reactivity
-    projects.value = [...constructionBudgetService.getAllProjects()]
+    // Force reactivity update
+    projects.value = [...projects.value]
     
     markAsUnsaved()
   }
@@ -725,10 +719,11 @@ const addTaskToProject = (projectId) => {
   const project = projects.value.find(p => p.id === projectId)
   
   if (project) {
-    const newTask = constructionBudgetService.addTaskToProject(projectId)
+    // Add task directly to the local project
+    const newTask = project.addTask()
     
-    // Update the reactive array to trigger Vue reactivity
-    projects.value = [...constructionBudgetService.getAllProjects()]
+    // Force reactivity update
+    projects.value = [...projects.value]
     
     markAsUnsaved()
   } else {
@@ -744,17 +739,17 @@ const deleteTask = async (projectId, taskId) => {
         await deleteTaskFromDatabase(taskId)
       }
       
-      // Remove from local project
-      constructionBudgetService.removeTaskFromProject(projectId, taskId)
-      
-      // Force reactivity update by creating a new array reference
-      projects.value = constructionBudgetService.getAllProjects().map(project => ({
-        ...project,
-        tasks: [...project.tasks]
-      }))
-      
-      markAsUnsaved()
-      alertService.success('Task deleted successfully')
+      // Find and remove from local project
+      const project = projects.value.find(p => p.id === projectId)
+      if (project) {
+        project.removeTask(taskId)
+        
+        // Force reactivity update
+        projects.value = [...projects.value]
+        
+        markAsUnsaved()
+        alertService.success('Task deleted successfully')
+      }
     } catch (error) {
       alertService.error(`Failed to delete task: ${error.message}`)
     }
@@ -797,10 +792,10 @@ const deleteTaskFromDatabase = async (taskId) => {
 
 const updateProjectName = (projectId, newName) => {
   try {
-    const project = constructionBudgetService.getProject(projectId)
+    const project = projects.value.find(p => p.id === projectId)
     if (project) {
       project.name = newName || `PROJECT ${projectId}`
-      projects.value = [...constructionBudgetService.getAllProjects()]
+      projects.value = [...projects.value]
       markAsUnsaved()
     }
   } catch (error) {
@@ -821,17 +816,17 @@ const updateProjectNameInput = (event, project) => {
   }
   
   // Force reactivity update
-  projects.value = [...constructionBudgetService.getAllProjects()]
+  projects.value = [...projects.value]
 }
 
 const updateTaskName = (projectId, taskId, newName) => {
   try {
-    const project = constructionBudgetService.getProject(projectId)
+    const project = projects.value.find(p => p.id === projectId)
     if (project) {
       const task = project.tasks.find(t => t.id === taskId)
       if (task) {
         task.task = newName || 'Untitled Task'
-        projects.value = [...constructionBudgetService.getAllProjects()]
+        projects.value = [...projects.value]
         markAsUnsaved()
       }
     }
@@ -849,15 +844,18 @@ const addNewProject = () => {
 const confirmCreateProject = () => {
   const projectNumber = projects.value.length + 1
   const nameToUse = (newProjectName.value || '').trim() || `PROJECT ${projectNumber}`
-  const newProject = constructionBudgetService.createProject(nameToUse)
+  const newProject = ConstructionBudgetProject.createEmpty(nameToUse)
   
   // Set the project name on the first task as well
   if (newProject.tasks.length > 0) {
     newProject.tasks[0].project_name = nameToUse
   }
   
-  // Update the reactive array to trigger Vue reactivity
-  projects.value = [...constructionBudgetService.getAllProjects()]
+  // Add to local projects array
+  projects.value.push(newProject)
+  
+  // Force reactivity update
+  projects.value = [...projects.value]
   
   showNewProjectModal.value = false
   newProjectName.value = ''
@@ -911,13 +909,13 @@ const onDropTask = (projectId, toIndex) => {
     return
   }
   try {
-    const project = constructionBudgetService.getProject(projectId)
+    const project = projects.value.find(p => p.id === projectId)
     if (!project || !project.tasks) return
     const tasks = project.tasks
     if (fromIndex === toIndex) return
     const [moved] = tasks.splice(fromIndex, 1)
     tasks.splice(toIndex, 0, moved)
-    projects.value = [...constructionBudgetService.getAllProjects()]
+    projects.value = [...projects.value]
     markAsUnsaved()
   } finally {
     dragging.value = { projectId: null, fromIndex: null }
