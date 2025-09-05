@@ -78,7 +78,7 @@
                 </h3>
                 <button 
                   @click="addNewProject" 
-                  class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 font-medium mt-3"
+                  class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-xl hover:from-violet-600 hover:to-violet-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 font-medium mt-3"
                 >
                   <FolderPlus class="w-4 h-4" />
                   Add New Project
@@ -254,37 +254,61 @@
                 <tbody class="bg-white divide-y divide-gray-100">
                   <template v-for="(project, projectIndex) in projects" :key="`project-${project.id}`">
                     <!-- Project Header Row -->
-                    <tr class="bg-gradient-to-r from-slate-50 to-gray-50 border-b-2 border-slate-200 hover:from-slate-100 hover:to-gray-100 transition-all duration-200">
-                      <td class="px-6 py-4 text-sm text-slate-800" :colspan="18">
-                        <div class="flex items-center justify-between">
-                          <div class="flex items-center gap-3">
-                            <div class="w-3 h-3 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"></div>
-                            <span class="font-bold text-lg">{{ project.tasks.length > 0 ? project.tasks[0].project_name : project.name }}</span>
-                          </div>
-                          <button
-                            @click="addTaskToProject(project.id)"
-                            class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-                          >
-                            <Plus class="w-4 h-4" />
-                            Add Task
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                      <tr class="bg-gradient-to-r from-slate-50 to-gray-50 border-b-2 border-slate-200 hover:from-slate-100 hover:to-gray-100 transition-all duration-200">
+                       <td class="px-6 py-4 text-sm text-slate-800" :colspan="18">
+                         <div class="flex items-center justify-between">
+                           <div class="flex items-center gap-3 text-black">
+                             <div class="w-3 h-3 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"></div>
+                             <input
+                               :value="project.tasks.length > 0 && project.tasks[0].project_name ? project.tasks[0].project_name : project.name"
+                               @input="updateProjectNameInput($event, project)"
+                               type="text"
+                               class="font-bold text-lg bg-transparent border-0 focus:ring-2 focus:ring-violet-500 focus:bg-white focus:shadow-sm px-2 py-1 rounded transition-all duration-200 min-w-0 flex-1"
+                               placeholder="Project name"
+                             />
+                           </div>
+                           <button
+                             @click="addTaskToProject(project.id)"
+                             class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                           >
+                             <Plus class="w-4 h-4" />
+                             Add Task
+                           </button>
+                         </div>
+                       </td>
+                     </tr>
                     
                     <!-- Project Tasks -->
                     <template v-for="(task, taskIndex) in project.tasks" :key="`task-${project.id}-${task.id || taskIndex}`">
-                      <tr class="transition-all duration-200 h-12 align-middle hover:bg-slate-50/50 border-b border-gray-100">
+                      <tr class="transition-all duration-200 h-12 align-middle hover:bg-slate-50/50 border-b border-gray-100"
+                          :draggable="true"
+                          @dragstart="onDragStart(project.id, taskIndex)"
+                          @dragover="onDragOver"
+                          @drop="onDropTask(project.id, taskIndex)">
                         <!-- Task Name -->
                         <td class="p-0 text-sm">
-                          <input
-                            v-model="task.task"
-                            type="text"
-                            class="w-full h-full px-4 py-0 border-0 bg-transparent text-sm focus:ring-2 focus:ring-violet-500 focus:bg-white focus:shadow-sm font-medium transition-all duration-200"
-                            :class="task.isSubtask ? 'pl-8 text-gray-600' : 'text-gray-900'"
-                            placeholder="Enter task name"
-                            @input="markAsUnsaved"
-                          />
+                          <div class="flex items-center gap-2 pr-2">
+                            <span class="cursor-grab text-gray-400 hover:text-gray-600 active:cursor-grabbing px-2">
+                              <GripVertical class="w-4 h-4" />
+                            </span>
+                                                         <input
+                               v-model="task.task"
+                               type="text"
+                               class="flex-1 h-full px-4 py-0 border-0 bg-transparent text-sm focus:ring-2 focus:ring-violet-500 focus:bg-white focus:shadow-sm font-medium transition-all duration-200"
+                               :class="task.isSubtask ? 'pl-8 text-gray-600' : 'text-gray-900'"
+                               placeholder="Enter task name"
+                               @input="markAsUnsaved"
+                               @blur="updateTaskName(project.id, task.id, task.task)"
+                             />
+                            <button
+                              type="button"
+                              class="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-md text-red-600 hover:text-white hover:bg-red-600 transition-colors"
+                              @click="deleteTask(project.id, task.id)"
+                              :title="`Delete task`"
+                            >
+                              <Trash class="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                         
                         <!-- Description -->
@@ -579,7 +603,9 @@ import {
   RefreshCw, 
   Download, 
   BarChart3, 
-  X 
+  X, 
+  Trash, 
+  GripVertical 
 } from "lucide-vue-next"
 
 // Reactive state
@@ -643,6 +669,15 @@ const formatCurrency = (amount) => {
 const markAsUnsaved = () => {
   isSaved.value = false
   saveError.value = ''
+  // Force reactivity update for computed properties
+  projects.value = [...projects.value]
+}
+
+const allowOnlyNumbers = (event) => {
+  const char = String.fromCharCode(event.which)
+  if (!/[0-9.]/.test(char)) {
+    event.preventDefault()
+  }
 }
 
 const saveChanges = async () => {
@@ -689,6 +724,64 @@ const addTaskToProject = (projectId) => {
   }
 }
 
+const deleteTask = (projectId, taskId) => {
+  if (confirm('Are you sure you want to delete this task?')) {
+    try {
+      constructionBudgetService.removeTaskFromProject(projectId, taskId)
+      projects.value = [...constructionBudgetService.getAllProjects()]
+      markAsUnsaved()
+      alertService.success('Task deleted successfully')
+    } catch (error) {
+      alertService.error(`Failed to delete task: ${error.message}`)
+    }
+  }
+}
+
+const updateProjectName = (projectId, newName) => {
+  try {
+    const project = constructionBudgetService.getProject(projectId)
+    if (project) {
+      project.name = newName || `PROJECT ${projectId}`
+      projects.value = [...constructionBudgetService.getAllProjects()]
+      markAsUnsaved()
+    }
+  } catch (error) {
+    alertService.error(`Failed to update project name: ${error.message}`)
+  }
+}
+
+const updateProjectNameInput = (event, project) => {
+  const newName = event.target.value
+  markAsUnsaved()
+  
+  // Update the project name
+  project.name = newName || `PROJECT ${project.id}`
+  
+  // If there are tasks, also update the first task's project_name
+  if (project.tasks.length > 0) {
+    project.tasks[0].project_name = newName || project.name
+  }
+  
+  // Force reactivity update
+  projects.value = [...constructionBudgetService.getAllProjects()]
+}
+
+const updateTaskName = (projectId, taskId, newName) => {
+  try {
+    const project = constructionBudgetService.getProject(projectId)
+    if (project) {
+      const task = project.tasks.find(t => t.id === taskId)
+      if (task) {
+        task.task = newName || 'Untitled Task'
+        projects.value = [...constructionBudgetService.getAllProjects()]
+        markAsUnsaved()
+      }
+    }
+  } catch (error) {
+    alertService.error(`Failed to update task name: ${error.message}`)
+  }
+}
+
 const addNewProject = () => {
   const projectNumber = projects.value.length + 1
   newProjectName.value = `PROJECT ${projectNumber}`
@@ -699,6 +792,11 @@ const confirmCreateProject = () => {
   const projectNumber = projects.value.length + 1
   const nameToUse = (newProjectName.value || '').trim() || `PROJECT ${projectNumber}`
   const newProject = constructionBudgetService.createProject(nameToUse)
+  
+  // Set the project name on the first task as well
+  if (newProject.tasks.length > 0) {
+    newProject.tasks[0].project_name = nameToUse
+  }
   
   // Update the reactive array to trigger Vue reactivity
   projects.value = [...constructionBudgetService.getAllProjects()]
@@ -738,6 +836,38 @@ const exportToExcel = () => {
   } catch (error) {
     alertService.error(`Failed to export data: ${error.message}`)
   }
+}
+
+// Drag-and-drop reordering
+const dragging = ref({ projectId: null, fromIndex: null })
+
+const onDragStart = (projectId, fromIndex) => {
+  dragging.value = { projectId, fromIndex }
+}
+
+const onDropTask = (projectId, toIndex) => {
+  const { projectId: fromProjectId, fromIndex } = dragging.value || {}
+  if (fromProjectId === null || fromIndex === null) return
+  if (fromProjectId !== projectId) {
+    dragging.value = { projectId: null, fromIndex: null }
+    return
+  }
+  try {
+    const project = constructionBudgetService.getProject(projectId)
+    if (!project || !project.tasks) return
+    const tasks = project.tasks
+    if (fromIndex === toIndex) return
+    const [moved] = tasks.splice(fromIndex, 1)
+    tasks.splice(toIndex, 0, moved)
+    projects.value = [...constructionBudgetService.getAllProjects()]
+    markAsUnsaved()
+  } finally {
+    dragging.value = { projectId: null, fromIndex: null }
+  }
+}
+
+const onDragOver = (event) => {
+  event.preventDefault()
 }
 
 // Settings modal handlers
