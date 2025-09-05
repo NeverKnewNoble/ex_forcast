@@ -80,9 +80,9 @@ const routes = [
     component: () => import('@/pages/general/Reports.vue'),
   },
   {
-    name: 'Construction_Budget',
-    path: '/construction_budget',
-    component: () => import('@/pages/non-hospitality/construction_budget_revenue.vue'),
+    name: 'Project Budget',
+    path: '/project_budget',
+    component: () => import('@/pages/non-hospitality/project_budget_revenue.vue'),
   },
 
 ]
