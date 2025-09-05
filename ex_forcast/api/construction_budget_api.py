@@ -164,26 +164,8 @@ def construction_budget_display(project=None):
                 }
                 projects.append(project_data)
         
-        # Also include projects that have no tasks
-        for project_id, proj_info in project_info.items():
-            if project_id not in grouped_data:
-                project_data = {
-                    "id": project_id,
-                    "name": proj_info["project_name"],
-                    "total_budget": proj_info["total_budget"],
-                    "total_actual": proj_info["total_actual"],
-                    "variance": proj_info["variance"],
-                    "tasks": [],
-                    "subtotalLabor": 0,
-                    "subtotalMaterials": 0,
-                    "subtotalTravel": 0,
-                    "subtotalEquipment": 0,
-                    "subtotalMisc": 0,
-                    "subtotalBudget": 0,
-                    "subtotalActual": 0,
-                    "subtotalUnderOver": 0
-                }
-                projects.append(project_data)
+        # Only include projects that have tasks - skip projects with no tasks
+        # (This section is removed as we only want projects with tasks)
 
         return {
             "success": True,

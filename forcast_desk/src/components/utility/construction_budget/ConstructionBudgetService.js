@@ -101,16 +101,11 @@ import {
   
         // Convert to API format
         const apiData = projects.map(proj => proj.toApiFormat())
-        
-        console.log('API Data being sent to backend:', apiData)
-        console.log('Project filter:', project)
 
         const requestBody = {
           changes: apiData,
           project: project
         }
-        
-        console.log('Full request body:', requestBody)
 
         const response = await fetch(`${API_CONFIG.baseUrl}.${API_CONFIG.endpoints.upsert}`, {
           method: 'POST',
@@ -264,11 +259,14 @@ import {
      * Get computed totals
      */
     getTotals() {
-      const totalTasks = this.projects.reduce((sum, proj) => sum + proj.tasks.length, 0)
-      const totalBudget = this.projects.reduce((sum, proj) => sum + proj.subtotalBudget, 0)
-      const totalActual = this.projects.reduce((sum, proj) => sum + proj.subtotalActual, 0)
+      // Filter out projects with no tasks for calculations
+      const projectsWithTasks = this.projects.filter(project => project.tasks && project.tasks.length > 0)
+      
+      const totalTasks = projectsWithTasks.reduce((sum, proj) => sum + proj.tasks.length, 0)
+      const totalBudget = projectsWithTasks.reduce((sum, proj) => sum + proj.subtotalBudget, 0)
+      const totalActual = projectsWithTasks.reduce((sum, proj) => sum + proj.subtotalActual, 0)
       const totalVariance = totalActual - totalBudget
-  
+
       return {
         totalTasks,
         totalBudget,
