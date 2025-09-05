@@ -3,7 +3,7 @@
     <!-- Project Selector Container -->
     <div class="flex items-center space-x-3">
       <!-- Project Dropdown -->
-      <div class="relative min-w-[200px]">
+      <div class="relative min-w-[270px]">
         <button
           @click="toggleDropdown"
           class="w-full flex items-center justify-between px-4 py-2 bg-white/80 backdrop-blur-xl border border-violet-200/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group dark:bg-gray-800/80 dark:border-gray-600/50"
@@ -81,6 +81,7 @@
 
       <!-- Create New Project Button -->
       <button
+        v-if="showNewProjectButton"
         @click="openCreateModal"
         class="flex items-center space-x-2 px-4 py-3 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 group"
       >
@@ -556,6 +557,14 @@ import {
 } from '@/components/utility/dashboard/projectService.js'
 import { loadProjectDepartmentOptions } from '@/components/utility/payroll/payroll_data_service.js'
 import alertService from '@/components/ui/ui_utility/alertService.js'
+
+// Props
+const props = defineProps({
+  showNewProjectButton: {
+    type: Boolean,
+    default: true
+  }
+})
 
 // Component state
 const isDropdownOpen = ref(false)

@@ -204,7 +204,7 @@ const menuItems = [
       { text: "F&B Revenue Assumptions", route: "/f&b_revenue_assumptions", icon: UtensilsCrossed },
       { text: "Banquet Revenue Assumptions", route: "/banquet_revenue", icon: HandPlatter},
       { text: "OOD Revenue Assumptions", route: "/ood_data_input", icon: Building2},
-      { text: "Construction Budget", route: "/construction_budget", icon: Hammer},
+      { text: "Project Budget", route: "/project_budget", icon: Hammer},
     ]
   },
   {
