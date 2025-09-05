@@ -245,7 +245,7 @@ def upsert_construction_budget(changes, project=None):
                 for task_data in tasks:
                     task_doc = {
                         "doctype": "Construction Budget Task",
-                        "project_name": task_data.get("project_name") or project_name,
+                        "project_name": task_data.get("project_name", ""),
                         "task_name": task_data.get("task", ""),
                         "description": task_data.get("description", ""),
                         "status": task_data.get("status", "Not Started"),
@@ -338,6 +338,41 @@ def delete_construction_budget_project(project_id):
 
     except Exception as e:
         frappe.logger().error(f"Error deleting construction budget project: {str(e)}")
+        frappe.db.rollback()
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
+@frappe.whitelist()
+def delete_construction_budget_task(task_id):
+    """Delete a construction budget task"""
+    try:
+        if not task_id:
+            return {
+                "success": False,
+                "error": "Task ID is required"
+            }
+
+        # Check if task exists
+        if not frappe.db.exists("Construction Budget Task", task_id):
+            return {
+                "success": False,
+                "error": "Task not found"
+            }
+
+        # Delete the task
+        frappe.delete_doc("Construction Budget Task", task_id)
+        frappe.db.commit()
+
+        return {
+            "success": True,
+            "message": "Task deleted successfully"
+        }
+
+    except Exception as e:
+        frappe.logger().error(f"Error deleting construction budget task: {str(e)}")
         frappe.db.rollback()
         return {
             "success": False,

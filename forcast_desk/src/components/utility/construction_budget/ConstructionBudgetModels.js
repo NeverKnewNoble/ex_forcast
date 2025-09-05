@@ -278,6 +278,14 @@ export class ConstructionBudgetProject {
     if (!taskData.id) {
       taskData.id = `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     }
+    
+    // Set the project name from the first task if available, otherwise use project name
+    if (!taskData.project_name) {
+      taskData.project_name = this.tasks.length > 0 && this.tasks[0].project_name 
+        ? this.tasks[0].project_name 
+        : this.name
+    }
+    
     const newTask = new ConstructionBudgetTask(taskData)
     this.tasks.push(newTask)
     return newTask
@@ -330,9 +338,14 @@ export class ConstructionBudgetProject {
     // Generated IDs start with "project-" and have timestamp-random format
     const isGeneratedId = this.id && this.id.startsWith('project-') && this.id.includes('-')
     
+    // Use the project name from the first task if available, otherwise fall back to this.name
+    const projectName = this.tasks.length > 0 && this.tasks[0].project_name 
+      ? this.tasks[0].project_name 
+      : this.name
+    
     return {
       project_id: isGeneratedId ? null : this.id, // Send null for new projects, real ID for existing ones
-      project_name: this.name,
+      project_name: projectName,
       tasks: this.tasks.map(task => task.toApiFormat())
     }
   }
