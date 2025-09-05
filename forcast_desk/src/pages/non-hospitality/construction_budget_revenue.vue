@@ -473,7 +473,7 @@
                     
                     <!-- Project Subtotal Row -->
                     <tr class="border-t-2 border-slate-300 bg-gradient-to-r from-slate-100 to-gray-100 font-bold shadow-lg">
-                      <td class="px-6 py-4 text-sm text-slate-800 font-bold" :colspan="6">
+                      <td class="px-6 py-4 text-sm text-slate-800 border border-slate-300 font-bold" :colspan="6">
                         <div class="flex items-center gap-2">
                           <div class="w-2 h-2 bg-slate-600 rounded-full"></div>
                           SUBTOTAL
