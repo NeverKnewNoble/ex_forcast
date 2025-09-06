@@ -162,7 +162,7 @@ export async function saveChanges(changedCells, isSaving, saveError, expenseData
     
     const response = await fetch("/api/method/ex_forcast.api.expense_estimate.upsert_expense_items", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Frappe-CSRF-Token": frappe.csrf_token },
       body: JSON.stringify({ 
         changes: payload,
         project: currentProject.project_name
