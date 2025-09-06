@@ -156,6 +156,8 @@ import {
   Sheet,
   ChartNoAxesCombined,
   Settings,
+  DollarSign,
+  Wallet,
 } from 'lucide-vue-next'
 
 // Get the current route
@@ -195,7 +197,6 @@ const handleMouseLeave = () => {
 const menuItems = [
   { text: "Home", route: "/", icon: Home },
   { text: "Dashboard", route: "/dashboard", icon: LayoutDashboard  },
-  { text: "Expense Assumptions", route: "/expense_estimate", icon: Calculator   },
   {
     text: "Revenue",
     icon: ChartNoAxesCombined ,
@@ -204,7 +205,6 @@ const menuItems = [
       { text: "F&B Revenue Assumptions", route: "/f&b_revenue_assumptions", icon: UtensilsCrossed },
       { text: "Banquet Revenue Assumptions", route: "/banquet_revenue", icon: HandPlatter},
       { text: "OOD Revenue Assumptions", route: "/ood_data_input", icon: Building2},
-      { text: "Project Budget", route: "/project_budget", icon: Hammer},
     ]
   },
   {
@@ -216,6 +216,14 @@ const menuItems = [
       { text: "Bonus", route: "/bonus", icon: Ellipsis }
     ]
   },
+  {
+    text: "Cost Of Sales",
+    icon: DollarSign,
+    children: [
+      { text: "Project Budget", route: "/project_budget", icon: Wallet},
+    ]
+  },
+  { text: "Expense Assumptions", route: "/expense_estimate", icon: Calculator },
   { text: "Receipts & Payments", route: "/receipts_payments", icon: ReceiptText },
   { text: "Reports", route: "/reports", icon: BookOpen },
   { text: "Settings", route: "#", icon: Settings, action: "openSettings" },
