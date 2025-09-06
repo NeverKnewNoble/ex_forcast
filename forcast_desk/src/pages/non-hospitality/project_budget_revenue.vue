@@ -20,7 +20,7 @@
               <div class="mb-8">
                 <div class="flex items-center gap-3 mb-2">
                   <div class="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <Hammer class="w-7 h-7 mx-2 text-white" />
+                    <Wallet class="w-7 h-7 mx-2 text-white" />
                   </div>
                   <h1 class="text-2xl font-bold text-gray-900">Project Budget</h1>
                 </div>
@@ -147,7 +147,7 @@
           <!-- Table Header -->
           <div class="flex items-center gap-2 mb-4">
             <div class="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
-              <Hammer class="w-3 h-3 text-white" />
+              <Wallet class="w-3 h-3 text-white" />
             </div>
             <h2 class="text-lg font-bold text-gray-800">Project Budgets and Revenue Overview</h2>
           </div>
@@ -157,7 +157,7 @@
           <div v-if="projectsWithTasks.length === 0" class="bg-white rounded-lg border border-violet-200 shadow-sm p-12">
             <div class="text-center">
               <div class="w-24 h-24 bg-gradient-to-br from-violet-100 to-violet-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Hammer class="w-12 h-12 text-violet-600" />
+                <Wallet class="w-12 h-12 text-violet-600" />
               </div>
               <h3 class="text-xl font-semibold text-gray-900 mb-2">No Projects Yet</h3>
               <p class="text-gray-600 mb-8 max-w-md mx-auto">
@@ -609,7 +609,8 @@ import {
   BarChart3, 
   X, 
   Trash, 
-  GripVertical 
+  GripVertical,
+  Wallet
 } from "lucide-vue-next"
 
 // Reactive state
