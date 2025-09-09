@@ -749,6 +749,7 @@ import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
 import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign, Loader2, AlertCircle, Building2, Save, Filter, Building, MapPin, RotateCcw } from 'lucide-vue-next';
 import alertService from "@/components/ui/ui_utility/alertService.js";
 
@@ -1012,7 +1013,11 @@ watch(selectedProject, async (newProject, oldProject) => {
       }
       // Refresh department locations too
       try {
-        const respLoc = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list');
+        const respLoc = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list', {
+          headers: {
+            'X-Frappe-CSRF-Token': getCSRFToken()
+          }
+        });
         const jsonLoc = await respLoc.json();
         if (jsonLoc.message && jsonLoc.message.success) {
           modalDepartmentLocations.value = (jsonLoc.message.locations || []).map(l => l.department_location || l.name);
@@ -1122,7 +1127,11 @@ onMounted(async () => {
     try {
       await loadDepartmentLocationOptions();
       // read from payroll service reactive ref via dynamic import not needed since function populates its own ref; we replicate by fetching API directly here
-      const respLoc = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list');
+      const respLoc = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list', {
+        headers: {
+          'X-Frappe-CSRF-Token': getCSRFToken()
+        }
+      });
       const jsonLoc = await respLoc.json();
       if (jsonLoc.message && jsonLoc.message.success) {
         modalDepartmentLocations.value = (jsonLoc.message.locations || []).map(l => l.department_location || l.name);

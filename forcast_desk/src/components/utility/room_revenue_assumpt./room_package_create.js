@@ -1,4 +1,6 @@
 // Utility to create a new Room Packages document
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
+
 export async function createRoomPackage({ package_name, number_of_rooms, project_name = null }) {
   try {
     const params = new URLSearchParams();
@@ -14,6 +16,7 @@ export async function createRoomPackage({ package_name, number_of_rooms, project
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
+        "X-Frappe-CSRF-Token": getCSRFToken()
       },
       body: params,
       credentials: "include",

@@ -1,3 +1,5 @@
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
+
 export async function createRestaurant({ cover_name, project = null }) {
   try {
     // Create form data
@@ -9,6 +11,9 @@ export async function createRestaurant({ cover_name, project = null }) {
     
     const response = await fetch('/api/method/ex_forcast.api.create_restaurant.create_restaurant', {
       method: 'POST',
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      },
       body: formData
     });
     const data = await response.json();

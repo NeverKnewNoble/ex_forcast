@@ -1,4 +1,6 @@
 // Custom API call to fetch room packages from Frappe backend
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
+
 export async function getRoomPackagesList(projectName = null) {
     try{
         let url = "/api/v2/method/ex_forcast.api.room_packages_list.get_room_packages";
@@ -10,6 +12,7 @@ export async function getRoomPackagesList(projectName = null) {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "X-Frappe-CSRF-Token": getCSRFToken()
             },
         })
 
@@ -40,6 +43,7 @@ export async function createDefaultRoomPackages(projectName) {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
+                "X-Frappe-CSRF-Token": getCSRFToken()
             },
             body: params,
             credentials: "include",
@@ -70,6 +74,7 @@ export async function deleteRoomPackage(packageName, projectName) {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
+        "X-Frappe-CSRF-Token": getCSRFToken()
       },
       body: params,
       credentials: "include",

@@ -3,6 +3,7 @@
 import { ref, reactive } from 'vue';
 import alertService from "@/components/ui/ui_utility/alertService.js";
 import { payrollDataConstructor, transformApiToFrontend, transformFrontendToApi, validatePayrollData } from './data_constructors/index.js';
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
 
 // Modal state
 export const showAddPayrollModal = ref(false);
@@ -88,7 +89,11 @@ export { months };
 //! ************ Department Options ****************
 export async function loadDepartmentOptions() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.department_list.get_department_list');
+    const response = await fetch('/api/method/ex_forcast.api.department_list.get_department_list', {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     const data = await response.json();
     
     if (data.message && data.message.success) {
@@ -125,7 +130,11 @@ export async function loadDepartmentOptions() {
 //! ************ Project Department Options (Filtered) ****************
 export async function loadProjectDepartmentOptions() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.department_list.get_department_list');
+    const response = await fetch('/api/method/ex_forcast.api.department_list.get_department_list', {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     const data = await response.json();
     
     if (data.message && data.message.success) {
@@ -178,7 +187,11 @@ export async function loadProjectDepartmentOptions() {
 //! ************ Department Location Options ****************
 export async function loadDepartmentLocationOptions() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list');
+    const response = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list', {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     const data = await response.json();
     
     if (data.message && data.message.success) {
@@ -218,7 +231,11 @@ export async function loadDepartmentLocationOptions() {
 //! ************ Designation Options ****************
 export async function loadDesignationOptions() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.designation_list.get_designation_list');
+    const response = await fetch('/api/method/ex_forcast.api.designation_list.get_designation_list', {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     const data = await response.json();
     
     if (data.message && data.message.success) {
@@ -275,7 +292,11 @@ export async function fetchPayrollData(projectName, fromYear = null, toYear = nu
       return;
     }
 
-    const response = await fetch(`/api/method/ex_forcast.api.call_and_save_payroll_data.payroll_data_display?project=${encodeURIComponent(projectName)}`);
+    const response = await fetch(`/api/method/ex_forcast.api.call_and_save_payroll_data.payroll_data_display?project=${encodeURIComponent(projectName)}`, {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     const data = await response.json();
     
     if (data.message && !data.message.error) {
@@ -451,6 +472,7 @@ export async function savePayrollChanges(changes, projectName) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify({
         changes: apiChanges,
@@ -573,6 +595,7 @@ export async function submitPayrollData(selectedProject, payrollRows, reloadData
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify(apiPayload)
     });
@@ -608,6 +631,7 @@ export async function createDepartment(departmentName) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify({
         department_name: departmentName
@@ -638,6 +662,7 @@ export async function createDepartmentLocation(locationName) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify({
         department_location: locationName
@@ -668,6 +693,7 @@ export async function createDesignation(designationName) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify({
         designation_name: designationName
@@ -698,6 +724,7 @@ export async function createRestaurant(restaurantName, project = null) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify({
         cover_name: restaurantName,
