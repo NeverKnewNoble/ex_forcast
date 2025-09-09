@@ -279,9 +279,10 @@ function getCurrentTime() {
 
 // Project change handler
 const handleProjectChange = (project) => {
-  // console.log('Project changed to:', project)
-  // You can add additional logic here when project changes
-  // For example, refresh data based on selected project
+  // Project changed - refresh data based on selected project
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Project changed to:', project)
+  }
 }
 
 // Settings modal handlers

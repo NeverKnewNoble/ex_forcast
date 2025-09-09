@@ -300,18 +300,29 @@ onMounted(() => {
     }
   }
   window.addEventListener('settings-updated', handler)
-  // Periodic fallback sync in case events are missed
-  const sync = () => {
-    const autoVal = localStorage.getItem('autoExpandSidebar') === 'true'
-    if (autoExpandSidebar.value !== autoVal) autoExpandSidebar.value = autoVal
-    const hospItem = localStorage.getItem('hospitalityExperience')
-    const hospVal = hospItem === null ? true : hospItem === 'true'
-    if (hospitalityExperience.value !== hospVal) hospitalityExperience.value = hospVal
-  }
-  const intervalId = setInterval(sync, 1000)
-  // Store for cleanup
-  window.__sidebarSyncInterval = intervalId
+  
+  // Store references for cleanup
   window.__sidebarSettingsHandler = handler
+  
+  // Use optimized localStorage and reduce sync frequency
+  const sync = () => {
+    try {
+      const autoVal = localStorage.getItem('autoExpandSidebar') === 'true'
+      if (autoExpandSidebar.value !== autoVal) autoExpandSidebar.value = autoVal
+      const hospItem = localStorage.getItem('hospitalityExperience')
+      const hospVal = hospItem === null ? true : hospItem === 'true'
+      if (hospitalityExperience.value !== hospVal) hospitalityExperience.value = hospVal
+    } catch (error) {
+      // Handle localStorage errors silently
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Sidebar sync error:', error)
+      }
+    }
+  }
+  
+  // Reduce sync frequency to 5 seconds instead of 1 second
+  const intervalId = setInterval(sync, 5000)
+  window.__sidebarSyncInterval = intervalId
 })
 
 onUnmounted(() => {

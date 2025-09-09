@@ -31,7 +31,9 @@ export async function initializeData(years, expenseData, originalExpenseData, ex
       totalRooms.value = parseInt(savedRooms) || 100;
     }
   } catch (err) {
-    console.error("Error loading data:", err);
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Error loading data:", err);
+    }
   }
 }
 

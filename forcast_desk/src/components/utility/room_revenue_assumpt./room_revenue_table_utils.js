@@ -180,7 +180,9 @@ export async function saveRoomChanges(changedCells, isSaving, saveError, roomDat
     }
     
   } catch (error) {
-    console.error('Error saving room revenue changes:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error saving room revenue changes:', error)
+    }
     saveError.value = error.message || "Failed to save changes. Please try again."
     
     // Show error alert
@@ -188,7 +190,9 @@ export async function saveRoomChanges(changedCells, isSaving, saveError, roomDat
       const alertService = await import('@/components/ui/ui_utility/alertService.js').then(m => m.default)
       alertService.error(error.message || "Failed to save changes. Please try again.")
     } catch (alertError) {
-      console.error('Could not show error alert:', alertError)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Could not show error alert:', alertError)
+      }
     }
   } finally {
     isSaving.value = false
