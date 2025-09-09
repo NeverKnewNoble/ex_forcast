@@ -14,19 +14,31 @@ def get_default_expenses_for_project(project_name):
         # Debug: Log the project name being searched for
         frappe.logger().info(f"Searching for project: '{project_name}'")
         
-        # Check if the project exists first
-        if not frappe.db.exists("Forecast Project", project_name):
-            # Try to find similar project names
+        # Resolve project by either docname or project_name field
+        resolved_project_name = None
+        
+        # Case 1: Provided value is the doctype docname
+        if frappe.db.exists("Forecast Project", project_name):
+            resolved_project_name = project_name
+        else:
+            # Case 2: Provided value is the human-friendly project_name field
+            resolved_project_name = frappe.db.get_value(
+                "Forecast Project",
+                {"project_name": project_name},
+                "name"
+            )
+
+        if not resolved_project_name:
+            # Try to find similar project names to help debugging
             all_projects = frappe.get_all("Forecast Project", fields=["name", "project_name"])
             frappe.logger().info(f"Available projects: {all_projects}")
-            
             return {
                 "success": False,
                 "error": f"Project '{project_name}' not found. Available projects: {[p.project_name for p in all_projects]}"
             }
-        
-        # Get the project document
-        project = frappe.get_doc("Forecast Project", project_name)
+
+        # Get the project document using the resolved docname
+        project = frappe.get_doc("Forecast Project", resolved_project_name)
         frappe.logger().info(f"Found project: {project.name}, project_name: {project.project_name}")
         
         # Get selected departments from the project
