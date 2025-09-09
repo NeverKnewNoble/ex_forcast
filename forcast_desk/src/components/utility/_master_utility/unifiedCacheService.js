@@ -24,9 +24,13 @@ export class UnifiedCacheService {
     try {
       await this.loadProjectCache()
       this.isInitialized.value = true
-      // console.log('[CACHE] Service initialized successfully')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[CACHE] Service initialized successfully')
+      }
     } catch (error) {
-      console.error('[CACHE] Initialization failed:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CACHE] Initialization failed:', error)
+      }
       this.errorState.value = error.message
     }
   }
@@ -58,9 +62,13 @@ export class UnifiedCacheService {
       // Persist to localStorage
       this.persistToStorage(projectId, pageId, rowCode, year, label, value)
       
-      console.log('[CACHE SET]', { projectId, pageId, rowCode, year, label, value })
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[CACHE SET]', { projectId, pageId, rowCode, year, label, value })
+      }
     } catch (error) {
-      console.error('[CACHE] Error setting value:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CACHE] Error setting value:', error)
+      }
       this.errorState.value = error.message
     }
   }
@@ -86,7 +94,9 @@ export class UnifiedCacheService {
 
       return 0.00
     } catch (error) {
-      console.error('[CACHE] Error getting value:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CACHE] Error getting value:', error)
+      }
       return 0.00
     }
   }
@@ -105,7 +115,9 @@ export class UnifiedCacheService {
       // Fallback to localStorage
       return this.getRowFromStorage(projectId, pageId, rowCode)
     } catch (error) {
-      console.error('[CACHE] Error getting row values:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CACHE] Error getting row values:', error)
+      }
       return {}
     }
   }
@@ -158,7 +170,9 @@ export class UnifiedCacheService {
         // console.log('[CACHE CLEAR] Year cache cleared:', { projectId, pageId, rowCode, year })
       }
     } catch (error) {
-      console.error('[CACHE] Error clearing cache:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CACHE] Error clearing cache:', error)
+      }
     }
   }
 
@@ -186,7 +200,9 @@ export class UnifiedCacheService {
         // console.log('[CACHE] No stored cache found for project:', project.project_name)
       }
     } catch (error) {
-      console.error('[CACHE] Error loading project cache:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CACHE] Error loading project cache:', error)
+      }
       this.cache.value = {}
       this.errorState.value = error.message
     }
@@ -203,7 +219,9 @@ export class UnifiedCacheService {
       const storageKey = this.getProjectKey('calculationCache')
       localStorage.setItem(storageKey, JSON.stringify(this.cache.value))
     } catch (error) {
-      console.error('[CACHE] Error persisting to storage:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CACHE] Error persisting to storage:', error)
+      }
       this.errorState.value = error.message
     }
   }
@@ -226,7 +244,9 @@ export class UnifiedCacheService {
       
       return null
     } catch (error) {
-      console.error('[CACHE] Error reading from storage:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CACHE] Error reading from storage:', error)
+      }
       return null
     }
   }
@@ -249,7 +269,9 @@ export class UnifiedCacheService {
       
       return {}
     } catch (error) {
-      console.error('[CACHE] Error reading row from storage:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CACHE] Error reading row from storage:', error)
+      }
       return {}
     }
   }
@@ -266,7 +288,9 @@ export class UnifiedCacheService {
         }
       })
     } catch (error) {
-      console.error('[CACHE] Error clearing all storage:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CACHE] Error clearing all storage:', error)
+      }
     }
   }
 
@@ -278,7 +302,9 @@ export class UnifiedCacheService {
       const storageKey = this.getProjectKey('calculationCache')
       localStorage.removeItem(storageKey)
     } catch (error) {
-      console.error('[CACHE] Error clearing project storage:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CACHE] Error clearing project storage:', error)
+      }
     }
   }
 
@@ -337,7 +363,9 @@ export class UnifiedCacheService {
       
       return null
     } catch (error) {
-      console.error('[CACHE] Error getting cache stats:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CACHE] Error getting cache stats:', error)
+      }
       return null
     }
   }
@@ -403,7 +431,9 @@ export class UnifiedCacheService {
         URL.revokeObjectURL(url)
       }
     } catch (error) {
-      console.error('[CACHE] Error exporting cache:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CACHE] Error exporting cache:', error)
+      }
     }
   }
 
@@ -440,7 +470,9 @@ export class UnifiedCacheService {
             this.cache.value = data.data
             this.persistToStorage()
             
-            console.log('[CACHE] Cache imported successfully')
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[CACHE] Cache imported successfully')
+            }
             resolve()
           } catch (error) {
             reject(new Error(`Failed to parse cache file: ${error.message}`))

@@ -85,7 +85,9 @@ export async function saveFnbChanges(changedCells, isSaving, saveError, fnbData,
     }
 
   } catch (error) {
-    console.error('Error saving F&B changes:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error saving F&B changes:', error);
+    }
     saveError.value = error.message || 'Failed to save changes';
     alertService.error(`Save failed: ${saveError.value}`);
   } finally {

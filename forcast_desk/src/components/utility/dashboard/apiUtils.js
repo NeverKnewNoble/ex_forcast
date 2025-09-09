@@ -151,6 +151,16 @@ export const makeFormDataRequest = async (url, formData) => {
  * Handle API errors consistently
  */
 export const handleApiError = (error, defaultMessage = 'An error occurred') => {
+  // Import production error handler dynamically to avoid circular dependencies
+  import('@/components/utility/_master_utility/productionErrorHandler.js').then(({ productionErrorHandler }) => {
+    productionErrorHandler.handleApiError(error, 'API Request')
+  }).catch(() => {
+    // Fallback if error handler fails to load
+    if (process.env.NODE_ENV === 'development') {
+      console.error('API Error:', error)
+    }
+  })
+  
   if (error.message) {
     return error.message
   }

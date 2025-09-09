@@ -22,6 +22,9 @@ import { debugLocalStorage, migrateToProjectSpecificKeys, getAllProjectKeys } fr
 // Import unified cache service
 import { unifiedCacheService } from '@/components/utility/_master_utility/unifiedCacheService.js'
 
+// Import production error handler
+import { productionErrorHandler } from '@/components/utility/_master_utility/productionErrorHandler.js'
+
 let app = createApp(App)
 
 setConfig('resourceFetcher', frappeRequest)
@@ -35,18 +38,34 @@ app.use(pinia);
 
 // Initialize unified cache service
 unifiedCacheService.initialize().then(() => {
-  // console.log('[MAIN] Cache service initialized')
+  // Cache service initialized successfully
 }).catch(error => {
-  console.error('[MAIN] Failed to initialize cache service:', error)
+  // Handle cache initialization error with production error handler
+  productionErrorHandler.logError(error, 'Cache Service Initialization')
 })
 
-// Add global debug functions for testing project-specific localStorage
-window.debugProjectLocalStorage = debugLocalStorage
-window.migrateToProjectSpecificKeys = migrateToProjectSpecificKeys
-window.getAllProjectKeys = getAllProjectKeys
+// Add global debug functions only in development
+if (process.env.NODE_ENV === 'development') {
+  window.debugProjectLocalStorage = debugLocalStorage
+  window.migrateToProjectSpecificKeys = migrateToProjectSpecificKeys
+  window.getAllProjectKeys = getAllProjectKeys
+  window.unifiedCacheService = unifiedCacheService
+  window.productionErrorHandler = productionErrorHandler
+}
 
-// Add cache service to global scope for debugging
-window.unifiedCacheService = unifiedCacheService
+// Global error handling
+window.addEventListener('error', (event) => {
+  productionErrorHandler.logError(event.error, 'Global Error Handler', {
+    filename: event.filename,
+    lineno: event.lineno,
+    colno: event.colno
+  })
+})
+
+window.addEventListener('unhandledrejection', (event) => {
+  productionErrorHandler.logError(event.reason, 'Unhandled Promise Rejection')
+  event.preventDefault() // Prevent default browser behavior
+})
 
 app.component('Button', Button)
 app.component('Card', Card)
