@@ -197,6 +197,7 @@ const handleMouseLeave = () => {
 const menuItems = [
   { text: "Home", route: "/", icon: Home },
   { text: "Dashboard", route: "/dashboard", icon: LayoutDashboard  },
+  { text: "Expense Assumptions", route: "/expense_estimate", icon: Calculator },
   {
     text: "Revenue",
     icon: ChartNoAxesCombined ,
@@ -223,7 +224,6 @@ const menuItems = [
       { text: "Project Budget", route: "/project_budget", icon: Wallet},
     ]
   },
-  { text: "Expense Assumptions", route: "/expense_estimate", icon: Calculator },
   { text: "Receipts & Payments", route: "/receipts_payments", icon: ReceiptText },
   { text: "Reports", route: "/reports", icon: BookOpen },
   { text: "Settings", route: "#", icon: Settings, action: "openSettings" },

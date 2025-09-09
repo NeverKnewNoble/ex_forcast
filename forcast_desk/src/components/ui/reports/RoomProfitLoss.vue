@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg border border-blue-200 dark:border-blue-700 shadow-sm overflow-hidden">
+  <div class="bg-white rounded-lg border border-blue-300 dark:border-blue-700 shadow-sm overflow-hidden">
     <!-- Table Container -->
     <div class="overflow-x-auto">
       <div class="min-w-full w-max">
@@ -52,7 +52,7 @@
                 </div>
               </th>
             </tr>
-            <tr class="bg-blue-50 dark:bg-blue-900/200/90 text-xs">
+            <tr class="bg-blue-500 dark:bg-blue-900/20 text-xs text-white dark:text-gray-200">
               <template v-for="year in visibleYears" :key="'months-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="year + '-' + label">
@@ -107,8 +107,8 @@
           </tr>
 
             <!-- NO OF ROOMS -->
-            <tr v-if="hasNoOfRoomsData()" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasNoOfRoomsData()" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 font-medium border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   NO OF ROOMS
                 </div>
@@ -116,19 +116,19 @@
               <template v-for="year in visibleYears" :key="'no-rooms-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'no-rooms-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs">{{ formatNumber(getNoOfRooms(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatNumber(getNoOfRoomsTotal(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatNumber(getNoOfRoomsTotal(year)) }}</span>
                   </td>
                 </template>
@@ -136,8 +136,8 @@
           </tr>
 
             <!-- NO OF DAYS -->
-            <tr v-if="hasNoOfDaysData()" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasNoOfDaysData()" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 font-medium border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   NO OF DAYS
                 </div>
@@ -145,19 +145,19 @@
               <template v-for="year in visibleYears" :key="'no-days-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'no-days-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs">{{ formatNumber(getNoOfDays(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatNumber(getNoOfDaysTotal(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatNumber(getNoOfDaysTotal(year)) }}</span>
                   </td>
                 </template>
@@ -165,8 +165,8 @@
             </tr>
 
             <!-- AVAILABLE ROOMS -->
-            <tr v-if="hasAvailableRoomsData()" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasAvailableRoomsData()" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 font-medium border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   AVAILABLE ROOMS
                 </div>
@@ -174,19 +174,19 @@
               <template v-for="year in visibleYears" :key="'available-rooms-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'available-rooms-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs">{{ formatNumber(getAvailableRooms(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatNumber(getAvailableRoomsTotal(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatNumber(getAvailableRoomsTotal(year)) }}</span>
                   </td>
                 </template>
@@ -194,8 +194,8 @@
             </tr>
 
             <!-- SOLD ROOMS (excl. comp) -->
-            <tr v-if="hasSoldRoomsData()" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasSoldRoomsData()" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 font-medium border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   SOLD ROOMS (excl. comp)
                 </div>
@@ -203,19 +203,19 @@
               <template v-for="year in visibleYears" :key="'sold-rooms-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'sold-rooms-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs">{{ formatNumber(getSoldRooms(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatNumber(getSoldRoomsTotal(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatNumber(getSoldRoomsTotal(year)) }}</span>
                   </td>
                 </template>
@@ -223,8 +223,8 @@
           </tr>
 
             <!-- ROOM OCCUPANCY % -->
-            <tr v-if="hasOccupancyData()" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasOccupancyData()" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 font-medium border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   ROOM OCCUPANCY %
                 </div>
@@ -232,19 +232,19 @@
               <template v-for="year in visibleYears" :key="'occupancy-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'occupancy-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs">{{ formatPercentage(getOccupancyPercentage(year, label)) }}%</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatPercentage(getOccupancyPercentageTotal(year)) }}%</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatPercentage(getOccupancyPercentageTotal(year)) }}%</span>
                   </td>
                 </template>
@@ -252,8 +252,8 @@
           </tr>
 
             <!-- NUMBER OF GUESTS -->
-            <tr v-if="hasGuestsData()" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasGuestsData()" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 font-medium border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   NUMBER OF GUESTS
                 </div>
@@ -261,19 +261,19 @@
               <template v-for="year in visibleYears" :key="'guests-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'guests-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs">{{ formatNumber(getNumberOfGuests(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatNumber(getNumberOfGuestsTotal(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatNumber(getNumberOfGuestsTotal(year)) }}</span>
                   </td>
                 </template>
@@ -281,8 +281,8 @@
           </tr>
 
                                                  <!-- NUMBER OF F&B COVERS -->
-            <tr v-if="hasCoversData()" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasCoversData()" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 font-medium border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   NUMBER OF F&B COVERS
                 </div>
@@ -290,19 +290,19 @@
               <template v-for="year in visibleYears" :key="'covers-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'covers-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs">{{ formatNumber(getNumberOfCovers(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatNumber(getNumberOfCoversTotal(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatNumber(getNumberOfCoversTotal(year)) }}</span>
                   </td>
                 </template>
@@ -310,8 +310,8 @@
           </tr>
 
             <!-- AVERAGE F&B SPENT PER COVER -->
-            <tr v-if="hasFnbSpentData()" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasFnbSpentData()" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 font-medium border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   AVERAGE F&B SPENT PER COVER
                 </div>
@@ -319,19 +319,19 @@
               <template v-for="year in visibleYears" :key="'avg-fnb-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'avg-fnb-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs">{{ formatMoney(getAverageFnbSpent(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getAverageFnbSpentTotal(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getAverageFnbSpentTotal(year)) }}</span>
                   </td>
                 </template>
@@ -339,8 +339,8 @@
           </tr>
 
             <!-- AVERAGE ROOM RATE -->
-            <tr v-if="hasRoomRateData()" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasRoomRateData()" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 font-medium border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   AVERAGE ROOM RATE
                 </div>
@@ -348,19 +348,19 @@
               <template v-for="year in visibleYears" :key="'avg-rate-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'avg-rate-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs">{{ formatMoney(getAverageRoomRate(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getAverageRoomRateTotal(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getAverageRoomRateTotal(year)) }}</span>
                   </td>
                 </template>
@@ -368,8 +368,8 @@
           </tr>
 
                         <!-- REV PER AVAILABLE ROOM -->
-            <tr v-if="hasRevPerRoomData()" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasRevPerRoomData()" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 font-medium border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   REVENUE PER AVAILABLE ROOM
                 </div>
@@ -377,19 +377,19 @@
               <template v-for="year in visibleYears" :key="'rev-per-room-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'rev-per-room-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs">{{ formatMoney(getRevPerAvailableRoom(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getRevPerAvailableRoomTotal(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getRevPerAvailableRoomTotal(year)) }}</span>
                   </td>
                 </template>
@@ -479,7 +479,7 @@
             <template v-if="isMarketSegmentationEnabled()">
               <!-- Dynamic segments from Market Segmentation cache (keys starting with 'Room Revenue:') -->
               <template v-for="segment in roomRevenueSegments" :key="'segment-' + segment">
-                <tr v-if="hasSegmentData(segment)" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
+                <tr v-if="hasSegmentData(segment)" class="bg-blue-50 dark:bg-blue-900/20 text-gray-700 dark:text-gray-200 border-b border-blue-200 dark:border-blue-700">
                   <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
                     <div class="flex items-center gap-1">
                       {{ segment }}
@@ -488,19 +488,19 @@
                   <template v-for="year in visibleYears" :key="'segment-' + segment + '-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <template v-for="label in getColumnLabelsForYear(year)" :key="'segment-cell-' + segment + '-' + year + '-' + label">
-                        <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                        <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-gray-700 dark:text-gray-200">
                           <span class="font-mono text-xs">{{ formatMoney(getSegmentRevenue(year, label, segment)) }}</span>
                         </td>
-                        <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                        <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-gray-700 dark:text-gray-200">
                           <span class="font-mono text-xs text-blue-600">{{ formatPercentage(getSegmentRevenuePercentage(year, label, segment)) }}%</span>
                         </td>
                       </template>
-                      <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                      <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                         <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getSegmentRevenueTotal(year, segment)) }}</span>
                       </td>
                     </template>
                     <template v-else>
-                      <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                      <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                         <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getSegmentRevenueTotal(year, segment)) }}</span>
                       </td>
                     </template>
@@ -509,7 +509,7 @@
               </template>
 
               <!-- TOTAL REVENUE -->
-              <tr class="bg-blue-50 dark:bg-blue-900/200 border-b-2 border-blue-600">
+              <tr class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000 border-b-2 border-blue-600">
                 <td class="px-2 py-1 font-bold border-r border-blue-600">
                   <div class="flex items-center gap-1 text-white">
                     TOTAL REVENUE
@@ -518,19 +518,19 @@
                 <template v-for="year in visibleYears" :key="'total-rooms-revenue-' + year">
                   <template v-if="!isYearCollapsed(year)">
                     <template v-for="label in getColumnLabelsForYear(year)" :key="'total-rooms-revenue-cell-' + year + '-' + label">
-                      <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/200">
+                      <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                         <span class="font-mono text-xs text-white">{{ formatMoney(getTotalRoomsRevenue(year, label)) }}</span>
                       </td>
-                      <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/200">
+                      <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                         
                       </td>
                     </template>
-                    <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-50 dark:bg-blue-900/200">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                       <span class="font-mono text-xs text-white">{{ formatMoney(getTotalRoomsRevenueTotal(year)) }}</span>
                     </td>
                   </template>
                   <template v-else>
-                    <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-50 dark:bg-blue-900/200">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                       <span class="font-mono text-xs text-white">{{ formatMoney(getTotalRoomsRevenueTotal(year)) }}</span>
                     </td>
                   </template>
@@ -600,7 +600,7 @@
             <template v-if="!isMarketSegmentationEnabled()">
               <!-- Dynamic room types from Room Revenue Assumptions cache (keys starting with 'Room Type:') -->
               <template v-for="pkg in roomTypePackages" :key="'pkg-' + pkg">
-                <tr v-if="hasRoomTypeData(pkg)" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
+                <tr v-if="hasRoomTypeData(pkg)" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
                   <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
                     <div class="flex items-center gap-1">
                       {{ pkg }}
@@ -609,19 +609,19 @@
                   <template v-for="year in visibleYears" :key="'pkg-' + pkg + '-' + year">
                     <template v-if="!isYearCollapsed(year)">
                       <template v-for="label in getColumnLabelsForYear(year)" :key="'pkg-cell-' + pkg + '-' + year + '-' + label">
-                        <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                        <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-gray-700 dark:text-gray-200">
                           <span class="font-mono text-xs">{{ formatMoney(getRoomTypeRevenue(year, label, pkg)) }}</span>
                         </td>
-                        <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                        <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-gray-700 dark:text-gray-200">
                           <span class="font-mono text-xs text-blue-600">{{ formatPercentage(getRoomTypeRevenuePercentage(year, label, pkg)) }}%</span>
                         </td>
                       </template>
-                      <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                      <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                         <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getRoomTypeRevenueTotal(year, pkg)) }}</span>
                       </td>
                     </template>
                     <template v-else>
-                      <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
+                      <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-100 dark:bg-blue-800/30">
                         <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getRoomTypeRevenueTotal(year, pkg)) }}</span>
                       </td>
                     </template>
@@ -630,7 +630,7 @@
               </template>
 
               <!-- Total Rooms Revenue -->
-              <tr class="bg-blue-50 dark:bg-blue-900/200 border-b-2 border-blue-600">
+              <tr class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000 border-b-2 border-blue-600">
                 <td class="px-2 py-1 font-bold border-r border-blue-600">
                   <div class="flex items-center gap-1 text-white">
                     TOTAL ROOMS REVENUE
@@ -639,19 +639,19 @@
                 <template v-for="year in visibleYears" :key="'total-rooms-revenue-' + year">
                   <template v-if="!isYearCollapsed(year)">
                     <template v-for="label in getColumnLabelsForYear(year)" :key="'total-rooms-revenue-cell-' + year + '-' + label">
-                      <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/200">
+                      <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                         <span class="font-mono text-xs text-white">{{ formatMoney(getTotalRoomsRevenue(year, label)) }}</span>
                       </td>
-                      <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/200">
+                      <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                         
                       </td>
                     </template>
-                    <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-50 dark:bg-blue-900/200">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                       <span class="font-mono text-xs text-white">{{ formatMoney(getTotalRoomsRevenueTotal(year)) }}</span>
                     </td>
                   </template>
                   <template v-else>
-                    <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-50 dark:bg-blue-900/200">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                       <span class="font-mono text-xs text-white">{{ formatMoney(getTotalRoomsRevenueTotal(year)) }}</span>
                     </td>
                   </template>
@@ -703,8 +703,8 @@
 
             <!-- Dynamic Room Department Expenses -->
             <template v-for="exp in roomDepartmentExpenses" :key="'room-expense-' + exp">
-              <tr v-if="hasRoomExpenseData(exp)" class="bg-white border-b border-blue-200 dark:border-blue-700">
-                <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+              <tr v-if="hasRoomExpenseData(exp)" class="bg-white border-b border-blue-300 dark:border-blue-700">
+                <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                   <div class="flex items-center gap-1">
                     {{ exp }}
                   </div>
@@ -712,19 +712,19 @@
                 <template v-for="year in visibleYears" :key="'room-expense-' + exp + '-' + year">
                   <template v-if="!isYearCollapsed(year)">
                     <template v-for="label in getColumnLabelsForYear(year)" :key="'room-expense-cell-' + exp + '-' + year + '-' + label">
-                      <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                      <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                         <span class="font-mono text-xs">{{ formatMoney(getRoomExpenseAmount(year, label, exp)) }}</span>
                       </td>
-                      <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                      <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                         
                       </td>
                     </template>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getRoomExpenseTotal(year, exp)) }}</span>
                     </td>
                   </template>
                   <template v-else>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getRoomExpenseTotal(year, exp)) }}</span>
                     </td>
                   </template>
@@ -733,7 +733,7 @@
             </template>
 
             <!-- Gross Total Expenses -->
-            <tr class="bg-blue-50 dark:bg-blue-900/200 border-b-2 border-blue-600">
+            <tr class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000 border-b-2 border-blue-600">
               <td class="px-3 py-2 font-bold border-r border-blue-600">
                 <div class="flex items-center gap-1 text-white">
                   Gross Total Expenses
@@ -742,19 +742,19 @@
               <template v-for="year in visibleYears" :key="'gross-expenses-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'gross-expenses-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/200">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                       <span class="font-mono text-xs text-white">{{ formatMoney(getGrossRoomExpenses(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/200">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                       <span class="font-mono text-xs text-white">{{ formatPercentage(getGrossRoomExpensesPercentage(year, label)) }}%</span>
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-50 dark:bg-blue-900/200">
+                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                     <span class="font-mono text-xs text-white">{{ formatMoney(getGrossRoomExpensesYear(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-50 dark:bg-blue-900/200">
+                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                     <span class="font-mono text-xs text-white">{{ formatMoney(getGrossRoomExpensesYear(year)) }}</span>
                   </td>
                 </template>
@@ -783,8 +783,8 @@
             </tr>
 
             <!-- Payroll: Management Group Header -->
-            <tr v-if="hasPayrollGroupData('management')" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollGroupData('management')" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 font-medium border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Management
                 </div>
@@ -792,21 +792,21 @@
               <template v-for="year in visibleYears" :key="'mgmt-subheader-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'mgmt-subheader-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-center border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20"></td>
-                    <td class="px-2 py-1 text-center border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20"></td>
+                    <td class="px-2 py-1 text-center border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200"></td>
+                    <td class="px-2 py-1 text-center border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200"></td>
                   </template>
-                  <td class="px-2 py-1 text-center border border-blue-200 dark:border-blue-700 bg-blue-100 dark:bg-blue-800/30"></td>
+                  <td class="px-2 py-1 text-center border border-blue-300 dark:border-blue-700 bg-blue-100 dark:bg-blue-800/30"></td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-center border border-blue-200 dark:border-blue-700 bg-blue-100 dark:bg-blue-800/30"></td>
+                  <td class="px-2 py-1 text-center border border-blue-300 dark:border-blue-700 bg-blue-100 dark:bg-blue-800/30"></td>
                 </template>
               </template>
             </tr>
 
             <!-- Payroll: Management per-location rows -->
             <template v-for="loc in payrollLocationsManagement" :key="'mgmt-loc-' + loc">
-              <tr class="bg-white border-b border-blue-200 dark:border-blue-700">
-                <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+              <tr class="bg-white border-b border-blue-300 dark:border-blue-700">
+                <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                   <div class="flex items-center gap-1">
                     {{ loc }}
                   </div>
@@ -814,19 +814,19 @@
                 <template v-for="year in visibleYears" :key="'mgmt-row-' + loc + '-' + year">
                   <template v-if="!isYearCollapsed(year)">
                     <template v-for="label in getColumnLabelsForYear(year)" :key="'mgmt-cell-' + loc + '-' + year + '-' + label">
-                      <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                      <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                         <span class="font-mono text-xs">{{ formatMoney(getPayrollMonthlySalaryByLocation(year, label, loc, 'management')) }}</span>
                       </td>
-                      <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                      <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                         
                       </td>
                     </template>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollMonthlySalaryTotal(year, loc, 'management')) }}</span>
                     </td>
                   </template>
                   <template v-else>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollMonthlySalaryTotal(year, loc, 'management')) }}</span>
                     </td>
                   </template>
@@ -835,8 +835,8 @@
             </template>
 
             <!-- Payroll: Non-Management Group Header -->
-            <tr v-if="hasPayrollGroupData('non-management')" class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 font-medium border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollGroupData('non-management')" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 font-medium border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Non-Management
                 </div>
@@ -844,21 +844,21 @@
               <template v-for="year in visibleYears" :key="'nonmgmt-subheader-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'nonmgmt-subheader-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-center border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20"></td>
-                    <td class="px-2 py-1 text-center border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20"></td>
+                    <td class="px-2 py-1 text-center border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200"></td>
+                    <td class="px-2 py-1 text-center border border-blue-300 dark:border-blue-700 bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200"></td>
                   </template>
-                  <td class="px-2 py-1 text-center border border-blue-200 dark:border-blue-700 bg-blue-100 dark:bg-blue-800/30"></td>
+                  <td class="px-2 py-1 text-center border border-blue-300 dark:border-blue-700 bg-blue-100 dark:bg-blue-800/30"></td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-center border border-blue-200 dark:border-blue-700 bg-blue-100 dark:bg-blue-800/30"></td>
+                  <td class="px-2 py-1 text-center border border-blue-300 dark:border-blue-700 bg-blue-100 dark:bg-blue-800/30"></td>
                 </template>
               </template>
             </tr>
 
             <!-- Payroll: Non-Management per-location rows -->
             <template v-for="loc in payrollLocationsNonManagement" :key="'nonmgmt-loc-' + loc">
-              <tr class="bg-white border-b border-blue-200 dark:border-blue-700">
-                <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+              <tr class="bg-white border-b border-blue-300 dark:border-blue-700">
+                <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                   <div class="flex items-center gap-1">
                     {{ loc }}
                   </div>
@@ -866,19 +866,19 @@
                 <template v-for="year in visibleYears" :key="'nonmgmt-row-' + loc + '-' + year">
                   <template v-if="!isYearCollapsed(year)">
                     <template v-for="label in getColumnLabelsForYear(year)" :key="'nonmgmt-cell-' + loc + '-' + year + '-' + label">
-                      <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                      <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                         <span class="font-mono text-xs">{{ formatMoney(getPayrollMonthlySalaryByLocation(year, label, loc, 'non-management')) }}</span>
                       </td>
-                      <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                      <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                         
                       </td>
                     </template>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollMonthlySalaryTotal(year, loc, 'non-management')) }}</span>
                     </td>
                   </template>
                   <template v-else>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                       <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollMonthlySalaryTotal(year, loc, 'non-management')) }}</span>
                     </td>
                   </template>
@@ -887,7 +887,7 @@
             </template>
 
             <!-- Total Payroll -->
-            <tr class="bg-blue-50 dark:bg-blue-900/200 border-b-2 border-blue-600">
+            <tr class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000 border-b-2 border-blue-600">
               <td class="px-3 py-2 font-bold border-r border-blue-600">
                 <div class="flex items-center gap-1 text-white">
                   Total Payroll
@@ -896,19 +896,19 @@
               <template v-for="year in visibleYears" :key="'total-payroll-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'total-payroll-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/200">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                       <span class="font-mono text-xs text-white">{{ formatMoney(getTotalPayroll(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/200">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                       <span class="font-mono text-xs text-white">{{ formatPercentage(getTotalPayrollPercentage(year, label)) }}%</span>
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-50 dark:bg-blue-900/200">
+                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                     <span class="font-mono text-xs text-white">{{ formatMoney(getTotalPayrollYear(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-50 dark:bg-blue-900/200">
+                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                     <span class="font-mono text-xs text-white">{{ formatMoney(getTotalPayrollYear(year)) }}</span>
                   </td>
                 </template>
@@ -938,8 +938,8 @@
             </tr>
 
             <!-- NSSIT Row -->
-            <tr v-if="hasPayrollRelatedData('NSSIT')" class="bg-white border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollRelatedData('NSSIT')" class="bg-white border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   NSSIT
                 </div>
@@ -947,19 +947,19 @@
               <template v-for="year in visibleYears" :key="'nssit-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'nssit-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'NSSIT')) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'NSSIT')) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'NSSIT')) }}</span>
                   </td>
                 </template>
@@ -967,8 +967,8 @@
             </tr>
 
             <!-- Vacation Row -->
-            <tr v-if="hasPayrollRelatedData('Vacation')" class="bg-white border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollRelatedData('Vacation')" class="bg-white border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Vacation
                 </div>
@@ -976,19 +976,19 @@
               <template v-for="year in visibleYears" :key="'vacation-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'vacation-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Vacation')) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Vacation')) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Vacation')) }}</span>
                   </td>
                 </template>
@@ -996,8 +996,8 @@
             </tr>
 
             <!-- Relocation Row -->
-            <tr v-if="hasPayrollRelatedData('Relocation')" class="bg-white border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollRelatedData('Relocation')" class="bg-white border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Relocation
                 </div>
@@ -1005,19 +1005,19 @@
               <template v-for="year in visibleYears" :key="'relocation-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'relocation-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Relocation')) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Relocation')) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Relocation')) }}</span>
                   </td>
                 </template>
@@ -1025,8 +1025,8 @@
             </tr>
 
             <!-- Severence & Indemnity Row -->
-            <tr v-if="hasPayrollRelatedData('Severence & Indemnity')" class="bg-white border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollRelatedData('Severence & Indemnity')" class="bg-white border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Severence & Indemnity
                 </div>
@@ -1034,19 +1034,19 @@
               <template v-for="year in visibleYears" :key="'severence-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'severence-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Severence & Indemnity')) }}</span>
                   </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Severence & Indemnity')) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Severence & Indemnity')) }}</span>
                   </td>
                 </template>
@@ -1054,8 +1054,8 @@
             </tr>
 
             <!-- Other Row -->
-            <tr v-if="hasPayrollRelatedData('Other')" class="bg-white border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollRelatedData('Other')" class="bg-white border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Other
                 </div>
@@ -1063,19 +1063,19 @@
               <template v-for="year in visibleYears" :key="'other-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'other-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Other')) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Other')) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Other')) }}</span>
                   </td>
                 </template>
@@ -1083,8 +1083,8 @@
             </tr>
 
             <!-- Medical Row -->
-            <tr v-if="hasPayrollRelatedData('Medical')" class="bg-white border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollRelatedData('Medical')" class="bg-white border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Medical
                 </div>
@@ -1092,19 +1092,19 @@
               <template v-for="year in visibleYears" :key="'medical-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'medical-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Medical')) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Medical')) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Medical')) }}</span>
                   </td>
                 </template>
@@ -1112,8 +1112,8 @@
             </tr>
 
             <!-- Uniforms Row -->
-            <tr v-if="hasPayrollRelatedData('Uniforms')" class="bg-white border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollRelatedData('Uniforms')" class="bg-white border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Uniforms
                 </div>
@@ -1121,19 +1121,19 @@
               <template v-for="year in visibleYears" :key="'uniforms-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'uniforms-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Uniforms')) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Uniforms')) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Uniforms')) }}</span>
                   </td>
                 </template>
@@ -1141,8 +1141,8 @@
             </tr>
 
             <!-- Employee Meal Row -->
-            <tr v-if="hasPayrollRelatedData('Employee Meal')" class="bg-white border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollRelatedData('Employee Meal')" class="bg-white border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Employee Meal
                 </div>
@@ -1150,19 +1150,19 @@
               <template v-for="year in visibleYears" :key="'employee-meal-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'employee-meal-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Employee Meal')) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Employee Meal')) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Employee Meal')) }}</span>
                   </td>
                 </template>
@@ -1170,8 +1170,8 @@
             </tr>
 
             <!-- Transport Row -->
-            <tr v-if="hasPayrollRelatedData('Transport')" class="bg-white border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollRelatedData('Transport')" class="bg-white border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Transport
                 </div>
@@ -1179,19 +1179,19 @@
               <template v-for="year in visibleYears" :key="'transport-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'transport-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Transport')) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Transport')) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Transport')) }}</span>
                   </td>
                 </template>
@@ -1199,8 +1199,8 @@
             </tr>
 
             <!-- Telephone Row -->
-            <tr v-if="hasPayrollRelatedData('Telephone')" class="bg-white border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollRelatedData('Telephone')" class="bg-white border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Telephone
                 </div>
@@ -1208,19 +1208,19 @@
               <template v-for="year in visibleYears" :key="'telephone-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'telephone-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Telephone')) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Telephone')) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Telephone')) }}</span>
                   </td>
                 </template>
@@ -1228,8 +1228,8 @@
             </tr>
 
             <!-- Air Ticket Row -->
-            <tr v-if="hasPayrollRelatedData('Air Ticket')" class="bg-white border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollRelatedData('Air Ticket')" class="bg-white border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Air Ticket
                 </div>
@@ -1237,19 +1237,19 @@
               <template v-for="year in visibleYears" :key="'air-ticket-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'air-ticket-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Air Ticket')) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Air Ticket')) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Air Ticket')) }}</span>
   </td>
                 </template>
@@ -1257,8 +1257,8 @@
             </tr>
 
             <!-- Other Benefits Row -->
-            <tr v-if="hasPayrollRelatedData('Other Benefits')" class="bg-white border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasPayrollRelatedData('Other Benefits')" class="bg-white border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Other Benefits
                 </div>
@@ -1266,19 +1266,19 @@
               <template v-for="year in visibleYears" :key="'other-benefits-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'other-benefits-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getPayrollRelatedValue(year, label, 'Other Benefits')) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Other Benefits')) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getPayrollRelatedTotal(year, 'Other Benefits')) }}</span>
                   </td>
                 </template>
@@ -1286,7 +1286,7 @@
             </tr>
 
             <!-- Total Payroll Related Expenses -->
-            <tr class="bg-blue-50 dark:bg-blue-900/200 border-b-2 border-blue-600">
+            <tr class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000 border-b-2 border-blue-600">
               <td class="px-3 py-2 font-bold border-r border-blue-600">
                 <div class="flex items-center gap-1 text-white">
                   Total Payroll Related Expenses
@@ -1295,19 +1295,19 @@
               <template v-for="year in visibleYears" :key="'total-payroll-related-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'total-payroll-related-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/200">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                       <span class="font-mono text-xs text-white">{{ formatMoney(getTotalPayrollRelatedExpenses(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/200">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                       <span class="font-mono text-xs text-white">{{ formatPercentage(getTotalPayrollRelatedExpensesPercentage(year, label)) }}%</span>
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-50 dark:bg-blue-900/200">
+                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                     <span class="font-mono text-xs text-white">{{ formatMoney(getTotalPayrollRelatedExpensesYear(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-50 dark:bg-blue-900/200">
+                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                     <span class="font-mono text-xs text-white">{{ formatMoney(getTotalPayrollRelatedExpensesYear(year)) }}</span>
                   </td>
                 </template>
@@ -1336,8 +1336,8 @@
             </tr>
 
             <!-- Bonus Details Row -->
-            <tr v-if="hasBonusData()" class="bg-white border-b border-blue-200 dark:border-blue-700">
-              <td class="px-3 py-2 border-r border-blue-200 dark:border-blue-700">
+            <tr v-if="hasBonusData()" class="bg-white border-b border-blue-300 dark:border-blue-700">
+              <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
                 <div class="flex items-center gap-1">
                   Bonus Details
                 </div>
@@ -1345,20 +1345,20 @@
               <template v-for="year in visibleYears" :key="'bonus-details-row-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'bonus-details-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs">{{ formatMoney(getBonusValue(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                    <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                       <span class="font-mono text-xs text-blue-600">{{ formatPercentage(getBonusPercentage(year, label)) }}%</span>
                       <!-- Debug: {{ getBonusValue(year, label) }} / {{ getBonusTotal(year) }} = {{ getBonusPercentage(year, label) }}% -->
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 font-semibold bg-blue-50 dark:bg-blue-900/20">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getBonusTotal(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-200 dark:border-blue-700 bg-white">
+                  <td class="px-2 py-1 text-right border border-blue-300 dark:border-blue-700 bg-white">
                     <span class="font-mono text-xs text-blue-700 dark:text-blue-300">{{ formatMoney(getBonusTotal(year)) }}</span>
                   </td>
                 </template>
@@ -1424,7 +1424,7 @@
             </tr>
 
             <!-- DEPARTMENTAL INCOME (LOSS) Row -->
-            <tr class="bg-blue-50 dark:bg-blue-900/200 border-b-2 border-blue-600">
+            <tr class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000 border-b-2 border-blue-600">
               <td class="px-3 py-2 font-bold border-r border-blue-600">
                 <div class="flex items-center gap-1 text-white">
                   DEPARTMENTAL INCOME (LOSS)
@@ -1433,19 +1433,19 @@
               <template v-for="year in visibleYears" :key="'departmental-income-' + year">
                 <template v-if="!isYearCollapsed(year)">
                   <template v-for="label in getColumnLabelsForYear(year)" :key="'departmental-income-cell-' + year + '-' + label">
-                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/200">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                       <span class="font-mono text-xs text-white">{{ formatMoney(getDepartmentalIncome(year, label)) }}</span>
                     </td>
-                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/200">
+                    <td class="px-2 py-1 text-right border border-blue-600 font-semibold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                       <span class="font-mono text-xs text-blue-200">{{ formatPercentage(getDepartmentalIncomePercentage(year, label)) }}%</span>
                     </td>
                   </template>
-                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-50 dark:bg-blue-900/200">
+                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                     <span class="font-mono text-xs text-white">{{ formatMoney(getDepartmentalIncomeYear(year)) }}</span>
                   </td>
                 </template>
                 <template v-else>
-                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-50 dark:bg-blue-900/200">
+                  <td class="px-2 py-1 text-right border border-blue-600 font-bold bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-2000">
                     <span class="font-mono text-xs text-white">{{ formatMoney(getDepartmentalIncomeYear(year)) }}</span>
                   </td>
                 </template>
