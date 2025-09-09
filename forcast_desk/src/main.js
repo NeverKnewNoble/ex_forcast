@@ -68,3 +68,6 @@ try {
     }
   })
 } catch (e) {}
+
+// Frappe CSRF Shim To Fetch CSRF Token From Cookie
+import '@/components/utility/_master_utility/csrf-shim.js'
