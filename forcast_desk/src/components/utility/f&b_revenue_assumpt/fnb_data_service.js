@@ -1,5 +1,6 @@
 // Data service functions for F&B Revenue operations
 // import { cloneDeep } from 'lodash-es';
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
 
 // Base API URL
 const API_BASE = '/api/method/ex_forcast.api.call_and_save_fnb_revenue';
@@ -18,7 +19,11 @@ export async function loadFnbRevenueData(project = null) {
       url += `?project=${encodeURIComponent(project)}`;
     }
     
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -58,6 +63,9 @@ export async function saveFnbRevenueChanges(changes, project = null) {
     
     const response = await fetch(`${API_BASE}.upsert_fnb_revenue_items`, {
       method: 'POST',
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      },
       body: formData
     });
     
@@ -93,7 +101,11 @@ export async function getRestaurantsList(project = null) {
       url += `?project=${encodeURIComponent(project)}`;
     }
     
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -117,7 +129,11 @@ export async function getRestaurantsList(project = null) {
 export async function testFnbApi() {
   try {
     console.log('Testing F&B API connection...');
-    const response = await fetch(`${API_BASE}.test_fnb_api`);
+    const response = await fetch(`${API_BASE}.test_fnb_api`, {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

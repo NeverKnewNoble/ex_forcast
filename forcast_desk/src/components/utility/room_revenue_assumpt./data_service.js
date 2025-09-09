@@ -1,4 +1,5 @@
 import { selectedProject } from '@/components/utility/dashboard/projectService.js';
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
 
 // Custom API call to fetch Room Revenue Information from our Frappe backend
 export async function getRoomRevenueList() {
@@ -21,6 +22,7 @@ export async function getRoomRevenueList() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
     });
 
@@ -61,6 +63,7 @@ export async function createSegmentCategory(categoryName) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: params,
     });
@@ -87,6 +90,7 @@ export async function getSegmentCategories() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
     });
 
@@ -112,6 +116,7 @@ export async function getDefaultSegmentCategories() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
     });
 
@@ -142,6 +147,7 @@ export async function deleteSegmentCategory(categoryName) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: params,
     });
@@ -180,6 +186,7 @@ export async function saveRoomRevenueChanges(changes) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: params,
     });
@@ -221,6 +228,7 @@ export async function createRoomMarketSegment(segmentName, categoryName) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: params,
     });
@@ -247,6 +255,7 @@ export async function getRoomMarketSegments() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
     });
 
@@ -272,6 +281,7 @@ export async function getDefaultRoomMarketSegments() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
     });
 
@@ -302,6 +312,7 @@ export async function deleteRoomMarketSegment(segmentName) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: params,
     });
@@ -342,6 +353,7 @@ export async function getMarketSegmentList() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
     });
 
@@ -389,6 +401,7 @@ export async function saveMarketSegmentChanges(changes) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: params,
     });

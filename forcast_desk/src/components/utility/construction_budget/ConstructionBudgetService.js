@@ -9,6 +9,7 @@ import {
     ConstructionBudgetSummary,
     ConstructionBudgetUtils 
   } from './ConstructionBudgetModels.js'
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js'
   
   /**
    * API Configuration
@@ -44,7 +45,11 @@ import {
   
         const url = `${API_CONFIG.baseUrl}.${API_CONFIG.endpoints.display}?project=${project || ''}`
         
-        const response = await fetch(url)
+        const response = await fetch(url, {
+          headers: {
+            'X-Frappe-CSRF-Token': getCSRFToken()
+          }
+        })
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
@@ -111,6 +116,7 @@ import {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'X-Frappe-CSRF-Token': getCSRFToken()
           },
           body: JSON.stringify(requestBody)
         })
@@ -159,6 +165,7 @@ import {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'X-Frappe-CSRF-Token': getCSRFToken()
           },
           body: JSON.stringify({
             project_id: projectId
@@ -189,7 +196,11 @@ import {
      */
     async getSummary(project = null) {
       try {
-        const response = await fetch(`${API_CONFIG.baseUrl}.${API_CONFIG.endpoints.summary}?project=${project || ''}`)
+        const response = await fetch(`${API_CONFIG.baseUrl}.${API_CONFIG.endpoints.summary}?project=${project || ''}`, {
+          headers: {
+            'X-Frappe-CSRF-Token': getCSRFToken()
+          }
+        })
         const result = await response.json()
   
         if (result.success) {
@@ -466,7 +477,11 @@ import {
      */
     async testApiConnection() {
       try {
-        const response = await fetch(`${API_CONFIG.baseUrl}.test_construction_budget_api`)
+        const response = await fetch(`${API_CONFIG.baseUrl}.test_construction_budget_api`, {
+          headers: {
+            'X-Frappe-CSRF-Token': getCSRFToken()
+          }
+        })
         const result = await response.json()
         
         // Handle nested response structure (Frappe wraps responses in 'message')
