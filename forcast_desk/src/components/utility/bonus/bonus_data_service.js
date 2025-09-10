@@ -32,7 +32,7 @@ export async function fetchBonusData(projectName, fromYear = null, toYear = null
             params.append('toYear', toYear.toString());
         }
 
-        const url = `/api/v2/method/ex_forcast.api.call_and_save_bonus_data.bonus_data_display?${params.toString()}`;
+        const url = `/api/method/ex_forcast.api.call_and_save_bonus_data.bonus_data_display?${params.toString()}`;
         // console.log('API URL:', url);
         const response = await makeApiRequest(url);
 
@@ -83,7 +83,7 @@ export async function saveBonusChanges(changes, projectName) {
             projectName
         );
 
-        const url = '/api/v2/method/ex_forcast.api.call_and_save_bonus_data.upsert_bonus_data';
+        const url = '/api/method/ex_forcast.api.call_and_save_bonus_data.upsert_bonus_data';
         const response = await makeApiRequest(url, {
             method: 'POST',
             headers: {

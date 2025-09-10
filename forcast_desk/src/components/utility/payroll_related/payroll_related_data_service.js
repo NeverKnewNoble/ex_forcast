@@ -19,7 +19,7 @@ export const payrollRelatedSaveError = ref("");
  */
 export async function fetchPayrollRelatedData(projectName, fromYear = null, toYear = null) {
   try {
-    const response = await fetch(`/api/v2/method/ex_forcast.api.call_and_save_payroll_related_data.payroll_related_data_display?project=${encodeURIComponent(projectName)}`, {
+    const response = await fetch(`/api/method/ex_forcast.api.call_and_save_payroll_related_data.payroll_related_data_display?project=${encodeURIComponent(projectName)}`, {
       headers: {
         'X-Frappe-CSRF-Token': getCSRFToken()
       }
@@ -74,7 +74,7 @@ export async function savePayrollRelatedChanges(changes, projectName) {
       project: projectName
     };
     
-    const response = await fetch('/api/v2/method/ex_forcast.api.call_and_save_payroll_related_data.upsert_payroll_related_data', {
+    const response = await fetch('/api/method/ex_forcast.api.call_and_save_payroll_related_data.upsert_payroll_related_data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

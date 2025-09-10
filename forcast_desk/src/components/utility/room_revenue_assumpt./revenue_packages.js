@@ -3,7 +3,7 @@ import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
 
 export async function getRoomPackagesList(projectName = null) {
     try{
-        let url = "/api/v2/method/ex_forcast.api.room_packages_list.get_room_packages";
+        let url = "/api/method/ex_forcast.api.room_packages_list.get_room_packages";
         if (projectName) {
             url += `?project_name=${encodeURIComponent(projectName)}`;
         }

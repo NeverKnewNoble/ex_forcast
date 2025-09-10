@@ -1,10 +1,13 @@
 // Custom API call to fetch accounts from our Frappe backend
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
+
 export async function getExpenseList() {
   try {
-    const response = await fetch('/api/v2/method/ex_forcast.api.account_list.get_accounts', {
+    const response = await fetch('/api/method/ex_forcast.api.account_list.get_accounts', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
     });
 
