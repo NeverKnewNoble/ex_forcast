@@ -63,6 +63,12 @@ if (process.env.NODE_ENV === 'development') {
     window.testCSRFToken = module.testCSRFToken
     window.getCSRFToken = module.getCSRFToken
   })
+  
+  // Import expense data test functions
+  import('@/components/utility/expense_assumption/data_service.js').then(module => {
+    window.testDefaultExpenses = module.testDefaultExpenses
+    window.testExpenseData = module.testExpenseData
+  })
 }
 
 // Global error handling

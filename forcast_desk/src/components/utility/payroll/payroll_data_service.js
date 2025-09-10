@@ -319,19 +319,35 @@ export async function fetchPayrollData(projectName, fromYear = null, toYear = nu
 
       // Load default payroll rows for project's departments (for UI assistance)
       try {
-        const respDefaults = await fetch(`/api/v2/method/ex_forcast.api.default_payroll.get_default_payroll_for_project?project_name=${encodeURIComponent(projectName)}`, {
+        console.log('🔍 [DEFAULT PAYROLL] Starting loadPayrollData for project:', projectName);
+        const csrfToken = getCSRFToken();
+        console.log('🔍 [DEFAULT PAYROLL] CSRF Token:', csrfToken ? csrfToken.substring(0, 10) + '...' : 'NOT FOUND');
+        
+        const url = `/api/v2/method/ex_forcast.api.default_payroll.get_default_payroll_for_project?project_name=${encodeURIComponent(projectName)}`;
+        console.log('🔍 [DEFAULT PAYROLL] Making request to:', url);
+        
+        const respDefaults = await fetch(url, {
           headers: {
-            'X-Frappe-CSRF-Token': getCSRFToken()
+            'X-Frappe-CSRF-Token': csrfToken
           }
         });
+        
+        console.log('🔍 [DEFAULT PAYROLL] Response status:', respDefaults.status, respDefaults.statusText);
+        console.log('🔍 [DEFAULT PAYROLL] Response headers:', Object.fromEntries(respDefaults.headers.entries()));
+        
         const jsonDefaults = await respDefaults.json();
+        console.log('🔍 [DEFAULT PAYROLL] API response:', jsonDefaults);
+        
         const dataDefaults = jsonDefaults.data || jsonDefaults;
         if (dataDefaults && dataDefaults.success) {
+          console.log('✅ [DEFAULT PAYROLL] Success! Default payroll data:', dataDefaults.default_payroll?.length || 0, 'items');
           defaultPayrollRows.value = dataDefaults.default_payroll || [];
         } else {
+          console.warn('❌ [DEFAULT PAYROLL] API returned error or no success:', dataDefaults);
           defaultPayrollRows.value = [];
         }
-      } catch (_) {
+      } catch (error) {
+        console.error('❌ [DEFAULT PAYROLL] Error loading default payroll:', error);
         defaultPayrollRows.value = [];
       }
       
