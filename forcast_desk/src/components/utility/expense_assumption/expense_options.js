@@ -1,9 +1,9 @@
 // Service to fetch expense field options from the API
-import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js'
 
 export async function getExpenseFieldOptions() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.expense_options.get_expense_field_options', {
+    const response = await fetch('/api/v2/method/ex_forcast.api.expense_options.get_expense_field_options', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

@@ -4,7 +4,7 @@ import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js'
 // Data service for handling API calls and data loading
 export async function loadYearOptions() {
   try {
-    const response = await fetch("/api/method/ex_forcast.api.year.get_year_options", {
+    const response = await fetch("/api/v2/method/ex_forcast.api.year.get_year_options", {
       headers: {
         'X-Frappe-CSRF-Token': getCSRFToken()
       }
@@ -34,7 +34,7 @@ export async function loadExpenseData() {
     }
 
     // Load expense data filtered by project
-    const response = await fetch(`/api/method/ex_forcast.api.expense_estimate.estimate_display?project=${encodeURIComponent(currentProject.project_name)}`, {
+    const response = await fetch(`/api/v2/method/ex_forcast.api.expense_estimate.estimate_display?project=${encodeURIComponent(currentProject.project_name)}`, {
       headers: {
         'X-Frappe-CSRF-Token': getCSRFToken()
       }
@@ -85,7 +85,7 @@ export async function loadDefaultExpensesForProject() {
     // console.log('loadDefaultExpensesForProject - using projectName:', projectName);
 
     // Load default expenses for the project's selected departments
-    const response = await fetch(`/api/method/ex_forcast.api.default_expenses.get_default_expenses_for_project?project_name=${encodeURIComponent(projectName)}`, {
+    const response = await fetch(`/api/v2/method/ex_forcast.api.default_expenses.get_default_expenses_for_project?project_name=${encodeURIComponent(projectName)}`, {
       headers: {
         'X-Frappe-CSRF-Token': getCSRFToken()
       }
@@ -138,7 +138,7 @@ export async function loadAllExpensesAndCategories() {
     }
 
     // Load all expense assumptions for the project (regardless of year data)
-    const response = await fetch(`/api/method/ex_forcast.api.expense_estimate.get_all_expense_assumptions?project=${encodeURIComponent(currentProject.project_name)}`, {
+    const response = await fetch(`/api/v2/method/ex_forcast.api.expense_estimate.get_all_expense_assumptions?project=${encodeURIComponent(currentProject.project_name)}`, {
       headers: {
         'X-Frappe-CSRF-Token': getCSRFToken()
       }

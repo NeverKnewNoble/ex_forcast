@@ -1110,7 +1110,7 @@ onMounted(async () => {
     costTypeOptions.value = fieldOptions.cost_type.map(costType => ({ label: costType, value: costType }));
     
     // Load group accounts
-    const response = await fetch("/api/method/ex_forcast.api.account_list.get_group_accounts", {
+    const response = await fetch("/api/v2/method/ex_forcast.api.account_list.get_group_accounts", {
       headers: {
         'X-Frappe-CSRF-Token': getCSRFToken()
       }
@@ -1407,7 +1407,7 @@ async function createExpenseCategory() {
   categoryCreateError.value = "";
   categoryCreateSuccess.value = "";
   try {
-    const response = await fetch("/api/method/ex_forcast.api.expense_options.create_expense_category", {
+    const response = await fetch("/api/v2/method/ex_forcast.api.expense_options.create_expense_category", {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
@@ -1437,7 +1437,7 @@ async function createAccount() {
   if (!newAccount.value.account_name.trim() || !newAccount.value.account_number.trim() || !newAccount.value.parent_account) return;
   creatingAccount.value = true;
   try {
-    const response = await fetch("/api/method/ex_forcast.api.account_list.create_account", {
+    const response = await fetch("/api/v2/method/ex_forcast.api.account_list.create_account", {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",

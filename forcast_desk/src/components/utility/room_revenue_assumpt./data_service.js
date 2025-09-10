@@ -18,7 +18,7 @@ export async function getRoomRevenueList() {
     }
 
     // Load room revenue data filtered by project
-    const response = await fetch(`/api/method/ex_forcast.api.room_revenue_display.room_revenue_display?project=${encodeURIComponent(currentProject.project_name)}`, {
+    const response = await fetch(`/api/v2/method/ex_forcast.api.room_revenue_display.room_revenue_display?project=${encodeURIComponent(currentProject.project_name)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export async function createSegmentCategory(categoryName) {
     const params = new URLSearchParams();
     params.append('category_name', categoryName);
     
-    const response = await fetch('/api/method/ex_forcast.api.segment_category_api.create_segment_category', {
+    const response = await fetch('/api/v2/method/ex_forcast.api.segment_category_api.create_segment_category', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -86,7 +86,7 @@ export async function createSegmentCategory(categoryName) {
 // API call to fetch all Segment Categories
 export async function getSegmentCategories() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.segment_category_api.get_segment_categories', {
+    const response = await fetch('/api/v2/method/ex_forcast.api.segment_category_api.get_segment_categories', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ export async function getSegmentCategories() {
 // API call to fetch default Segment Categories (module = "Ex Forcast")
 export async function getDefaultSegmentCategories() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.segment_category_api.get_default_segment_categories', {
+    const response = await fetch('/api/v2/method/ex_forcast.api.segment_category_api.get_default_segment_categories', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ export async function deleteSegmentCategory(categoryName) {
     const params = new URLSearchParams();
     params.append('category_name', categoryName);
     
-    const response = await fetch('/api/method/ex_forcast.api.segment_category_api.delete_segment_category', {
+    const response = await fetch('/api/v2/method/ex_forcast.api.segment_category_api.delete_segment_category', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -182,7 +182,7 @@ export async function saveRoomRevenueChanges(changes) {
     params.append('changes', JSON.stringify(changes))
     params.append('project', currentProject.project_name)
     
-    const response = await fetch('/api/method/ex_forcast.api.room_revenue_display.upsert_room_revenue_items', {
+    const response = await fetch('/api/v2/method/ex_forcast.api.room_revenue_display.upsert_room_revenue_items', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -224,7 +224,7 @@ export async function createRoomMarketSegment(segmentName, categoryName) {
     params.append('market_segment', segmentName);
     params.append('segment_category', categoryName);
     
-    const response = await fetch('/api/method/ex_forcast.api.room_market_segment_api.create_room_market_segment', {
+    const response = await fetch('/api/v2/method/ex_forcast.api.room_market_segment_api.create_room_market_segment', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -251,7 +251,7 @@ export async function createRoomMarketSegment(segmentName, categoryName) {
 // API call to fetch all Room Market Segments
 export async function getRoomMarketSegments() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.room_market_segment_api.get_room_market_segments', {
+    const response = await fetch('/api/v2/method/ex_forcast.api.room_market_segment_api.get_room_market_segments', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -277,7 +277,7 @@ export async function getRoomMarketSegments() {
 // API call to fetch default Room Market Segments (module = "Ex Forcast")
 export async function getDefaultRoomMarketSegments() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.room_market_segment_api.get_default_room_market_segments', {
+    const response = await fetch('/api/v2/method/ex_forcast.api.room_market_segment_api.get_default_room_market_segments', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -308,7 +308,7 @@ export async function deleteRoomMarketSegment(segmentName) {
     const params = new URLSearchParams();
     params.append('market_segment', segmentName);
     
-    const response = await fetch('/api/method/ex_forcast.api.room_market_segment_api.delete_room_market_segment', {
+    const response = await fetch('/api/v2/method/ex_forcast.api.room_market_segment_api.delete_room_market_segment', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -349,7 +349,7 @@ export async function getMarketSegmentList() {
     }
 
     // Load market segment data filtered by project
-    const response = await fetch(`/api/method/ex_forcast.api.room_revenue_display.market_segment_display?project=${encodeURIComponent(currentProject.project_name)}`, {
+    const response = await fetch(`/api/v2/method/ex_forcast.api.room_revenue_display.market_segment_display?project=${encodeURIComponent(currentProject.project_name)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -397,7 +397,7 @@ export async function saveMarketSegmentChanges(changes) {
     params.append('changes', JSON.stringify(changes))
     params.append('project', currentProject.project_name)
     
-    const response = await fetch('/api/method/ex_forcast.api.room_revenue_display.upsert_market_segment_items', {
+    const response = await fetch('/api/v2/method/ex_forcast.api.room_revenue_display.upsert_market_segment_items', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

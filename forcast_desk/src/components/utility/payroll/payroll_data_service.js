@@ -319,7 +319,7 @@ export async function fetchPayrollData(projectName, fromYear = null, toYear = nu
 
       // Load default payroll rows for project's departments (for UI assistance)
       try {
-        const respDefaults = await fetch(`/api/method/ex_forcast.api.default_payroll.get_default_payroll_for_project?project_name=${encodeURIComponent(projectName)}`, {
+        const respDefaults = await fetch(`/api/v2/method/ex_forcast.api.default_payroll.get_default_payroll_for_project?project_name=${encodeURIComponent(projectName)}`, {
           headers: {
             'X-Frappe-CSRF-Token': getCSRFToken()
           }
