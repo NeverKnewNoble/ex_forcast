@@ -110,10 +110,10 @@ export const testCSRFToken = () => {
   const token = getCSRFToken()
   
   // console.log('🧪 [CSRF TEST] Final result:', {
-    token: token ? token.substring(0, 20) + '...' : 'NOT FOUND',
-    length: token?.length || 0,
-    isValid: token && token.length > 0
-  })
+  //   token: token ? token.substring(0, 20) + '...' : 'NOT FOUND',
+  //   length: token?.length || 0,
+  //   isValid: token && token.length > 0
+  // })
   
   return token
 }

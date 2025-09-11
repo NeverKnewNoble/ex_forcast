@@ -1913,11 +1913,11 @@ function getAvailableRooms(year, label) {
     let availableRooms = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Number of rooms available', year, label);
     
     // console.log(`Room P&L: Available Rooms cache lookup for ${year}/${label}:`, {
-      projectName: projectName.value,
-      cacheKey: 'Number of rooms available',
-      cachedValue: availableRooms,
-      cacheExists: availableRooms !== undefined && availableRooms !== null
-    });
+    //   projectName: projectName.value,
+    //   cacheKey: 'Number of rooms available',
+    //   cachedValue: availableRooms,
+    //   cacheExists: availableRooms !== undefined && availableRooms !== null
+    // });
     
     if (availableRooms !== undefined && availableRooms !== null) {
       return getNumber(availableRooms);
@@ -1931,10 +1931,10 @@ function getAvailableRooms(year, label) {
         const days = getNoOfDays(year, label);
         const calculatedValue = getNumber(totalRooms) * days;
         // console.log(`Room P&L: Calculated from Room Revenue Total Rooms:`, {
-          totalRooms,
-          days,
-          calculatedValue
-        });
+        //   totalRooms,
+        //   days,
+        //   calculatedValue
+        // });
         return calculatedValue;
       }
     }
@@ -1945,10 +1945,10 @@ function getAvailableRooms(year, label) {
     const fallbackValue = rooms * days;
     
     // console.log(`Room P&L: Using fallback calculation for available rooms:`, {
-      rooms,
-      days,
-      fallbackValue
-    });
+    //   rooms,
+    //   days,
+    //   fallbackValue
+    // });
     
     return fallbackValue;
   } catch (error) {
@@ -1986,11 +1986,11 @@ function getSoldRooms(year, label) {
     const soldRooms = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Number of rooms sold (excl.)', year, label);
     
     // console.log(`Room P&L: Sold Rooms cache lookup for ${year}/${label}:`, {
-      projectName: projectName.value,
-      cacheKey: 'Number of rooms sold (excl.)',
-      cachedValue: soldRooms,
-      cacheExists: soldRooms !== undefined && soldRooms !== null
-    });
+    //   projectName: projectName.value,
+    //   cacheKey: 'Number of rooms sold (excl.)',
+    //   cachedValue: soldRooms,
+    //   cacheExists: soldRooms !== undefined && soldRooms !== null
+    // });
     
     if (soldRooms !== undefined && soldRooms !== null) {
       return getNumber(soldRooms);
@@ -2002,10 +2002,10 @@ function getSoldRooms(year, label) {
       const availableRooms = getAvailableRooms(year, label);
       const calculatedSoldRooms = Math.round((getNumber(occupancy) / 100) * availableRooms);
       // console.log(`Room P&L: Calculated sold rooms from occupancy:`, {
-        occupancy,
-        availableRooms,
-        calculatedSoldRooms
-      });
+      //   occupancy,
+      //   availableRooms,
+      //   calculatedSoldRooms
+      // });
       return calculatedSoldRooms;
     }
     
@@ -2013,9 +2013,9 @@ function getSoldRooms(year, label) {
     const availableRooms = getAvailableRooms(year, label);
     const placeholderSoldRooms = Math.round(availableRooms * 0.75);
     // console.log(`Room P&L: Using placeholder 75% occupancy for sold rooms:`, {
-      availableRooms,
-      placeholderSoldRooms
-    });
+    //   availableRooms,
+    //   placeholderSoldRooms
+    // });
     return placeholderSoldRooms;
   } catch (error) {
     console.error('Error fetching sold rooms:', error);

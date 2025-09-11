@@ -1,1 +1,0 @@
-import"./payroll_data_service-BzFBQEI-.js";function o(r){["Backspace","Delete","Tab","Escape","Enter","ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(r.key)||r.key==="a"&&r.ctrlKey===!0||r.key==="c"&&r.ctrlKey===!0||r.key==="v"&&r.ctrlKey===!0||r.key==="x"&&r.ctrlKey===!0||/[0-9.,]/.test(r.key)||r.preventDefault()}export{o as a};
