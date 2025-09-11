@@ -10,13 +10,13 @@ import { formatCurrency, formatPercentage } from '@/components/utility/payroll_r
  * @returns {string} - Formatted bonus percentage
  */
 export function getBonusPercentage(row, year) {
-    // console.log('getBonusPercentageUtil called with:', { rowId: row.id, year, bonusData: bonusData.value });
+   //  // console.log('getBonusPercentageUtil called with:', { rowId: row.id, year, bonusData: bonusData.value });
     if (!bonusData.value[year] || !bonusData.value[year][row.id]) {
-        // console.log('No bonus data found for:', row.id, 'in year:', year);
+       //  // console.log('No bonus data found for:', row.id, 'in year:', year);
         return '0.00';
     }
     const bonusPercentage = bonusData.value[year][row.id].bonusPercentage || 0;
-    // console.log('Found bonus percentage:', bonusPercentage);
+   //  // console.log('Found bonus percentage:', bonusPercentage);
     return formatPercentage(bonusPercentage);
 }
 

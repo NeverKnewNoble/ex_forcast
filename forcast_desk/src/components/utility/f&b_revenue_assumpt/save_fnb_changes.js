@@ -30,12 +30,12 @@ export async function saveFnbChanges(changedCells, isSaving, saveError, fnbData,
     // Convert changed cells to the format expected by the API
     const changes = [];
     
-    // console.log('Processing changedCells:', changedCells.value);
+   //  // console.log('Processing changedCells:', changedCells.value);
     
     for (const change of changedCells.value) {
       try {
         const rowKeyObj = JSON.parse(change.row);
-        // console.log('Parsed rowKeyObj:', rowKeyObj);
+       //  // console.log('Parsed rowKeyObj:', rowKeyObj);
         
         // Skip calculated totals and invalid data
         if (rowKeyObj.type && (
@@ -45,7 +45,7 @@ export async function saveFnbChanges(changedCells, isSaving, saveError, fnbData,
           rowKeyObj.type === 'Lunch Revenue' ||
           rowKeyObj.type === 'Dinner Revenue'
         )) {
-        //   console.log('Skipping calculated total:', rowKeyObj);
+       //  //   console.log('Skipping calculated total:', rowKeyObj);
           continue;
         }
         
@@ -63,7 +63,7 @@ export async function saveFnbChanges(changedCells, isSaving, saveError, fnbData,
       }
     }
 
-    // console.log('Prepared changes for API:', changes);
+   //  // console.log('Prepared changes for API:', changes);
 
     // Save only the specific changes to server
     const result = await saveFnbRevenueChanges(changes, project);

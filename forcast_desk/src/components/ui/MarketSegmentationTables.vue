@@ -1154,7 +1154,7 @@ watch(() => props.marketSegmentData, (newData) => {
 // Watch for changes in totalNumberOfRooms and clear cache
 watch(() => props.totalNumberOfRooms, (newValue, oldValue) => {
   if (newValue !== oldValue) {
-    console.log('TotalNumberOfRooms changed from', oldValue, 'to', newValue, '- clearing cache');
+    // console.log('TotalNumberOfRooms changed from', oldValue, 'to', newValue, '- clearing cache');
     // Clear the Total Available Rooms cache when totalRooms changes
     const project = getProjectName();
     if (calculationCache.cache[project]?.[PAGE_KEY]) {
@@ -1471,7 +1471,7 @@ function getTotalAvailableRooms(year, label) {
   }
   
   // Debug logging - uncomment to troubleshoot
-  // console.log('Total Available Rooms Debug:', {
+ //  // console.log('Total Available Rooms Debug:', {
   //   year,
   //   label,
   //   totalRooms,
@@ -1490,7 +1490,7 @@ function getTotalAvailableRooms(year, label) {
   const cacheKey = 'Total Available Rooms';
   const cacheVal = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, label);
   if (cacheVal && cacheVal > 0) {
-    // console.log('Using cached value:', cacheVal);
+   //  // console.log('Using cached value:', cacheVal);
     return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   }
   
@@ -1780,15 +1780,15 @@ async function handleResetToDefaults() {
 // Function to manually refresh the cache
 function refreshCache() {
   const project = getProjectName();
-  console.log('Refreshing cache for project:', project);
-  console.log('Current cache state:', calculationCache.cache[project]?.[PAGE_KEY]);
+  // console.log('Refreshing cache for project:', project);
+  // console.log('Current cache state:', calculationCache.cache[project]?.[PAGE_KEY]);
   
   // Log the total rooms from cache vs prop
   const firstYear = props.visibleYears?.[0];
   const firstLabel = firstYear ? props.getColumnLabelsForYearLocal(firstYear)?.[0] : null;
   if (firstYear && firstLabel) {
     const cachedTotalRooms = calculationCache.getValue(project, 'Room Revenue Assumptions', 'Total Rooms', firstYear, firstLabel);
-    console.log('Cache comparison:', {
+    // console.log('Cache comparison:', {
       fromCache: cachedTotalRooms,
       fromProp: props.totalNumberOfRooms,
       project,
@@ -1811,7 +1811,7 @@ function refreshCache() {
     marketSegmentChanges.value = [...marketSegmentChanges.value];
   });
   
-  console.log('Cache refreshed');
+  // console.log('Cache refreshed');
 }
 
 // Expose functions for parent component

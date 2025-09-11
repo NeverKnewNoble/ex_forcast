@@ -612,7 +612,7 @@
 
   // Watch for changes in banquetData to ensure calculated fields update
   watch(banquetData, (newData, oldData) => {
-    // console.log('banquetData changed:', newData);
+   //  // console.log('banquetData changed:', newData);
     
     // Clear calculation cache when banquet data changes to ensure consistency
     if (selectedProject.value && selectedProject.value.project_name) {
@@ -754,11 +754,11 @@
   
   // Watch for project changes and reload data
   watch(selectedProject, async (newProject, oldProject) => {
-    // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
+   //  // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
     
     if (newProject) {
       try {
-        // console.log('Reloading Banquet revenue data for new project:', newProject.project_name);
+       //  // console.log('Reloading Banquet revenue data for new project:', newProject.project_name);
         
         // Reload Banquet revenue data for the new project
         const loaded = await loadBanquetRevenueData(newProject.project_name) || {};
@@ -774,7 +774,7 @@
         // Reload banquet details for the new project
         await fetchBanquetDetails();
         
-        // console.log('Banquet revenue data reloaded successfully for project:', newProject.project_name);
+       //  // console.log('Banquet revenue data reloaded successfully for project:', newProject.project_name);
         alertService.success(`Switched to project: ${newProject.project_name}`);
       } catch (error) {
         console.error('Error reloading Banquet revenue data for new project:', error);
@@ -928,7 +928,7 @@
     }
     // Debug logging for pax and avg_food_check
     if (toNum(row.pax) > 0 || toNum(row.avg_food_check) > 0) {
-      // console.log(`getBanquetRowData for ${year}/${label}:`, {
+     //  // console.log(`getBanquetRowData for ${year}/${label}:`, {
       //   pax: toNum(row.pax),
       //   avg_food_check: toNum(row.avg_food_check),
       //   calculated_food: toNum(row.pax) * toNum(row.avg_food_check),

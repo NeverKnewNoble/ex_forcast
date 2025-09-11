@@ -967,7 +967,7 @@ setInterval(checkHospitalityExperience, 1000);
 watch(selectedProject, async (newProject, oldProject) => {
   if (newProject && newProject !== oldProject) {
     try {
-      // console.log('Project changed, reloading expense data for:', newProject.project_name);
+     //  // console.log('Project changed, reloading expense data for:', newProject.project_name);
       
       // Reload all expenses and categories for the new project
       const allExpensesResult = await loadAllExpensesAndCategories();
@@ -1002,7 +1002,7 @@ watch(selectedProject, async (newProject, oldProject) => {
       changedCells.value = [];
       isSaved.value = true;
       
-      // console.log("Expense data loaded for project:", newProject.project_name);
+     //  // console.log("Expense data loaded for project:", newProject.project_name);
       alertService.success(`Switched to project: ${newProject.project_name}`);
 
       // Refresh modal departments for new project
@@ -1038,19 +1038,19 @@ watch(selectedProject, async (newProject, oldProject) => {
 watch(() => selectedProject.value?.project_name, async (newProjectName, oldProjectName) => {
   if (newProjectName && newProjectName !== oldProjectName) {
     try {
-      // console.log('Project name changed, loading default expenses for:', newProjectName);
-      // console.log('Full selectedProject object:', selectedProject.value);
-      // console.log('Project name field:', selectedProject.value?.project_name);
-      // console.log('Project name field:', selectedProject.value?.name);
+     //  // console.log('Project name changed, loading default expenses for:', newProjectName);
+     //  // console.log('Full selectedProject object:', selectedProject.value);
+     //  // console.log('Project name field:', selectedProject.value?.project_name);
+     //  // console.log('Project name field:', selectedProject.value?.name);
       
       // Load default expenses for the newly selected project
       const defaultExpensesResult = await loadDefaultExpensesForProject();
-      // console.log('Default expenses result:', defaultExpensesResult);
+     //  // console.log('Default expenses result:', defaultExpensesResult);
       if (defaultExpensesResult.status === 'success') {
         defaultExpenses.value = defaultExpensesResult.defaultExpenses;
-        // console.log('Set defaultExpenses to:', defaultExpenses.value);
+       //  // console.log('Set defaultExpenses to:', defaultExpenses.value);
       } else {
-        // console.log('Failed to load default expenses:', defaultExpensesResult.message);
+       //  // console.log('Failed to load default expenses:', defaultExpensesResult.message);
       }
     } catch (error) {
       console.error("Error loading default expenses for project:", error);
@@ -1156,11 +1156,11 @@ onMounted(async () => {
     
     // Manual trigger: If project is already selected, load default expenses
     if (selectedProject.value?.project_name) {
-      // console.log('Manual trigger: Loading default expenses for existing project:', selectedProject.value.project_name);
+     //  // console.log('Manual trigger: Loading default expenses for existing project:', selectedProject.value.project_name);
       const defaultExpensesResult = await loadDefaultExpensesForProject();
       if (defaultExpensesResult.status === 'success') {
         defaultExpenses.value = defaultExpensesResult.defaultExpenses;
-        // console.log('Manual trigger: Set defaultExpenses to:', defaultExpenses.value);
+       //  // console.log('Manual trigger: Set defaultExpenses to:', defaultExpenses.value);
       }
     }
   } catch (err) {
@@ -1327,7 +1327,7 @@ function cacheExpenseData(expenseData, projectName) {
       }
     }
     
-    console.log(`[EXPENSE CACHE] Cached ${Object.keys(expenseData).length} years of expense data for project: ${projectName}`);
+    // console.log(`[EXPENSE CACHE] Cached ${Object.keys(expenseData).length} years of expense data for project: ${projectName}`);
   } catch (error) {
     console.error('Error caching expense data:', error);
   }
@@ -1416,7 +1416,7 @@ async function createExpenseCategory() {
       body: JSON.stringify({ category_name: newCategoryName.value.trim() })
     });
     const result = await response.json();
-    // console.log('create_expense_category API result:', result);
+   //  // console.log('create_expense_category API result:', result);
     if (result.data && result.data.success) {
       alertService.success(`Category '${newCategoryName.value.trim()}' created successfully!`);
       newCategoryName.value = "";

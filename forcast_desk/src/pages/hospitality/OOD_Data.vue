@@ -1350,7 +1350,7 @@ import SettingsModal from '@/components/ui/SettingsModal.vue';
       saveError.value = "";
       
       // Log changedCells to see if health club changes are tracked
-      // console.log('[OOD Save] changedCells:', JSON.parse(JSON.stringify(changedCells.value)));
+     //  // console.log('[OOD Save] changedCells:', JSON.parse(JSON.stringify(changedCells.value)));
 
       // Group changed cells by year and month
       const changesByYearMonth = {};
@@ -1422,7 +1422,7 @@ import SettingsModal from '@/components/ui/SettingsModal.vue';
           }
           // Save health club table if there are changes
           if (health_club_table.length > 0) {
-            // console.log('[OOD Save] Health Club Table Payload:', { year, month, health_club_table });
+           //  // console.log('[OOD Save] Health Club Table Payload:', { year, month, health_club_table });
             savePromises.push(
               saveHealthClubTableData(year, month, health_club_table, selectedProject.value?.project_name)
             );
@@ -1610,7 +1610,7 @@ import SettingsModal from '@/components/ui/SettingsModal.vue';
         year,
         label
       );
-      // console.log('[Cache Lookup] project:', projectName, 'page:', pageId, 'row:', rowCode, 'year:', year, 'label:', label, '=>', numberOfGuests);
+     //  // console.log('[Cache Lookup] project:', projectName, 'page:', pageId, 'row:', rowCode, 'year:', year, 'label:', label, '=>', numberOfGuests);
       return calculateLaundryRevenue(
         laundryData.static,
         fieldCode,

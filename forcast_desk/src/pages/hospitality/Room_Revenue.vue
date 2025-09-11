@@ -1608,7 +1608,7 @@ function updateRoomRevenueCache() {
     // Cache Total Number of Rooms based on market segmentation setting
     if (marketSegmentation.value) {
       // When market segmentation is enabled, cache the totalNumberOfRooms value
-      console.log('Caching manual total rooms:', totalNumberOfRooms.value, 'for market segmentation');
+      // console.log('Caching manual total rooms:', totalNumberOfRooms.value, 'for market segmentation');
       for (const year of visibleYears.value) {
         const labels = getColumnLabelsForYearLocal(year);
         for (const label of labels) {
@@ -1618,7 +1618,7 @@ function updateRoomRevenueCache() {
     } else {
       // When market segmentation is disabled, cache the total rooms from room package count management
       const totalRoomsFromPackages = Object.values(roomTypeCounts.value).reduce((sum, count) => sum + (parseInt(count) || 0), 0);
-      console.log('Caching calculated total rooms from packages:', totalRoomsFromPackages);
+      // console.log('Caching calculated total rooms from packages:', totalRoomsFromPackages);
       for (const year of visibleYears.value) {
         const labels = getColumnLabelsForYearLocal(year);
         for (const label of labels) {
@@ -1728,7 +1728,7 @@ function loadProjectSettings() {
 
 // Watch for total number of rooms changes
 watch(totalNumberOfRooms, (newValue) => {
-  console.log('TotalNumberOfRooms changed to:', newValue, 'Market Segmentation:', marketSegmentation.value);
+  // console.log('TotalNumberOfRooms changed to:', newValue, 'Market Segmentation:', marketSegmentation.value);
   localStorage.setItem(getProjectKey('totalNumberOfRooms'), newValue.toString());
   // Update cache when total rooms change
   updateRoomRevenueCache();
@@ -1845,7 +1845,7 @@ onMounted(async () => {
 
 // Watch for project changes and reload data
 watch(selectedProject, (newProject, oldProject) => {
-  // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
+ //  // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
   
   if (newProject) {
     // Load project-specific settings
@@ -1866,7 +1866,7 @@ watch(selectedProject, (newProject, oldProject) => {
 // Async function to reload data for a project
 async function reloadDataForProject(newProject) {
   try {
-    // console.log('Reloading data for new project:', newProject.project_name);
+   //  // console.log('Reloading data for new project:', newProject.project_name);
     
     // Reload room revenue data for the new project
     roomData.value = await getRoomRevenueList();
@@ -1907,7 +1907,7 @@ async function reloadDataForProject(newProject) {
     // Update cache after reloading data
     updateRoomRevenueCache();
     
-    // console.log('Data reloaded successfully for project:', newProject.project_name);
+   //  // console.log('Data reloaded successfully for project:', newProject.project_name);
   } catch (error) {
     console.error('Error reloading data for new project:', error);
   }
@@ -2013,7 +2013,7 @@ const saveChangesWrapper = async () => {
         // Handle both direct response and wrapped response structures
         const responseData = result.data || result;
         if (responseData && responseData.status === 'success') {
-          // console.log('Market segment changes saved successfully:', responseData);
+         //  // console.log('Market segment changes saved successfully:', responseData);
           // Clear changes after successful save
           marketSegmentationTablesRef.value.marketSegmentChanges = [];
           originalMarketSegmentData.value = cloneDeep(marketSegmentData.value);
@@ -2097,7 +2097,7 @@ async function addNewRoomType() {
         project_name: selectedProject.value?.project_name 
       });
       
-      // console.log('Create room package result:', result);
+     //  // console.log('Create room package result:', result);
       
       // Check for success in different possible response structures
       if (result && (result.success || result.message?.success)) {
@@ -2178,7 +2178,7 @@ async function ensureDefaultPackages() {
   try {
     const result = await createDefaultRoomPackages(selectedProject.value.project_name);
     if (result && result.success) {
-      console.log('Default packages ensured for project:', selectedProject.value.project_name);
+      // console.log('Default packages ensured for project:', selectedProject.value.project_name);
       // Refresh room packages list
       await refreshRoomPackages();
     }

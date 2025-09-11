@@ -65,7 +65,7 @@ export async function loadCategoriesFromAPI() {
     if (response && response.data && response.data.message && response.data.message.success) {
       const categories = response.data.message.data || [];
       marketSegmentCategories.value = sortCategoriesInOrder(categories.map(cat => cat.category_name));
-      // console.log('Loaded categories from API:', marketSegmentCategories.value);
+     //  // console.log('Loaded categories from API:', marketSegmentCategories.value);
     } else {
       console.error('Failed to load categories from API:', response);
       // Fallback to localStorage
@@ -88,7 +88,7 @@ export async function loadSegmentsFromAPI() {
         market_segment: seg.market_segment,
         segment_category: seg.segment_category
       }));
-      // console.log('Loaded segments from API:', marketSegments.value);
+     //  // console.log('Loaded segments from API:', marketSegments.value);
     } else {
       console.error('Failed to load segments from API:', response);
       // Fallback to localStorage
@@ -126,7 +126,7 @@ export async function addMarketSegmentCategory(categoryName) {
       // Save to localStorage
       saveToLocalStorage();
       
-      // console.log('Category added successfully:', trimmedName);
+     //  // console.log('Category added successfully:', trimmedName);
       return true;
     } else {
       throw new Error(response?.data?.message?.error || 'Failed to create category');
@@ -162,7 +162,7 @@ export async function removeMarketSegmentCategory(categoryName) {
       // Save to localStorage
       saveToLocalStorage();
       
-      // console.log('Category removed successfully:', categoryName);
+     //  // console.log('Category removed successfully:', categoryName);
       return true;
     } else {
       throw new Error(response?.data?.message?.error || 'Failed to delete category');
@@ -209,7 +209,7 @@ export async function addMarketSegment(segmentName, categoryName) {
       // Save to localStorage
       saveToLocalStorage();
       
-      // console.log('Segment added successfully:', trimmedName);
+     //  // console.log('Segment added successfully:', trimmedName);
       return true;
     } else {
       throw new Error(response?.data?.message?.error || 'Failed to create segment');
@@ -242,7 +242,7 @@ export async function removeMarketSegment(segmentName) {
       // Save to localStorage
       saveToLocalStorage();
       
-      // console.log('Segment removed successfully:', segmentName);
+     //  // console.log('Segment removed successfully:', segmentName);
       return true;
     } else {
       throw new Error(response?.data?.message?.error || 'Failed to delete segment');
@@ -256,14 +256,14 @@ export async function removeMarketSegment(segmentName) {
 // Reset to default categories and segments from database (module = "Ex Forcast")
 export async function resetToDefaults() {
   try {
-    // console.log('Resetting to defaults from database...');
+   //  // console.log('Resetting to defaults from database...');
     
     // Fetch default categories from database
     const categoriesResponse = await getDefaultSegmentCategories();
     if (categoriesResponse && categoriesResponse.data && categoriesResponse.data.message && categoriesResponse.data.message.success) {
       const categories = categoriesResponse.data.message.data || [];
       marketSegmentCategories.value = sortCategoriesInOrder(categories.map(cat => cat.category_name));
-      // console.log('Loaded default categories from database:', marketSegmentCategories.value);
+     //  // console.log('Loaded default categories from database:', marketSegmentCategories.value);
     } else {
       console.error('Failed to load default categories from database:', categoriesResponse);
       // Fallback to hardcoded defaults
@@ -283,7 +283,7 @@ export async function resetToDefaults() {
         market_segment: seg.market_segment,
         segment_category: seg.segment_category
       }));
-      // console.log('Loaded default segments from database:', marketSegments.value);
+     //  // console.log('Loaded default segments from database:', marketSegments.value);
     } else {
       console.error('Failed to load default segments from database:', segmentsResponse);
       // Fallback to hardcoded defaults
@@ -301,7 +301,7 @@ export async function resetToDefaults() {
     // Save to localStorage
     saveToLocalStorage();
     
-    // console.log('Reset to defaults completed');
+   //  // console.log('Reset to defaults completed');
     alertService.success('Reset to defaults completed successfully!');
     
   } catch (error) {
@@ -354,7 +354,7 @@ export function loadFromLocalStorage() {
       marketSegments.value = JSON.parse(savedSegments);
     }
     
-    // console.log('Loaded from localStorage:', {
+   //  // console.log('Loaded from localStorage:', {
     //   categories: marketSegmentCategories.value,
     //   segments: marketSegments.value
     // });

@@ -16,7 +16,7 @@ export async function getExpenseList() {
     }
 
     const result = await response.json();
-    // console.log("API response:", result);
+   //  // console.log("API response:", result);
 
     // Handle the nested data structure
     const data = result.data || result;

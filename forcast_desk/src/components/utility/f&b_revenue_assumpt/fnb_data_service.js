@@ -12,7 +12,7 @@ const API_BASE = '/api/method/ex_forcast.api.call_and_save_fnb_revenue';
  */
 export async function loadFnbRevenueData(project = null) {
   try {
-    // console.log('Loading F&B revenue data from server for project:', project);
+   //  // console.log('Loading F&B revenue data from server for project:', project);
     
     let url = `${API_BASE}.fnb_revenue_display`;
     if (project) {
@@ -28,7 +28,7 @@ export async function loadFnbRevenueData(project = null) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    // console.log('Raw server response:', data);
+   //  // console.log('Raw server response:', data);
     
     if (data.error) {
       throw new Error(data.error);
@@ -36,7 +36,7 @@ export async function loadFnbRevenueData(project = null) {
     
     // Handle case where data might be wrapped in message object
     const serverData = data.message || data;
-    // console.log('Processed server data:', serverData);
+   //  // console.log('Processed server data:', serverData);
     return serverData;
   } catch (error) {
     console.error('Error loading F&B revenue data:', error);
@@ -52,7 +52,7 @@ export async function loadFnbRevenueData(project = null) {
  */
 export async function saveFnbRevenueChanges(changes, project = null) {
   try {
-    // console.log('Sending F&B revenue changes to server for project:', project, 'changes:', changes);
+   //  // console.log('Sending F&B revenue changes to server for project:', project, 'changes:', changes);
     
     // Create form data
     const formData = new FormData();
@@ -76,7 +76,7 @@ export async function saveFnbRevenueChanges(changes, project = null) {
     }
     
     const result = await response.json();
-    // console.log('Server response:', result);
+   //  // console.log('Server response:', result);
     
     if (result.message?.status === 'error') {
       throw new Error(result.message.message);
@@ -128,7 +128,7 @@ export async function getRestaurantsList(project = null) {
  */
 export async function testFnbApi() {
   try {
-    console.log('Testing F&B API connection...');
+    // console.log('Testing F&B API connection...');
     const response = await fetch(`${API_BASE}.test_fnb_api`, {
       headers: {
         'X-Frappe-CSRF-Token': getCSRFToken()
@@ -138,7 +138,7 @@ export async function testFnbApi() {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    console.log('Test API response:', data);
+    // console.log('Test API response:', data);
     return data;
   } catch (error) {
     console.error('Error testing F&B API:', error);
@@ -195,7 +195,7 @@ export function convertServerDataToFrontendFormat(serverData) {
     
     for (const month in serverData[year]) {
       const items = serverData[year][month];
-    //   console.log(`Processing year ${year}, month ${month}:`, items);
+   //  //   console.log(`Processing year ${year}, month ${month}:`, items);
       
       if (!Array.isArray(items)) {
         console.warn(`Items for year ${year}, month ${month} is not an array:`, items);
@@ -323,21 +323,21 @@ export function convertFrontendDataToServerFormat(frontendData) {
  */
 export async function loadFnbRevenueDataForFrontend(project = null) {
   try {
-    // console.log('Loading F&B revenue data for frontend for project:', project);
+   //  // console.log('Loading F&B revenue data for frontend for project:', project);
     const serverData = await loadFnbRevenueData(project);
     
     if (!serverData || Object.keys(serverData).length === 0) {
-      console.log('No F&B revenue data found, returning empty object');
+      // console.log('No F&B revenue data found, returning empty object');
       return {};
     }
     
-    // console.log('Raw server data:', serverData);
+   //  // console.log('Raw server data:', serverData);
     const frontendData = convertServerDataToFrontendFormat(serverData);
-    // console.log('Converted frontend data:', frontendData);
+   //  // console.log('Converted frontend data:', frontendData);
     
     // Migrate any old format data to new format
     const migratedData = migrateOldDataFormat(frontendData);
-    // console.log('Migrated data:', migratedData);
+   //  // console.log('Migrated data:', migratedData);
     
     return migratedData;
   } catch (error) {

@@ -1113,12 +1113,12 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   
   // Watch for changes in payrollData to ensure calculated fields update
   watch(payrollData, (newData, oldData) => {
-    // console.log('payrollData changed:', newData);
+   //  // console.log('payrollData changed:', newData);
   }, { deep: true, immediate: true });
   
   // Watch for bonus data changes
   watch(bonusData, (newData, oldData) => {
-    // console.log('bonusData changed:', newData);
+   //  // console.log('bonusData changed:', newData);
     
     // Clear cache when bonus data changes
     if (selectedProject.value?.project_name) {
@@ -1248,20 +1248,20 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   
   // Watch for project changes and reload data
   watch(selectedProject, async (newProject, oldProject) => {
-    // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
+   //  // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
     
     // Clear cache for old project if it exists
     if (oldProject?.project_name) {
       // Clear entire project cache
       if (calculationCache.cache[oldProject.project_name]) {
         delete calculationCache.cache[oldProject.project_name];
-        console.log('[CACHE CLEAR] Project cache cleared:', oldProject.project_name);
+        // console.log('[CACHE CLEAR] Project cache cleared:', oldProject.project_name);
       }
     }
     
     if (newProject) {
       try {
-        // console.log('Reloading Payroll data for new project:', newProject.project_name);
+       //  // console.log('Reloading Payroll data for new project:', newProject.project_name);
         
         // Reload Payroll data for the new project
         await fetchPayrollData(newProject.project_name, fromYear.value, toYear.value);
@@ -1280,7 +1280,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         isSaved.value = true;
         saveError.value = "";
         
-        // console.log('Payroll data reloaded successfully for project:', newProject.project_name);
+       //  // console.log('Payroll data reloaded successfully for project:', newProject.project_name);
         alertService.success(`Switched to project: ${newProject.project_name}`);
       } catch (error) {
         console.error('Error reloading Payroll data for new project:', error);
@@ -1323,7 +1323,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         isSaved.value = true;
         saveError.value = "";
         
-        // console.log(`Payroll data filtered for years ${newFromYear}-${newToYear}`);
+       //  // console.log(`Payroll data filtered for years ${newFromYear}-${newToYear}`);
       } catch (error) {
         console.error('Error reloading Payroll data for new year range:', error);
         alertService.error("Failed to load data for selected year range. Please try again.");
@@ -1583,8 +1583,8 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   
   // Hotel Total Local Functions
   function calculateHotelTotalLocal() {
-    // console.log('calculateHotelTotalLocal called');
-    // console.log('payrollRows.value:', payrollRows.value);
+   //  // console.log('calculateHotelTotalLocal called');
+   //  // console.log('payrollRows.value:', payrollRows.value);
     
     // Defensive check for payrollRows.value
     if (!payrollRows.value || !Array.isArray(payrollRows.value)) {
@@ -1592,7 +1592,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     }
     
     const result = calculateHotelTotal(payrollRows.value);
-    // console.log('calculateHotelTotalLocal result:', result);
+   //  // console.log('calculateHotelTotalLocal result:', result);
     return result;
   }
   

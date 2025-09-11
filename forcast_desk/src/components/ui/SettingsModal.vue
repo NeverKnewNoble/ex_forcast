@@ -464,17 +464,17 @@ const userDetailsResource = createResource({
   },
     onSuccess(data) {
     isLoadingUserDetails.value = false
-    // console.log('User details fetched:', data)
+   //  // console.log('User details fetched:', data)
     if (data) {
       const userData = data
-      // console.log('User data:', userData)
+     //  // console.log('User data:', userData)
       userSettings.value.username = userData.name || session.user || ''
       userSettings.value.email = userData.email || ''
       userSettings.value.fullName = userData.full_name || userData.name || session.user || ''
-      // console.log('Updated user settings:', userSettings.value)
-      // console.log('Username field value:', userSettings.value.username)
-      // console.log('Email field value:', userSettings.value.email)
-      // console.log('Full Name field value:', userSettings.value.fullName)
+     //  // console.log('Updated user settings:', userSettings.value)
+     //  // console.log('Username field value:', userSettings.value.username)
+     //  // console.log('Email field value:', userSettings.value.email)
+     //  // console.log('Full Name field value:', userSettings.value.fullName)
     }
   },
   onError(error) {
@@ -491,9 +491,9 @@ const userDetailsResource = createResource({
 
 // Populate user settings from session data
 const populateUserSettingsFromSession = () => {
-  // console.log('Session data:', session)
+ //  // console.log('Session data:', session)
   if (session && session.user) {
-    // console.log('User ID from session:', session.user)
+   //  // console.log('User ID from session:', session.user)
     isLoadingUserDetails.value = true
     
     // Set basic session data first
@@ -502,7 +502,7 @@ const populateUserSettingsFromSession = () => {
     // Try to fetch detailed user information
     userDetailsResource.reload()
   } else {
-    // console.log('No session or user data available')
+   //  // console.log('No session or user data available')
   }
 }
 

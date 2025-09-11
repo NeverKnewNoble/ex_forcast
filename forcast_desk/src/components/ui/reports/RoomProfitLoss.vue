@@ -1504,7 +1504,7 @@ function isMarketSegmentationEnabled() {
 // Computed properties
 const projectName = computed(() => {
   const name = selectedProject.value?.project_name || 'Project Name';
-  // console.log('Room P&L: Project name computed:', {
+ //  // console.log('Room P&L: Project name computed:', {
   //   selectedProject: selectedProject.value,
   //   projectName: name,
   //   hasProject: !!selectedProject.value
@@ -1516,7 +1516,7 @@ const projectName = computed(() => {
 watch(selectedProject, () => {
   // Force a reactive update when project changes
   // This will trigger recalculation of room counts from the new project's cache
-  // console.log('Room P&L: Project changed to:', selectedProject.value?.project_name);
+ //  // console.log('Room P&L: Project changed to:', selectedProject.value?.project_name);
   // Reload Room department expenses for the new project
   loadRoomExpensesFromApi();
 }, { deep: true });
@@ -1528,12 +1528,12 @@ onMounted(() => {
   
   // The parent component (Reports.vue) now handles data loading via the unified service
   // This eliminates the need to visit other pages first
-  console.log('Room P&L: Component mounted, data should be loaded by parent component');
+  // console.log('Room P&L: Component mounted, data should be loaded by parent component');
   
   // Debug: Log what's available in cache
   if (selectedProject.value?.project_name) {
-    console.log('Room P&L: Debugging cache access for project:', selectedProject.value.project_name);
-    console.log('Room P&L: Available cache pages:', Object.keys(calculationCache.cache[selectedProject.value.project_name] || {}));
+    // console.log('Room P&L: Debugging cache access for project:', selectedProject.value.project_name);
+    // console.log('Room P&L: Available cache pages:', Object.keys(calculationCache.cache[selectedProject.value.project_name] || {}));
   }
 });
 
@@ -1562,7 +1562,7 @@ const roomDepartmentExpenses = computed(() => {
         });
         
         if (expensesSet.size > 0) {
-          console.log('[ROOM P&L] Found', expensesSet.size, 'room expenses in calculation cache');
+          // console.log('[ROOM P&L] Found', expensesSet.size, 'room expenses in calculation cache');
           return Array.from(expensesSet);
         }
       }
@@ -1597,7 +1597,7 @@ async function loadRoomExpensesFromApi() {
     if (projectName.value) {
       const cachedRoomExpenses = calculationCache.getRowValues(projectName.value, 'Expense Assumptions:Room');
       if (cachedRoomExpenses && Object.keys(cachedRoomExpenses).length > 0) {
-        console.log('[ROOM P&L] Using cached expense data for room department');
+        // console.log('[ROOM P&L] Using cached expense data for room department');
         // Convert cached data back to the format expected by the component
         const convertedData = {};
         Object.entries(cachedRoomExpenses).forEach(([year, months]) => {
@@ -1616,7 +1616,7 @@ async function loadRoomExpensesFromApi() {
     }
     
     // Fallback to API call if no cached data
-    console.log('[ROOM P&L] No cached data found, loading from API');
+    // console.log('[ROOM P&L] No cached data found, loading from API');
     const exp = await loadExpenseData();
     if (exp && !exp.status) {
       expenseDataCache.value = exp;
@@ -1825,16 +1825,16 @@ function getNoOfRooms(year, label) {
     const roomCount = calculationCache.getValue(projectName.value, 'Room Revenue Assumptions', 'Total Rooms', year, label);
     
     if (roomCount !== undefined && roomCount !== null) {
-      console.log(`Room P&L: Retrieved room count for ${year}/${label}:`, roomCount, 'Market segmentation:', isMarketSegmentationEnabled);
+      // console.log(`Room P&L: Retrieved room count for ${year}/${label}:`, roomCount, 'Market segmentation:', isMarketSegmentationEnabled);
       return getNumber(roomCount);
     }
     
     // Debug: Log what's available in cache
-    console.log(`Room P&L: No cached room count found for ${year}/${label}`);
-    console.log(`Room P&L: Available cache for project ${projectName.value}:`, Object.keys(calculationCache.cache[projectName.value] || {}));
+    // console.log(`Room P&L: No cached room count found for ${year}/${label}`);
+    // console.log(`Room P&L: Available cache for project ${projectName.value}:`, Object.keys(calculationCache.cache[projectName.value] || {}));
     
     // Default fallback
-    console.log(`Room P&L: Using default room count: 100`);
+    // console.log(`Room P&L: Using default room count: 100`);
     return 100;
   } catch (error) {
     console.error('Error fetching room count:', error);
@@ -1912,7 +1912,7 @@ function getAvailableRooms(year, label) {
     // First try: Get from F&B page - Number of rooms available row
     let availableRooms = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Number of rooms available', year, label);
     
-    console.log(`Room P&L: Available Rooms cache lookup for ${year}/${label}:`, {
+    // console.log(`Room P&L: Available Rooms cache lookup for ${year}/${label}:`, {
       projectName: projectName.value,
       cacheKey: 'Number of rooms available',
       cachedValue: availableRooms,
@@ -1930,7 +1930,7 @@ function getAvailableRooms(year, label) {
       if (totalRooms !== undefined && totalRooms !== null) {
         const days = getNoOfDays(year, label);
         const calculatedValue = getNumber(totalRooms) * days;
-        console.log(`Room P&L: Calculated from Room Revenue Total Rooms:`, {
+        // console.log(`Room P&L: Calculated from Room Revenue Total Rooms:`, {
           totalRooms,
           days,
           calculatedValue
@@ -1944,7 +1944,7 @@ function getAvailableRooms(year, label) {
     const days = getNoOfDays(year, label);
     const fallbackValue = rooms * days;
     
-    console.log(`Room P&L: Using fallback calculation for available rooms:`, {
+    // console.log(`Room P&L: Using fallback calculation for available rooms:`, {
       rooms,
       days,
       fallbackValue
@@ -1985,7 +1985,7 @@ function getSoldRooms(year, label) {
     // Get from F&B page - Number of rooms sold (excl.) row (note: lowercase in cache)
     const soldRooms = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Number of rooms sold (excl.)', year, label);
     
-    console.log(`Room P&L: Sold Rooms cache lookup for ${year}/${label}:`, {
+    // console.log(`Room P&L: Sold Rooms cache lookup for ${year}/${label}:`, {
       projectName: projectName.value,
       cacheKey: 'Number of rooms sold (excl.)',
       cachedValue: soldRooms,
@@ -2001,7 +2001,7 @@ function getSoldRooms(year, label) {
     if (occupancy !== undefined && occupancy !== null) {
       const availableRooms = getAvailableRooms(year, label);
       const calculatedSoldRooms = Math.round((getNumber(occupancy) / 100) * availableRooms);
-      console.log(`Room P&L: Calculated sold rooms from occupancy:`, {
+      // console.log(`Room P&L: Calculated sold rooms from occupancy:`, {
         occupancy,
         availableRooms,
         calculatedSoldRooms
@@ -2012,7 +2012,7 @@ function getSoldRooms(year, label) {
     // Default fallback: Use 75% occupancy as placeholder
     const availableRooms = getAvailableRooms(year, label);
     const placeholderSoldRooms = Math.round(availableRooms * 0.75);
-    console.log(`Room P&L: Using placeholder 75% occupancy for sold rooms:`, {
+    // console.log(`Room P&L: Using placeholder 75% occupancy for sold rooms:`, {
       availableRooms,
       placeholderSoldRooms
     });
@@ -2474,8 +2474,8 @@ const payrollLocationsManagement = computed(() => {
     const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const locs = new Set();
     
-    console.log(`Room P&L: Looking for payroll management data in page "${page}"`);
-    console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
+    // console.log(`Room P&L: Looking for payroll management data in page "${page}"`);
+    // console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
     
     Object.keys(pageData).forEach((rowCode) => {
       const parsed = parseMonthlySalaryRowCode(rowCode);
@@ -2484,7 +2484,7 @@ const payrollLocationsManagement = computed(() => {
       }
     });
     
-    console.log(`Room P&L: Found ${locs.size} management locations:`, Array.from(locs));
+    // console.log(`Room P&L: Found ${locs.size} management locations:`, Array.from(locs));
     return Array.from(locs);
   } catch (e) {
     console.error('Room P&L: Error discovering payroll management locations:', e);
@@ -2499,8 +2499,8 @@ const payrollLocationsNonManagement = computed(() => {
     const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const locs = new Set();
     
-    console.log(`Room P&L: Looking for payroll non-management data in page "${page}"`);
-    console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
+    // console.log(`Room P&L: Looking for payroll non-management data in page "${page}"`);
+    // console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
     
     Object.keys(pageData).forEach((rowCode) => {
       const parsed = parseMonthlySalaryRowCode(rowCode);
@@ -2509,7 +2509,7 @@ const payrollLocationsNonManagement = computed(() => {
       }
     });
     
-    console.log(`Room P&L: Found ${locs.size} non-management locations:`, Array.from(locs));
+    // console.log(`Room P&L: Found ${locs.size} non-management locations:`, Array.from(locs));
     return Array.from(locs);
   } catch (e) {
     console.error('Room P&L: Error discovering payroll non-management locations:', e);
@@ -2636,8 +2636,8 @@ const roomRevenueSegments = computed(() => {
     const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const segments = new Set();
     
-    console.log(`Room P&L: Looking for market segmentation data in page "${page}"`);
-    console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
+    // console.log(`Room P&L: Looking for market segmentation data in page "${page}"`);
+    // console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
     
     Object.keys(pageData).forEach((rowCode) => {
       if (rowCode.startsWith('Room Revenue:')) {
@@ -2646,7 +2646,7 @@ const roomRevenueSegments = computed(() => {
       }
     });
     
-    console.log(`Room P&L: Found ${segments.size} market segments:`, Array.from(segments));
+    // console.log(`Room P&L: Found ${segments.size} market segments:`, Array.from(segments));
     return Array.from(segments);
   } catch (e) {
     console.error('Room P&L: Error discovering room revenue segments:', e);
@@ -2824,8 +2824,8 @@ const roomTypePackages = computed(() => {
     const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const types = new Set();
     
-    console.log(`Room P&L: Looking for room type packages in page "${page}"`);
-    console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
+    // console.log(`Room P&L: Looking for room type packages in page "${page}"`);
+    // console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
     
     Object.keys(pageData).forEach((rowCode) => {
       if (rowCode.startsWith('Room Type:')) {
@@ -2834,7 +2834,7 @@ const roomTypePackages = computed(() => {
       }
     });
     
-    console.log(`Room P&L: Found ${types.size} room type packages:`, Array.from(types));
+    // console.log(`Room P&L: Found ${types.size} room type packages:`, Array.from(types));
     return Array.from(types);
   } catch (e) {
     console.error('Room P&L: Error discovering room type packages:', e);

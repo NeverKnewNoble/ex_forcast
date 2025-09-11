@@ -47,12 +47,12 @@ export function getAllProjectKeys() {
 // Function to debug localStorage state
 export function debugLocalStorage() {
   const project = selectedProject.value;
-  console.log('Current project:', project?.project_name);
-  console.log('Project-specific keys:', getAllProjectKeys());
+  // console.log('Current project:', project?.project_name);
+  // console.log('Project-specific keys:', getAllProjectKeys());
   
   getAllProjectKeys().forEach(key => {
     const value = localStorage.getItem(key);
-    console.log(`${key}:`, value);
+    // console.log(`${key}:`, value);
   });
 }
 
@@ -88,7 +88,7 @@ export function migrateToProjectSpecificKeys() {
     if (oldValue) {
       localStorage.setItem(newKey, oldValue);
       localStorage.removeItem(oldKey);
-      console.log(`Migrated ${oldKey} to ${newKey}`);
+      // console.log(`Migrated ${oldKey} to ${newKey}`);
     }
   });
 } 

@@ -10,9 +10,9 @@ export async function loadYearOptions() {
       }
     });
     const data = await response.json();
-    // console.log('Raw API response:', data);
+   //  // console.log('Raw API response:', data);
     const filteredOptions = data.data.options.filter(option => option);
-    // console.log('Filtered year options:', filteredOptions);
+   //  // console.log('Filtered year options:', filteredOptions);
     return filteredOptions; 
   } catch (error) {
     console.error("Error loading year options:", error);
@@ -25,8 +25,8 @@ export async function loadExpenseData() {
     // Get the currently selected project
     const currentProject = selectedProject.value
     
-    console.log('🔍 [EXPENSE DATA] Starting loadExpenseData...');
-    console.log('🔍 [EXPENSE DATA] currentProject:', currentProject);
+    // console.log('🔍 [EXPENSE DATA] Starting loadExpenseData...');
+    // console.log('🔍 [EXPENSE DATA] currentProject:', currentProject);
     
     if (!currentProject) {
       console.warn('❌ [EXPENSE DATA] No project selected');
@@ -38,11 +38,11 @@ export async function loadExpenseData() {
     }
 
     const csrfToken = getCSRFToken();
-    console.log('🔍 [EXPENSE DATA] CSRF Token:', csrfToken ? csrfToken.substring(0, 10) + '...' : 'NOT FOUND');
+    // console.log('🔍 [EXPENSE DATA] CSRF Token:', csrfToken ? csrfToken.substring(0, 10) + '...' : 'NOT FOUND');
 
     // Load expense data filtered by project
     const url = `/api/v2/method/ex_forcast.api.expense_estimate.estimate_display?project=${encodeURIComponent(currentProject.project_name)}`;
-    console.log('🔍 [EXPENSE DATA] Making request to:', url);
+    // console.log('🔍 [EXPENSE DATA] Making request to:', url);
     
     const response = await fetch(url, {
       headers: {
@@ -50,11 +50,11 @@ export async function loadExpenseData() {
       }
     });
     
-    console.log('🔍 [EXPENSE DATA] Response status:', response.status, response.statusText);
-    console.log('🔍 [EXPENSE DATA] Response headers:', Object.fromEntries(response.headers.entries()));
+    // console.log('🔍 [EXPENSE DATA] Response status:', response.status, response.statusText);
+    // console.log('🔍 [EXPENSE DATA] Response headers:', Object.fromEntries(response.headers.entries()));
     
     const data = await response.json();
-    console.log('🔍 [EXPENSE DATA] API response:', data);
+    // console.log('🔍 [EXPENSE DATA] API response:', data);
     
     // Check if the project has any data
     const expenseData = data.data || {};
@@ -84,10 +84,10 @@ export async function loadDefaultExpensesForProject() {
     // Get the currently selected project
     const currentProject = selectedProject.value
     
-    console.log('🔍 [DEFAULT EXPENSES] Starting loadDefaultExpensesForProject...');
-    console.log('🔍 [DEFAULT EXPENSES] currentProject:', currentProject);
-    console.log('🔍 [DEFAULT EXPENSES] currentProject.project_name:', currentProject?.project_name);
-    console.log('🔍 [DEFAULT EXPENSES] currentProject.name:', currentProject?.name);
+    // console.log('🔍 [DEFAULT EXPENSES] Starting loadDefaultExpensesForProject...');
+    // console.log('🔍 [DEFAULT EXPENSES] currentProject:', currentProject);
+    // console.log('🔍 [DEFAULT EXPENSES] currentProject.project_name:', currentProject?.project_name);
+    // console.log('🔍 [DEFAULT EXPENSES] currentProject.name:', currentProject?.name);
     
     if (!currentProject) {
       console.warn('❌ [DEFAULT EXPENSES] No project selected');
@@ -99,14 +99,14 @@ export async function loadDefaultExpensesForProject() {
 
     // Use project_name if available, otherwise use name
     const projectName = currentProject.project_name || currentProject.name;
-    console.log('🔍 [DEFAULT EXPENSES] using projectName:', projectName);
+    // console.log('🔍 [DEFAULT EXPENSES] using projectName:', projectName);
 
     const csrfToken = getCSRFToken();
-    console.log('🔍 [DEFAULT EXPENSES] CSRF Token:', csrfToken ? csrfToken.substring(0, 10) + '...' : 'NOT FOUND');
+    // console.log('🔍 [DEFAULT EXPENSES] CSRF Token:', csrfToken ? csrfToken.substring(0, 10) + '...' : 'NOT FOUND');
 
     // Load default expenses for the project's selected departments
     const url = `/api/v2/method/ex_forcast.api.default_expenses.get_default_expenses_for_project?project_name=${encodeURIComponent(projectName)}`;
-    console.log('🔍 [DEFAULT EXPENSES] Making request to:', url);
+    // console.log('🔍 [DEFAULT EXPENSES] Making request to:', url);
     
     const response = await fetch(url, {
       headers: {
@@ -114,15 +114,15 @@ export async function loadDefaultExpensesForProject() {
       }
     });
     
-    console.log('🔍 [DEFAULT EXPENSES] Response status:', response.status, response.statusText);
-    console.log('🔍 [DEFAULT EXPENSES] Response headers:', Object.fromEntries(response.headers.entries()));
+    // console.log('🔍 [DEFAULT EXPENSES] Response status:', response.status, response.statusText);
+    // console.log('🔍 [DEFAULT EXPENSES] Response headers:', Object.fromEntries(response.headers.entries()));
     
     const result = await response.json();
-    console.log('🔍 [DEFAULT EXPENSES] API response:', result);
+    // console.log('🔍 [DEFAULT EXPENSES] API response:', result);
     
     // Extract the actual data from the wrapped response
     const data = result.data || result;
-    // console.log('loadDefaultExpensesForProject - extracted data:', data);
+   //  // console.log('loadDefaultExpensesForProject - extracted data:', data);
     
     if (data.success) {
       return {
@@ -209,10 +209,10 @@ export function extractAllExpenses(expenseData) {
 
 // Debug function to test default expenses loading
 export async function testDefaultExpenses() {
-  console.log('🧪 [TEST] Testing default expenses loading...');
+  // console.log('🧪 [TEST] Testing default expenses loading...');
   try {
     const result = await loadDefaultExpensesForProject();
-    console.log('🧪 [TEST] Default expenses result:', result);
+    // console.log('🧪 [TEST] Default expenses result:', result);
     return result;
   } catch (error) {
     console.error('🧪 [TEST] Error testing default expenses:', error);
@@ -222,10 +222,10 @@ export async function testDefaultExpenses() {
 
 // Debug function to test expense data loading
 export async function testExpenseData() {
-  console.log('🧪 [TEST] Testing expense data loading...');
+  // console.log('🧪 [TEST] Testing expense data loading...');
   try {
     const result = await loadExpenseData();
-    console.log('🧪 [TEST] Expense data result:', result);
+    // console.log('🧪 [TEST] Expense data result:', result);
     return result;
   } catch (error) {
     console.error('🧪 [TEST] Error testing expense data:', error);

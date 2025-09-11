@@ -48,7 +48,7 @@ export async function createExpenseDocument({ year, month, expenses }) {
       doc
     })
     
-    // console.log('Document created successfully:', result)
+   //  // console.log('Document created successfully:', result)
     return { success: true, name: result.name }
   } catch (error) {
     console.error('Error creating expense document:', error)

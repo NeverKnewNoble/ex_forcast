@@ -1568,12 +1568,12 @@ watch(visibleYears, () => {
 
 // Watch for changes in payrollData to ensure calculated fields update
 watch(payrollData, (newData, oldData) => {
-  // console.log('payrollData changed:', newData);
+ //  // console.log('payrollData changed:', newData);
 }, { deep: true, immediate: true });
 
 // Watch for payroll related data changes
 watch(payrollRelatedData, (newData, oldData) => {
-  // console.log('payrollRelatedData changed:', newData);
+ //  // console.log('payrollRelatedData changed:', newData);
   
   // Make payroll related data available globally for the utility functions
   window.__payrollRelatedData = newData;
@@ -1693,11 +1693,11 @@ onMounted(async () => {
 
 // Watch for project changes and reload data
 watch(selectedProject, async (newProject, oldProject) => {
-  // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
+ //  // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
   
   if (newProject) {
     try {
-      // console.log('Reloading Payroll data for new project:', newProject.project_name);
+     //  // console.log('Reloading Payroll data for new project:', newProject.project_name);
       
       // Reload Payroll data for the new project
       await fetchPayrollData(newProject.project_name, fromYear.value, toYear.value);
@@ -1716,7 +1716,7 @@ watch(selectedProject, async (newProject, oldProject) => {
       isSaved.value = true;
       saveError.value = "";
       
-      // console.log('Payroll data reloaded successfully for project:', newProject.project_name);
+     //  // console.log('Payroll data reloaded successfully for project:', newProject.project_name);
       alertService.success(`Switched to project: ${newProject.project_name}`);
     } catch (error) {
       console.error('Error reloading Payroll data for new project:', error);
@@ -1753,7 +1753,7 @@ watch([fromYear, toYear], async ([newFromYear, newToYear], [oldFromYear, oldToYe
       isSaved.value = true;
       saveError.value = "";
       
-      // console.log(`Payroll data filtered for years ${newFromYear}-${newToYear}`);
+     //  // console.log(`Payroll data filtered for years ${newFromYear}-${newToYear}`);
     } catch (error) {
       console.error('Error reloading Payroll data for new year range:', error);
       alertService.error("Failed to load data for selected year range. Please try again.");
@@ -2013,8 +2013,8 @@ function calculateLocationTotalAnnualLocal(category, location, year) {
 
 // Hotel Total Local Functions
 function calculateHotelTotalLocal() {
-  // console.log('calculateHotelTotalLocal called');
-  // console.log('payrollRows.value:', payrollRows.value);
+ //  // console.log('calculateHotelTotalLocal called');
+ //  // console.log('payrollRows.value:', payrollRows.value);
   
   // Defensive check for payrollRows.value
   if (!payrollRows.value || !Array.isArray(payrollRows.value)) {
@@ -2022,7 +2022,7 @@ function calculateHotelTotalLocal() {
   }
   
   const result = calculateHotelTotal(payrollRows.value);
-  // console.log('calculateHotelTotalLocal result:', result);
+ //  // console.log('calculateHotelTotalLocal result:', result);
   return result;
 }
 

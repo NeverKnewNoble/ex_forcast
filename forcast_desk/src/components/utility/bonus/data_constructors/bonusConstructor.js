@@ -67,11 +67,11 @@ export class BonusDataConstructor extends PayrollDataConstructor {
                 // Handle the correct API response structure
                 // apiResponse.message[year] = { "bonus": { "row_id": { "bonus_percentage": value } } }
                 const yearData = apiResponse.message[year];
-                // console.log('Processing year data:', year, yearData);
+               //  // console.log('Processing year data:', year, yearData);
                 if (yearData && yearData.bonus) {
                     Object.keys(yearData.bonus).forEach(rowId => {
                         const bonusItem = yearData.bonus[rowId];
-                        // console.log('Processing bonus item:', rowId, bonusItem);
+                       //  // console.log('Processing bonus item:', rowId, bonusItem);
                         transformedData[year][rowId] = {
                             bonusPercentage: bonusItem.bonus_percentage || 0,
                             payroll_unique_id: rowId

@@ -19,7 +19,7 @@ export const bonusSaveError = ref("");
  */
 export async function fetchBonusData(projectName, fromYear = null, toYear = null) {
     try {
-        // console.log('Fetching bonus data for project:', projectName, 'years:', fromYear, 'to', toYear);
+       //  // console.log('Fetching bonus data for project:', projectName, 'years:', fromYear, 'to', toYear);
         
         const params = new URLSearchParams();
         if (projectName) {
@@ -33,7 +33,7 @@ export async function fetchBonusData(projectName, fromYear = null, toYear = null
         }
 
         const url = `/api/v2/method/ex_forcast.api.call_and_save_bonus_data.bonus_data_display?${params.toString()}`;
-        // console.log('API URL:', url);
+       //  // console.log('API URL:', url);
         const response = await makeApiRequest(url);
 
         if (response.error) {
@@ -43,8 +43,8 @@ export async function fetchBonusData(projectName, fromYear = null, toYear = null
         // Transform API response to frontend format using bonus constructor
         // Handle Frappe's response wrapper
         const apiResponse = response.data || response;
-        // console.log('Raw API response:', response);
-        // console.log('Extracted API response:', apiResponse);
+       //  // console.log('Raw API response:', response);
+       //  // console.log('Extracted API response:', apiResponse);
         
         const transformedData = bonusDataConstructor.transformBonusApiToFrontend(
             { message: apiResponse },
@@ -53,8 +53,8 @@ export async function fetchBonusData(projectName, fromYear = null, toYear = null
             toYear
         );
 
-        // console.log('Bonus API response:', response);
-        // console.log('Transformed bonus data:', transformedData);
+       //  // console.log('Bonus API response:', response);
+       //  // console.log('Transformed bonus data:', transformedData);
 
         // Update reactive state
         bonusData.value = transformedData.bonusData || {};

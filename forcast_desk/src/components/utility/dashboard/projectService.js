@@ -169,13 +169,13 @@ export const initializeProjectService = async () => {
       const exists = projects.value.find(p => p.name === storedProject.name)
       if (exists) {
         selectedProject.value = storedProject
-        // console.log('Project service initialized with stored project:', storedProject.project_name)
+       //  // console.log('Project service initialized with stored project:', storedProject.project_name)
       } else {
-        console.log('Stored project not found in project list, clearing selection')
+        // console.log('Stored project not found in project list, clearing selection')
         selectedProject.value = null
       }
     } else {
-              // console.log('No stored project found')
+             //  // console.log('No stored project found')
     }
     
     // Don't auto-select first project - let user choose

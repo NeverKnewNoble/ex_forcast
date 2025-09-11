@@ -7,7 +7,7 @@ export async function getRoomRevenueList() {
     // Get the currently selected project
     const currentProject = selectedProject.value
     
-    // console.log('getRoomRevenueList called with project:', currentProject?.project_name);
+   //  // console.log('getRoomRevenueList called with project:', currentProject?.project_name);
     
     if (!currentProject) {
       // Return special status to indicate no project selected
@@ -27,7 +27,7 @@ export async function getRoomRevenueList() {
     });
 
     const data = await response.json();
-    // console.log('Room revenue API response for project:', currentProject.project_name, data);
+   //  // console.log('Room revenue API response for project:', currentProject.project_name, data);
     
     // Check if the project has any data
     const roomRevenueData = data.data || {};
@@ -54,7 +54,7 @@ export async function getRoomRevenueList() {
 // API call to create a new Segment Category
 export async function createSegmentCategory(categoryName) {
   try {
-    // console.log('Creating segment category:', categoryName);
+   //  // console.log('Creating segment category:', categoryName);
     
     const params = new URLSearchParams();
     params.append('category_name', categoryName);
@@ -75,7 +75,7 @@ export async function createSegmentCategory(categoryName) {
     }
 
     const data = await response.json();
-    // console.log('Segment Category creation response:', data);
+   //  // console.log('Segment Category creation response:', data);
     return data;
   } catch (error) {
     console.error('Error creating segment category:', error);
@@ -101,7 +101,7 @@ export async function getSegmentCategories() {
     }
 
     const data = await response.json();
-    // console.log('Segment Categories response:', data);
+   //  // console.log('Segment Categories response:', data);
     return data;
   } catch (error) {
     console.error('Error fetching segment categories:', error);
@@ -127,7 +127,7 @@ export async function getDefaultSegmentCategories() {
     }
 
     const data = await response.json();
-    // console.log('Default Segment Categories response:', data);
+   //  // console.log('Default Segment Categories response:', data);
     return data;
   } catch (error) {
     console.error('Error fetching default segment categories:', error);
@@ -138,7 +138,7 @@ export async function getDefaultSegmentCategories() {
 // API call to delete a Segment Category
 export async function deleteSegmentCategory(categoryName) {
   try {
-    // console.log('Deleting segment category:', categoryName);
+   //  // console.log('Deleting segment category:', categoryName);
     
     const params = new URLSearchParams();
     params.append('category_name', categoryName);
@@ -159,7 +159,7 @@ export async function deleteSegmentCategory(categoryName) {
     }
 
     const data = await response.json();
-    // console.log('Segment Category deletion response:', data);
+   //  // console.log('Segment Category deletion response:', data);
     return data;
   } catch (error) {
     console.error('Error deleting segment category:', error);
@@ -218,7 +218,7 @@ export function extractAllRoomRevenuePackages(roomRevenueData) {
 // API call to create a new Room Market Segment
 export async function createRoomMarketSegment(segmentName, categoryName) {
   try {
-    // console.log('Creating room market segment:', segmentName, 'in category:', categoryName);
+   //  // console.log('Creating room market segment:', segmentName, 'in category:', categoryName);
     
     const params = new URLSearchParams();
     params.append('market_segment', segmentName);
@@ -240,7 +240,7 @@ export async function createRoomMarketSegment(segmentName, categoryName) {
     }
 
     const data = await response.json();
-    // console.log('Room Market Segment creation response:', data);
+   //  // console.log('Room Market Segment creation response:', data);
     return data;
   } catch (error) {
     console.error('Error creating room market segment:', error);
@@ -266,7 +266,7 @@ export async function getRoomMarketSegments() {
     }
 
     const data = await response.json();
-    // console.log('Room Market Segments response:', data);
+   //  // console.log('Room Market Segments response:', data);
     return data;
   } catch (error) {
     console.error('Error fetching room market segments:', error);
@@ -292,7 +292,7 @@ export async function getDefaultRoomMarketSegments() {
     }
 
     const data = await response.json();
-    // console.log('Default Room Market Segments response:', data);
+   //  // console.log('Default Room Market Segments response:', data);
     return data;
   } catch (error) {
     console.error('Error fetching default room market segments:', error);
@@ -303,7 +303,7 @@ export async function getDefaultRoomMarketSegments() {
 // API call to delete a Room Market Segment
 export async function deleteRoomMarketSegment(segmentName) {
   try {
-    // console.log('Deleting room market segment:', segmentName);
+   //  // console.log('Deleting room market segment:', segmentName);
     
     const params = new URLSearchParams();
     params.append('market_segment', segmentName);
@@ -324,7 +324,7 @@ export async function deleteRoomMarketSegment(segmentName) {
     }
 
     const data = await response.json();
-    // console.log('Room Market Segment deletion response:', data);
+   //  // console.log('Room Market Segment deletion response:', data);
     return data;
   } catch (error) {
     console.error('Error deleting room market segment:', error);
@@ -338,7 +338,7 @@ export async function getMarketSegmentList() {
     // Get the currently selected project
     const currentProject = selectedProject.value
     
-    // console.log('getMarketSegmentList called with project:', currentProject?.project_name);
+   //  // console.log('getMarketSegmentList called with project:', currentProject?.project_name);
     
     if (!currentProject) {
       // Return special status to indicate no project selected
@@ -358,7 +358,7 @@ export async function getMarketSegmentList() {
     });
 
     const data = await response.json();
-    // console.log('Market segment API response for project:', currentProject.project_name, data);
+   //  // console.log('Market segment API response for project:', currentProject.project_name, data);
     
     // Check if the project has any data
     const marketSegmentData = data.data || {};

@@ -33,7 +33,7 @@ export function usePageDataRecovery(pageId, options = {}) {
       recoveryStatus.value = 'recovering'
       errors.value = []
 
-      console.log(`[RECOVERY] Starting data recovery for page: ${pageId}`)
+      // console.log(`[RECOVERY] Starting data recovery for page: ${pageId}`)
 
       // Wait for cache service to be ready
       if (!unifiedCacheService.isInitialized.value) {
@@ -59,14 +59,14 @@ export function usePageDataRecovery(pageId, options = {}) {
         lastRecoveryTime.value = new Date()
         recoveryStatus.value = 'success'
         
-        console.log(`[RECOVERY] Successfully recovered ${count} data entries for page: ${pageId}`)
+        // console.log(`[RECOVERY] Successfully recovered ${count} data entries for page: ${pageId}`)
         
         // Call success callback if provided
         if (onDataRecovered && typeof onDataRecovered === 'function') {
           onDataRecovered(pageData)
         }
       } else {
-        console.log(`[RECOVERY] No cached data found for page: ${pageId}`)
+        // console.log(`[RECOVERY] No cached data found for page: ${pageId}`)
         recoveryStatus.value = 'success'
         recoveredDataCount.value = 0
       }
@@ -97,7 +97,7 @@ export function usePageDataRecovery(pageId, options = {}) {
       recoveredDataCount.value = 0
       lastRecoveryTime.value = null
       recoveryStatus.value = 'idle'
-      console.log(`[RECOVERY] Cleared page data for: ${pageId}`)
+      // console.log(`[RECOVERY] Cleared page data for: ${pageId}`)
     } catch (error) {
       console.error(`[RECOVERY] Failed to clear page data:`, error)
     }
@@ -235,7 +235,7 @@ export function usePageDataRecoveryWithRetry(pageId, options = {}) {
           await baseRecovery.recoverPageData()
           
           if (baseRecovery.recoveryStatus.value === 'success') {
-            console.log(`[RECOVERY] Successfully recovered data on attempt ${retryCount.value + 1}`)
+            // console.log(`[RECOVERY] Successfully recovered data on attempt ${retryCount.value + 1}`)
             return
           }
         } catch (error) {
@@ -319,7 +319,7 @@ export function useFormDataRecovery(pageId, formFields, options = {}) {
         restoredFields.value.add(key)
       })
 
-      console.log(`[FORM RECOVERY] Restored ${restoredFields.value.size} form fields`)
+      // console.log(`[FORM RECOVERY] Restored ${restoredFields.value.size} form fields`)
       
       // Validate restored data if requested
       if (validateOnRestore) {

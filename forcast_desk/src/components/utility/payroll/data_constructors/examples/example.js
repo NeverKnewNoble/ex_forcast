@@ -95,15 +95,15 @@ const exampleFrontendData = {
 
 // Example usage functions
 export function demonstrateApiToFrontend() {
-  console.log('=== API to Frontend Transformation ===');
+  // console.log('=== API to Frontend Transformation ===');
   
   try {
     const result = transformApiToFrontend(exampleApiResponse, 'Test Project', 2024, 2024);
-    console.log('Transformed result:', result);
+    // console.log('Transformed result:', result);
     
     // Validate the transformed data
     const validation = validatePayrollData(result, 'frontend');
-    console.log('Validation result:', validation);
+    // console.log('Validation result:', validation);
     
     return result;
   } catch (error) {
@@ -113,7 +113,7 @@ export function demonstrateApiToFrontend() {
 }
 
 export function demonstrateFrontendToApi() {
-  console.log('=== Frontend to API Transformation ===');
+  // console.log('=== Frontend to API Transformation ===');
   
   try {
     const result = transformFrontendToApi(
@@ -121,7 +121,7 @@ export function demonstrateFrontendToApi() {
       exampleFrontendData.payrollData,
       'Test Project'
     );
-    console.log('Transformed result:', result);
+    // console.log('Transformed result:', result);
     
     return result;
   } catch (error) {
@@ -131,7 +131,7 @@ export function demonstrateFrontendToApi() {
 }
 
 export function demonstrateValidation() {
-  console.log('=== Data Validation ===');
+  // console.log('=== Data Validation ===');
   
   // Test valid data
   const validData = {
@@ -148,7 +148,7 @@ export function demonstrateValidation() {
   };
   
   const validResult = validatePayrollData(validData, 'frontend');
-  console.log('Valid data validation:', validResult);
+  // console.log('Valid data validation:', validResult);
   
   // Test invalid data
   const invalidData = {
@@ -165,16 +165,16 @@ export function demonstrateValidation() {
   };
   
   const invalidResult = validatePayrollData(invalidData, 'frontend');
-  console.log('Invalid data validation:', invalidResult);
+  // console.log('Invalid data validation:', invalidResult);
   
   return { validResult, invalidResult };
 }
 
 export function demonstrateDefaultRow() {
-  console.log('=== Default Row Creation ===');
+  // console.log('=== Default Row Creation ===');
   
   const defaultRow = payrollDataConstructor.createDefaultRow();
-  console.log('Default row:', defaultRow);
+  // console.log('Default row:', defaultRow);
   
   return defaultRow;
 }

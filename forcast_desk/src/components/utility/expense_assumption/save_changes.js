@@ -158,9 +158,9 @@ export async function saveChanges(changedCells, isSaving, saveError, expenseData
     
     // Debug logging to see what's being sent
     if (process.env.NODE_ENV === 'development') {
-      console.log('Saving expense changes with payload:', payload);
-      console.log('Changed cells with department info:', changedCells.value);
-      console.log('Default expenses for reference:', defaultExpenses);
+      // console.log('Saving expense changes with payload:', payload);
+      // console.log('Changed cells with department info:', changedCells.value);
+      // console.log('Default expenses for reference:', defaultExpenses);
     }
     
     const response = await fetch("/api/method/ex_forcast.api.expense_estimate.upsert_expense_items", {
@@ -176,7 +176,7 @@ export async function saveChanges(changedCells, isSaving, saveError, expenseData
       })
     });
     const result = await response.json();
-    // console.log('result', result);
+   //  // console.log('result', result);
     
     if (result.message?.status === "success") {
       alertService.success("Changes saved successfully!");

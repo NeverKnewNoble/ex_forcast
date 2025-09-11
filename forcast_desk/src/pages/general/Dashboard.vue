@@ -281,7 +281,7 @@ function getCurrentTime() {
 const handleProjectChange = (project) => {
   // Project changed - refresh data based on selected project
   if (process.env.NODE_ENV === 'development') {
-    console.log('Project changed to:', project)
+    // console.log('Project changed to:', project)
   }
 }
 

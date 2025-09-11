@@ -8,13 +8,13 @@ export const getCSRFToken = () => {
   let token = ''
   let methodUsed = ''
   
-  console.log('🔍 [CSRF] Starting CSRF token detection...')
+  // console.log('🔍 [CSRF] Starting CSRF token detection...')
   
   // Method 1: Check frappe global object (most reliable)
   if (window.frappe && window.frappe.csrf_token) {
     token = window.frappe.csrf_token
     methodUsed = 'window.frappe.csrf_token'
-    console.log('✅ [CSRF] Found via method 1 (frappe global):', token.substring(0, 10) + '...')
+    // console.log('✅ [CSRF] Found via method 1 (frappe global):', token.substring(0, 10) + '...')
   }
   
   // Method 2: Check meta tag
@@ -23,7 +23,7 @@ export const getCSRFToken = () => {
     if (metaTag) {
       token = metaTag.getAttribute('content')
       methodUsed = 'meta[name="csrf-token"]'
-      console.log('✅ [CSRF] Found via method 2 (meta tag):', token.substring(0, 10) + '...')
+      // console.log('✅ [CSRF] Found via method 2 (meta tag):', token.substring(0, 10) + '...')
     }
   }
   
@@ -33,7 +33,7 @@ export const getCSRFToken = () => {
     if (frappeMetaTag) {
       token = frappeMetaTag.getAttribute('content')
       methodUsed = 'meta[name="frappe-csrf-token"]'
-      console.log('✅ [CSRF] Found via method 3 (frappe meta tag):', token.substring(0, 10) + '...')
+      // console.log('✅ [CSRF] Found via method 3 (frappe meta tag):', token.substring(0, 10) + '...')
     }
   }
   
@@ -43,7 +43,7 @@ export const getCSRFToken = () => {
     if (storedToken) {
       token = storedToken
       methodUsed = 'localStorage'
-      console.log('✅ [CSRF] Found via method 4 (localStorage):', token.substring(0, 10) + '...')
+      // console.log('✅ [CSRF] Found via method 4 (localStorage):', token.substring(0, 10) + '...')
     }
   }
   
@@ -55,7 +55,7 @@ export const getCSRFToken = () => {
       if (name === 'csrf_token') {
         token = value
         methodUsed = 'cookies'
-        console.log('✅ [CSRF] Found via method 5 (cookies):', token.substring(0, 10) + '...')
+        // console.log('✅ [CSRF] Found via method 5 (cookies):', token.substring(0, 10) + '...')
         break
       }
     }
@@ -71,7 +71,7 @@ export const getCSRFToken = () => {
         if (match) {
           token = match[1]
           methodUsed = 'script tag'
-          console.log('✅ [CSRF] Found via method 6 (script tag):', token.substring(0, 10) + '...')
+          // console.log('✅ [CSRF] Found via method 6 (script tag):', token.substring(0, 10) + '...')
           break
         }
       }
@@ -80,9 +80,9 @@ export const getCSRFToken = () => {
   
   // Final result logging
   if (token) {
-    console.log('🎉 [CSRF] SUCCESS! Token found via:', methodUsed)
-    console.log('🔑 [CSRF] Token length:', token.length)
-    console.log('🔑 [CSRF] Token preview:', token.substring(0, 20) + '...')
+    // console.log('🎉 [CSRF] SUCCESS! Token found via:', methodUsed)
+    // console.log('🔑 [CSRF] Token length:', token.length)
+    // console.log('🔑 [CSRF] Token preview:', token.substring(0, 20) + '...')
   } else {
     console.error('❌ [CSRF] FAILED! No token found in any method')
     console.warn('🔍 [CSRF] Available sources check:', {
@@ -103,13 +103,13 @@ export const getCSRFToken = () => {
  * Call this from browser console: testCSRFToken()
  */
 export const testCSRFToken = () => {
-  console.log('🧪 [CSRF TEST] Starting CSRF token test...')
-  console.log('🧪 [CSRF TEST] Current URL:', window.location.href)
-  console.log('🧪 [CSRF TEST] Document ready state:', document.readyState)
+  // console.log('🧪 [CSRF TEST] Starting CSRF token test...')
+  // console.log('🧪 [CSRF TEST] Current URL:', window.location.href)
+  // console.log('🧪 [CSRF TEST] Document ready state:', document.readyState)
   
   const token = getCSRFToken()
   
-  console.log('🧪 [CSRF TEST] Final result:', {
+  // console.log('🧪 [CSRF TEST] Final result:', {
     token: token ? token.substring(0, 20) + '...' : 'NOT FOUND',
     length: token?.length || 0,
     isValid: token && token.length > 0
