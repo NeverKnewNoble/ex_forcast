@@ -494,7 +494,7 @@
                                     :key="'occupied-cell-' + year + '-' + label + '-' + roomType"
                                      contenteditable="true"
                                     class="px-2 py-2 text-right border border-blue-200 hover:bg-blue-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:border-blue-600 dark:hover:bg-blue-900/20 dark:focus:bg-gray-700"
-                                    @input="handleRoomCellInput({ year, label, roomType, field: 'occupied_beds', event: $event })"
+                                    @input="handleRoomCellInputWrapper({ year, label, roomType, field: 'occupied_beds', event: $event })"
                                     @focus="handleRoomCellFocus({ year, label, roomType, field: 'occupied_beds', event: $event })"
                                     @blur="handleRoomCellEditWrapper({ year, label, roomType, field: 'occupied_beds', event: $event })"
                                   >
@@ -615,7 +615,7 @@
                                     :key="'rate-cell-' + year + '-' + label + '-' + roomType"
                                      contenteditable="true"
                                     class="px-2 py-2 text-right border border-green-200 hover:bg-green-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent transition-all duration-200 dark:border-green-600 dark:hover:bg-green-900/20 dark:focus:bg-gray-700"
-                                    @input="handleRoomCellInput({ year, label, roomType, field: 'rate', event: $event })"
+                                    @input="handleRoomCellInputWrapper({ year, label, roomType, field: 'rate', event: $event })"
                                     @focus="handleRoomCellFocus({ year, label, roomType, field: 'rate', event: $event })"
                                     @blur="handleRoomCellEditWrapper({ year, label, roomType, field: 'rate', event: $event })"
                                   >
@@ -2270,6 +2270,36 @@ function handleMarketSegmentCellEditWrapper({ year, label, segment, field, event
 }
 
 import MarketSegmentationTables from '@/components/ui/MarketSegmentationTables.vue';
+
+// Preserve caret position while updating reactive data from contenteditable cells
+function handleRoomCellInputWrapper({ year, label, roomType, field, event }) {
+  const target = event.target;
+  if (!target) return;
+  const selection = window.getSelection();
+  let startOffset = 0;
+  if (selection && selection.rangeCount > 0) {
+    const range = selection.getRangeAt(0);
+    startOffset = range.startOffset;
+  }
+  handleRoomCellInput({ year, label, roomType, field, event });
+  // Restore caret position to previous logical place within the same node
+  requestAnimationFrame(() => {
+    try {
+      const sel = window.getSelection();
+      if (!sel) return;
+      const node = target.firstChild || target;
+      const textLen = (node.textContent || '').length;
+      const newOffset = Math.min(startOffset, textLen);
+      const newRange = document.createRange();
+      newRange.setStart(node, newOffset);
+      newRange.setEnd(node, newOffset);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+    } catch (_) {
+      // ignore
+    }
+  });
+}
 
 // Persist VAT and Breakfast allocation to localStorage (project-scoped)
 watch(vatByYear, (newValue) => {
