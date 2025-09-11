@@ -29,12 +29,12 @@ export const debugApiRequest = async (url, options = {}) => {
   
   // Check available CSRF sources
   // console.log('Available CSRF Sources:', {
-    frappeGlobal: !!window.frappe?.csrf_token,
-    metaTag: !!document.querySelector('meta[name="csrf-token"]'),
-    frappeMetaTag: !!document.querySelector('meta[name="frappe-csrf-token"]'),
-    localStorage: !!localStorage.getItem('csrf_token'),
-    cookies: document.cookie.includes('csrf_token')
-  })
+  //   frappeGlobal: !!window.frappe?.csrf_token,
+  //   metaTag: !!document.querySelector('meta[name="csrf-token"]'),
+  //   frappeMetaTag: !!document.querySelector('meta[name="frappe-csrf-token"]'),
+  //   localStorage: !!localStorage.getItem('csrf_token'),
+  //   cookies: document.cookie.includes('csrf_token')
+  // })
   
   console.groupEnd()
   

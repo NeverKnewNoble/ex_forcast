@@ -1789,7 +1789,7 @@ function refreshCache() {
   if (firstYear && firstLabel) {
     const cachedTotalRooms = calculationCache.getValue(project, 'Room Revenue Assumptions', 'Total Rooms', firstYear, firstLabel);
     // console.log('Cache comparison:', {
-     //   fromCache: cachedTotalRooms,
+    //   fromCache: cachedTotalRooms,
     //   fromProp: props.totalNumberOfRooms,
     //   project,
     //   year: firstYear,
