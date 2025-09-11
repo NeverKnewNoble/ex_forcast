@@ -52,12 +52,12 @@ export async function saveMarketSegmentChanges(changes, isSaving, saveError, isS
   saveError.value = '';
 
   try {
-    console.log('Saving market segment changes:', changes);
+    // console.log('Saving market segment changes:', changes);
     
     const result = await saveMarketSegmentChangesAPI(changes);
     
     if (result && result.message && result.message.status === 'success') {
-      console.log('Market segment changes saved successfully:', result);
+      // console.log('Market segment changes saved successfully:', result);
       isSaved.value = true;
       alertService.success('Market segment changes saved successfully!');
     } else {

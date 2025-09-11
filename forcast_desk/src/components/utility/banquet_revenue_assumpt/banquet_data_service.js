@@ -11,7 +11,7 @@ const API_BASE = '/api/method/ex_forcast.api.call_and_save_banquet_revenue';
  */
 export async function loadBanquetRevenueData(project = null) {
   try {
-    // console.log('Loading Banquet revenue data from server for project:', project);
+   //  // console.log('Loading Banquet revenue data from server for project:', project);
     
     let url = `${API_BASE}.banquet_revenue_display`;
     if (project) {
@@ -28,7 +28,7 @@ export async function loadBanquetRevenueData(project = null) {
     }
     // Handle case where data might be wrapped in message object
     const serverData = data.message || data;
-    // console.log('Raw server response:', data);
+   //  // console.log('Raw server response:', data);
     return serverData;
   } catch (error) {
     console.error('Error loading Banquet revenue data:', error);
@@ -93,13 +93,13 @@ export function convertBanquetServerDataToFrontend(serverData) {
  */
 export async function testBanquetApi() {
   try {
-    console.log('Testing Banquet API connection...');
+    // console.log('Testing Banquet API connection...');
     const response = await fetch(`${API_BASE}.test_banquet_api`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    console.log('Test API response:', data);
+    // console.log('Test API response:', data);
     return data;
   } catch (error) {
     console.error('Error testing Banquet API:', error);
@@ -114,17 +114,17 @@ export async function testBanquetApi() {
  */
 export async function loadBanquetRevenueDataForFrontend(project = null) {
   try {
-    // console.log('Loading Banquet revenue data for frontend for project:', project);
+   //  // console.log('Loading Banquet revenue data for frontend for project:', project);
     const serverData = await loadBanquetRevenueData(project);
     
     if (!serverData || Object.keys(serverData).length === 0) {
-      console.log('No Banquet revenue data found, returning empty object');
+      // console.log('No Banquet revenue data found, returning empty object');
       return {};
     }
     
-    // console.log('Raw server data:', serverData);
+   //  // console.log('Raw server data:', serverData);
     const frontendData = convertBanquetServerDataToFrontend(serverData);
-    // console.log('Converted frontend data:', frontendData);
+   //  // console.log('Converted frontend data:', frontendData);
     
     return frontendData;
   } catch (error) {

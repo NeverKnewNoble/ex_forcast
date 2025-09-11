@@ -567,10 +567,10 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
       type: rowKeyObj.type
     });
     
-    // console.log('Looking up data for:', { rowKey, year, label, fnbDataKeys: Object.keys(fnbData) });
+   //  // console.log('Looking up data for:', { rowKey, year, label, fnbDataKeys: Object.keys(fnbData) });
     
     const raw = fnbData?.[rowKey]?.[year]?.[label];
-    // console.log('Raw value found:', raw);
+   //  // console.log('Raw value found:', raw);
     
     let num = parseFloat(raw?.toString().replace(/,/g, ''));
     if (isNaN(num)) num = 0;
@@ -585,7 +585,7 @@ export function getFnbCellValue(fnbData, row, year, label, totalRooms = null) {
 }
 
 export function setFnbCellValue(fnbData, row, year, label, value) {
-  // console.log('setFnbCellValue called with:', { row, year, label, value, fnbDataExists: !!fnbData });
+ //  // console.log('setFnbCellValue called with:', { row, year, label, value, fnbDataExists: !!fnbData });
   if (!fnbData || typeof fnbData !== 'object') {
     console.warn('setFnbCellValue: fnbData is not an object');
     return;
@@ -611,7 +611,7 @@ export function setFnbCellValue(fnbData, row, year, label, value) {
   if (!fnbData[rowKey]) fnbData[rowKey] = {};
   if (!fnbData[rowKey][year]) fnbData[rowKey][year] = {};
   fnbData[rowKey][year][label] = value;
-  // console.log('setFnbCellValue completed. Data structure:', fnbData[rowKey][year]);
+ //  // console.log('setFnbCellValue completed. Data structure:', fnbData[rowKey][year]);
 }
 
 // --- Shared Utility for Formatting and Cleaning (copied from expense_estimate_utils.js) ---
@@ -662,22 +662,22 @@ function cleanNumberValue(event) {
 
 // --- Refactored Handlers ---
 export function handleFnbCellInput({ row, year, label, event, fnbData, changedCells, isSaved }) {
-  // console.log('handleFnbCellInput called with:', { row, year, label, event: !!event, fnbData: !!fnbData });
+ //  // console.log('handleFnbCellInput called with:', { row, year, label, event: !!event, fnbData: !!fnbData });
   if (!event || !event.target) {
-    console.log('handleFnbCellInput: event or event.target is not valid, returning');
+    // console.log('handleFnbCellInput: event or event.target is not valid, returning');
     return;
   }
   
   // Initialize fnbData if it's not valid
   if (!fnbData || typeof fnbData !== 'object') {
-    console.log('handleFnbCellInput: fnbData is not valid, initializing as empty object');
+    // console.log('handleFnbCellInput: fnbData is not valid, initializing as empty object');
     fnbData = {};
   }
   
   // Format and validate input
   const value = formatNumberInput(event);
   // Log cell change for debugging
-  // console.log('Cell changed:', { row, year, label, value });
+ //  // console.log('Cell changed:', { row, year, label, value });
   setFnbCellValue(fnbData, row, year, label, value);
   // Track changes
   if (changedCells && isSaved) {
@@ -694,21 +694,21 @@ export function handleFnbCellInput({ row, year, label, event, fnbData, changedCe
 }
 
 export function handleFnbCellEdit({ row, year, label, event, fnbData, changedCells, isSaved }) {
-  // console.log('handleFnbCellEdit called with:', { row, year, label, event: !!event, fnbData: !!fnbData });
+ //  // console.log('handleFnbCellEdit called with:', { row, year, label, event: !!event, fnbData: !!fnbData });
   if (!event || !event.target) {
-    console.log('handleFnbCellEdit: event or event.target is not valid, returning');
+    // console.log('handleFnbCellEdit: event or event.target is not valid, returning');
     return;
   }
   
   // Initialize fnbData if it's not valid
   if (!fnbData || typeof fnbData !== 'object') {
-    console.log('handleFnbCellEdit: fnbData is not valid, initializing as empty object');
+    // console.log('handleFnbCellEdit: fnbData is not valid, initializing as empty object');
     fnbData = {};
   }
   
   // Clean and format value on blur
   const newValue = cleanNumberValue(event);
-  // console.log('Cell edited (blur):', { row, year, label, newValue });
+ //  // console.log('Cell edited (blur):', { row, year, label, newValue });
   setFnbCellValue(fnbData, row, year, label, newValue);
   // Track changes
   if (changedCells && isSaved) {
@@ -723,9 +723,9 @@ export function handleFnbCellEdit({ row, year, label, event, fnbData, changedCel
 }
 
 export function handleFnbCellFocus({ row, year, label, event }) {
-  // console.log('handleFnbCellFocus called with:', { row, year, label, event: !!event });
+ //  // console.log('handleFnbCellFocus called with:', { row, year, label, event: !!event });
   if (!event || !event.target) {
-    console.log('handleFnbCellFocus: event or event.target is not valid, returning');
+    // console.log('handleFnbCellFocus: event or event.target is not valid, returning');
     return;
   }
   let value = event.target.innerText;

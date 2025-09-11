@@ -1000,7 +1000,7 @@
 
   // Debug props
   watch(() => props, (newProps) => {
-    // console.log('EmployeeBenefitsTable props updated:', {
+   //  // console.log('EmployeeBenefitsTable props updated:', {
     //   payrollRowsLength: newProps.payrollRows?.length,
     //   payrollData: newProps.payrollData,
     //   payrollRelatedData: newProps.payrollRelatedData,
@@ -1076,30 +1076,30 @@
 
   // Helper function to get monthly count value (similar to Payroll_Related.vue)
   function getMonthlyCountValueLocal(rowId, year, month) {
-    // console.log('Getting monthly count for:', { rowId, year, month, payrollData: props.payrollData }); 
+   //  // console.log('Getting monthly count for:', { rowId, year, month, payrollData: props.payrollData }); 
     
     // Defensive check for payrollData - handle both ref and direct object
     const payrollDataValue = props.payrollData?.value || props.payrollData;
     if (!payrollDataValue) {
-      // console.log('No payrollData available');
+     //  // console.log('No payrollData available');
       return 0;
     }
     
     const row = props.payrollRows.find(r => r.id === rowId);
     if (!row) {
-      // console.log('No row found for ID:', rowId);
+     //  // console.log('No row found for ID:', rowId);
       return 0;
     }
     
-    // console.log('Found row:', row);
+   //  // console.log('Found row:', row);
     
     // Check if there's an override for this specific month
     const countData = payrollDataValue[year]?.[rowId]?.['count'];
-    // console.log('Count data for year/month:', countData);
+   //  // console.log('Count data for year/month:', countData);
     
     if (countData && typeof countData === 'object' && countData !== null && !Array.isArray(countData)) {
       const overrideValue = countData[month];
-      // console.log('Override value for month', month, ':', overrideValue);
+     //  // console.log('Override value for month', month, ':', overrideValue);
       if (overrideValue !== undefined && overrideValue !== null) {
         return overrideValue;
       }
@@ -1107,19 +1107,19 @@
     
     // If no override exists, return the main count value (getter behavior)
     const mainCount = row.count || 0;
-    // console.log('Using main count value:', mainCount);
+   //  // console.log('Using main count value:', mainCount);
     return mainCount;
   }
 
   // Helper function to get employee benefits values from payroll related data
   function getEmployeeBenefitsValue(row, field) {
     if (!props.visibleYears || props.visibleYears.length === 0) {
-      // console.log('No visible years available');
+     //  // console.log('No visible years available');
       return 0;
     }
     
     const year = props.visibleYears[0];
-    // console.log('Getting employee benefits value for:', { rowId: row.id, field, year, payrollRelatedData: props.payrollRelatedData });
+   //  // console.log('Getting employee benefits value for:', { rowId: row.id, field, year, payrollRelatedData: props.payrollRelatedData });
     
     // Handle different data structures for payrollRelatedData
     let payrollRelatedDataValue = props.payrollRelatedData;
@@ -1138,11 +1138,11 @@
     }
     
     if (!yearData) {
-      // console.log('No year data found for year:', year);
+     //  // console.log('No year data found for year:', year);
       return 0;
     }
     
-    // console.log('Year data found:', yearData);
+   //  // console.log('Year data found:', yearData);
     
     // Map field names to the expected format
     const fieldMappings = {
@@ -1157,7 +1157,7 @@
     
     const mappedField = fieldMappings[field];
     if (!mappedField) {
-      // console.log('No mapping found for field:', field);
+     //  // console.log('No mapping found for field:', field);
       return 0;
     }
     
@@ -1174,10 +1174,10 @@
       employeeBenefitsData = yearData[row.id];
     }
     
-    // console.log('Employee benefits data for row:', row.id, employeeBenefitsData); 
+   //  // console.log('Employee benefits data for row:', row.id, employeeBenefitsData); 
     
     const value = employeeBenefitsData?.[mappedField] || 0;
-    // console.log('Final value for field', field, ':', value);
+   //  // console.log('Final value for field', field, ':', value);
     
     return value;
   }
@@ -1187,7 +1187,7 @@
     const medicalBase = getEmployeeBenefitsValue(row, 'medical');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = medicalBase * monthlyCount;
-    // console.log('Medical calculation:', { rowId: row.id, medicalBase, monthlyCount, monthlyValue });
+   //  // console.log('Medical calculation:', { rowId: row.id, medicalBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 
@@ -1195,7 +1195,7 @@
     const uniformsBase = getEmployeeBenefitsValue(row, 'uniforms');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = uniformsBase * monthlyCount;
-    // console.log('Uniforms calculation:', { rowId: row.id, uniformsBase, monthlyCount, monthlyValue });
+   //  // console.log('Uniforms calculation:', { rowId: row.id, uniformsBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 
@@ -1203,7 +1203,7 @@
     const employeeMealBase = getEmployeeBenefitsValue(row, 'employee_meal');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = employeeMealBase * monthlyCount;
-    // console.log('Employee meal calculation:', { rowId: row.id, employeeMealBase, monthlyCount, monthlyValue });
+   //  // console.log('Employee meal calculation:', { rowId: row.id, employeeMealBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 
@@ -1211,7 +1211,7 @@
     const transportBase = getEmployeeBenefitsValue(row, 'transport');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = transportBase * monthlyCount;
-    // console.log('Transport calculation:', { rowId: row.id, transportBase, monthlyCount, monthlyValue });
+   //  // console.log('Transport calculation:', { rowId: row.id, transportBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 
@@ -1219,7 +1219,7 @@
     const telephoneBase = getEmployeeBenefitsValue(row, 'telephone');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = telephoneBase * monthlyCount;
-    // console.log('Telephone calculation:', { rowId: row.id, telephoneBase, monthlyCount, monthlyValue });
+   //  // console.log('Telephone calculation:', { rowId: row.id, telephoneBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 
@@ -1227,7 +1227,7 @@
     const airTicketBase = getEmployeeBenefitsValue(row, 'air_ticket');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = airTicketBase * monthlyCount;
-    // console.log('Air ticket calculation:', { rowId: row.id, airTicketBase, monthlyCount, monthlyValue });
+   //  // console.log('Air ticket calculation:', { rowId: row.id, airTicketBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 
@@ -1235,7 +1235,7 @@
     const benefitsOtherBase = getEmployeeBenefitsValue(row, 'benefits_other');
     const monthlyCount = getMonthlyCountValueLocal(row.id, year, month);
     const monthlyValue = benefitsOtherBase * monthlyCount;
-    // console.log('Benefits other calculation:', { rowId: row.id, benefitsOtherBase, monthlyCount, monthlyValue });
+   //  // console.log('Benefits other calculation:', { rowId: row.id, benefitsOtherBase, monthlyCount, monthlyValue });
     return formatMoney(monthlyValue);
   }
 

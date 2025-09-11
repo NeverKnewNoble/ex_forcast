@@ -749,6 +749,7 @@ import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
 import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign, Loader2, AlertCircle, Building2, Save, Filter, Building, MapPin, RotateCcw } from 'lucide-vue-next';
 import alertService from "@/components/ui/ui_utility/alertService.js";
 
@@ -966,7 +967,7 @@ setInterval(checkHospitalityExperience, 1000);
 watch(selectedProject, async (newProject, oldProject) => {
   if (newProject && newProject !== oldProject) {
     try {
-      // console.log('Project changed, reloading expense data for:', newProject.project_name);
+     //  // console.log('Project changed, reloading expense data for:', newProject.project_name);
       
       // Reload all expenses and categories for the new project
       const allExpensesResult = await loadAllExpensesAndCategories();
@@ -1001,7 +1002,7 @@ watch(selectedProject, async (newProject, oldProject) => {
       changedCells.value = [];
       isSaved.value = true;
       
-      // console.log("Expense data loaded for project:", newProject.project_name);
+     //  // console.log("Expense data loaded for project:", newProject.project_name);
       alertService.success(`Switched to project: ${newProject.project_name}`);
 
       // Refresh modal departments for new project
@@ -1012,7 +1013,11 @@ watch(selectedProject, async (newProject, oldProject) => {
       }
       // Refresh department locations too
       try {
-        const respLoc = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list');
+        const respLoc = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list', {
+          headers: {
+            'X-Frappe-CSRF-Token': getCSRFToken()
+          }
+        });
         const jsonLoc = await respLoc.json();
         if (jsonLoc.message && jsonLoc.message.success) {
           modalDepartmentLocations.value = (jsonLoc.message.locations || []).map(l => l.department_location || l.name);
@@ -1033,19 +1038,19 @@ watch(selectedProject, async (newProject, oldProject) => {
 watch(() => selectedProject.value?.project_name, async (newProjectName, oldProjectName) => {
   if (newProjectName && newProjectName !== oldProjectName) {
     try {
-      // console.log('Project name changed, loading default expenses for:', newProjectName);
-      // console.log('Full selectedProject object:', selectedProject.value);
-      // console.log('Project name field:', selectedProject.value?.project_name);
-      // console.log('Project name field:', selectedProject.value?.name);
+     //  // console.log('Project name changed, loading default expenses for:', newProjectName);
+     //  // console.log('Full selectedProject object:', selectedProject.value);
+     //  // console.log('Project name field:', selectedProject.value?.project_name);
+     //  // console.log('Project name field:', selectedProject.value?.name);
       
       // Load default expenses for the newly selected project
       const defaultExpensesResult = await loadDefaultExpensesForProject();
-      // console.log('Default expenses result:', defaultExpensesResult);
+     //  // console.log('Default expenses result:', defaultExpensesResult);
       if (defaultExpensesResult.status === 'success') {
         defaultExpenses.value = defaultExpensesResult.defaultExpenses;
-        // console.log('Set defaultExpenses to:', defaultExpenses.value);
+       //  // console.log('Set defaultExpenses to:', defaultExpenses.value);
       } else {
-        // console.log('Failed to load default expenses:', defaultExpensesResult.message);
+       //  // console.log('Failed to load default expenses:', defaultExpensesResult.message);
       }
     } catch (error) {
       console.error("Error loading default expenses for project:", error);
@@ -1105,7 +1110,11 @@ onMounted(async () => {
     costTypeOptions.value = fieldOptions.cost_type.map(costType => ({ label: costType, value: costType }));
     
     // Load group accounts
-    const response = await fetch("/api/v2/method/ex_forcast.api.account_list.get_group_accounts");
+    const response = await fetch("/api/v2/method/ex_forcast.api.account_list.get_group_accounts", {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     const result = await response.json();
     if (result.data && result.data.group_accounts) {
       groupAccounts.value = result.data.group_accounts;
@@ -1122,7 +1131,11 @@ onMounted(async () => {
     try {
       await loadDepartmentLocationOptions();
       // read from payroll service reactive ref via dynamic import not needed since function populates its own ref; we replicate by fetching API directly here
-      const respLoc = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list');
+      const respLoc = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list', {
+        headers: {
+          'X-Frappe-CSRF-Token': getCSRFToken()
+        }
+      });
       const jsonLoc = await respLoc.json();
       if (jsonLoc.message && jsonLoc.message.success) {
         modalDepartmentLocations.value = (jsonLoc.message.locations || []).map(l => l.department_location || l.name);
@@ -1143,11 +1156,11 @@ onMounted(async () => {
     
     // Manual trigger: If project is already selected, load default expenses
     if (selectedProject.value?.project_name) {
-      // console.log('Manual trigger: Loading default expenses for existing project:', selectedProject.value.project_name);
+     //  // console.log('Manual trigger: Loading default expenses for existing project:', selectedProject.value.project_name);
       const defaultExpensesResult = await loadDefaultExpensesForProject();
       if (defaultExpensesResult.status === 'success') {
         defaultExpenses.value = defaultExpensesResult.defaultExpenses;
-        // console.log('Manual trigger: Set defaultExpenses to:', defaultExpenses.value);
+       //  // console.log('Manual trigger: Set defaultExpenses to:', defaultExpenses.value);
       }
     }
   } catch (err) {
@@ -1314,7 +1327,7 @@ function cacheExpenseData(expenseData, projectName) {
       }
     }
     
-    console.log(`[EXPENSE CACHE] Cached ${Object.keys(expenseData).length} years of expense data for project: ${projectName}`);
+    // console.log(`[EXPENSE CACHE] Cached ${Object.keys(expenseData).length} years of expense data for project: ${projectName}`);
   } catch (error) {
     console.error('Error caching expense data:', error);
   }
@@ -1396,11 +1409,14 @@ async function createExpenseCategory() {
   try {
     const response = await fetch("/api/v2/method/ex_forcast.api.expense_options.create_expense_category", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      },
       body: JSON.stringify({ category_name: newCategoryName.value.trim() })
     });
     const result = await response.json();
-    // console.log('create_expense_category API result:', result);
+   //  // console.log('create_expense_category API result:', result);
     if (result.data && result.data.success) {
       alertService.success(`Category '${newCategoryName.value.trim()}' created successfully!`);
       newCategoryName.value = "";
@@ -1423,7 +1439,10 @@ async function createAccount() {
   try {
     const response = await fetch("/api/v2/method/ex_forcast.api.account_list.create_account", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      },
       body: JSON.stringify({
         account_name: newAccount.value.account_name.trim(),
         account_number: newAccount.value.account_number.trim(),

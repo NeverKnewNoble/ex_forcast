@@ -1,6 +1,7 @@
 import alertService from "@/components/ui/ui_utility/alertService.js";
 import { cloneDeep } from 'lodash-es';
 import { selectedProject } from '@/components/utility/dashboard/projectService.js';
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
 
 //! Helper function to find expense details from data
 function findExpenseDetails(expenseData, expense, year, month) {
@@ -156,21 +157,26 @@ export async function saveChanges(changedCells, isSaving, saveError, expenseData
     });
     
     // Debug logging to see what's being sent
-    console.log('Saving expense changes with payload:', payload);
-    console.log('Changed cells with department info:', changedCells.value);
-    console.log('Default expenses for reference:', defaultExpenses);
+    if (process.env.NODE_ENV === 'development') {
+      // console.log('Saving expense changes with payload:', payload);
+      // console.log('Changed cells with department info:', changedCells.value);
+      // console.log('Default expenses for reference:', defaultExpenses);
+    }
     
     const response = await fetch("/api/method/ex_forcast.api.expense_estimate.upsert_expense_items", {
       method: "POST",
       credentials: "include",
-      headers: { "Content-Type": "application/json", "X-Frappe-CSRF-Token": frappe.csrf_token },
+      headers: { 
+        "Content-Type": "application/json", 
+        "X-Frappe-CSRF-Token": getCSRFToken() 
+      },
       body: JSON.stringify({ 
         changes: payload,
         project: currentProject.project_name
       })
     });
     const result = await response.json();
-    // console.log('result', result);
+   //  // console.log('result', result);
     
     if (result.message?.status === "success") {
       alertService.success("Changes saved successfully!");

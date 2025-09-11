@@ -51,6 +51,24 @@ if (process.env.NODE_ENV === 'development') {
   window.getAllProjectKeys = getAllProjectKeys
   window.unifiedCacheService = unifiedCacheService
   window.productionErrorHandler = productionErrorHandler
+  
+  // Import debug API utilities
+  import('@/components/utility/_master_utility/debugApi.js').then(module => {
+    window.debugApiRequest = module.debugApiRequest
+    window.testCSRFToken = module.testCSRFToken
+  })
+  
+  // Import CSRF test function
+  import('@/components/utility/dashboard/apiUtils.js').then(module => {
+    window.testCSRFToken = module.testCSRFToken
+    window.getCSRFToken = module.getCSRFToken
+  })
+  
+  // Import expense data test functions
+  import('@/components/utility/expense_assumption/data_service.js').then(module => {
+    window.testDefaultExpenses = module.testDefaultExpenses
+    window.testExpenseData = module.testExpenseData
+  })
 }
 
 // Global error handling

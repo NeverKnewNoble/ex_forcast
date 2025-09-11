@@ -528,6 +528,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, watch, computed } from 'vue'
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js'
 import { 
   FolderOpen, 
   ChevronDown, 
@@ -586,7 +587,11 @@ const newFbRestaurant = ref('')
 const loadDepartmentDetails = async () => {
   try {
     // Load Rooms locations from payroll department locations API
-    const roomsResponse = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list')
+    const roomsResponse = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list', {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    })
     const roomsData = await roomsResponse.json()
     if (roomsData.message && roomsData.message.success) {
       roomsLocations.value = roomsData.message.locations.map(location => ({

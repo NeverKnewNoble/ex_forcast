@@ -3,6 +3,7 @@
 import { ref, reactive } from 'vue';
 import alertService from "@/components/ui/ui_utility/alertService.js";
 import { payrollDataConstructor, transformApiToFrontend, transformFrontendToApi, validatePayrollData } from './data_constructors/index.js';
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
 
 // Modal state
 export const showAddPayrollModal = ref(false);
@@ -88,7 +89,11 @@ export { months };
 //! ************ Department Options ****************
 export async function loadDepartmentOptions() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.department_list.get_department_list');
+    const response = await fetch('/api/method/ex_forcast.api.department_list.get_department_list', {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     const data = await response.json();
     
     if (data.message && data.message.success) {
@@ -107,7 +112,7 @@ export async function loadDepartmentOptions() {
         { value: 'SALES & MARKETING', label: 'SALES & MARKETING' },
         { value: 'ADMINISTRATION', label: 'ADMINISTRATION' }
       ];
-      console.log('Using fallback department options');
+      // console.log('Using fallback department options');
     }
   } catch (error) {
     console.error('Error loading departments:', error);
@@ -118,14 +123,18 @@ export async function loadDepartmentOptions() {
       { value: 'SALES & MARKETING', label: 'SALES & MARKETING' },
       { value: 'ADMINISTRATION', label: 'ADMINISTRATION' }
     ];
-    console.log('Using fallback department options due to error');
+    // console.log('Using fallback department options due to error');
   }
 }
 
 //! ************ Project Department Options (Filtered) ****************
 export async function loadProjectDepartmentOptions() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.department_list.get_department_list');
+    const response = await fetch('/api/method/ex_forcast.api.department_list.get_department_list', {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     const data = await response.json();
     
     if (data.message && data.message.success) {
@@ -178,7 +187,11 @@ export async function loadProjectDepartmentOptions() {
 //! ************ Department Location Options ****************
 export async function loadDepartmentLocationOptions() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list');
+    const response = await fetch('/api/method/ex_forcast.api.payroll_department_location_list.get_payroll_department_location_list', {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     const data = await response.json();
     
     if (data.message && data.message.success) {
@@ -197,7 +210,7 @@ export async function loadDepartmentLocationOptions() {
         { value: 'Sales Office', label: 'Sales Office' },
         { value: 'Administration', label: 'Administration' }
       ];
-      console.log('Using fallback department location options');
+      // console.log('Using fallback department location options');
     }
   } catch (error) {
     console.error('Error loading department locations:', error);
@@ -210,7 +223,7 @@ export async function loadDepartmentLocationOptions() {
       { value: 'Sales Office', label: 'Sales Office' },
       { value: 'Administration', label: 'Administration' }
     ];
-    console.log('Using fallback department location options due to error');
+    // console.log('Using fallback department location options due to error');
   }
 }
 
@@ -218,7 +231,11 @@ export async function loadDepartmentLocationOptions() {
 //! ************ Designation Options ****************
 export async function loadDesignationOptions() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.designation_list.get_designation_list');
+    const response = await fetch('/api/method/ex_forcast.api.designation_list.get_designation_list', {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     const data = await response.json();
     
     if (data.message && data.message.success) {
@@ -243,7 +260,7 @@ export async function loadDesignationOptions() {
         { value: 'General Manager', label: 'General Manager' },
         { value: 'Accountant', label: 'Accountant' }
       ];
-      console.log('Using fallback designation options');
+      // console.log('Using fallback designation options');
     }
   } catch (error) {
     console.error('Error loading designations:', error);
@@ -262,7 +279,7 @@ export async function loadDesignationOptions() {
       { value: 'General Manager', label: 'General Manager' },
       { value: 'Accountant', label: 'Accountant' }
     ];
-    console.log('Using fallback designation options due to error');
+    // console.log('Using fallback designation options due to error');
   }
 }
 
@@ -275,7 +292,11 @@ export async function fetchPayrollData(projectName, fromYear = null, toYear = nu
       return;
     }
 
-    const response = await fetch(`/api/method/ex_forcast.api.call_and_save_payroll_data.payroll_data_display?project=${encodeURIComponent(projectName)}`);
+    const response = await fetch(`/api/method/ex_forcast.api.call_and_save_payroll_data.payroll_data_display?project=${encodeURIComponent(projectName)}`, {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     const data = await response.json();
     
     if (data.message && !data.message.error) {
@@ -298,19 +319,39 @@ export async function fetchPayrollData(projectName, fromYear = null, toYear = nu
 
       // Load default payroll rows for project's departments (for UI assistance)
       try {
-        const respDefaults = await fetch(`/api/v2/method/ex_forcast.api.default_payroll.get_default_payroll_for_project?project_name=${encodeURIComponent(projectName)}`);
+        // console.log('🔍 [DEFAULT PAYROLL] Starting loadPayrollData for project:', projectName);
+        const csrfToken = getCSRFToken();
+        // console.log('🔍 [DEFAULT PAYROLL] CSRF Token:', csrfToken ? csrfToken.substring(0, 10) + '...' : 'NOT FOUND');
+        
+        const url = `/api/v2/method/ex_forcast.api.default_payroll.get_default_payroll_for_project?project_name=${encodeURIComponent(projectName)}`;
+        // console.log('🔍 [DEFAULT PAYROLL] Making request to:', url);
+        
+        const respDefaults = await fetch(url, {
+          headers: {
+            'X-Frappe-CSRF-Token': csrfToken
+          }
+        });
+        
+        // console.log('🔍 [DEFAULT PAYROLL] Response status:', respDefaults.status, respDefaults.statusText);
+        // console.log('🔍 [DEFAULT PAYROLL] Response headers:', Object.fromEntries(respDefaults.headers.entries()));
+        
         const jsonDefaults = await respDefaults.json();
+        // console.log('🔍 [DEFAULT PAYROLL] API response:', jsonDefaults);
+        
         const dataDefaults = jsonDefaults.data || jsonDefaults;
         if (dataDefaults && dataDefaults.success) {
+          // console.log('✅ [DEFAULT PAYROLL] Success! Default payroll data:', dataDefaults.default_payroll?.length || 0, 'items');
           defaultPayrollRows.value = dataDefaults.default_payroll || [];
         } else {
+          console.warn('❌ [DEFAULT PAYROLL] API returned error or no success:', dataDefaults);
           defaultPayrollRows.value = [];
         }
-      } catch (_) {
+      } catch (error) {
+        console.error('❌ [DEFAULT PAYROLL] Error loading default payroll:', error);
         defaultPayrollRows.value = [];
       }
       
-      // console.log('Payroll data loaded successfully:', {
+     //  // console.log('Payroll data loaded successfully:', {
       //   totalRows: transformedResult.totalRows,
       //   payrollRowsLength: transformedResult.payrollRows?.length,
       //   payrollDataKeys: Object.keys(transformedResult.payrollData || {})
@@ -337,7 +378,7 @@ export async function savePayrollChanges(changes, projectName) {
       return { status: 'success', message: 'No changes to save' };
     }
 
-    // console.log('Saving payroll changes:', {
+   //  // console.log('Saving payroll changes:', {
     //   changesCount: changes.length,
     //   projectName,
     //   availableRows: payrollRows.value.length
@@ -347,7 +388,7 @@ export async function savePayrollChanges(changes, projectName) {
     const changesByRow = {};
     
     changes.forEach(change => {
-      // console.log('Processing change:', change);
+     //  // console.log('Processing change:', change);
       if (!changesByRow[change.rowId]) {
         changesByRow[change.rowId] = {
           changes: [],
@@ -371,7 +412,7 @@ export async function savePayrollChanges(changes, projectName) {
       }
     });
 
-    // console.log('Changes grouped by row:', Object.keys(changesByRow));
+   //  // console.log('Changes grouped by row:', Object.keys(changesByRow));
 
     // Ensure related records exist for rows being changed (locations, designations)
     const rowsToEnsure = Object.keys(changesByRow).map(rowId => payrollRows.value.find(r => r.id === rowId)).filter(Boolean);
@@ -393,7 +434,7 @@ export async function savePayrollChanges(changes, projectName) {
       const rowChanges = changesByRow[rowId];
       const latestChange = rowChanges.changes[rowChanges.changes.length - 1];
 
-      // console.log('Processing change for row:', {
+     //  // console.log('Processing change for row:', {
       //   rowId,
       //   unique_id: row.unique_id,
       //   department: row.department,
@@ -421,7 +462,7 @@ export async function savePayrollChanges(changes, projectName) {
         apiChange.monthly_count = rowChanges.monthly_count;
       }
       
-      // console.log('API change being sent:', apiChange);
+     //  // console.log('API change being sent:', apiChange);
       return apiChange;
     });
 
@@ -451,6 +492,7 @@ export async function savePayrollChanges(changes, projectName) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify({
         changes: apiChanges,
@@ -461,7 +503,7 @@ export async function savePayrollChanges(changes, projectName) {
     const data = await response.json();
     
     if (data.message && data.message.success) {
-      // console.log('Payroll changes saved successfully:', data.message);
+     //  // console.log('Payroll changes saved successfully:', data.message);
       return { status: 'success', message: 'Changes saved successfully' };
     } else {
       throw new Error(data.message?.error || 'Failed to save changes');
@@ -573,6 +615,7 @@ export async function submitPayrollData(selectedProject, payrollRows, reloadData
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify(apiPayload)
     });
@@ -608,6 +651,7 @@ export async function createDepartment(departmentName) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify({
         department_name: departmentName
@@ -638,6 +682,7 @@ export async function createDepartmentLocation(locationName) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify({
         department_location: locationName
@@ -668,6 +713,7 @@ export async function createDesignation(designationName) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify({
         designation_name: designationName
@@ -698,6 +744,7 @@ export async function createRestaurant(restaurantName, project = null) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify({
         cover_name: restaurantName,

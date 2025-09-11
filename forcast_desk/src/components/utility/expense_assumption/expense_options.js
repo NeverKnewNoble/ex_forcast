@@ -1,10 +1,13 @@
 // Service to fetch expense field options from the API
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js'
+
 export async function getExpenseFieldOptions() {
   try {
     const response = await fetch('/api/v2/method/ex_forcast.api.expense_options.get_expense_field_options', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
     });
 
@@ -13,7 +16,7 @@ export async function getExpenseFieldOptions() {
     }
 
     const result = await response.json();
-    // console.log("Expense options API response:", result);
+   //  // console.log("Expense options API response:", result);
 
     // Handle the nested data structure
     const data = result.data || result;

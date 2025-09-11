@@ -1,4 +1,6 @@
 // Utility to create a new Room Packages document
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
+
 export async function createRoomPackage({ package_name, number_of_rooms, project_name = null }) {
   try {
     const params = new URLSearchParams();
@@ -8,18 +10,19 @@ export async function createRoomPackage({ package_name, number_of_rooms, project
       params.append('project_name', project_name);
     }
 
-    // console.log('Creating room package with params:', { package_name, number_of_rooms, project_name });
+   //  // console.log('Creating room package with params:', { package_name, number_of_rooms, project_name });
 
     const response = await fetch("/api/method/ex_forcast.api.room_packages_list.create_room_package", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
+        "X-Frappe-CSRF-Token": getCSRFToken()
       },
       body: params,
       credentials: "include",
     });
     
-    // console.log('API response status:', response.status);
+   //  // console.log('API response status:', response.status);
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -28,7 +31,7 @@ export async function createRoomPackage({ package_name, number_of_rooms, project
     }
     
     const data = await response.json();
-    // console.log('API success response:', data);
+   //  // console.log('API success response:', data);
     return data;
   } catch (error) {
     // console.error('Network error:', error);

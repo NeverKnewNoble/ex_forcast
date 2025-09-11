@@ -322,7 +322,7 @@ const calculationCache = useCalculationCache();
 
 // Watch for data changes
 watch(() => [props.payrollRows, props.payrollData, props.payrollRelatedData, props.visibleYears], () => {
-  // console.log('PayrollTaxesTable Data Changed:', {
+ //  // console.log('PayrollTaxesTable Data Changed:', {
   //   payrollRowsLength: props.payrollRows?.length,
   //   payrollDataKeys: Object.keys(props.payrollData || {}),
   //   relatedDataKeys: Object.keys(props.payrollRelatedData || {}),
@@ -344,7 +344,7 @@ function formatMoney(value) {
 
 // Helper functions to get unique categories and locations
 function getUniqueCategories() {
-  // console.log('PayrollTaxesTable - payrollRows:', props.payrollRows);
+ //  // console.log('PayrollTaxesTable - payrollRows:', props.payrollRows);
   const categories = new Set();
   props.payrollRows.forEach(row => {
     if (row.category) {
@@ -352,7 +352,7 @@ function getUniqueCategories() {
     }
   });
   const result = Array.from(categories).sort();
-  // console.log('PayrollTaxesTable - categories:', result);
+ //  // console.log('PayrollTaxesTable - categories:', result);
   return result;
 }
 
@@ -364,7 +364,7 @@ function getUniqueLocationsForCategory(category) {
     }
   });
   const result = Array.from(locations).sort();
-  // console.log('PayrollTaxesTable - locations for category', category, ':', result);
+ //  // console.log('PayrollTaxesTable - locations for category', category, ':', result);
   return result;
 }
 
@@ -405,7 +405,7 @@ function getTaxTotalForRow(row) {
   // Get the tax total from the Payroll_Related.vue data
   // This should match the calculation used in Payroll_Related.vue
   if (!props.visibleYears || props.visibleYears.length === 0) {
-    // console.log('getTaxTotalForRow: Missing visibleYears', { visibleYears: props.visibleYears });
+   //  // console.log('getTaxTotalForRow: Missing visibleYears', { visibleYears: props.visibleYears });
     return 0;
   }
   
@@ -416,7 +416,7 @@ function getTaxTotalForRow(row) {
   
   // Calculate tax total: (salary * count * tax percentage) / 100
   const taxTotal = (salary * count * taxPercentage) / 100;
-  // console.log('getTaxTotalForRow:', { rowId: row.id, salary, count, taxPercentage, taxTotal });
+ //  // console.log('getTaxTotalForRow:', { rowId: row.id, salary, count, taxPercentage, taxTotal });
   return taxTotal;
 }
 
@@ -429,14 +429,14 @@ function getTaxPercentageForRow(row) {
   const year = props.visibleYears[0];
   const rowId = row.id;
   
-  // console.log('getTaxPercentageForRow:', { rowId, year });
+ //  // console.log('getTaxPercentageForRow:', { rowId, year });
   
   // Try to get from global payroll related data
   if (window.__payrollRelatedData && window.__payrollRelatedData[year]) {
     const yearData = window.__payrollRelatedData[year];
     const taxPercentage = yearData.payroll_taxes?.[rowId]?.tax_percentage;
     
-    // console.log('Found tax percentage from global data:', { rowId, taxPercentage, yearData });
+   //  // console.log('Found tax percentage from global data:', { rowId, taxPercentage, yearData });
     
     if (taxPercentage !== undefined && taxPercentage !== null) {
       return parseFloat(taxPercentage);
@@ -448,7 +448,7 @@ function getTaxPercentageForRow(row) {
     const yearData = props.payrollRelatedData[year];
     const taxPercentage = yearData.payroll_taxes?.[rowId]?.tax_percentage;
     
-    // console.log('Found tax percentage from props:', { rowId, taxPercentage });
+   //  // console.log('Found tax percentage from props:', { rowId, taxPercentage });
     
     if (taxPercentage !== undefined && taxPercentage !== null) {
       return parseFloat(taxPercentage);
@@ -456,7 +456,7 @@ function getTaxPercentageForRow(row) {
   }
   
   // Default tax percentage if not found
-  // console.log('No tax percentage found for row:', rowId);
+ //  // console.log('No tax percentage found for row:', rowId);
   return 0;
 }
 
@@ -469,7 +469,7 @@ function getMonthlyCountForRow(row, month) {
   const year = props.visibleYears[0];
   const rowId = row.id;
   
-  // console.log('getMonthlyCountForRow:', { rowId, year, month });
+ //  // console.log('getMonthlyCountForRow:', { rowId, year, month });
   
   // Try to get monthly count from payroll data
   if (props.payrollData && props.payrollData[year] && props.payrollData[year][rowId]) {
@@ -478,13 +478,13 @@ function getMonthlyCountForRow(row, month) {
     // Check if count data exists
     if (rowData.count && rowData.count[month] !== undefined) {
       const monthlyCount = rowData.count[month];
-      // console.log('Found monthly count from payrollData:', { rowId, month, monthlyCount });
+     //  // console.log('Found monthly count from payrollData:', { rowId, month, monthlyCount });
       return parseFloat(monthlyCount);
     }
   }
   
   // If no monthly count found, use the main count
-  // console.log('No monthly count found, using main count:', { rowId, month, mainCount: row.count });
+ //  // console.log('No monthly count found, using main count:', { rowId, month, mainCount: row.count });
   return row.count || 0;
 }
 
@@ -512,7 +512,7 @@ function calculateNSSITMonthlyValue(row, month) {
     // Silently handle caching errors
   }
   
-  // console.log('calculateNSSITMonthlyValue:', { rowId: row.id, month, taxTotal, monthlyCount, nssitValue });
+ //  // console.log('calculateNSSITMonthlyValue:', { rowId: row.id, month, taxTotal, monthlyCount, nssitValue });
   return formatMoney(nssitValue);
 }
 
@@ -543,7 +543,7 @@ function calculateNSSITTotalValue(row) {
     // Silently handle caching errors
   }
   
-  // console.log('calculateNSSITTotalValue:', { rowId: row.id, totalNSSIT });
+ //  // console.log('calculateNSSITTotalValue:', { rowId: row.id, totalNSSIT });
   return formatMoney(totalNSSIT);
 }
 

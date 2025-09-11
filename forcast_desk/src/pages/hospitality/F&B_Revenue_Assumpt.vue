@@ -1201,11 +1201,11 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   
   // Watch for project changes and reload data
   watch(selectedProject, async (newProject, oldProject) => {
-    // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
+   //  // console.log('Project changed from:', oldProject?.project_name, 'to:', newProject?.project_name);
     
     if (newProject) {
       try {
-        // console.log('Reloading F&B revenue data for new project:', newProject.project_name);
+       //  // console.log('Reloading F&B revenue data for new project:', newProject.project_name);
         
         // Reload F&B revenue data for the new project
         const fnbRevenueData = await loadFnbRevenueDataForFrontend(newProject.project_name);
@@ -1245,7 +1245,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         changedCells.value = [];
         isSaved.value = true;
         
-        // console.log('F&B revenue data reloaded successfully for project:', newProject.project_name);
+       //  // console.log('F&B revenue data reloaded successfully for project:', newProject.project_name);
         alertService.success(`Switched to project: ${newProject.project_name}`);
       } catch (error) {
         console.error('Error reloading F&B revenue data for new project:', error);
@@ -1602,7 +1602,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   function getFnbCellValue(fnbData, row, year, label, totalRooms) {
     // Debug logging for restaurant total calculations
     if (typeof row === 'string' && row.includes('"type":"Total')) {
-      console.log('🔍 getFnbCellValue called for:', { row, year, label });
+      // console.log('🔍 getFnbCellValue called for:', { row, year, label });
     }
     
     // Handle Default Breakfast Outlet auto-calculations for Breakfast section rows
@@ -2027,10 +2027,10 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
           if (selectedProject.value && selectedProject.value.project_name) {
             const project = selectedProject.value.project_name;
             const cacheKey = `Total Cover:${rowKeyObj.restaurant}`;
-            console.log('🔍 Caching Total Cover:', { project, cacheKey, year, label, totalCover });
+            // console.log('🔍 Caching Total Cover:', { project, cacheKey, year, label, totalCover });
             calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalCover);
           } else {
-            console.log('❌ Cannot cache - no project selected:', { selectedProject: selectedProject.value });
+            // console.log('❌ Cannot cache - no project selected:', { selectedProject: selectedProject.value });
           }
           
           return totalCover.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -2075,10 +2075,10 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
           if (selectedProject.value && selectedProject.value.project_name) {
             const project = selectedProject.value.project_name;
             const cacheKey = `Total Food Revenue:${rowKeyObj.restaurant}`;
-            console.log('🔍 Caching Total Food Revenue:', { project, cacheKey, year, label, totalFoodRevenue });
+            // console.log('🔍 Caching Total Food Revenue:', { project, cacheKey, year, label, totalFoodRevenue });
             calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalFoodRevenue);
           } else {
-            console.log('❌ Cannot cache Total Food Revenue - no project selected:', { selectedProject: selectedProject.value });
+            // console.log('❌ Cannot cache Total Food Revenue - no project selected:', { selectedProject: selectedProject.value });
           }
           
           return totalFoodRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -2121,10 +2121,10 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         if (selectedProject.value && selectedProject.value.project_name) {
           const project = selectedProject.value.project_name;
           const cacheKey = `Total Food Revenue:${rowKeyObj.restaurant}`;
-          console.log('🔍 Caching Total Food Revenue (all restaurants):', { project, cacheKey, year, label, totalFoodRevenue });
+          // console.log('🔍 Caching Total Food Revenue (all restaurants):', { project, cacheKey, year, label, totalFoodRevenue });
           calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalFoodRevenue);
         } else {
-          console.log('❌ Cannot cache Total Food Revenue (all restaurants) - no project selected:', { selectedProject: selectedProject.value });
+          // console.log('❌ Cannot cache Total Food Revenue (all restaurants) - no project selected:', { selectedProject: selectedProject.value });
         }
         
         return totalFoodRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -2166,10 +2166,10 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         if (selectedProject.value && selectedProject.value.project_name) {
           const project = selectedProject.value.project_name;
           const cacheKey = `Total Beverage Revenue:${rowKeyObj.restaurant}`;
-          console.log('🔍 Caching Total Beverage Revenue:', { project, cacheKey, year, label, totalBeverageRevenue });
+          // console.log('🔍 Caching Total Beverage Revenue:', { project, cacheKey, year, label, totalBeverageRevenue });
           calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalBeverageRevenue);
         } else {
-          console.log('❌ Cannot cache Total Beverage Revenue - no project selected:', { selectedProject: selectedProject.value });
+          // console.log('❌ Cannot cache Total Beverage Revenue - no project selected:', { selectedProject: selectedProject.value });
         }
         
         return totalBeverageRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -2208,10 +2208,10 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         if (selectedProject.value && selectedProject.value.project_name) {
           const project = selectedProject.value.project_name;
           const cacheKey = `Total Revenue:${rowKeyObj.restaurant}`;
-          console.log('🔍 Caching Total Revenue:', { project, cacheKey, year, label, totalRevenue });
+          // console.log('🔍 Caching Total Revenue:', { project, cacheKey, year, label, totalRevenue });
           calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalRevenue);
         } else {
-          console.log('❌ Cannot cache Total Revenue - no project selected:', { selectedProject: selectedProject.value });
+          // console.log('❌ Cannot cache Total Revenue - no project selected:', { selectedProject: selectedProject.value });
         }
         
         return totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -2224,12 +2224,12 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
 
   // After data refresh or load, ensure fnbData is always an object
   watch(expenseData, () => {
-    // console.log('expenseData watcher triggered, fnbData before:', fnbData, typeof fnbData);
+   //  // console.log('expenseData watcher triggered, fnbData before:', fnbData, typeof fnbData);
     if (!fnbData || typeof fnbData !== 'object') {
-      console.log('fnbData is invalid, resetting to empty object');
+      // console.log('fnbData is invalid, resetting to empty object');
       fnbData = {};
     }
-    // console.log('fnbData after:', fnbData, typeof fnbData);
+   //  // console.log('fnbData after:', fnbData, typeof fnbData);
   });
 
   // Helper function to check if a row is auto-calculated
@@ -2270,7 +2270,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
 
   // Wrapper function to handle cell input with proper reactive reference
   function handleFnbCellInputWrapper(params) {
-    // console.log('handleFnbCellInputWrapper called with:', params);
+   //  // console.log('handleFnbCellInputWrapper called with:', params);
     const result = handleFnbCellInput({ ...params, fnbData });
     
     // Manually track the change to ensure saved state is updated
@@ -2279,7 +2279,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
       const numValue = parseFloat(value) || 0;
       const newValue = numValue.toFixed(2);
       
-      // console.log('Cell input change detected:', { row: params.row, year: params.year, label: params.label, newValue });
+     //  // console.log('Cell input change detected:', { row: params.row, year: params.year, label: params.label, newValue });
       
       // Add to changedCells if not already present
       const existingChange = changedCells.value.find(c => 
@@ -2293,16 +2293,16 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
           label: params.label, 
           newValue 
         });
-        // console.log('Added new change to changedCells, total changes:', changedCells.value.length);
+       //  // console.log('Added new change to changedCells, total changes:', changedCells.value.length);
       } else {
         existingChange.newValue = newValue;
-        // console.log('Updated existing change in changedCells');
+       //  // console.log('Updated existing change in changedCells');
       }
       
       // Mark as unsaved
       if (isSaved.value) {
         isSaved.value = false;
-        // console.log('Marked as unsaved');
+       //  // console.log('Marked as unsaved');
       }
     }
     

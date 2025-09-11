@@ -1,4 +1,6 @@
 // Custom API call to fetch room packages from Frappe backend
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
+
 export async function getRoomPackagesList(projectName = null) {
     try{
         let url = "/api/v2/method/ex_forcast.api.room_packages_list.get_room_packages";
@@ -10,6 +12,7 @@ export async function getRoomPackagesList(projectName = null) {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "X-Frappe-CSRF-Token": getCSRFToken()
             },
         })
 
@@ -19,7 +22,7 @@ export async function getRoomPackagesList(projectName = null) {
 
         const result = await response.json()
         return result
-        // console.log("Room Package response:", result)
+       //  // console.log("Room Package response:", result)
     }catch(error){
         console.error("Failed To Get List Of Room Packages")
         return {
@@ -40,6 +43,7 @@ export async function createDefaultRoomPackages(projectName) {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
+                "X-Frappe-CSRF-Token": getCSRFToken()
             },
             body: params,
             credentials: "include",
@@ -64,18 +68,19 @@ export async function deleteRoomPackage(packageName, projectName) {
     params.append('package_name', packageName);
     params.append('project_name', projectName);
 
-    // console.log('Deleting room package with params:', { packageName, projectName });
+   //  // console.log('Deleting room package with params:', { packageName, projectName });
 
     const response = await fetch("/api/method/ex_forcast.api.room_packages_list.delete_room_package", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
+        "X-Frappe-CSRF-Token": getCSRFToken()
       },
       body: params,
       credentials: "include",
     });
     
-    // console.log('Delete API response status:', response.status);
+   //  // console.log('Delete API response status:', response.status);
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -84,7 +89,7 @@ export async function deleteRoomPackage(packageName, projectName) {
     }
     
     const data = await response.json();
-    // console.log('Delete API success response:', data);
+   //  // console.log('Delete API success response:', data);
     return data;
   } catch (error) {
     // console.error('Delete network error:', error);

@@ -793,7 +793,7 @@
       dataLoading.value = true;
       dataError.value = null;
       
-      // console.log('Reports: Loading data for project:', selectedProject.value.project_name, 'years:', visibleYears.value);
+     //  // console.log('Reports: Loading data for project:', selectedProject.value.project_name, 'years:', visibleYears.value);
       
       // Use the unified service to get all data
       const unifiedData = await reportDataService.getReportData(
@@ -804,7 +804,7 @@
       reportData.value = unifiedData;
       dataCompleteness.value = unifiedData.metadata?.dataCompleteness || 0;
       
-      // console.log('Reports: Successfully loaded unified data, completeness:', dataCompleteness.value + '%');
+     //  // console.log('Reports: Successfully loaded unified data, completeness:', dataCompleteness.value + '%');
       
       // Show success message if data is loaded
       if (dataCompleteness.value > 0) {
@@ -1076,7 +1076,7 @@
     selectedReport.value = reportType;
     // The watcher will automatically save to localStorage
     // You can add additional logic here for different report types
-    // console.log('Selected report:', reportType);
+   //  // console.log('Selected report:', reportType);
   };
 
   const clearSelectedReport = () => {
@@ -1098,13 +1098,13 @@
         return;
       }
       
-      // console.log('=== CACHE DEBUG ===');
-      // console.log('Project:', selectedProject.value.project_name);
+     //  // console.log('=== CACHE DEBUG ===');
+     //  // console.log('Project:', selectedProject.value.project_name);
       
       // Debug using the report service
       if (window.debugReportCache) {
         const cacheInfo = window.debugReportCache(selectedProject.value.project_name);
-        // console.log('Cache inspection results:', cacheInfo);
+       //  // console.log('Cache inspection results:', cacheInfo);
         
         // Show summary in alert
         const pages = Object.keys(cacheInfo);
@@ -1116,12 +1116,12 @@
         const cache = calculationCache.cache[selectedProject.value.project_name] || {};
         const pages = Object.keys(cache);
         
-        // console.log('Available pages:', pages);
+       //  // console.log('Available pages:', pages);
         pages.forEach(page => {
           const pageData = cache[page] || {};
           const rowCodes = Object.keys(pageData);
-          // console.log(`Page "${page}": ${rowCodes.length} row codes`);
-          // console.log('Sample row codes:', rowCodes.slice(0, 5));
+         //  // console.log(`Page "${page}": ${rowCodes.length} row codes`);
+         //  // console.log('Sample row codes:', rowCodes.slice(0, 5));
         });
         
         alertService.info(`Cache Debug: ${pages.length} pages found. Check console for details.`);
@@ -1148,15 +1148,15 @@
         return;
       }
       
-      // console.log('=== REPORT DATA DEBUG ===');
-      // console.log('Project:', selectedProject.value.project_name);
-      // console.log('Years:', visibleYears.value);
+     //  // console.log('=== REPORT DATA DEBUG ===');
+     //  // console.log('Project:', selectedProject.value.project_name);
+     //  // console.log('Years:', visibleYears.value);
       
       // Test data loading for each report type
       const reportTypes = ['room-pnl', 'fnb-pnl', 'ood-pnl'];
       
       for (const reportType of reportTypes) {
-        // console.log(`\n--- Testing ${reportType} ---`);
+       //  // console.log(`\n--- Testing ${reportType} ---`);
         
         try {
           const data = await reportDataService.getReportSpecificData(
@@ -1165,7 +1165,7 @@
             visibleYears.value
           );
           
-          // console.log(`${reportType} data loaded:`, data);
+         //  // console.log(`${reportType} data loaded:`, data);
           
           // Check data completeness
           let totalPoints = 0;
@@ -1194,7 +1194,7 @@
           });
           
           const completeness = totalPoints > 0 ? Math.round((populatedPoints / totalPoints) * 100) : 0;
-          // console.log(`${reportType} completeness: ${populatedPoints}/${totalPoints} (${completeness}%)`);
+         //  // console.log(`${reportType} completeness: ${populatedPoints}/${totalPoints} (${completeness}%)`);
           
         } catch (error) {
           console.error(`Error loading ${reportType} data:`, error);

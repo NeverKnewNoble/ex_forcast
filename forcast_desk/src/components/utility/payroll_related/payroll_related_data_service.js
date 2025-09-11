@@ -2,6 +2,7 @@
 
 import { ref } from 'vue';
 import { selectedProject } from '@/components/utility/dashboard/projectService.js';
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
 
 // State for payroll related data
 export const payrollRelatedData = ref({});
@@ -18,7 +19,11 @@ export const payrollRelatedSaveError = ref("");
  */
 export async function fetchPayrollRelatedData(projectName, fromYear = null, toYear = null) {
   try {
-    const response = await fetch(`/api/v2/method/ex_forcast.api.call_and_save_payroll_related_data.payroll_related_data_display?project=${encodeURIComponent(projectName)}`);
+    const response = await fetch(`/api/v2/method/ex_forcast.api.call_and_save_payroll_related_data.payroll_related_data_display?project=${encodeURIComponent(projectName)}`, {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -73,6 +78,7 @@ export async function savePayrollRelatedChanges(changes, projectName) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify(requestBody)
     });

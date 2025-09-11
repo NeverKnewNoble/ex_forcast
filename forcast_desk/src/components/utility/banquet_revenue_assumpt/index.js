@@ -207,11 +207,11 @@ export function handleBanquetCellEdit({ year, label, expense, event, originalBan
     }
     banquetData[year][label] = dataEntries; // REPLACE the array reference!
     // Debug logging
-    // console.log(`Cell updated: ${year}/${label}/${expense} = ${newValue}`);
-    // console.log('Updated banquetData structure:', banquetData);
+   //  // console.log(`Cell updated: ${year}/${label}/${expense} = ${newValue}`);
+   //  // console.log('Updated banquetData structure:', banquetData);
     // Verify the data was stored correctly
     const verifyData = banquetData?.[year]?.[label]?.find(e => e.expense === expense);
-    // console.log('Verification - stored data:', verifyData);
+   //  // console.log('Verification - stored data:', verifyData);
   } else {
     changedCells.value = changedCells.value.filter(c => !(c.year === year && c.label === label && c.expense === expense));
     if (changedCells.value.length === 0) isSaved.value = true;

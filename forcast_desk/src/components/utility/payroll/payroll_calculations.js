@@ -386,16 +386,16 @@ export function calculateLocationTotalAnnual(payrollRows, category, location, ye
  */
 export function calculateHotelTotal(payrollRows) {
   // Debug logging
-  // console.log('calculateHotelTotal called with:', { payrollRows: payrollRows?.length });
+ //  // console.log('calculateHotelTotal called with:', { payrollRows: payrollRows?.length });
   
   if (!payrollRows || payrollRows.length === 0) {
-    // console.log('No payroll rows found');
+   //  // console.log('No payroll rows found');
     return 0;
   }
   
   // Get all unique locations across all categories
   const locations = [...new Set(payrollRows.map(row => row.departmentLocation))];
-  // console.log('Unique locations:', locations);
+ //  // console.log('Unique locations:', locations);
   
   // Sum up all location totals across all categories
   const total = locations.reduce((sum, location) => {
@@ -403,11 +403,11 @@ export function calculateHotelTotal(payrollRows) {
       row.departmentLocation === location
     );
     const locationTotal = locationRows.reduce((locationSum, row) => locationSum + (row.count || 0), 0);
-    // console.log(`Location ${location} total:`, locationTotal);
+   //  // console.log(`Location ${location} total:`, locationTotal);
     return sum + locationTotal;
   }, 0);
   
-  // console.log('Hotel total:', total);
+ //  // console.log('Hotel total:', total);
   return total;
 }
 

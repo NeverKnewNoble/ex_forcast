@@ -1573,11 +1573,11 @@ onMounted(async () => {
     if (selectedProject.value?.project_name) {
       const restaurantList = await getRestaurants(selectedProject.value.project_name);
       restaurants.value = restaurantList;
-      // console.log('🍽️ Loaded restaurants from API:', restaurantList);
+     //  // console.log('🍽️ Loaded restaurants from API:', restaurantList);
       
       // Log each restaurant to see the structure
       restaurantList.forEach((restaurant, index) => {
-        // console.log(`Restaurant ${index + 1}:`, restaurant);
+       //  // console.log(`Restaurant ${index + 1}:`, restaurant);
       });
     }
   } catch (error) {
@@ -1592,7 +1592,7 @@ watch(selectedProject, async (newProject) => {
     try {
       const restaurantList = await getRestaurants(newProject.project_name);
       restaurants.value = restaurantList;
-      console.log('Reloaded restaurants for new project:', restaurantList);
+      // console.log('Reloaded restaurants for new project:', restaurantList);
     } catch (error) {
       console.error('Error reloading restaurants for new project:', error);
       restaurants.value = [];
@@ -1613,13 +1613,13 @@ function getRestaurantFoodRevenue(restaurant, year, label) {
     // "Total Food Revenue:Fine Dining" for the cacheKey
     const cacheKey = `Total Food Revenue:${restaurantName}`;
     
-    // console.log(`🔍 Looking for food revenue: ${cacheKey} for ${year} ${label}`);
+   //  // console.log(`🔍 Looking for food revenue: ${cacheKey} for ${year} ${label}`);
     
     // Try to get from the calculation cache using the proper page and row structure
     const val = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', cacheKey, year, label);
     
     if (val !== undefined && val !== null) {
-      // console.log(`✅ Found food revenue for ${restaurantName}: ${val}`);
+     //  // console.log(`✅ Found food revenue for ${restaurantName}: ${val}`);
       return getNumber(val);
     }
     
@@ -1639,11 +1639,11 @@ function getRestaurantFoodRevenue(restaurant, year, label) {
     );
     
     if (fallbackVal !== undefined && fallbackVal !== null) {
-      // console.log(`✅ Found food revenue (fallback) for ${restaurantName}: ${fallbackVal}`);
+     //  // console.log(`✅ Found food revenue (fallback) for ${restaurantName}: ${fallbackVal}`);
       return getNumber(fallbackVal);
     }
     
-    // console.log(`❌ No food revenue data found for ${restaurantName} in ${year} ${label}`);
+   //  // console.log(`❌ No food revenue data found for ${restaurantName} in ${year} ${label}`);
     return 0;
   } catch (error) {
     console.error(`Error getting food revenue for ${restaurant}:`, error);
@@ -1664,13 +1664,13 @@ function getRestaurantBeverageRevenue(restaurant, year, label) {
     // "Total Beverage Revenue:Fine Dining" for the cacheKey
     const cacheKey = `Total Beverage Revenue:${restaurantName}`;
     
-    // console.log(`🔍 Looking for beverage revenue: ${cacheKey} for ${year} ${label}`);
+   //  // console.log(`🔍 Looking for beverage revenue: ${cacheKey} for ${year} ${label}`);
     
     // Try to get from the calculation cache using the proper page and row structure
     const val = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', cacheKey, year, label);
     
     if (val !== undefined && val !== null) {
-      // console.log(`✅ Found beverage revenue for ${restaurantName}: ${val}`);
+     //  // console.log(`✅ Found beverage revenue for ${restaurantName}: ${val}`);
       return getNumber(val);
     }
     
@@ -1690,11 +1690,11 @@ function getRestaurantBeverageRevenue(restaurant, year, label) {
     );
     
     if (fallbackVal !== undefined && fallbackVal !== null) {
-      // console.log(`✅ Found beverage revenue (fallback) for ${restaurantName}: ${val}`);
+     //  // console.log(`✅ Found beverage revenue (fallback) for ${restaurantName}: ${val}`);
       return getNumber(fallbackVal);
     }
     
-    console.log(`❌ No beverage revenue data found for ${restaurantName} in ${year} ${label}`);
+    // console.log(`❌ No beverage revenue data found for ${restaurantName} in ${year} ${label}`);
     return 0;
   } catch (error) {
     console.error(`Error getting beverage revenue for ${restaurant}:`, error);
@@ -1714,11 +1714,11 @@ function getBanquetFoodRevenue(year, label) {
     const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'Food', year, label);
     
     if (val !== undefined && val !== null) {
-      // console.log(`✅ Found banquet food revenue: ${val} for ${year} ${label}`);
+     //  // console.log(`✅ Found banquet food revenue: ${val} for ${year} ${label}`);
       return getNumber(val);
     }
     
-    console.log(`❌ No banquet food revenue data found for ${year} ${label}`);
+    // console.log(`❌ No banquet food revenue data found for ${year} ${label}`);
     return 0;
   } catch (error) {
     console.error(`Error getting banquet food revenue for ${year} ${label}:`, error);
@@ -1746,12 +1746,12 @@ function getOutsideCateringFoodRevenue(year, label) {
     for (const rowCode of possibleRowCodes) {
       const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', rowCode, year, label);
       if (val !== undefined && val !== null) {
-        // console.log(`✅ Found outside catering food revenue from ${rowCode}: ${val} for ${year} ${label}`);
+       //  // console.log(`✅ Found outside catering food revenue from ${rowCode}: ${val} for ${year} ${label}`);
         return getNumber(val);
       }
     }
     
-    console.log(`❌ No outside catering food revenue data found for ${year} ${label}`);
+    // console.log(`❌ No outside catering food revenue data found for ${year} ${label}`);
     return 0;
   } catch (error) {
     console.error(`Error getting outside catering food revenue for ${year} ${label}:`, error);
@@ -1777,11 +1777,11 @@ function getBanquetBeverageRevenue(year, label) {
     const total = liquor + softDrinks;
     
     if (liquor > 0 || softDrinks > 0) {
-      // console.log(`✅ Found banquet beverage revenue for ${year} ${label}: Liquor: ${liquor}, Soft Drinks: ${softDrinks}, Total: ${total}`);
+     //  // console.log(`✅ Found banquet beverage revenue for ${year} ${label}: Liquor: ${liquor}, Soft Drinks: ${softDrinks}, Total: ${total}`);
       return total;
     }
     
-    // console.log(`❌ No banquet beverage revenue data found for ${year} ${label}`);
+   //  // console.log(`❌ No banquet beverage revenue data found for ${year} ${label}`);
     return 0;
   } catch (error) {
     console.error(`Error getting banquet beverage revenue for ${year} ${label}:`, error);
@@ -1801,11 +1801,11 @@ function getOutsideCateringBeverageRevenue(year, label) {
     const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'outside_service_beverage_catering', year, label);
     
     if (val !== undefined && val !== null) {
-      // console.log(`✅ Found outside catering beverage revenue: ${val} for ${year} ${label}`);
+     //  // console.log(`✅ Found outside catering beverage revenue: ${val} for ${year} ${label}`);
       return getNumber(val);
     }
     
-    console.log(`❌ No outside catering beverage revenue data found for ${year} ${label}`);
+    // console.log(`❌ No outside catering beverage revenue data found for ${year} ${label}`);
     return 0;
   } catch (error) {
     console.error(`Error getting outside catering beverage revenue for ${year} ${label}:`, error);
@@ -1826,11 +1826,11 @@ function getFunctionRoomRentalRevenue(year, label) {
     const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'Hall Space Charges', year, label);
     
     if (val !== undefined && val !== null) {
-      // console.log(`✅ Found function room rental revenue: ${val} for ${year} ${label}`);
+     //  // console.log(`✅ Found function room rental revenue: ${val} for ${year} ${label}`);
       return getNumber(val);
     }
     
-    // console.log(`❌ No function room rental revenue data found for ${year} ${label}`);
+   //  // console.log(`❌ No function room rental revenue data found for ${year} ${label}`);
     return 0;
   } catch (error) {
     console.error(`Error getting function room rental revenue for ${year} ${label}:`, error);
@@ -1870,18 +1870,18 @@ function getMiscellaneousOtherRevenue(year, label) {
       if (val !== undefined && val !== null) {
         const additionalValue = getNumber(val) || 0;
         additionalTotal += additionalValue;
-        // console.log(`✅ Found additional revenue from ${rowCode}: ${additionalValue} for ${year} ${label}`);
+       //  // console.log(`✅ Found additional revenue from ${rowCode}: ${additionalValue} for ${year} ${label}`);
       }
     }
     
     const total = tobacco + nonFnb + others + additionalTotal;
     
     if (total > 0) {
-      // console.log(`✅ Found miscellaneous other revenue for ${year} ${label}: Tobacco: ${tobacco}, non_fnb: ${nonFnb}, Others: ${others}, Additional: ${additionalTotal}, Total: ${total}`);
+     //  // console.log(`✅ Found miscellaneous other revenue for ${year} ${label}: Tobacco: ${tobacco}, non_fnb: ${nonFnb}, Others: ${others}, Additional: ${additionalTotal}, Total: ${total}`);
       return total;
     }
     
-    // console.log(`❌ No miscellaneous other revenue data found for ${year} ${label}`);
+   //  // console.log(`❌ No miscellaneous other revenue data found for ${year} ${label}`);
     return 0;
   } catch (error) {
     console.error(`Error getting miscellaneous other revenue for ${year} ${label}:`, error);

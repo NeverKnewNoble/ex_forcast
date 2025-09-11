@@ -6,30 +6,62 @@
 export const getCSRFToken = () => {
   // Try multiple ways to get CSRF token
   let token = ''
+  let methodUsed = ''
   
-  // Method 1: Check meta tag
-  const metaTag = document.querySelector('meta[name="csrf-token"]')
-  if (metaTag) {
-    token = metaTag.getAttribute('content')
+  // console.log('🔍 [CSRF] Starting CSRF token detection...')
+  
+  // Method 1: Check frappe global object (most reliable)
+  if (window.frappe && window.frappe.csrf_token) {
+    token = window.frappe.csrf_token
+    methodUsed = 'window.frappe.csrf_token'
+    // console.log('✅ [CSRF] Found via method 1 (frappe global):', token.substring(0, 10) + '...')
   }
   
-  // Method 2: Check for frappe CSRF token
+  // Method 2: Check meta tag
+  if (!token) {
+    const metaTag = document.querySelector('meta[name="csrf-token"]')
+    if (metaTag) {
+      token = metaTag.getAttribute('content')
+      methodUsed = 'meta[name="csrf-token"]'
+      // console.log('✅ [CSRF] Found via method 2 (meta tag):', token.substring(0, 10) + '...')
+    }
+  }
+  
+  // Method 3: Check for frappe CSRF token meta tag
   if (!token) {
     const frappeMetaTag = document.querySelector('meta[name="frappe-csrf-token"]')
     if (frappeMetaTag) {
       token = frappeMetaTag.getAttribute('content')
+      methodUsed = 'meta[name="frappe-csrf-token"]'
+      // console.log('✅ [CSRF] Found via method 3 (frappe meta tag):', token.substring(0, 10) + '...')
     }
   }
   
-  // Method 3: Check localStorage
+  // Method 4: Check localStorage
   if (!token) {
     const storedToken = localStorage.getItem('csrf_token')
     if (storedToken) {
       token = storedToken
+      methodUsed = 'localStorage'
+      // console.log('✅ [CSRF] Found via method 4 (localStorage):', token.substring(0, 10) + '...')
     }
   }
   
-  // Method 4: Check for any script tag with CSRF
+  // Method 5: Check cookies
+  if (!token) {
+    const cookies = document.cookie.split(';')
+    for (let cookie of cookies) {
+      const [name, value] = cookie.trim().split('=')
+      if (name === 'csrf_token') {
+        token = value
+        methodUsed = 'cookies'
+        // console.log('✅ [CSRF] Found via method 5 (cookies):', token.substring(0, 10) + '...')
+        break
+      }
+    }
+  }
+  
+  // Method 6: Check for any script tag with CSRF
   if (!token) {
     const scripts = document.querySelectorAll('script')
     for (const script of scripts) {
@@ -38,11 +70,50 @@ export const getCSRFToken = () => {
         const match = content.match(/csrf_token['"]?\s*[:=]\s*['"]([^'"]+)['"]/)
         if (match) {
           token = match[1]
+          methodUsed = 'script tag'
+          // console.log('✅ [CSRF] Found via method 6 (script tag):', token.substring(0, 10) + '...')
           break
         }
       }
     }
   }
+  
+  // Final result logging
+  if (token) {
+    // console.log('🎉 [CSRF] SUCCESS! Token found via:', methodUsed)
+    // console.log('🔑 [CSRF] Token length:', token.length)
+    // console.log('🔑 [CSRF] Token preview:', token.substring(0, 20) + '...')
+  } else {
+    console.error('❌ [CSRF] FAILED! No token found in any method')
+    console.warn('🔍 [CSRF] Available sources check:', {
+      frappeGlobal: !!window.frappe?.csrf_token,
+      metaTag: !!document.querySelector('meta[name="csrf-token"]'),
+      frappeMetaTag: !!document.querySelector('meta[name="frappe-csrf-token"]'),
+      localStorage: !!localStorage.getItem('csrf_token'),
+      cookies: document.cookie.includes('csrf_token'),
+      allCookies: document.cookie
+    })
+  }
+  
+  return token
+}
+
+/**
+ * Test CSRF token detection (for debugging)
+ * Call this from browser console: testCSRFToken()
+ */
+export const testCSRFToken = () => {
+  // console.log('🧪 [CSRF TEST] Starting CSRF token test...')
+  // console.log('🧪 [CSRF TEST] Current URL:', window.location.href)
+  // console.log('🧪 [CSRF TEST] Document ready state:', document.readyState)
+  
+  const token = getCSRFToken()
+  
+  // console.log('🧪 [CSRF TEST] Final result:', {
+  //   token: token ? token.substring(0, 20) + '...' : 'NOT FOUND',
+  //   length: token?.length || 0,
+  //   isValid: token && token.length > 0
+  // })
   
   return token
 }
@@ -82,6 +153,19 @@ export const makeApiRequest = async (url, options = {}) => {
       
       if (!response.ok) {
         const errorText = await response.text()
+        
+        // Log detailed error information in development
+        if (process.env.NODE_ENV === 'development') {
+          console.error(`API Request Failed (Attempt ${i + 1}):`, {
+            url,
+            status: response.status,
+            statusText: response.statusText,
+            headers: Object.fromEntries(response.headers.entries()),
+            requestHeaders: headerConfigs[i],
+            responseText: errorText,
+            csrfToken: csrfToken ? 'Present' : 'Missing'
+          })
+        }
         
         // If it's a 403 or 401, try next header config
         if ((response.status === 403 || response.status === 401) && i < headerConfigs.length - 1) {

@@ -2,6 +2,7 @@
 //! Export all utility functions and constants
 export * from './ood_defaults';
 export * from './ood_calculations';
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
 
 
 //! Format value based on field type
@@ -153,7 +154,11 @@ export async function loadOODData(projectName = null) {
     if (projectName) {
       url += `?project=${encodeURIComponent(projectName)}`;
     }
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     if (!response.ok) throw new Error('Failed to load OOD data');
     const result = await response.json();
     // The backend returns { year: { month: { laundry_table: [...], health_club_table: [...] } } }
@@ -176,6 +181,9 @@ export async function saveOODChanges(changes, projectName = null) {
     }
     const response = await fetch(url, {
       method: 'POST',
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      },
       body: formData
     });
     if (!response.ok) throw new Error('Failed to save OOD changes');
@@ -230,7 +238,11 @@ export function isYearCollapsed(year, collapsedYears) {
 //! Load year options
 export async function loadYearOptions() {
   try {
-    const response = await fetch('/api/method/ex_forcast.api.year.get_year_options');
+    const response = await fetch('/api/method/ex_forcast.api.year.get_year_options', {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     if (!response.ok) throw new Error('Failed to load years');
     
     const result = await response.json();
@@ -248,7 +260,11 @@ export async function loadLaundryTableData(projectName = null) {
     if (projectName) {
       url += `?project=${encodeURIComponent(projectName)}`;
     }
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     if (!response.ok) throw new Error('Failed to load laundry table data');
     const result = await response.json();
     return result.message || {};
@@ -271,6 +287,9 @@ export async function saveLaundryTableData(year, month, laundryTable, projectNam
     }
     const response = await fetch(url, {
       method: 'POST',
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      },
       body: formData
     });
     if (!response.ok) throw new Error('Failed to save laundry table data');
@@ -289,7 +308,11 @@ export async function loadHealthClubTableData(projectName = null) {
     if (projectName) {
       url += `?project=${encodeURIComponent(projectName)}`;
     }
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      }
+    });
     if (!response.ok) throw new Error('Failed to load health club table data');
     const result = await response.json();
     return result.message || {};
@@ -312,6 +335,9 @@ export async function saveHealthClubTableData(year, month, healthClubTable, proj
     }
     const response = await fetch(url, {
       method: 'POST',
+      headers: {
+        'X-Frappe-CSRF-Token': getCSRFToken()
+      },
       body: formData
     });
     if (!response.ok) throw new Error('Failed to save health club table data');

@@ -575,6 +575,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue"
 import ProjectSelector from "@/components/ui/ProjectSelector.vue"
 import alertService from "@/components/ui/ui_utility/alertService.js"
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js'
+import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js'
 import { 
   constructionBudgetService, 
   ConstructionBudgetServiceUtils 
@@ -767,6 +768,7 @@ const deleteTaskFromDatabase = async (taskId) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': getCSRFToken()
       },
       body: JSON.stringify({
         task_id: taskId
