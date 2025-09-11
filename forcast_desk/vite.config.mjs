@@ -19,6 +19,14 @@ export default defineConfig({
     outDir: `../${path.basename(path.resolve('..'))}/public/forcast_desk`,
     emptyOutDir: true,
     target: 'es2015',
+    // Drop console.* and debugger in production builds
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
+      },
+    },
   },
   optimizeDeps: {
     include: ['frappe-ui > feather-icons', 'showdown', 'engine.io-client', 'interactjs'],
