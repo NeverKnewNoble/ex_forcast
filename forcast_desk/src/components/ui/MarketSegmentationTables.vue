@@ -1789,12 +1789,12 @@ function refreshCache() {
   if (firstYear && firstLabel) {
     const cachedTotalRooms = calculationCache.getValue(project, 'Room Revenue Assumptions', 'Total Rooms', firstYear, firstLabel);
     // console.log('Cache comparison:', {
-      fromCache: cachedTotalRooms,
-      fromProp: props.totalNumberOfRooms,
-      project,
-      year: firstYear,
-      label: firstLabel
-    });
+     //   fromCache: cachedTotalRooms,
+    //   fromProp: props.totalNumberOfRooms,
+    //   project,
+    //   year: firstYear,
+    //   label: firstLabel
+    // });
   }
   
   // Clear the total available rooms cache
