@@ -1,0 +1,165 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-09-12 13:59:02.854191",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "hidden_meta_data_section",
+  "parent1",
+  "parent_field",
+  "parent_type",
+  "column_break_sxdg",
+  "index",
+  "line_id",
+  "section_break_naqr",
+  "category",
+  "section_break_uzad",
+  "item_name",
+  "party_responsible",
+  "status",
+  "_complete",
+  "projected_amount",
+  "column_break_ohbf",
+  "actual_amount",
+  "variance",
+  "current_paid",
+  "amount_due",
+  "section_break_rrvs",
+  "comments"
+ ],
+ "fields": [
+  {
+   "fieldname": "parent1",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Parent"
+  },
+  {
+   "fieldname": "parent_field",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Parent Field"
+  },
+  {
+   "fieldname": "parent_type",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Parent Type"
+  },
+  {
+   "fieldname": "column_break_sxdg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Index"
+  },
+  {
+   "fieldname": "line_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Line Id"
+  },
+  {
+   "fieldname": "section_break_uzad",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Name"
+  },
+  {
+   "fieldname": "party_responsible",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Party Responsible"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Not Started\nIn Progress\nComplete\nOn Hold"
+  },
+  {
+   "fieldname": "_complete",
+   "fieldtype": "Percent",
+   "label": "% Complete"
+  },
+  {
+   "fieldname": "projected_amount",
+   "fieldtype": "Currency",
+   "label": "Projected Amount"
+  },
+  {
+   "fieldname": "column_break_ohbf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "actual_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Actual Amount"
+  },
+  {
+   "fieldname": "variance",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Variance"
+  },
+  {
+   "fieldname": "current_paid",
+   "fieldtype": "Currency",
+   "label": "Current Paid"
+  },
+  {
+   "fieldname": "amount_due",
+   "fieldtype": "Currency",
+   "label": "Amount Due"
+  },
+  {
+   "fieldname": "section_break_rrvs",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "comments",
+   "fieldtype": "Text",
+   "label": "Comments"
+  },
+  {
+   "fieldname": "hidden_meta_data_section",
+   "fieldtype": "Section Break",
+   "label": "Hidden Meta Data"
+  },
+  {
+   "fieldname": "section_break_naqr",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "label": "Category",
+   "options": "Contractor Estimator Category"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-09-13 16:45:40.155302",
+ "modified_by": "Administrator",
+ "module": "Ex Forcast",
+ "name": "Contractor Estimator Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

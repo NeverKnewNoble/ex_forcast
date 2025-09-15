@@ -158,6 +158,7 @@ import {
   Settings,
   DollarSign,
   Wallet,
+  HardHat,
 } from 'lucide-vue-next'
 
 // Get the current route
@@ -222,6 +223,7 @@ const menuItems = [
     icon: DollarSign,
     children: [
       { text: "Project Budget", route: "/project_budget", icon: Wallet},
+      { text: "Contractor Estimator", route: "/contractor_estimator", icon: HardHat},
     ]
   },
   { text: "Receipts & Payments", route: "/receipts_payments", icon: ReceiptText },

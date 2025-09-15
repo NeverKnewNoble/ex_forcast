@@ -84,6 +84,11 @@ const routes = [
     path: '/project_budget',
     component: () => import('@/pages/non-hospitality/project_budget_revenue.vue'),
   },
+  {
+    name: 'Contractor Estimator',
+    path: '/contractor_estimator',
+    component: () => import('@/pages/non-hospitality/contractor_estimator.vue'),
+  },
 
 ]
 
