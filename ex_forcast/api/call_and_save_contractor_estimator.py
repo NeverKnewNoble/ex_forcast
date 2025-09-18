@@ -2,6 +2,8 @@ import frappe
 from collections import defaultdict
 import json
 
+
+# ! Test Connection
 @frappe.whitelist(allow_guest=True)
 def test_connection():
     """Test endpoint to verify Contractor Estimator API is working"""
@@ -11,15 +13,17 @@ def test_connection():
         "timestamp": frappe.utils.now()
     }
 
+
+# ! Get Contractor Estimator Data
 @frappe.whitelist(allow_guest=True)
 def get_contractor_estimator_data(project_name=None):
     """Fetch contractor estimator data using flattened model"""
     try:
         # Get all estimators for the project
         estimators = frappe.get_all("Contractor Estimator", 
-                                  filters={"project": project_name} if project_name else {},
-                                  fields=["name", "project", "total_projected", "total_actual", 
-                                         "total_variance", "total_current_paid", "total_amount_due"])
+                    filters={"project": project_name} if project_name else {},
+                    fields=["name", "project", "total_projected", "total_actual", 
+                            "total_variance", "total_current_paid", "total_amount_due"])
         
         if not estimators:
             return {
@@ -70,10 +74,13 @@ def get_contractor_estimator_data(project_name=None):
                 
                 # Add items to category
                 for item in category_items:
+                    # Get the actual item name from the Item doctype
+                    actual_item_name = frappe.db.get_value("Item", item.item_name, "item_name") if item.item_name else ""
+                    
                     item_data = {
                         "id": item.name,
                         "lineId": item.line_id,
-                        "name": item.item_name,
+                        "name": actual_item_name,  # Use actual item name, not document name
                         "party": item.party_responsible,
                         "status": item.status,
                         "percentComplete": float(item._complete or 0),
@@ -103,6 +110,8 @@ def get_contractor_estimator_data(project_name=None):
             "error": str(err)
         }
 
+
+# ! Save Contractor Estimator Data
 @frappe.whitelist()
 def save_contractor_estimator_data(data, project_name=None):
     """
@@ -114,27 +123,60 @@ def save_contractor_estimator_data(data, project_name=None):
         if isinstance(data, str):
             data = json.loads(data)
 
+        # # Debug: Print the incoming data structure
+        # print(f"DEBUG - Incoming data type: {type(data)}")
+        # print(f"DEBUG - Incoming data: {data}")
+        
+        # Validate data structure
+        if not isinstance(data, list):
+            return {
+                "success": False,
+                "error": "Data must be a list of estimators"
+            }
+
         results = []
 
         for estimator_data in data:
             try:
+                # Debug: Print estimator data
+                # print(f"DEBUG - Processing estimator: {estimator_data}")
+                
+                # Validate estimator data structure
+                if not isinstance(estimator_data, dict):
+                    # print(f"ERROR - Estimator data is not a dictionary: {type(estimator_data)}")
+                    continue
+                
                 estimator_id = estimator_data.get("id")
                 project = estimator_data.get("project", "")
                 categories = estimator_data.get("categories", []) or []
+
+                # Validate categories structure
+                if not isinstance(categories, list):
+                    # print(f"ERROR - Categories is not a list: {type(categories)}")
+                    continue
 
                 final_project_name = project or project_name
 
                 # Find or create estimator
                 if estimator_id and frappe.db.exists("Contractor Estimator", estimator_id):
+                    # print(f"DEBUG - Loading existing estimator: {estimator_id}")
                     estimator_doc = frappe.get_doc("Contractor Estimator", estimator_id)
                     estimator_doc.project = final_project_name
+                    # print(f"DEBUG - Loaded existing estimator doc: {estimator_doc.name}")
                 else:
+                    print(f"DEBUG - Creating new estimator")
                     estimator_doc = frappe.new_doc("Contractor Estimator")
                     estimator_doc.project = final_project_name
-
-                # Clear old data
+                    print(f"DEBUG - Created new estimator doc")
+                
+                # Clear existing categories and items
                 estimator_doc.set("categories", [])
-                estimator_doc.set("items", [])
+                # print(f"DEBUG - Cleared existing categories")
+                
+                # Debug: Print what we're about to save
+                # print(f"DEBUG - About to save estimator with {len(categories)} categories")
+                for i, cat in enumerate(categories):
+                    print(f"DEBUG - Category {i}: '{cat.get('name')}' with {len(cat.get('items', []))} items")
 
                 # Running totals for the estimator
                 total_projected = 0.0
@@ -143,17 +185,42 @@ def save_contractor_estimator_data(data, project_name=None):
                 total_current_paid = 0.0
                 total_amount_due = 0.0
 
-                # First, add all categories and save to get their row names
+                # First, add all categories with their items directly
                 category_map = {}
                 
                 for category_data in categories:
+                    # Debug: Print category data
+                    # print(f"DEBUG - Processing category: {category_data}")
+                    
+                    # Validate category data structure
+                    if not isinstance(category_data, dict):
+                        print(f"ERROR - Category data is not a dictionary: {type(category_data)}")
+                        continue
+                    
                     category_name = category_data.get("name", "") or ""
                     category_order = category_data.get("order", 0) or 0
                     items = category_data.get("items", []) or []
+                    
+                    # Validate items structure
+                    if not isinstance(items, list):
+                        print(f"ERROR - Items is not a list for category '{category_name}': {type(items)}")
+                        continue
+
+                    # Debug: Print items data
+                    print(f"DEBUG - Category '{category_name}' has {len(items)} items")
 
                     # Calculate category totals
                     c_proj = c_act = c_var = c_paid = c_due = 0.0
                     for item_data in items:
+                        # Debug: Print item data
+                        print(f"DEBUG - Processing item: {item_data}")
+                        print(f"DEBUG - Item lineId: {item_data.get('lineId')} (type: {type(item_data.get('lineId'))})")
+                        
+                        # Validate item data structure
+                        if not isinstance(item_data, dict):
+                            print(f"ERROR - Item data is not a dictionary: {type(item_data)}")
+                            continue
+                        
                         projected_amount = float(item_data.get("projected") or 0)
                         actual_amount = float(item_data.get("actual") or 0)
                         current_paid = float(item_data.get("currentPaid") or 0)
@@ -167,16 +234,32 @@ def save_contractor_estimator_data(data, project_name=None):
                         c_due += amount_due
 
                     # Add category to estimator
-                    category_row = estimator_doc.append("categories", {
-                        "doctype": "Contractor Estimator Category",
-                        "category_name": category_name,
-                        "order": category_order,
-                        "subtotal_projected": c_proj,
-                        "subtotal_actual": c_act,
-                        "subtotal_variance": c_var,
-                        "subtotal_current_paid": c_paid,
-                        "subtotal_amount_due": c_due,
-                    })
+                    try:
+                        print(f"DEBUG - About to append category '{category_name}' to estimator")
+                        print(f"DEBUG - Estimator doc type: {type(estimator_doc)}")
+                        print(f"DEBUG - Estimator doc has categories field: {hasattr(estimator_doc, 'categories')}")
+                        
+                        category_row = estimator_doc.append("categories", {
+                            "doctype": "Contractor Estimator Category",
+                            "category_name": category_name,
+                            "order": category_order,
+                            "subtotal_projected": c_proj,
+                            "subtotal_actual": c_act,
+                            "subtotal_variance": c_var,
+                            "subtotal_current_paid": c_paid,
+                            "subtotal_amount_due": c_due,
+                        })
+                        # print(f"DEBUG - Successfully added category: {category_name}")
+                        # print(f"DEBUG - Category row type: {type(category_row)}")
+                        # print(f"DEBUG - Category row has items field: {hasattr(category_row, 'items')}")
+                    except Exception as cat_error:
+                        # print(f"ERROR - Failed to add category '{category_name}': {cat_error}")
+                        # print(f"ERROR - Category error type: {type(cat_error)}")
+                        # print(f"ERROR - Category error details: {str(cat_error)}")
+                        raise cat_error
+
+                    # Store category reference for items (we'll add items after all categories are created)
+                    category_map[category_name] = category_row
 
                     # Add to estimator totals
                     total_projected += c_proj
@@ -185,6 +268,92 @@ def save_contractor_estimator_data(data, project_name=None):
                     total_current_paid += c_paid
                     total_amount_due += c_due
 
+                # Save the estimator first to get category row names
+                # print(f"DEBUG - Saving estimator with categories first to get row names")
+                try:
+                    if estimator_id and frappe.db.exists("Contractor Estimator", estimator_id):
+                        estimator_doc.save(ignore_permissions=True)
+                    else:
+                        estimator_doc.insert(ignore_permissions=True)
+                    frappe.db.commit()
+                    # print(f"DEBUG - Successfully saved estimator with categories")
+                except Exception as save_error:
+                    # print(f"ERROR - Failed to save estimator with categories: {save_error}")
+                    raise save_error
+
+                # Reload the estimator to get the category row names
+                estimator_doc = frappe.get_doc("Contractor Estimator", estimator_doc.name)
+                # print(f"DEBUG - Reloaded estimator, categories: {[(cat.name, cat.category_name) for cat in estimator_doc.categories]}")
+
+                # Now add all items directly to the estimator, linked to their categories
+                # print(f"DEBUG - About to add items to estimator")
+                for category_data in categories:
+                    category_name = category_data.get("name", "") or ""
+                    items = category_data.get("items", []) or []
+                    
+                    # Find the category row by name
+                    category_row = None
+                    for cat in estimator_doc.categories:
+                        if cat.category_name == category_name:
+                            category_row = cat
+                            break
+                    
+                    if not category_row:
+                        # print(f"ERROR - Category '{category_name}' not found in saved estimator")
+                        continue
+                    
+                    for item_data in items:
+                        try:
+                            # Validate item data structure
+                            if not isinstance(item_data, dict):
+                                # print(f"ERROR - Item data is not a dictionary: {type(item_data)}")
+                                continue
+                            
+                            projected_amount = float(item_data.get("projected") or 0)
+                            actual_amount = float(item_data.get("actual") or 0)
+                            current_paid = float(item_data.get("currentPaid") or 0)
+                            variance = actual_amount - projected_amount
+                            amount_due = actual_amount - current_paid
+
+                            # Generate a line_id if it's null or empty
+                            line_id = item_data.get("lineId")
+                            if not line_id or line_id == "null" or line_id == "" or line_id is None:
+                                import uuid
+                                line_id = str(uuid.uuid4())[:8]  # Generate a short unique ID
+
+                            # Get the Item document name (item_name is a Link field)
+                            item_name_string = item_data.get("name") or ""
+                            item_doc_name = frappe.db.get_value("Item", {"item_name": item_name_string}, "name")
+                            
+                            if not item_doc_name:
+                                # print(f"ERROR - Item '{item_name_string}' not found in Item doctype")
+                                continue
+                            
+                            # print(f"DEBUG - About to append item '{item_name_string}' (doc: {item_doc_name}) to estimator")
+                            # print(f"DEBUG - Linking item '{item_name_string}' to category '{category_name}' -> '{category_row.name}'")
+                            
+                            # Add item directly to estimator with category reference
+                            estimator_doc.append("items", {
+                                "doctype": "Contractor Estimator Item",
+                                "line_id": line_id,
+                                "item_name": item_doc_name,  # Use Item document name, not string
+                                "party_responsible": item_data.get("party") or "",
+                                "status": item_data.get("status") or "Not Started",
+                                "_complete": float(item_data.get("percentComplete") or 0),
+                                "projected_amount": projected_amount,
+                                "actual_amount": actual_amount,
+                                "current_paid": current_paid,
+                                "variance": variance,
+                                "amount_due": amount_due,
+                                "comments": item_data.get("comments") or "",
+                                "category": category_row.name,  # Link to category by document name
+                            })
+                            # print(f"DEBUG - Successfully added item: {item_data.get('name')}")
+                        except Exception as item_error:
+                            # print(f"ERROR - Failed to add item '{item_data.get('name')}': {item_error}")
+                            # print(f"ERROR - Item data: {item_data}")
+                            raise item_error
+
                 # Set estimator totals
                 estimator_doc.total_projected = total_projected
                 estimator_doc.total_actual = total_actual
@@ -192,53 +361,17 @@ def save_contractor_estimator_data(data, project_name=None):
                 estimator_doc.total_current_paid = total_current_paid
                 estimator_doc.total_amount_due = total_amount_due
 
-                # Save categories first to get their row names
-                if estimator_id and frappe.db.exists("Contractor Estimator", estimator_id):
+                # Save the complete estimator with items
+                try:
                     estimator_doc.save(ignore_permissions=True)
-                else:
-                    estimator_doc.insert(ignore_permissions=True)
-                
-                # Commit the transaction
-                frappe.db.commit()
-                
-                # Reload to get the actual category row names
-                estimator_doc.reload()
-                
-                # Build category name to row name mapping
-                for category in estimator_doc.categories:
-                    category_map[category.category_name] = category.name
-                
-                # Now add items with proper category references
-                for category_data in categories:
-                    category_name = category_data.get("name", "") or ""
-                    items = category_data.get("items", []) or []
+                    frappe.db.commit()
+                    print(f"DEBUG - Successfully saved estimator with {len(estimator_doc.categories)} categories and {len(estimator_doc.items)} items")
                     
-                    for item_data in items:
-                        projected_amount = float(item_data.get("projected") or 0)
-                        actual_amount = float(item_data.get("actual") or 0)
-                        current_paid = float(item_data.get("currentPaid") or 0)
-                        variance = actual_amount - projected_amount
-                        amount_due = actual_amount - current_paid
-
-                        estimator_doc.append("items", {
-                            "doctype": "Contractor Estimator Item",
-                            "line_id": item_data.get("lineId") or "",
-                            "item_name": item_data.get("name") or "",
-                            "party_responsible": item_data.get("party") or "",
-                            "status": item_data.get("status") or "Not Started",
-                            "_complete": float(item_data.get("percentComplete") or 0),
-                            "projected_amount": projected_amount,
-                            "actual_amount": actual_amount,
-                            "current_paid": current_paid,
-                            "variance": variance,
-                            "amount_due": amount_due,
-                            "comments": item_data.get("comments") or "",
-                            "category": category_map[category_name],  # Use actual category row name
-                        })
-                
-                # Save items
-                estimator_doc.save(ignore_permissions=True)
-                frappe.db.commit()
+                except Exception as save_error:
+                    # print(f"ERROR - Failed to save estimator with items: {save_error}")
+                    # print(f"ERROR - Estimator doc categories: {[cat.category_name for cat in estimator_doc.categories]}")
+                    # print(f"ERROR - Total items: {len(estimator_doc.items)}")
+                    raise save_error
                 
 
                 results.append({
@@ -265,6 +398,8 @@ def save_contractor_estimator_data(data, project_name=None):
             "error": str(e)
         }
 
+
+# ! Create Contractor Estimator
 @frappe.whitelist()
 def create_contractor_estimator(estimator_data):
     """Create a new contractor estimator"""
@@ -297,6 +432,8 @@ def create_contractor_estimator(estimator_data):
             "error": str(e)
         }
 
+
+# ! Delete Contractor Estimator
 @frappe.whitelist()
 def delete_contractor_estimator(estimator_id):
     """Delete a contractor estimator"""
@@ -331,6 +468,8 @@ def delete_contractor_estimator(estimator_id):
             "error": str(e)
         }
 
+
+# ! Get Summary of Contractor Estimator
 @frappe.whitelist(allow_guest=True)
 def get_contractor_estimator_summary(project_name=None):
     """Get summary statistics for contractor estimator"""
@@ -397,6 +536,294 @@ def get_contractor_estimator_summary(project_name=None):
 
     except Exception as e:
         frappe.logger().error(f"Error getting contractor estimator summary: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
+# ! Get Items From Item Doctype
+@frappe.whitelist()
+def get_items_by_order_of_category():
+    """Get items from Item doctype grouped by item_group"""
+    try:
+        
+        query = """
+            SELECT 
+                item_name, 
+                item_group
+            FROM 
+                `tabItem`
+            ORDER BY `tabItem`.item_group ASC, `tabItem`.item_name ASC
+        """
+        items = frappe.db.sql(query, as_dict=True)
+
+        # Group items by item_group
+        grouped_items = {}
+        for item in items:
+            item_group = item.get("item_group", "Uncategorized")
+            item_name = item.get("item_name", "")
+            
+            if item_group not in grouped_items:
+                grouped_items[item_group] = []
+            
+            grouped_items[item_group].append(item_name)
+
+        return {
+            "success": True,
+            "data": grouped_items
+        }
+    
+    except Exception as e:
+        frappe.logger().error(f"Error getting items by order of item_group: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@frappe.whitelist(allow_guest=True)
+def get_item_groups():
+    """Get all existing Item Groups"""
+    try:
+        query = """
+            SELECT 
+                name,
+                item_group_name,
+                parent_item_group,
+                is_group
+            FROM 
+                `tabItem Group`
+            WHERE 
+                is_group = 0
+            ORDER BY 
+                item_group_name ASC
+        """
+        item_groups = frappe.db.sql(query, as_dict=True)
+        
+        return {
+            "success": True,
+            "data": item_groups
+        }
+        
+    except Exception as e:
+        frappe.logger().error(f"Error getting Item Groups: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@frappe.whitelist()
+def create_item_group(item_group_name):
+    """Create a new Item Group doctype document"""
+    try:
+        if not item_group_name or not item_group_name.strip():
+            return {
+                "success": False,
+                "error": "Item Group name is required"
+            }
+        
+        item_group_name = item_group_name.strip()
+        
+        # Check if Item Group already exists
+        if frappe.db.exists("Item Group", item_group_name):
+            return {
+                "success": False,
+                "error": f"Item Group '{item_group_name}' already exists"
+            }
+        
+        # Create new Item Group document
+        item_group_doc = frappe.new_doc("Item Group")
+        item_group_doc.item_group_name = item_group_name
+        item_group_doc.parent_item_group = "All Item Groups"  # Default parent
+        item_group_doc.is_group = 0  # This is a leaf node, not a group
+        item_group_doc.insert(ignore_permissions=True)
+        frappe.db.commit()
+        
+        return {
+            "success": True,
+            "message": f"Item Group '{item_group_name}' created successfully",
+            "data": {
+                "name": item_group_doc.name,
+                "item_group_name": item_group_doc.item_group_name
+            }
+        }
+        
+    except Exception as e:
+        frappe.logger().error(f"Error creating Item Group: {str(e)}")
+        frappe.db.rollback()
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@frappe.whitelist()
+def create_item(item_name, item_group):
+    """Create a new Item doctype document"""
+    try:
+        if not item_name or not item_name.strip():
+            return {
+                "success": False,
+                "error": "Item name is required"
+            }
+        
+        if not item_group or not item_group.strip():
+            return {
+                "success": False,
+                "error": "Item group is required"
+            }
+        
+        item_name = item_name.strip()
+        item_group = item_group.strip()
+        
+        # Check if Item already exists by item_name
+        existing_item = frappe.db.get_value("Item", {"item_name": item_name}, "name")
+        if existing_item:
+            # Item already exists, return success with existing item info
+            existing_doc = frappe.get_doc("Item", existing_item)
+            return {
+                "success": True,
+                "message": f"Item '{item_name}' already exists",
+                "data": {
+                    "name": existing_doc.name,
+                    "item_code": existing_doc.item_code,
+                    "item_name": existing_doc.item_name,
+                    "item_group": existing_doc.item_group
+                }
+            }
+        
+        # Generate item_code (use item_name as base, make it unique)
+        item_code = item_name.replace(" ", "_").replace("-", "_").upper()
+        
+        # Ensure item_code is unique
+        counter = 1
+        original_item_code = item_code
+        while frappe.db.exists("Item", item_code):
+            item_code = f"{original_item_code}_{counter}"
+            counter += 1
+        
+        # Create new Item document
+        item_doc = frappe.new_doc("Item")
+        item_doc.item_code = item_code
+        item_doc.item_name = item_name
+        item_doc.item_group = item_group
+        item_doc.is_stock_item = 0  # Default to non-stock item
+        item_doc.is_sales_item = 1  # Default to sales item
+        item_doc.is_purchase_item = 1  # Default to purchase item
+        item_doc.insert(ignore_permissions=True)
+        frappe.db.commit()
+        
+        return {
+            "success": True,
+            "message": f"Item '{item_name}' created successfully",
+            "data": {
+                "name": item_doc.name,
+                "item_code": item_doc.item_code,
+                "item_name": item_doc.item_name,
+                "item_group": item_doc.item_group
+            }
+        }
+        
+    except Exception as e:
+        frappe.logger().error(f"Error creating Item: {str(e)}")
+        frappe.db.rollback()
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
+@frappe.whitelist()
+def delete_contractor_estimator_item(estimator_id, item_line_id):
+    """Delete a Contractor Estimator Item by line_id from a specific estimator"""
+    try:
+        if not estimator_id or not estimator_id.strip():
+            return {
+                "success": False,
+                "error": "Estimator ID is required"
+            }
+        
+        if not item_line_id or not item_line_id.strip():
+            return {
+                "success": False,
+                "error": "Item line ID is required"
+            }
+        
+        estimator_id = estimator_id.strip()
+        item_line_id = item_line_id.strip()
+        
+        # Check if estimator exists
+        if not frappe.db.exists("Contractor Estimator", estimator_id):
+            return {
+                "success": False,
+                "error": f"Contractor Estimator '{estimator_id}' not found"
+            }
+        
+        # Get the estimator document
+        estimator_doc = frappe.get_doc("Contractor Estimator", estimator_id)
+        
+        # Find the item in the estimator's items
+        item_found = False
+        item_name = ""
+        
+        for item in estimator_doc.items:
+            if item.line_id == item_line_id:
+                item_name = item.item_name
+                # Remove the item from the estimator
+                estimator_doc.remove(item)
+                item_found = True
+                break
+        
+        if not item_found:
+            return {
+                "success": False,
+                "error": f"Item with line ID '{item_line_id}' not found in estimator"
+            }
+        
+        # Recalculate category totals
+        for category in estimator_doc.categories:
+            c_proj = c_act = c_var = c_paid = c_due = 0.0
+            # Get items for this category from the estimator's items
+            category_items = [item for item in estimator_doc.items if item.category == category.name]
+            for item in category_items:
+                c_proj += float(item.projected_amount or 0)
+                c_act += float(item.actual_amount or 0)
+                c_paid += float(item.current_paid or 0)
+                c_var += float(item.variance or 0)
+                c_due += float(item.amount_due or 0)
+            
+            category.subtotal_projected = c_proj
+            category.subtotal_actual = c_act
+            category.subtotal_variance = c_var
+            category.subtotal_current_paid = c_paid
+            category.subtotal_amount_due = c_due
+        
+        # Recalculate estimator totals
+        total_projected = total_actual = total_variance = total_current_paid = total_amount_due = 0.0
+        for category in estimator_doc.categories:
+            total_projected += float(category.subtotal_projected or 0)
+            total_actual += float(category.subtotal_actual or 0)
+            total_variance += float(category.subtotal_variance or 0)
+            total_current_paid += float(category.subtotal_current_paid or 0)
+            total_amount_due += float(category.subtotal_amount_due or 0)
+        
+        estimator_doc.total_projected = total_projected
+        estimator_doc.total_actual = total_actual
+        estimator_doc.total_variance = total_variance
+        estimator_doc.total_current_paid = total_current_paid
+        estimator_doc.total_amount_due = total_amount_due
+        
+        # Save the updated estimator
+        estimator_doc.save(ignore_permissions=True)
+        frappe.db.commit()
+        
+        return {
+            "success": True,
+            "message": f"Item '{item_name}' deleted successfully from estimator"
+        }
+        
+    except Exception as e:
+        frappe.logger().error(f"Error deleting Contractor Estimator Item: {str(e)}")
+        frappe.db.rollback()
         return {
             "success": False,
             "error": str(e)

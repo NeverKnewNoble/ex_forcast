@@ -103,13 +103,20 @@
                   </button>
                 </div>
                 
-                <div class="mt-2">
+                <div class="mt-2 space-y-2">
+                  <button 
+                    @click="showAddCategoryModal"
+                    class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white border border-violet-200 text-violet-700 rounded-lg hover:bg-violet-50 transition-all text-sm font-medium"
+                  >
+                    <Plus class="w-4 h-4" />
+                    Add Category
+                  </button>
                   <button 
                     @click="restoreDefaultCategories"
                     class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white border border-orange-200 text-orange-700 rounded-lg hover:bg-orange-50 transition-all text-sm font-medium"
                   >
                     <RotateCcw class="w-4 h-4" />
-                    Restore Defaults
+                    Restore from API
                   </button>
                 </div>
               </div>
@@ -426,6 +433,13 @@
       @close="closeSettings" 
     />
 
+    <!-- Add Category Modal -->
+    <AddCategoryModal 
+      :is-visible="showAddCategoryModalState" 
+      @close="closeAddCategoryModal"
+      @create="handleCreateCategory"
+    />
+
     <!-- New Estimator Modal -->
     <div v-if="showNewEstimatorModal" class="fixed inset-0 z-50 flex items-center justify-center">
       <div class="absolute inset-0 bg-black/30"></div>
@@ -475,6 +489,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import Sidebar from "@/components/ui/Sidebar.vue"
 import SettingsModal from "@/components/ui/SettingsModal.vue"
 import ProjectSelector from "@/components/ui/ProjectSelector.vue"
+import AddCategoryModal from "@/components/ui/contractor_estimator/AddCategoryModal.vue"
 import alertService from "@/components/ui/ui_utility/alertService.js"
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js'
 import { 
@@ -518,6 +533,7 @@ const isSaving = ref(false)
 const saveError = ref('')
 const showSettingsModal = ref(false)
 const showNewEstimatorModal = ref(false)
+const showAddCategoryModalState = ref(false)
 const newEstimatorTitle = ref('')
 const newEstimatorLocation = ref('')
 
@@ -571,35 +587,49 @@ const loadData = async (forceReload = false) => {
     currentEstimator.value = estimators.value[0] || null
     
     
-    // Always ensure we have default categories with items
+    // Always ensure we have categories with items from API
     if (!currentEstimator.value) {
-      // No estimator exists, create one with default categories
+      // No estimator exists, create one with API data
       const projectTitle = currentProject || 'New Project Estimate'
       const location = ''
-      const newEstimator = ContractorEstimator.createWithDefaultCategories(projectTitle, location)
       
-      // Set the project field to the current selected project
-      newEstimator.project = currentProject
-      
-      estimators.value = [newEstimator]
-      currentEstimator.value = newEstimator
-      isSaved.value = false // Mark as unsaved since we created new data
-    } else {
-      // Estimator exists, but ensure it has default categories with items
-      const hasItems = currentEstimator.value.categories.some(cat => cat.items.length > 0)
-      
-      if (!hasItems) {
-        // No items in any category, restore default categories with items
-        const currentProjectTitle = currentEstimator.value.projectTitle || 'New Project Estimate'
-        const currentLocation = currentEstimator.value.location || ''
-        
-        const newEstimator = ContractorEstimator.createWithDefaultCategories(currentProjectTitle, currentLocation)
-        newEstimator.project = currentProject
-        newEstimator.id = currentEstimator.value.id // Keep the same ID
+      try {
+        const newEstimator = await contractorEstimatorService.createMergedEstimator(projectTitle, location, currentProject)
         
         estimators.value = [newEstimator]
         currentEstimator.value = newEstimator
-        isSaved.value = false // Mark as unsaved since we updated with default data
+        isSaved.value = newEstimator.id ? true : false // Mark as saved if it has an ID (was loaded from database)
+      } catch (error) {
+        console.error('Error creating estimator from API data:', error)
+        // Fallback to empty estimator if API fails
+        const newEstimator = ContractorEstimator.createEmpty(projectTitle, location)
+        newEstimator.project = currentProject
+        
+        estimators.value = [newEstimator]
+        currentEstimator.value = newEstimator
+        isSaved.value = false
+      }
+    } else {
+      // Estimator exists, but ensure it has items
+      const hasItems = currentEstimator.value.categories.some(cat => cat.items.length > 0)
+      
+      if (!hasItems) {
+        // No items in any category, create new estimator with API data
+        const currentProjectTitle = currentEstimator.value.projectTitle || 'New Project Estimate'
+        const currentLocation = currentEstimator.value.location || ''
+        
+        try {
+          const newEstimator = await contractorEstimatorService.createMergedEstimator(currentProjectTitle, currentLocation, currentProject)
+          newEstimator.id = currentEstimator.value.id // Keep the same ID
+          
+          estimators.value = [newEstimator]
+          currentEstimator.value = newEstimator
+          isSaved.value = false // Mark as unsaved since we updated with API data
+        } catch (error) {
+          console.error('Error creating estimator from API data:', error)
+          // Keep existing estimator if API fails
+          isSaved.value = true
+        }
       } else {
         isSaved.value = true
       }
@@ -632,6 +662,9 @@ const saveChanges = async () => {
   try {
     const currentProject = selectedProject.value?.name
     
+    // First, create any new items in Frappe before saving
+    await createNewItemsInFrappe()
+    
     await contractorEstimatorService.saveData(estimators.value, currentProject)
     isSaved.value = true
     alertService.success('Contractor estimate saved successfully')
@@ -641,6 +674,40 @@ const saveChanges = async () => {
   } finally {
     isSaving.value = false
   }
+}
+
+const createNewItemsInFrappe = async () => {
+  if (!currentEstimator.value) return
+  
+  const itemsToCreate = []
+  
+  // Collect all items that need to be created
+  currentEstimator.value.categories.forEach(category => {
+    category.items.forEach(item => {
+      if (item.name && item.name.trim()) {
+        itemsToCreate.push({
+          itemName: item.name.trim(),
+          itemGroup: category.name,
+          item: item
+        })
+      }
+    })
+  })
+  
+  if (itemsToCreate.length === 0) return
+  
+  // Create items in Frappe
+  const creationPromises = itemsToCreate.map(async ({ itemName, itemGroup, item }) => {
+    try {
+      await contractorEstimatorService.createItem(itemName, itemGroup)
+      console.log(`Item "${itemName}" created in Frappe under group "${itemGroup}"`)
+    } catch (error) {
+      // If item already exists or creation fails, log but don't stop the process
+      console.warn(`Failed to create item "${itemName}":`, error.message)
+    }
+  })
+  
+  await Promise.allSettled(creationPromises)
 }
 
 const updateCategoryName = (event, category) => {
@@ -663,10 +730,38 @@ const deleteItem = async (categoryId, itemId) => {
     try {
       const category = currentEstimator.value?.categories.find(c => c.id === categoryId)
       if (category) {
-        category.removeItem(itemId)
-        currentEstimator.value.updateTotals()
-        markAsUnsaved()
-        alertService.success('Item deleted successfully')
+        const item = category.items.find(i => i.id === itemId)
+        if (item) {
+          // Check if item has any data (projected, actual, paid amounts, comments, etc.)
+          const hasData = item.projected > 0 || 
+                         item.actual > 0 || 
+                         item.currentPaid > 0 || 
+                         (item.comments && item.comments.trim() !== '') ||
+                         item.party !== '' ||
+                         item.status !== 'Not Started' ||
+                         item.percentComplete > 0
+
+          // If item has data and estimator is saved, delete from database
+          if (hasData && currentEstimator.value?.id) {
+            console.log(`Item '${item.name}' has data, deleting from database...`)
+            const deleteResult = await contractorEstimatorService.deleteItem(currentEstimator.value.id, item.lineId)
+            
+            if (deleteResult.success) {
+              console.log('Successfully deleted item from database')
+            } else {
+              console.warn('Failed to delete item from database:', deleteResult.error)
+              // Continue with local removal even if database deletion fails
+            }
+          } else {
+            console.log(`Item '${item.name}' has no data, removing locally only`)
+          }
+
+          // Remove item from local model
+          category.removeItem(itemId)
+          currentEstimator.value.updateTotals()
+          markAsUnsaved()
+          alertService.success('Item deleted successfully')
+        }
       }
     } catch (error) {
       alertService.error(`Failed to delete item: ${error.message}`)
@@ -696,26 +791,23 @@ const deleteCategory = async (categoryId) => {
   }
 }
 
-const restoreDefaultCategories = () => {
-  if (confirm('Are you sure you want to restore all default categories? This will replace your current categories and items.')) {
+const restoreDefaultCategories = async () => {
+  if (confirm('Are you sure you want to restore all categories from API? This will replace your current categories and items.')) {
     try {
       const currentProjectTitle = currentEstimator.value?.projectTitle || 'New Project Estimate'
       const currentLocation = currentEstimator.value?.location || ''
       const currentProject = selectedProject.value?.name
       
-      const newEstimator = ContractorEstimator.createWithDefaultCategories(currentProjectTitle, currentLocation)
+      const newEstimator = await contractorEstimatorService.createMergedEstimator(currentProjectTitle, currentLocation, currentProject)
       
-      // Set the project field to the current selected project
-      newEstimator.project = currentProject
-      
-      // Replace current estimator with default one
+      // Replace current estimator with API-based one
       estimators.value = [newEstimator]
       currentEstimator.value = newEstimator
       
       markAsUnsaved()
-      alertService.success('Default categories restored successfully')
+      alertService.success('Categories restored from API successfully')
     } catch (error) {
-      alertService.error(`Failed to restore default categories: ${error.message}`)
+      alertService.error(`Failed to restore categories from API: ${error.message}`)
     }
   }
 }
@@ -726,24 +818,26 @@ const createNewEstimator = () => {
   showNewEstimatorModal.value = true
 }
 
-const confirmCreateEstimator = () => {
+const confirmCreateEstimator = async () => {
   const titleToUse = (newEstimatorTitle.value || '').trim() || 'New Project Estimate'
   const locationToUse = (newEstimatorLocation.value || '').trim() || ''
   const currentProject = selectedProject.value?.name
   
-  const newEstimator = ContractorEstimator.createWithDefaultCategories(titleToUse, locationToUse)
-  
-  // Set the project field to the current selected project
-  newEstimator.project = currentProject
-  
-  // Add to local estimators array
-  estimators.value = [newEstimator]
-  currentEstimator.value = newEstimator
-  
-  showNewEstimatorModal.value = false
-  newEstimatorTitle.value = ''
-  newEstimatorLocation.value = ''
-  markAsUnsaved()
+  try {
+    const newEstimator = await contractorEstimatorService.createMergedEstimator(titleToUse, locationToUse, currentProject)
+    
+    // Add to local estimators array
+    estimators.value = [newEstimator]
+    currentEstimator.value = newEstimator
+    
+    showNewEstimatorModal.value = false
+    newEstimatorTitle.value = ''
+    newEstimatorLocation.value = ''
+    markAsUnsaved()
+  } catch (error) {
+    console.error('Error creating estimator from API data:', error)
+    alertService.error(`Failed to create estimator: ${error.message}`)
+  }
 }
 
 const cancelNewEstimator = () => {
@@ -791,6 +885,66 @@ const openSettings = () => {
 
 const closeSettings = () => {
   showSettingsModal.value = false
+}
+
+// Add Category Modal handlers
+const showAddCategoryModal = () => {
+  showAddCategoryModalState.value = true
+}
+
+const closeAddCategoryModal = () => {
+  showAddCategoryModalState.value = false
+}
+
+const handleCreateCategory = async (categoryName, mode) => {
+  if (!currentEstimator.value) {
+    alertService.error('Please create an estimator first')
+    return
+  }
+  
+  try {
+    if (mode === 'create') {
+      // First, create the Item Group in Frappe
+      await contractorEstimatorService.createItemGroup(categoryName)
+    }
+    // For 'select' mode, the Item Group already exists, so no need to create it
+    
+    // Then add category to the current estimator
+    const newCategory = currentEstimator.value.addCategory({ 
+      name: categoryName,
+      order: currentEstimator.value.categories.length + 1
+    })
+    
+    closeAddCategoryModal()
+    markAsUnsaved()
+    
+    if (mode === 'create') {
+      alertService.success(`Category "${categoryName}" added successfully and Item Group created in Frappe`)
+    } else {
+      alertService.success(`Category "${categoryName}" added successfully from existing Item Group`)
+    }
+  } catch (error) {
+    // If Item Group creation fails (only for create mode), still add the category locally
+    if (mode === 'create') {
+      console.warn('Failed to create Item Group, adding category locally:', error.message)
+      
+      try {
+        const newCategory = currentEstimator.value.addCategory({ 
+          name: categoryName,
+          order: currentEstimator.value.categories.length + 1
+        })
+        
+        closeAddCategoryModal()
+        markAsUnsaved()
+        alertService.warning(`Category "${categoryName}" added locally, but Item Group creation failed: ${error.message}`)
+      } catch (localError) {
+        alertService.error(`Failed to add category: ${localError.message}`)
+      }
+    } else {
+      // For select mode, if there's an error, it's likely a different issue
+      alertService.error(`Failed to add category: ${error.message}`)
+    }
+  }
 }
 
 // Handle project change from ProjectSelector

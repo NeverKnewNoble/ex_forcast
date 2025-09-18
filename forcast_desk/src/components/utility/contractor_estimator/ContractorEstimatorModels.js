@@ -155,11 +155,23 @@ export class ContractorEstimatorCategory {
   }
 
   toJSON() {
+    // Filter out items that have no meaningful data
+    const itemsWithData = this.items.filter(item => {
+      // Only keep items that have actual data (not just a name)
+      return item.projected > 0 || 
+             item.actual > 0 || 
+             item.currentPaid > 0 || 
+             (item.comments && item.comments.trim() !== '') ||
+             (item.party && item.party.trim() !== '') ||
+             item.status !== 'Not Started' ||
+             item.percentComplete > 0
+    })
+
     return {
       id: this.id,
       name: this.name,
       order: this.order,
-      items: this.items.map(item => item.toJSON()),
+      items: itemsWithData.map(item => item.toJSON()),
       subtotals: this.subtotals
     }
   }
@@ -261,47 +273,48 @@ export class ContractorEstimator {
     return new ContractorEstimator({ projectTitle, location })
   }
 
-  static createWithDefaultCategories(projectTitle = '', location = '') {
-    const estimator = new ContractorEstimator({ projectTitle, location })
-    
-    // Add default categories with their items based on Excel analysis
-    const defaultCategories = [
-      'Planning',
-      'Site Prep',
-      'Earthwork / Excavation',
-      'Utilities',
-      'Water + Sewer',
-      'Foundation',
-      'Rough Framing',
-      'Windows + Doors (Exterior)',
-      'Finish - Exterior',
-      'Roofing',
-      'Masonry / Paving',
-      'Porches + Decks',
-      'Insulation + Air Sealing',
-      'Plumbing',
-      'Electrical',
-      'HVAC',
-      'Drywall + Plaster',
-      'Finish - Interior',
-      'Kitchen',
-      'Bath',
-      'Appliances',
-      'Other'
-    ]
+  // COMMENTED OUT: Default categories creation - now using API data instead
+  // static createWithDefaultCategories(projectTitle = '', location = '') {
+  //   const estimator = new ContractorEstimator({ projectTitle, location })
+  //   
+  //   // Add default categories with their items based on Excel analysis
+  //   const defaultCategories = [
+  //     'Planning',
+  //     'Site Prep',
+  //     'Earthwork / Excavation',
+  //     'Utilities',
+  //     'Water + Sewer',
+  //     'Foundation',
+  //     'Rough Framing',
+  //     'Windows + Doors (Exterior)',
+  //     'Finish - Exterior',
+  //     'Roofing',
+  //     'Masonry / Paving',
+  //     'Porches + Decks',
+  //     'Insulation + Air Sealing',
+  //     'Plumbing',
+  //     'Electrical',
+  //     'HVAC',
+  //     'Drywall + Plaster',
+  //     'Finish - Interior',
+  //     'Kitchen',
+  //     'Bath',
+  //     'Appliances',
+  //     'Other'
+  //   ]
 
-    defaultCategories.forEach((name, index) => {
-      const category = estimator.addCategory({ name, order: index + 1 })
-      
-      // Add default items for this category
-      const defaultItems = DEFAULT_CATEGORY_ITEMS[name] || []
-      defaultItems.forEach(itemName => {
-        category.addItem({ name: itemName })
-      })
-    })
+  //   defaultCategories.forEach((name, index) => {
+  //     const category = estimator.addCategory({ name, order: index + 1 })
+  //     
+  //     // Add default items for this category
+  //     const defaultItems = DEFAULT_CATEGORY_ITEMS[name] || []
+  //     defaultItems.forEach(itemName => {
+  //       category.addItem({ name: itemName })
+  //     })
+  //   })
 
-    return estimator
-  }
+  //   return estimator
+  // }
 }
 
 // Status options for dropdowns
@@ -312,7 +325,8 @@ export const STATUS_OPTIONS = [
   'On Hold'
 ]
 
-// Default items per category (from Excel analysis)
+// COMMENTED OUT: Default items per category - now using API data instead
+/*
 export const DEFAULT_CATEGORY_ITEMS = {
   'Planning': [
     'Admin Fees',
@@ -629,3 +643,4 @@ export const DEFAULT_CATEGORY_ITEMS = {
   ],
   'Other': []
 }
+*/
