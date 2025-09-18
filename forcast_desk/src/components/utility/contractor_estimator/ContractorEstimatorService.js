@@ -41,45 +41,328 @@ class ContractorEstimatorService {
    */
   async fetchData(projectName = null) {
     try {
-      const response = await fetch('/api/method/ex_forcast.api.call_and_save_contractor_estimator.get_contractor_estimator_data', {
+      // Use the merged approach that combines default Item Groups with saved data
+      const mergedEstimator = await this.createMergedEstimator('', '', projectName)
+      
+      this.estimators = [mergedEstimator]
+      return this.estimators
+    } catch (error) {
+      console.error('Error fetching contractor estimator data:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Get items by order of item_group
+   */
+  async getItemsByOrderOfItemGroup() {
+    try {
+      const response = await fetch('/api/method/ex_forcast.api.call_and_save_contractor_estimator.get_items_by_order_of_category', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Frappe-CSRF-Token': getCSRFToken()
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const result = await response.json()
+      const actualResult = result.message || result
+      
+      if (!actualResult.success) {
+        throw new Error(actualResult.error || 'Failed to fetch items by category')
+      }
+      
+      // console.log('Service - Items by order of category:', actualResult.data)
+      return actualResult.data
+    }
+    catch (error) {
+      console.error('Error getting items by order of category:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Create estimator from API item groups
+   */
+  async createEstimatorFromItemGroups(projectTitle = '', location = '', project = '') {
+    try {
+      const itemGroupsData = await this.getItemsByOrderOfItemGroup()
+      
+      const estimator = new ContractorEstimator({ 
+        projectTitle, 
+        location, 
+        project 
+      })
+      
+      // Create categories from item groups
+      Object.keys(itemGroupsData).forEach((itemGroup, index) => {
+        const category = estimator.addCategory({ 
+          name: itemGroup, 
+          order: index + 1 
+        })
+        
+        // Add items for this category
+        const items = itemGroupsData[itemGroup] || []
+        items.forEach(itemName => {
+          category.addItem({ name: itemName })
+        })
+      })
+      
+      return estimator
+    } catch (error) {
+      console.error('Error creating estimator from item groups:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Create estimator by merging default Item Groups data with saved Contractor Estimator data
+   */
+  async createMergedEstimator(projectTitle = '', location = '', project = '') {
+    try {
+      // Get default data from Item Groups
+      const itemGroupsData = await this.getItemsByOrderOfItemGroup()
+      
+      // Try to get saved data from Contractor Estimator (direct API call to avoid circular dependency)
+      let savedEstimator = null
+      try {
+        const response = await fetch('/api/method/ex_forcast.api.call_and_save_contractor_estimator.get_contractor_estimator_data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Frappe-CSRF-Token': getCSRFToken()
+          },
+          body: JSON.stringify({
+            project_name: project
+          })
+        })
+
+        if (response.ok) {
+          const result = await response.json()
+          const actualResult = result.message || result
+          
+          if (actualResult.success && actualResult.data && actualResult.data.length > 0) {
+            savedEstimator = new ContractorEstimator(actualResult.data[0])
+          }
+        }
+      } catch (error) {
+        console.log('No saved estimator found, using default data only')
+      }
+      
+      // Start with default data from Item Groups
+      const estimator = new ContractorEstimator({ 
+        projectTitle, 
+        location, 
+        project,
+        id: savedEstimator?.id // Use saved ID if available
+      })
+      
+      // Create categories from item groups (default structure)
+      Object.keys(itemGroupsData).forEach((itemGroup, index) => {
+        const category = estimator.addCategory({ 
+          name: itemGroup, 
+          order: index + 1 
+        })
+        
+        // Add default items for this category
+        const items = itemGroupsData[itemGroup] || []
+        items.forEach(itemName => {
+          category.addItem({ name: itemName })
+        })
+      })
+      
+      // If we have saved data, merge it with the default data
+      if (savedEstimator) {
+        console.log('Merging saved data with default Item Groups data')
+        
+        // Update estimator totals from saved data
+        estimator.totals = { ...savedEstimator.totals }
+        
+        // Merge category data
+        savedEstimator.categories.forEach(savedCategory => {
+          const defaultCategory = estimator.categories.find(cat => cat.name === savedCategory.name)
+          
+          if (defaultCategory) {
+            // Update category totals from saved data
+            defaultCategory.subtotals = { ...savedCategory.subtotals }
+            
+            // Merge items: keep default items, but update with saved data if they exist
+            savedCategory.items.forEach(savedItem => {
+              const defaultItem = defaultCategory.items.find(item => item.name === savedItem.name)
+              
+              if (defaultItem) {
+                // Update default item with saved data
+                defaultItem.projected = savedItem.projected
+                defaultItem.actual = savedItem.actual
+                defaultItem.currentPaid = savedItem.currentPaid
+                defaultItem.comments = savedItem.comments
+                defaultItem.party = savedItem.party
+                defaultItem.status = savedItem.status
+                defaultItem.percentComplete = savedItem.percentComplete
+                defaultItem.lineId = savedItem.lineId
+                // Recalculate derived fields
+                defaultItem.variance = defaultItem.actual - defaultItem.projected
+                defaultItem.amountDue = defaultItem.actual - defaultItem.currentPaid
+              } else {
+                // This is a new item that was added by user, add it to the category
+                defaultCategory.addItem({
+                  name: savedItem.name,
+                  projected: savedItem.projected,
+                  actual: savedItem.actual,
+                  currentPaid: savedItem.currentPaid,
+                  comments: savedItem.comments,
+                  party: savedItem.party,
+                  status: savedItem.status,
+                  percentComplete: savedItem.percentComplete,
+                  lineId: savedItem.lineId
+                })
+              }
+            })
+            
+            // Recalculate category totals
+            defaultCategory.updateSubtotals()
+          } else {
+            // This is a new category that was added by user, add it
+            const newCategory = estimator.addCategory({
+              name: savedCategory.name,
+              order: savedCategory.order
+            })
+            
+            // Add all items from this saved category
+            savedCategory.items.forEach(savedItem => {
+              newCategory.addItem({
+                name: savedItem.name,
+                projected: savedItem.projected,
+                actual: savedItem.actual,
+                currentPaid: savedItem.currentPaid,
+                comments: savedItem.comments,
+                party: savedItem.party,
+                status: savedItem.status,
+                percentComplete: savedItem.percentComplete,
+                lineId: savedItem.lineId
+              })
+            })
+          }
+        })
+        
+        // Recalculate estimator totals
+        estimator.updateTotals()
+      }
+      
+      return estimator
+    } catch (error) {
+      console.error('Error creating merged estimator:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Get all existing Item Groups from Frappe
+   */
+  async getItemGroups() {
+    try {
+      const response = await fetch('/api/method/ex_forcast.api.call_and_save_contractor_estimator.get_item_groups', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Frappe-CSRF-Token': getCSRFToken()
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      const actualResult = result.message || result
+      
+      if (!actualResult.success) {
+        throw new Error(actualResult.error || 'Failed to fetch item groups')
+      }
+      
+      console.log('Service - Item Groups fetched:', actualResult.data)
+      return actualResult.data
+    } catch (error) {
+      console.error('Error fetching item groups:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Create a new Item Group in Frappe
+   */
+  async createItemGroup(itemGroupName) {
+    try {
+      const response = await fetch('/api/method/ex_forcast.api.call_and_save_contractor_estimator.create_item_group', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-Frappe-CSRF-Token': getCSRFToken()
         },
         body: JSON.stringify({
-          project_name: projectName
+          item_group_name: itemGroupName
         })
       })
 
       if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`)
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const result = await response.json()
       const actualResult = result.message || result
-
+      
       if (!actualResult.success) {
-        throw new Error(actualResult.error || 'Failed to fetch contractor estimator data')
+        throw new Error(actualResult.error || 'Failed to create item group')
       }
-
-      // Parse the data into our models
-      this.estimators = (actualResult.data || []).map(estimatorData => {
-        return new ContractorEstimator(estimatorData)
-      })
-      return this.estimators
+      
+      console.log('Service - Item Group created:', actualResult)
+      return actualResult
     } catch (error) {
-      console.error('Error fetching contractor estimator data:', error)
-      
-      // Fallback to local storage or create default data
-      if (this.estimators.length === 0) {
-        this.estimators = [ContractorEstimator.createWithDefaultCategories()]
-      }
-      
+      console.error('Error creating item group:', error)
       throw error
     }
   }
+
+  /**
+   * Create a new Item in Frappe
+   */
+  async createItem(itemName, itemGroup) {
+    try {
+      const response = await fetch('/api/method/ex_forcast.api.call_and_save_contractor_estimator.create_item', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Frappe-CSRF-Token': getCSRFToken()
+        },
+        body: JSON.stringify({
+          item_name: itemName,
+          item_group: itemGroup
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      const actualResult = result.message || result
+      
+      if (!actualResult.success) {
+        throw new Error(actualResult.error || 'Failed to create item')
+      }
+      
+      console.log('Service - Item created:', actualResult)
+      return actualResult
+    } catch (error) {
+      console.error('Error creating item:', error)
+      throw error
+    }
+  }
+
+
 
   /**
    * Save contractor estimator data to API
@@ -371,6 +654,47 @@ class ContractorEstimatorService {
       totalProjected: estimator.totals.projected,
       totalActual: estimator.totals.actual,
       totalVariance: estimator.totals.variance
+    }
+  }
+
+  /**
+   * Delete a contractor estimator item from the database
+   * @param {string} estimatorId - The estimator ID
+   * @param {string} itemLineId - The item line ID to delete
+   * @returns {Promise<Object>} - API response
+   */
+  async deleteItem(estimatorId, itemLineId) {
+    try {
+      const response = await fetch('/api/method/ex_forcast.api.call_and_save_contractor_estimator.delete_contractor_estimator_item', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          estimator_id: estimatorId,
+          item_line_id: itemLineId
+        })
+      })
+
+      const result = await response.json()
+      
+      if (result.message && result.message.success) {
+        return {
+          success: true,
+          message: result.message.message
+        }
+      } else {
+        return {
+          success: false,
+          error: result.message?.error || 'Failed to delete item'
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error)
+      return {
+        success: false,
+        error: error.message || 'Network error occurred'
+      }
     }
   }
 }

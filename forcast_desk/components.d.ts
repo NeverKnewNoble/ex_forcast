@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AddCategoryModal: typeof import('./src/components/ui/contractor_estimator/AddCategoryModal.vue')['default']
     Alert: typeof import('./src/components/ui/Alert.vue')['default']
     DataRecoveryModal: typeof import('./src/components/ui/DataRecoveryModal.vue')['default']
     EmployeeBenefitsTable: typeof import('./src/components/ui/payroll/EmployeeBenefitsTable.vue')['default']
