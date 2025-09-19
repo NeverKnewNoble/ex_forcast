@@ -25,6 +25,22 @@
                   <h1 class="text-2xl font-bold text-gray-900">Contractor Estimator</h1>
                 </div>
                 <p class="text-sm text-gray-500">Manage and track your construction project estimates</p>
+                
+                <!-- Default Company Indicator -->
+                <div v-if="defaultCompany" class="mt-3">
+                  <div class="flex items-center gap-2 text-xs font-medium text-violet-600 bg-violet-50 px-3 py-2 rounded-lg border border-violet-200">
+                    <div class="w-2 h-2 bg-violet-500 rounded-full"></div>
+                    Company: {{ defaultCompany.company_name }} ({{ defaultCompany.abbr }})
+                  </div>
+                </div>
+                
+                <!-- GL Balance Loading Indicator -->
+                <div v-if="isLoadingGLBalances" class="mt-3">
+                  <div class="flex items-center gap-2 text-xs font-medium text-blue-600 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
+                    <Loader2 class="w-3 h-3 animate-spin" />
+                    Loading GL balances...
+                  </div>
+                </div>
               </div>
 
               <!-- Project Selection Section -->
@@ -290,29 +306,29 @@
                             type="text"
                             class="w-full h-full px-4 py-0 border-0 bg-transparent text-sm focus:ring-2 focus:ring-violet-500 focus:bg-white focus:shadow-sm font-medium transition-all duration-200"
                             placeholder="Enter item name"
-                            @input="markAsUnsaved"
+                            @input="markAsUnsaved(); handleItemNameChange(item)"
                           />
                         </td>
                         
                         <!-- Projected Subtotal -->
                         <td class="p-0 text-sm">
                           <input
-                            v-model.number="item.projected"
-                            type="number"
-                            step="0.01"
+                            :value="formatNumber(item.projected)"
+                            @input="handleNumberInput($event, item, 'projected')"
+                            type="text"
                             class="w-full h-full px-2 py-0 text-right border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            @input="markAsUnsaved"
+                            placeholder="0"
                           />
                         </td>
                         
                         <!-- Actual Subtotal -->
                         <td class="p-0 text-sm">
                           <input
-                            v-model.number="item.actual"
-                            type="number"
-                            step="0.01"
+                            :value="formatNumber(item.actual)"
+                            @input="handleNumberInput($event, item, 'actual')"
+                            type="text"
                             class="w-full h-full px-2 py-0 text-right border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                            @input="markAsUnsaved"
+                            placeholder="0"
                           />
                         </td>
                         
@@ -359,11 +375,11 @@
                         <!-- Current Paid -->
                         <td class="p-0 text-sm">
                           <input
-                            v-model.number="item.currentPaid"
-                            type="number"
-                            step="0.01"
+                            :value="formatNumber(item.currentPaid)"
+                            @input="handleNumberInput($event, item, 'currentPaid')"
+                            type="text"
                             class="w-full h-full px-2 py-0 text-right border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            @input="markAsUnsaved"
+                            placeholder="0"
                           />
                         </td>
                         
@@ -504,7 +520,9 @@ import {
 import { 
   formatCurrency,
   getVarianceColorClass,
-  generateLineId
+  generateLineId,
+  formatNumber,
+  parseNumber
 } from '@/components/utility/contractor_estimator/ContractorEstimatorUtils.js'
 import { 
   ChevronLeft, 
@@ -540,6 +558,11 @@ const newEstimatorLocation = ref('')
 // Contractor estimator data
 const estimators = ref([])
 const currentEstimator = ref(null)
+
+// GL Balance and Company data
+const defaultCompany = ref(null)
+const isLoadingGLBalances = ref(false)
+const glBalanceResults = ref(null)
 
 // Status options
 const statusOptions = STATUS_OPTIONS
@@ -643,6 +666,10 @@ const loadData = async (forceReload = false) => {
   } finally {
     isSaving.value = false
   }
+  
+  // Auto-load GL balances and default company after data is loaded
+  await loadDefaultCompany()
+  await autoLoadGLBalances()
 }
 
 // Methods
@@ -653,6 +680,17 @@ const markAsUnsaved = () => {
   if (currentEstimator.value) {
     currentEstimator.value.updateTotals()
   }
+}
+
+const handleNumberInput = (event, item, field) => {
+  const inputValue = event.target.value
+  const numericValue = parseNumber(inputValue)
+  
+  // Update the item's field with the parsed numeric value
+  item[field] = numericValue
+  
+  // Mark as unsaved and update calculations
+  markAsUnsaved()
 }
 
 const saveChanges = async () => {
@@ -722,6 +760,28 @@ const addItemToCategory = (categoryId) => {
     const newItem = category.addItem()
     currentEstimator.value.updateTotals()
     markAsUnsaved()
+  }
+}
+
+// Auto-load GL balance when item name changes
+const handleItemNameChange = async (item) => {
+  if (item.name && item.name.trim()) {
+    // Auto-load GL balance after a short delay to allow user to finish typing
+    setTimeout(async () => {
+      try {
+        const result = await contractorEstimatorService.populateActualSubtotalFromGL(item, {
+          fromDate: '2025-01-01',
+          toDate: '2025-12-31'
+        })
+        
+        if (result.success) {
+          markAsUnsaved() // Mark as unsaved since we updated actual value
+        }
+      } catch (error) {
+        // Silently fail - don't show error for every keystroke
+        console.warn(`Failed to load GL balance for "${item.name}":`, error.message)
+      }
+    }, 1500) // 1.5 second delay
   }
 }
 
@@ -956,6 +1016,50 @@ const handleProjectChange = async (newProject) => {
   } catch (error) {
     console.error('Error switching project:', error)
     alertService.error('Failed to switch project')
+  }
+}
+
+// GL Balance and Company functions
+const loadDefaultCompany = async () => {
+  try {
+    const company = await contractorEstimatorService.getDefaultCompany()
+    defaultCompany.value = company
+  } catch (error) {
+    console.warn('Failed to load default company:', error.message)
+    defaultCompany.value = null
+  }
+}
+
+const autoLoadGLBalances = async () => {
+  if (!currentEstimator.value) return
+  
+  try {
+    isLoadingGLBalances.value = true
+    
+    const result = await contractorEstimatorService.autoLoadGLBalancesForEstimator(currentEstimator.value, {
+      fromDate: '2025-01-01', // You can make this configurable
+      toDate: '2025-12-31'    // You can make this configurable
+    })
+    
+    glBalanceResults.value = result
+    
+    if (result.success && result.successful > 0) {
+      // Mark as unsaved since we updated actual values
+      markAsUnsaved()
+      
+      // Show success message
+      alertService.success(
+        `GL balances loaded: ${result.successful} items updated` + 
+        (result.failed > 0 ? `, ${result.failed} failed` : '')
+      )
+    } else if (result.success && result.failed > 0) {
+      alertService.warning(`GL balance loading completed with ${result.failed} failures`)
+    }
+  } catch (error) {
+    console.error('Error auto-loading GL balances:', error)
+    alertService.warning('Failed to auto-load GL balances: ' + error.message)
+  } finally {
+    isLoadingGLBalances.value = false
   }
 }
 

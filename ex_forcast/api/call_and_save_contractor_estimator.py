@@ -1,6 +1,7 @@
 import frappe
 from collections import defaultdict
 import json
+from datetime import datetime
 
 
 # ! Test Connection
@@ -318,8 +319,10 @@ def save_contractor_estimator_data(data, project_name=None):
                             # Generate a line_id if it's null or empty
                             line_id = item_data.get("lineId")
                             if not line_id or line_id == "null" or line_id == "" or line_id is None:
-                                import uuid
-                                line_id = str(uuid.uuid4())[:8]  # Generate a short unique ID
+                                # Generate a formatted line ID like "01.01" instead of random UUID
+                                category_order = category_data.get("order", 1)
+                                item_index = items.index(item_data) + 1
+                                line_id = f"{category_order:02d}.{item_index:02d}"
 
                             # Get the Item document name (item_name is a Link field)
                             item_name_string = item_data.get("name") or ""
@@ -824,6 +827,474 @@ def delete_contractor_estimator_item(estimator_id, item_line_id):
     except Exception as e:
         frappe.logger().error(f"Error deleting Contractor Estimator Item: {str(e)}")
         frappe.db.rollback()
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
+@frappe.whitelist()
+def get_general_account_balances(company=None, from_date=None, to_date=None):
+    """
+    Get general account balances for the company (fallback approach when item-specific GL is not available)
+    
+    Args:
+        company (str): Company name (optional - uses default company if not provided)
+        from_date (str): Start date for GL entries (YYYY-MM-DD)
+        to_date (str): End date for GL entries (YYYY-MM-DD)
+    
+    Returns:
+        dict: General account balances
+    """
+    try:
+        # Get default company if not provided
+        if not company:
+            company = frappe.defaults.get_user_default("Company")
+            if not company:
+                company = frappe.db.get_default("company")
+        
+        # Validate company exists
+        if not frappe.db.exists("Company", company):
+            return {
+                "success": False,
+                "error": f"Company '{company}' not found"
+            }
+        
+        # Build conditions for GL Entry query
+        conditions = ["gle.company = %s"]
+        params = [company]
+        
+        if from_date:
+            conditions.append("gle.posting_date >= %s")
+            params.append(from_date)
+        
+        if to_date:
+            conditions.append("gle.posting_date <= %s")
+            params.append(to_date)
+        
+        where_clause = "WHERE " + " AND ".join(conditions)
+        
+        # Query to get GL entries for the company
+        sql_query = f"""
+            SELECT 
+                gle.account,
+                acc.account_name,
+                acc.account_type,
+                acc.company,
+                acc.parent_account,
+                acc.is_group,
+                SUM(gle.debit) as total_debit,
+                SUM(gle.credit) as total_credit,
+                SUM(gle.debit) - SUM(gle.credit) as net_amount
+            FROM `tabGL Entry` gle
+            INNER JOIN `tabAccount` acc ON gle.account = acc.name
+            {where_clause}
+            GROUP BY gle.account, acc.account_name, acc.account_type, acc.company, 
+                     acc.parent_account, acc.is_group
+            HAVING (SUM(gle.debit) != 0 OR SUM(gle.credit) != 0)
+            ORDER BY acc.account_type, acc.account_name
+        """
+        
+        gl_entries = frappe.db.sql(sql_query, params, as_dict=True)
+        
+        # Debug logging for general account balances
+        frappe.logger().info(f"General GL query returned {len(gl_entries)} entries for company '{company}'")
+        if gl_entries:
+            for entry in gl_entries[:3]:  # Log first 3 entries
+                total_activity = (entry.total_debit or 0) + (entry.total_credit or 0)
+                net_balance = (entry.total_debit or 0) - (entry.total_credit or 0)
+                balance_amount = abs(net_balance)
+                frappe.logger().info(f"Found account: {entry.account_name}")
+                frappe.logger().info(f"  - Total Debit: {entry.total_debit or 0}")
+                frappe.logger().info(f"  - Total Credit: {entry.total_credit or 0}")
+                frappe.logger().info(f"  - Total Activity (Debit + Credit): {total_activity}")
+                frappe.logger().info(f"  - Net Balance (Debit - Credit): {net_balance}")
+                frappe.logger().info(f"  - Using Balance Column for Actual Subtotal: {balance_amount}")
+        
+        if not gl_entries:
+            return {
+                "success": True,
+                "data": {
+                    "company": company,
+                    "accounts": [],
+                    "total_balance": 0,
+                    "message": f"No GL entries found for company '{company}'"
+                }
+            }
+        
+        # Calculate balance amounts for each account (using Balance column values)
+        accounts_data = []
+        total_balance = 0
+        
+        for entry in gl_entries:
+            # Calculate the balance amount (net amount from GL Entry)
+            total_debit = entry.total_debit or 0
+            total_credit = entry.total_credit or 0
+            net_amount = entry.net_amount or 0  # This is the Balance column value
+            balance_amount = abs(net_amount)  # Use absolute value for display
+            
+            # Determine if it's debit or credit balance
+            if net_amount > 0:
+                balance_type = "Debit"
+            elif net_amount < 0:
+                balance_type = "Credit"
+            else:
+                balance_type = "Balanced"
+            
+            account_data = {
+                "account": entry.account,
+                "account_name": entry.account_name,
+                "account_type": entry.account_type,
+                "company": entry.company,
+                "parent_account": entry.parent_account,
+                "is_group": entry.is_group,
+                "total_debit": total_debit,
+                "total_credit": total_credit,
+                "net_amount": net_amount,  # Net balance (debit - credit)
+                "balance_type": balance_type,
+                "total_balance": balance_amount  # This is what goes in Actual Subtotal (Balance column)
+            }
+            
+            accounts_data.append(account_data)
+            total_balance += balance_amount
+        
+        return {
+            "success": True,
+            "data": {
+                "company": company,
+                "accounts": accounts_data,
+                "total_balance": total_balance,
+                "filters_applied": {
+                    "from_date": from_date,
+                    "to_date": to_date,
+                    "company": company
+                },
+                "generated_at": datetime.now().isoformat()
+            }
+        }
+        
+    except Exception as e:
+        frappe.logger().error(f"Error getting general account balances: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
+@frappe.whitelist()
+def get_item_gl_balance(item_name, from_date=None, to_date=None, company=None):
+    """
+    Get General Ledger closing balance for an item by matching item name to account name
+    
+    Args:
+        item_name (str): Item name (like "Assim")
+        from_date (str): Start date for GL entries (YYYY-MM-DD)
+        to_date (str): End date for GL entries (YYYY-MM-DD) 
+        company (str): Company name (optional - uses default company if not provided)
+    
+    Returns:
+        dict: GL closing balance data for the item
+    """
+    try:
+        # Get default company if not provided
+        if not company:
+            company = frappe.defaults.get_user_default("Company")
+            if not company:
+                company = frappe.db.get_default("company")
+        
+        # Validate item exists
+        if not frappe.db.exists("Item", item_name):
+            return {
+                "success": False,
+                "error": f"Item '{item_name}' not found"
+            }
+        
+        # Validate company exists
+        if not frappe.db.exists("Company", company):
+            return {
+                "success": False,
+                "error": f"Company '{company}' not found"
+            }
+        
+        # Get item details
+        item_doc = frappe.get_doc("Item", item_name)
+        item_code = item_doc.item_code
+        item_name_field = item_doc.item_name
+        
+        # Debug logging
+        frappe.logger().info(f"Looking up GL balance for item: '{item_name}' (code: '{item_code}') in company: '{company}'")
+        
+        # Check if GL Entry table has item_code column
+        try:
+            # Test if item_code column exists
+            test_query = "SELECT item_code FROM `tabGL Entry` LIMIT 1"
+            frappe.db.sql(test_query)
+            has_item_code = True
+        except:
+            has_item_code = False
+        
+        # Build conditions based on available columns
+        if has_item_code:
+            # Use item_code if available
+            conditions = ["gle.item_code = %s", "gle.company = %s"]
+            params = [item_code, company]
+            
+            select_fields = """
+                gle.account,
+                acc.account_name,
+                acc.account_type,
+                acc.company,
+                acc.parent_account,
+                acc.is_group,
+                gle.item_code,
+                gle.item_name,
+                SUM(gle.debit) as total_debit,
+                SUM(gle.credit) as total_credit,
+                SUM(gle.debit) - SUM(gle.credit) as net_amount
+            """
+            
+            group_by = """
+                gle.account, acc.account_name, acc.account_type, acc.company, 
+                acc.parent_account, acc.is_group, gle.item_code, gle.item_name
+            """
+        else:
+            # Fallback: Use account-based approach for items
+            # Find accounts that might be related to this item
+            conditions = ["gle.company = %s"]
+            params = [company]
+            
+            # Look for accounts that might contain the item name or be inventory-related
+            # Try multiple matching strategies for better accuracy
+            item_related_conditions = [
+                "acc.account_name = %s",  # Exact match first
+                "acc.account_name LIKE %s",  # Contains item name
+                "acc.account_name LIKE %s",  # Contains item code
+                "acc.account_name LIKE %s",  # Case-insensitive match
+                "acc.account_type IN ('Asset', 'Expense', 'Cost of Goods Sold', 'Income')"
+            ]
+            params.extend([
+                item_name,  # Exact match
+                f"%{item_name}%",  # Contains item name
+                f"%{item_code}%",  # Contains item code
+                f"%{item_name.lower()}%"  # Case-insensitive
+            ])
+            
+            conditions.append(f"({' OR '.join(item_related_conditions)})")
+            
+            select_fields = """
+                gle.account,
+                acc.account_name,
+                acc.account_type,
+                acc.company,
+                acc.parent_account,
+                acc.is_group,
+                %s as item_code,
+                %s as item_name,
+                SUM(gle.debit) as total_debit,
+                SUM(gle.credit) as total_credit,
+                SUM(gle.debit) - SUM(gle.credit) as net_amount
+            """ % (frappe.db.escape(item_code), frappe.db.escape(item_name))
+            
+            group_by = """
+                gle.account, acc.account_name, acc.account_type, acc.company, 
+                acc.parent_account, acc.is_group
+            """
+        
+        if from_date:
+            conditions.append("gle.posting_date >= %s")
+            params.append(from_date)
+        
+        if to_date:
+            conditions.append("gle.posting_date <= %s")
+            params.append(to_date)
+        
+        where_clause = "WHERE " + " AND ".join(conditions)
+        
+        # Query to get GL entries for the item with account details
+        sql_query = f"""
+            SELECT 
+                {select_fields}
+            FROM `tabGL Entry` gle
+            INNER JOIN `tabAccount` acc ON gle.account = acc.name
+            {where_clause}
+            GROUP BY {group_by}
+            HAVING (SUM(gle.debit) != 0 OR SUM(gle.credit) != 0)
+            ORDER BY acc.account_type, acc.account_name
+        """
+        
+        gl_entries = frappe.db.sql(sql_query, params, as_dict=True)
+        
+        # Debug logging
+        frappe.logger().info(f"GL query returned {len(gl_entries)} entries for item '{item_name}'")
+        if gl_entries:
+            for entry in gl_entries[:3]:  # Log first 3 entries
+                total_activity = (entry.total_debit or 0) + (entry.total_credit or 0)
+                net_balance = (entry.total_debit or 0) - (entry.total_credit or 0)
+                balance_amount = abs(net_balance)
+                frappe.logger().info(f"Found account: {entry.account_name}")
+                frappe.logger().info(f"  - Total Debit: {entry.total_debit or 0}")
+                frappe.logger().info(f"  - Total Credit: {entry.total_credit or 0}")
+                frappe.logger().info(f"  - Total Activity (Debit + Credit): {total_activity}")
+                frappe.logger().info(f"  - Net Balance (Debit - Credit): {net_balance}")
+                frappe.logger().info(f"  - Using Balance Column for Actual Subtotal: {balance_amount}")
+        
+        if not gl_entries:
+            return {
+                "success": True,
+                "data": {
+                    "item_name": item_name,
+                    "item_code": item_code,
+                    "company": company,
+                    "accounts": [],
+                    "total_balance": 0,
+                    "message": f"No GL entries found for item '{item_name}' in company '{company}'",
+                    "method_used": "item_code" if has_item_code else "account_based"
+                }
+            }
+        
+        # Calculate balance amounts for each account (using Balance column values)
+        accounts_data = []
+        total_balance = 0
+        
+        for entry in gl_entries:
+            # Calculate the balance amount (net amount from GL Entry)
+            total_debit = entry.total_debit or 0
+            total_credit = entry.total_credit or 0
+            net_amount = entry.net_amount or 0  # This is the Balance column value
+            balance_amount = abs(net_amount)  # Use absolute value for display
+            
+            # Determine if it's debit or credit balance
+            if net_amount > 0:
+                balance_type = "Debit"
+            elif net_amount < 0:
+                balance_type = "Credit"
+            else:
+                balance_type = "Balanced"
+            
+            account_data = {
+                "account": entry.account,
+                "account_name": entry.account_name,
+                "account_type": entry.account_type,
+                "company": entry.company,
+                "parent_account": entry.parent_account,
+                "is_group": entry.is_group,
+                "item_code": entry.item_code,
+                "item_name": entry.item_name,
+                "total_debit": total_debit,
+                "total_credit": total_credit,
+                "net_amount": net_amount,  # Net balance (debit - credit)
+                "balance_type": balance_type,
+                "total_balance": balance_amount  # This is what goes in Actual Subtotal (Balance column)
+            }
+            
+            accounts_data.append(account_data)
+            total_balance += balance_amount
+        
+        return {
+            "success": True,
+            "data": {
+                "item_name": item_name,
+                "item_code": item_code,
+                "company": company,
+                "accounts": accounts_data,
+                "total_balance": total_balance,
+                "primary_account": accounts_data[0] if accounts_data else None,  # First account for display
+                "method_used": "item_code" if has_item_code else "account_based",
+                "filters_applied": {
+                    "item_name": item_name,
+                    "from_date": from_date,
+                    "to_date": to_date,
+                    "company": company
+                },
+                "generated_at": datetime.now().isoformat()
+            }
+        }
+        
+    except Exception as e:
+        frappe.logger().error(f"Error getting GL balance for item {item_name}: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
+@frappe.whitelist()
+def get_default_company():
+    """
+    Get the default company for the current user/site
+    
+    Returns:
+        dict: Default company information
+    """
+    try:
+        # Try user default first, then system default
+        user_company = frappe.defaults.get_user_default("Company")
+        system_company = frappe.db.get_default("company")
+        
+        default_company = user_company or system_company
+        
+        if not default_company:
+            return {
+                "success": False,
+                "error": "No default company found. Please set a default company in User Settings or System Defaults."
+            }
+        
+        # Get company details
+        company_doc = frappe.get_doc("Company", default_company)
+        
+        return {
+            "success": True,
+            "data": {
+                "name": company_doc.name,
+                "company_name": company_doc.company_name,
+                "abbr": company_doc.abbr,
+                "default_currency": company_doc.default_currency,
+                "country": company_doc.country,
+                "is_default": True
+            }
+        }
+        
+    except Exception as e:
+        frappe.logger().error(f"Error getting default company: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@frappe.whitelist()
+def debug_accounts(company=None, search_term=None):
+    """
+    Debug API to see what accounts exist in the system
+    """
+    try:
+        if not company:
+            company = frappe.db.get_default("Company")
+        
+        # Get all accounts for the company
+        accounts = frappe.get_all(
+            "Account",
+            filters={"company": company, "is_group": 0},
+            fields=["name", "account_name", "account_type", "parent_account"],
+            order_by="account_name"
+        )
+        
+        # Filter by search term if provided
+        if search_term:
+            search_lower = search_term.lower()
+            accounts = [acc for acc in accounts if search_lower in acc.account_name.lower()]
+        
+        return {
+            "success": True,
+            "data": {
+                "company": company,
+                "search_term": search_term,
+                "accounts": accounts,
+                "count": len(accounts)
+            }
+        }
+        
+    except Exception as e:
+        frappe.logger().error(f"Error debugging accounts: {str(e)}")
         return {
             "success": False,
             "error": str(e)

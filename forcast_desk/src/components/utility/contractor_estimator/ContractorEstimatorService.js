@@ -10,6 +10,7 @@ class ContractorEstimatorService {
   constructor() {
     this.estimators = []
     this.currentProject = null
+    this.autoLoadGLBalances = true // Set to false to disable auto-loading
   }
 
   /**
@@ -695,6 +696,331 @@ class ContractorEstimatorService {
         success: false,
         error: error.message || 'Network error occurred'
       }
+    }
+  }
+
+  /**
+   * Simple hash function to create deterministic but varied values for item names
+   */
+  simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash);
+  }
+
+  /**
+   * Get GL balance for an item to populate Actual Subtotal
+   */
+  async getItemGLBalance(itemName, filters = {}) {
+    try {
+      const response = await fetch('/api/method/ex_forcast.api.call_and_save_contractor_estimator.get_item_gl_balance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Frappe-CSRF-Token': getCSRFToken()
+        },
+        body: JSON.stringify({
+          item_name: itemName,
+          from_date: filters.fromDate,
+          to_date: filters.toDate,
+          company: filters.company // Optional - API will use default if not provided
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.message && result.message.success) {
+        return result.message.data;
+      } else {
+        throw new Error(result.message?.error || 'Failed to fetch GL balance');
+      }
+    } catch (error) {
+      console.error('Error fetching GL balance:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Auto-populate Actual Subtotal from GL balance for an item
+   */
+  async populateActualSubtotalFromGL(item, filters = {}) {
+    try {
+      // First try item-specific GL balance
+      try {
+        const glData = await this.getItemGLBalance(item.name, filters);
+        
+        if (glData && glData.primary_account) {
+          const balance = glData.primary_account.total_balance || 0;
+          
+          // Only update if we found actual GL data for this item
+          if (balance > 0) {
+            // Update the item's actual amount with GL balance
+            item.actual = Math.abs(balance); // Use absolute value for display
+            
+            // Mark as unsaved
+            item._unsaved = true;
+            
+            return {
+              success: true,
+              balance: balance,
+              account: glData.primary_account.account_name,
+              company: glData.company,
+              method: glData.method_used || 'item_specific'
+            };
+          } else {
+            // No GL data found for this specific item
+            return {
+              success: false,
+              message: 'No GL transactions found for this item'
+            };
+          }
+        }
+      } catch (itemError) {
+        console.warn('Item-specific GL balance failed:', itemError.message);
+      }
+      
+      // If item-specific lookup failed, try to find exact account match by name
+      try {
+        const generalGlData = await this.getGeneralAccountBalances(filters);
+        
+        if (generalGlData && generalGlData.accounts && generalGlData.accounts.length > 0) {
+          // Try to find exact account match by item name
+          const itemName = item.name.toLowerCase();
+          const exactMatch = generalGlData.accounts.find(acc => 
+            acc.account_name.toLowerCase().includes(itemName) || 
+            itemName.includes(acc.account_name.toLowerCase())
+          );
+          
+          if (exactMatch && exactMatch.total_balance > 0) {
+            // Found exact account match
+            item.actual = Math.abs(exactMatch.total_balance);
+            item._unsaved = true;
+            
+            return {
+              success: true,
+              balance: exactMatch.total_balance,
+              account: exactMatch.account_name,
+              company: generalGlData.company,
+              method: 'exact_account_match'
+            };
+          }
+        }
+      } catch (generalError) {
+        console.warn('General account lookup failed:', generalError.message);
+      }
+      
+      // If no GL data found for this item, don't assign any balance
+      return {
+        success: false,
+        message: 'No GL transactions found for this item'
+      };
+      
+    } catch (error) {
+      console.error('Error populating actual subtotal:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Get general account balances (fallback approach)
+   */
+  async getGeneralAccountBalances(filters = {}) {
+    try {
+      const response = await fetch('/api/method/ex_forcast.api.call_and_save_contractor_estimator.get_general_account_balances', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Frappe-CSRF-Token': getCSRFToken()
+        },
+        body: JSON.stringify({
+          from_date: filters.fromDate,
+          to_date: filters.toDate,
+          company: filters.company // Optional - API will use default if not provided
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.message && result.message.success) {
+        return result.message.data;
+      } else {
+        throw new Error(result.message?.error || 'Failed to fetch general account balances');
+      }
+    } catch (error) {
+      console.error('Error fetching general account balances:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get default company information
+   */
+  async getDefaultCompany() {
+    try {
+      const response = await fetch('/api/method/ex_forcast.api.call_and_save_contractor_estimator.get_default_company', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Frappe-CSRF-Token': getCSRFToken()
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.message && result.message.success) {
+        return result.message.data;
+      } else {
+        throw new Error(result.message?.error || 'Failed to fetch default company');
+      }
+    } catch (error) {
+      console.error('Error fetching default company:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Toggle auto-loading of GL balances
+   */
+  setAutoLoadGLBalances(enabled) {
+    this.autoLoadGLBalances = enabled;
+    console.log(`Auto-loading GL balances ${enabled ? 'enabled' : 'disabled'}`);
+  }
+
+  /**
+   * Debug function to test GL balance lookup
+   * Call this from browser console: contractorEstimatorService.debugGLBalance('Admin Fees')
+   */
+  async debugGLBalance(itemName) {
+    console.log(`=== Debugging GL Balance for: ${itemName} ===`);
+    
+    try {
+      // Test 1: Item-specific GL balance
+      console.log('1. Testing item-specific GL balance...');
+      const itemResult = await this.getItemGLBalance(itemName);
+      console.log('Item-specific result:', itemResult);
+      
+      // Test 2: General account balances
+      console.log('2. Testing general account balances...');
+      const generalResult = await this.getGeneralAccountBalances();
+      console.log('General result:', generalResult);
+      
+      // Test 3: Debug accounts API
+      console.log('3. Testing debug accounts API...');
+      const debugResult = await this.debugAccounts(itemName);
+      console.log('Debug accounts result:', debugResult);
+      
+      return {
+        itemSpecific: itemResult,
+        general: generalResult,
+        debug: debugResult
+      };
+      
+    } catch (error) {
+      console.error('Debug error:', error);
+      return { error: error.message };
+    }
+  }
+
+  /**
+   * Debug accounts API call
+   */
+  async debugAccounts(searchTerm) {
+    try {
+      const response = await fetch('/api/method/ex_forcast.api.call_and_save_contractor_estimator.debug_accounts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          search_term: searchTerm
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error('Error debugging accounts:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Auto-load GL balances for all items in an estimator
+   */
+  async autoLoadGLBalancesForEstimator(estimator, filters = {}) {
+    try {
+      // Check if auto-loading is enabled
+      if (!this.autoLoadGLBalances) {
+        return {
+          success: true,
+          total: 0,
+          successful: 0,
+          failed: 0,
+          results: [],
+          message: 'Auto-loading GL balances is disabled'
+        };
+      }
+
+      const promises = [];
+      
+      // Load GL balances for all items across all categories
+      for (const category of estimator.categories) {
+        for (const item of category.items) {
+          if (item.name && item.name.trim()) {
+            promises.push(
+              this.populateActualSubtotalFromGL(item, filters)
+                .catch(error => {
+                  console.warn(`Failed to load GL balance for item "${item.name}":`, error.message);
+                  return { success: false, item: item.name, error: error.message };
+                })
+            );
+          }
+        }
+      }
+      
+      // Wait for all GL balance loads to complete
+      const results = await Promise.all(promises);
+      
+      // Count successes and failures
+      const successful = results.filter(r => r.success).length;
+      const failed = results.filter(r => !r.success).length;
+      
+      return {
+        success: true,
+        total: promises.length,
+        successful: successful,
+        failed: failed,
+        results: results
+      };
+    } catch (error) {
+      console.error('Error auto-loading GL balances:', error);
+      return {
+        success: false,
+        error: error.message
+      };
     }
   }
 }
