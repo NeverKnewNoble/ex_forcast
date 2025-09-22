@@ -42,6 +42,38 @@ export const parseCurrency = (currencyString) => {
 }
 
 /**
+ * Format number with commas for thousands
+ */
+export const formatNumber = (value) => {
+  if (value === null || value === undefined || value === '') {
+    return ''
+  }
+  
+  const num = parseFloat(value)
+  if (isNaN(num)) {
+    return value.toString()
+  }
+  
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  }).format(num)
+}
+
+/**
+ * Parse number string (removes commas and converts to number)
+ */
+export const parseNumber = (numberString) => {
+  if (!numberString) return 0
+  
+  // Remove commas and spaces
+  const cleaned = numberString.toString().replace(/[,\s]/g, '')
+  const parsed = parseFloat(cleaned)
+  
+  return isNaN(parsed) ? 0 : parsed
+}
+
+/**
  * Validate numeric input
  */
 export const validateNumericInput = (value, min = null, max = null) => {

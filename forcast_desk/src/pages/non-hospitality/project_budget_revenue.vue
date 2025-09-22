@@ -85,6 +85,14 @@
                   <Plus class="w-4 h-4 text-violet-600" />
                   Quick Actions
                 </h3>
+
+                <button 
+                  @click="addNewProject" 
+                  class="inline-flex items-center justify-center w-full gap-2 mb-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-xl hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform font-medium"
+                >
+                  <FolderPlus class="w-5 h-5" />
+                  Add New Project
+                </button>
                 
                 <div class="flex gap-2">
                   <button 
