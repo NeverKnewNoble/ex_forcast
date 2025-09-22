@@ -20,7 +20,8 @@ import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js'
       display: 'construction_budget_display',
       upsert: 'upsert_construction_budget',
       delete: 'delete_construction_budget_project',
-      summary: 'get_construction_budget_summary'
+      summary: 'get_construction_budget_summary',
+      listProjects: 'list_projects'
     }
   }
   
@@ -33,6 +34,7 @@ import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js'
       this.isLoading = false
       this.error = null
       this.lastSync = null
+      this.cachedProjectOptions = []
     }
   
     /**
@@ -83,6 +85,30 @@ import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js'
       }
     }
   
+    /**
+     * Fetch available ERPNext Projects for selection (docname + title)
+     */
+    async fetchAvailableProjects(search = '', limit = 100) {
+      try {
+        const url = `${API_CONFIG.baseUrl}.${API_CONFIG.endpoints.listProjects}?search=${encodeURIComponent(search)}&limit=${limit}`
+        const response = await fetch(url, {
+          headers: {
+            'X-Frappe-CSRF-Token': getCSRFToken()
+          }
+        })
+        const result = await response.json()
+        const actual = result.message || result
+        if (!actual.success) {
+          throw new Error(actual.error || 'Failed to load projects')
+        }
+        this.cachedProjectOptions = actual.data || []
+        return this.cachedProjectOptions
+      } catch (e) {
+        console.error('Failed to fetch available Projects:', e)
+        throw e
+      }
+    }
+
     /**
      * Save construction budget data
      */
@@ -172,15 +198,16 @@ import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js'
           })
         })
   
-        const result = await response.json()
-  
-        if (result.success) {
+      const result = await response.json()
+      const actualResult = result.message || result
+
+      if (actualResult.success) {
           // Remove from local data
           this.projects = this.projects.filter(proj => proj.id !== projectId)
           this.lastSync = new Date()
           return true
         } else {
-          throw new Error(result.error || 'Failed to delete project')
+        throw new Error(actualResult.error || 'Failed to delete project')
         }
       } catch (error) {
         this.error = error.message

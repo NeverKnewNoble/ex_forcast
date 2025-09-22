@@ -16,6 +16,7 @@ declare module 'vue' {
     FoodBeverageProfitLoss: typeof import('./src/components/ui/reports/FoodBeverageProfitLoss.vue')['default']
     LoadingState: typeof import('./src/components/ui/payroll/LoadingState.vue')['default']
     MarketSegmentationTables: typeof import('./src/components/ui/MarketSegmentationTables.vue')['default']
+    NewProjectModal: typeof import('./src/components/ui/project_budget/NewProjectModal.vue')['default']
     NoDataState: typeof import('./src/components/ui/expense/NoDataState.vue')['default']
     NoPayrollDataState: typeof import('./src/components/ui/payroll/NoPayrollDataState.vue')['default']
     NoProjectSelectedState: typeof import('./src/components/ui/banquet/NoProjectSelectedState.vue')['default']

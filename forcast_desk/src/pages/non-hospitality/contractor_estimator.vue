@@ -43,13 +43,22 @@
                 </div>
               </div>
 
-              <!-- Project Selection Section -->
+              <!-- Project Selector (ERPNext Project doctype) -->
               <div class="mb-6">
                 <h3 class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                   <FolderOpen class="w-4 h-4 text-violet-600" />
-                  Selected Project
+                  Project
                 </h3>
-                <ProjectSelector :show-new-project-button="false" @project-changed="handleProjectChange" />
+                <select
+                  :value="projectSelection"
+                  @change="onProjectChange($event)"
+                  class="w-full px-3 py-2 bg-white border border-violet-200 rounded-lg text-gray-800 focus:ring-2 focus:ring-violet-500 focus:border-violet-400 text-sm shadow-sm hover:border-violet-300 transition-colors"
+                >
+                  <option value="" disabled>Select Project</option>
+                  <option v-for="proj in erpProjects" :key="proj.name" :value="proj.name">
+                    {{ proj.project_name || proj.name }}
+                  </option>
+                </select>
               </div>
 
               <!-- Save Status Section -->
@@ -132,7 +141,7 @@
                     class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white border border-orange-200 text-orange-700 rounded-lg hover:bg-orange-50 transition-all text-sm font-medium"
                   >
                     <RotateCcw class="w-4 h-4" />
-                    Restore from API
+                    Restore
                   </button>
                 </div>
               </div>
@@ -219,6 +228,9 @@
                   <tr class="border-b border-white/20">
                     <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-16">Line ID</th>
                     <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-80">Category & Items</th>
+                    <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-24">Qty</th>
+                    <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-28">Unit Type</th>
+                    <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-32">Rate</th>
                     <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-32">Projected Subtotal</th>
                     <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-32">Actual Subtotal</th>
                     <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-32">Variance</th>
@@ -237,7 +249,7 @@
                   <template v-for="(category, categoryIndex) in currentEstimator.categories" :key="`category-${category.id}`">
                     <!-- Category Name Row -->
                     <tr class="bg-gradient-to-r from-violet-100 to-purple-100 border-b border-violet-200 hover:from-violet-200 hover:to-purple-200 transition-all duration-200">
-                      <td class="px-6 py-4 text-sm text-violet-800 font-bold" colspan="12">
+                      <td class="px-6 py-4 text-sm text-violet-800 font-bold" colspan="15">
                         <div class="flex items-center justify-between">
                           <div class="flex items-center gap-3 text-violet-900">
                             <div class="w-4 h-4 bg-gradient-to-r from-violet-600 to-purple-600 rounded-full shadow-sm"></div>
@@ -271,7 +283,7 @@
                     
                     <!-- Category Totals Row -->
                     <tr class="bg-gradient-to-r from-violet-50 to-purple-50 border-b-2 border-violet-300 font-bold shadow-sm">
-                      <td class="px-6 py-3 text-sm text-violet-700 font-bold" colspan="2">
+                      <td class="px-6 py-3 text-sm text-violet-700 font-bold" colspan="5">
                         <div class="flex items-center gap-2">
                           <div class="w-2 h-2 bg-violet-500 rounded-full"></div>
                           SUBTOTAL
@@ -310,7 +322,41 @@
                           />
                         </td>
                         
-                        <!-- Projected Subtotal -->
+                        <!-- Quantity -->
+                        <td class="p-0 text-sm">
+                          <input
+                            :value="formatNumber(item.quantity)"
+                            @input="handleQuantityInput($event, item)"
+                            type="text"
+                            class="w-full h-full px-2 py-0 text-right border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                            placeholder="0"
+                          />
+                        </td>
+
+                        <!-- Unit Type (read-only) -->
+                        <td class="p-0 text-sm">
+                          <input
+                            :value="item.unitType"
+                            type="text"
+                            readonly
+                            class="w-full h-full px-4 py-0 border-0 bg-transparent text-sm text-gray-600 cursor-not-allowed"
+                            placeholder="UOM"
+                            tabindex="-1"
+                          />
+                        </td>
+
+                        <!-- Rate -->
+                        <td class="p-0 text-sm">
+                          <input
+                            :value="formatNumber(item.rate)"
+                            @input="handleRateInput($event, item)"
+                            type="text"
+                            class="w-full h-full px-2 py-0 text-right border-0 bg-transparent rounded-none text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                            placeholder="0"
+                          />
+                        </td>
+
+                        <!-- Projected Subtotal (qty * rate) -->
                         <td class="p-0 text-sm">
                           <input
                             :value="formatNumber(item.projected)"
@@ -416,7 +462,7 @@
                   
                   <!-- Grand Totals Row (at bottom) -->
                   <tr class="bg-gradient-to-r from-violet-50 to-purple-50 border-t-2 border-violet-200 font-bold">
-                    <td class="px-6 py-4 text-sm text-violet-800 font-bold" colspan="2">
+                    <td class="px-6 py-4 text-sm text-violet-800 font-bold" colspan="5">
                       <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"></div>
                         TOTALS
@@ -501,13 +547,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Sidebar from "@/components/ui/Sidebar.vue"
 import SettingsModal from "@/components/ui/SettingsModal.vue"
-import ProjectSelector from "@/components/ui/ProjectSelector.vue"
 import AddCategoryModal from "@/components/ui/contractor_estimator/AddCategoryModal.vue"
 import alertService from "@/components/ui/ui_utility/alertService.js"
-import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js'
+import { selectedProject, setSelectedProject, initializeProjectService, getStoredSelectedProject } from '@/components/utility/dashboard/projectService.js'
 import { 
   contractorEstimatorService 
 } from '@/components/utility/contractor_estimator/ContractorEstimatorService.js'
@@ -534,14 +579,14 @@ import {
   Loader2, 
   AlertCircle, 
   Plus, 
-  FolderOpen,
   RefreshCw, 
   Download, 
   BarChart3, 
   X, 
   Trash,
   HardHat,
-  RotateCcw
+  RotateCcw,
+  FolderOpen
 } from "lucide-vue-next"
 
 // Reactive state
@@ -554,6 +599,10 @@ const showNewEstimatorModal = ref(false)
 const showAddCategoryModalState = ref(false)
 const newEstimatorTitle = ref('')
 const newEstimatorLocation = ref('')
+// Currently selected project name for the sidebar select (kept in sync with service)
+const projectSelection = ref('')
+// ERPNext Project list
+const erpProjects = ref([])
 
 // Contractor estimator data
 const estimators = ref([])
@@ -690,6 +739,10 @@ const handleNumberInput = (event, item, field) => {
   item[field] = numericValue
   
   // Mark as unsaved and update calculations
+  if (field === 'projected' && typeof item.quantity === 'number' && typeof item.rate === 'number') {
+    // Keep projected user-editable, but we prefer derived value when qty/rate exist
+    item.projected = item.quantity * item.rate
+  }
   markAsUnsaved()
 }
 
@@ -769,6 +822,21 @@ const handleItemNameChange = async (item) => {
     // Auto-load GL balance after a short delay to allow user to finish typing
     setTimeout(async () => {
       try {
+        // Fetch Item details for unit type and rate
+        try {
+          const res = await fetch(`/api/resource/Item/${encodeURIComponent(item.name)}?fields=["name","item_name","stock_uom","valuation_rate"]`)
+          if (res.ok) {
+            const data = await res.json()
+            const d = data.data || {}
+            if (d.stock_uom) item.unitType = d.stock_uom
+            if (typeof d.valuation_rate === 'number') item.rate = d.valuation_rate
+            if (typeof item.quantity === 'number' && typeof item.rate === 'number') {
+              item.projected = item.quantity * item.rate
+            }
+          }
+        } catch (e) {
+          // ignore item meta failures
+        }
         const result = await contractorEstimatorService.populateActualSubtotalFromGL(item, {
           fromDate: '2025-01-01',
           toDate: '2025-12-31'
@@ -783,6 +851,28 @@ const handleItemNameChange = async (item) => {
       }
     }, 1500) // 1.5 second delay
   }
+}
+
+// Quantity change handler: updates projected as qty * rate
+const handleQuantityInput = (event, item) => {
+  const inputValue = event.target.value
+  const numericValue = parseNumber(inputValue)
+  item.quantity = numericValue
+  if (typeof item.rate === 'number') {
+    item.projected = (item.quantity || 0) * (item.rate || 0)
+  }
+  markAsUnsaved()
+}
+
+// Rate change handler: updates projected as qty * rate
+const handleRateInput = (event, item) => {
+  const inputValue = event.target.value
+  const numericValue = parseNumber(inputValue)
+  item.rate = numericValue
+  if (typeof item.quantity === 'number') {
+    item.projected = (item.quantity || 0) * (item.rate || 0)
+  }
+  markAsUnsaved()
 }
 
 const deleteItem = async (categoryId, itemId) => {
@@ -865,7 +955,7 @@ const restoreDefaultCategories = async () => {
       currentEstimator.value = newEstimator
       
       markAsUnsaved()
-      alertService.success('Categories restored from API successfully')
+      alertService.success('Categories restored successfully')
     } catch (error) {
       alertService.error(`Failed to restore categories from API: ${error.message}`)
     }
@@ -964,10 +1054,10 @@ const handleCreateCategory = async (categoryName, mode) => {
   
   try {
     if (mode === 'create') {
-      // First, create the Item Group in Frappe
+      // First, create the Category in Frappe
       await contractorEstimatorService.createItemGroup(categoryName)
     }
-    // For 'select' mode, the Item Group already exists, so no need to create it
+    // For 'select' mode, the Cate already exists, so no need to create it
     
     // Then add category to the current estimator
     const newCategory = currentEstimator.value.addCategory({ 
@@ -979,14 +1069,14 @@ const handleCreateCategory = async (categoryName, mode) => {
     markAsUnsaved()
     
     if (mode === 'create') {
-      alertService.success(`Category "${categoryName}" added successfully and Item Group created in Frappe`)
+      alertService.success(`Category "${categoryName}" added successfully and Category created`)
     } else {
-      alertService.success(`Category "${categoryName}" added successfully from existing Item Group`)
+      alertService.success(`Category "${categoryName}" added successfully from existing Category`)
     }
   } catch (error) {
-    // If Item Group creation fails (only for create mode), still add the category locally
+    // If Category creation fails (only for create mode), still add the category locally
     if (mode === 'create') {
-      console.warn('Failed to create Item Group, adding category locally:', error.message)
+      console.warn('Failed to create Category, adding category locally:', error.message)
       
       try {
         const newCategory = currentEstimator.value.addCategory({ 
@@ -996,7 +1086,7 @@ const handleCreateCategory = async (categoryName, mode) => {
         
         closeAddCategoryModal()
         markAsUnsaved()
-        alertService.warning(`Category "${categoryName}" added locally, but Item Group creation failed: ${error.message}`)
+        alertService.warning(`Category "${categoryName}" added locally, but Cate creation failed: ${error.message}`)
       } catch (localError) {
         alertService.error(`Failed to add category: ${localError.message}`)
       }
@@ -1007,17 +1097,7 @@ const handleCreateCategory = async (categoryName, mode) => {
   }
 }
 
-// Handle project change from ProjectSelector
-const handleProjectChange = async (newProject) => {
-  try {
-    // Reload data for the new project
-    await loadData(true)
-    alertService.success(`Switched to project: ${newProject?.project_name || 'Unknown'}`)
-  } catch (error) {
-    console.error('Error switching project:', error)
-    alertService.error('Failed to switch project')
-  }
-}
+//
 
 // GL Balance and Company functions
 const loadDefaultCompany = async () => {
@@ -1074,6 +1154,26 @@ onMounted(async () => {
   // Test API connection first
   const apiWorking = await contractorEstimatorService.testApiConnection()
 
+  // Load ERPNext Projects for selector first
+  try {
+    const res = await fetch('/api/resource/Project?limit_page_length=1000&fields=["name","project_name"]')
+    if (res.ok) {
+      const data = await res.json()
+      erpProjects.value = (data.data || []).map(p => ({ name: p.name, project_name: p.project_name }))
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  // Restore selected project from storage (service may clear it if not in its list)
+  const stored = getStoredSelectedProject?.() || null
+  if (stored && stored.name) {
+    setSelectedProject(stored)
+  }
+
+  // Sync initial project selection value from service
+  projectSelection.value = selectedProject?.value?.name || ''
+
   // Load contractor estimator data
   await loadData()
 
@@ -1084,15 +1184,32 @@ onMounted(async () => {
   }
 })
 
-// React to project changes and reload data
-watch(selectedProject, async (newVal, oldVal) => {
-  if (!newVal?.project_name) return
-  if (newVal?.project_name !== oldVal?.project_name) {
-    alertService.success(`Switched to project: ${newVal.project_name}`)
-    await loadData(true) // Force reload when switching projects
+// Handle sidebar project change
+const onProjectChange = async (event) => {
+  try {
+    const newProjectName = event.target.value
+    projectSelection.value = newProjectName
+
+  // Find full project object and update selection service
+  const proj = erpProjects.value ? erpProjects.value.find(p => p.name === newProjectName) : null
+    if (proj) {
+      setSelectedProject(proj)
+      alertService.success(`Switched to project: ${proj.project_name || proj.name}`)
+    }
+
+    // Reload data for the chosen project
+    await loadData(true)
+  } catch (error) {
+    alertService.error('Failed to switch project')
   }
-})
+}
+
+//
 </script>
+
+
+
+
 
 <style scoped>
 /* Custom animations */

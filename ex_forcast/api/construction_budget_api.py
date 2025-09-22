@@ -2,6 +2,38 @@ import frappe
 from collections import defaultdict
 import json
 
+def _get_or_create_project_by_name(project_identifier):
+    """Resolve a Project by docname or by project_name; create if missing.
+
+    Accepts either the Project document name (e.g., "PROJ-0001") or the
+    human-readable "project_name" value (e.g., "New Hotel"). If found,
+    returns the Project's document name. If not found, creates a new Project
+    with project_name set to the provided identifier and returns its name.
+    """
+    try:
+        if not project_identifier:
+            return None
+
+        # 1) Try resolve by docname directly
+        if frappe.db.exists("Project", project_identifier):
+            return project_identifier
+
+        # 2) Try resolve by the title field project_name
+        existing_name = frappe.db.get_value("Project", {"project_name": project_identifier}, "name")
+        if existing_name:
+            return existing_name
+
+        # 3) Create a new Project with the provided title
+        project_doc = frappe.get_doc({
+            "doctype": "Project",
+            "project_name": project_identifier
+        })
+        project_doc.insert()
+        return project_doc.name
+    except Exception as e:
+        frappe.logger().error(f"Error ensuring Project exists for '{project_identifier}': {str(e)}")
+        raise
+
 @frappe.whitelist(allow_guest=True)
 def test_construction_budget_api():
     """Test endpoint to verify API is working"""
@@ -10,6 +42,50 @@ def test_construction_budget_api():
         "message": "Construction Budget API is working",
         "timestamp": frappe.utils.now()
     }
+
+
+@frappe.whitelist(allow_guest=True)
+def list_projects(search=None, limit=100):
+    """Return a list of Projects with docname and human-readable project_name.
+
+    - search: optional substring to filter by title or name
+    - limit: max items to return
+    """
+    try:
+        filters = {}
+        # Build basic query
+        query = """
+            SELECT name, project_name
+            FROM `tabProject`
+        """
+        params = []
+        if search:
+            query += " WHERE project_name LIKE %s OR name LIKE %s"
+            like = f"%{search}%"
+            params.extend([like, like])
+        query += " ORDER BY project_name ASC, name ASC"
+        if limit:
+            query += " LIMIT %s"
+            params.append(int(limit))
+
+        rows = frappe.db.sql(query, params, as_dict=True)
+        data = [
+            {
+                "name": row.get("name"),
+                "project_name": row.get("project_name") or row.get("name")
+            }
+            for row in rows
+        ]
+        return {
+            "success": True,
+            "data": data
+        }
+    except Exception as e:
+        frappe.logger().error(f"Error listing Projects: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
 
 @frappe.whitelist(allow_guest=True)
 def construction_budget_display(project=None):
@@ -29,16 +105,16 @@ def construction_budget_display(project=None):
                 "data": []
             }
         
-        # SQL query to get construction budget data with project filter
+        # SQL query to get all construction budget data (no project filter)
         query = """
             SELECT 
                 parent.name as project_id,
-                parent.project,
                 parent.total_budget,
                 parent.total_actual,
                 parent.variance,
                 child.name as task_id,
                 child.project_name,
+                p.project_name as project_title,
                 child.task_name,
                 child.description,
                 child.status,
@@ -63,16 +139,15 @@ def construction_budget_display(project=None):
                 `tabConstruction Budget Task` AS child
             ON 
                 child.parent = parent.name
+            LEFT JOIN
+                `tabProject` AS p
+            ON
+                p.name = child.project_name
         """
         
-        # Add project filter if provided
-        if project:
-            query += " WHERE parent.project = %s"
-            query += " ORDER BY parent.name ASC, child.idx ASC"
-            raw_results = frappe.db.sql(query, (project,), as_dict=True)
-        else:
-            query += " ORDER BY parent.name ASC, child.idx ASC"
-            raw_results = frappe.db.sql(query, as_dict=True)
+        # Always fetch all; ignore any provided project filter
+        query += " ORDER BY parent.name ASC, child.idx ASC"
+        raw_results = frappe.db.sql(query, as_dict=True)
         
         frappe.logger().info(f"Raw SQL results count: {len(raw_results)}")
         frappe.logger().info(f"Sample result: {raw_results[0] if raw_results else 'No results'}")
@@ -83,12 +158,9 @@ def construction_budget_display(project=None):
 
         for row in raw_results:
             project_id = row.get("project_id")
-            project_name = row.get("project")
-            
-            # Store project info
+            # Store project info (no explicit human-readable name on parent; use totals only)
             if project_id not in project_info:
                 project_info[project_id] = {
-                    "project_name": project_name,
                     "project_id": project_id,
                     "total_budget": float(row.get("total_budget") or 0),
                     "total_actual": float(row.get("total_actual") or 0),
@@ -101,7 +173,8 @@ def construction_budget_display(project=None):
                 task_data = {
                     "id": row.get("task_id"),
                     "task": row.get("task_name") or "",
-                    "project_name": row.get("project_name") or "",
+                    # Expose human-readable Project title to the frontend; fall back to link name if missing
+                    "project_name": row.get("project_title") or row.get("project_name") or "",
                     "isSubtask": False,  # Can be enhanced later
                     "description": row.get("description") or "",
                     "status": row.get("status") or "Not Started",
@@ -148,7 +221,8 @@ def construction_budget_display(project=None):
                 
                 project_data = {
                     "id": project_id,
-                    "name": proj_info["project_name"],
+                    # Fallback name: prefer first task's project link (docname) if available
+                    "name": tasks[0].get("project_name") if tasks else project_id,
                     "total_budget": proj_info["total_budget"],
                     "total_actual": proj_info["total_actual"],
                     "variance": proj_info["variance"],
@@ -197,6 +271,9 @@ def upsert_construction_budget(changes, project=None):
 
         results = []
 
+        # Ignore incoming parent-level project filter; parent link will be derived from tasks when present
+        parent_project_link_name = None
+
         # Process construction budget changes
         for change in changes:
             try:
@@ -212,10 +289,10 @@ def upsert_construction_budget(changes, project=None):
                     # Update existing project
                     parent_doc = frappe.get_doc("Construction Budget Project", project_id)
                 else:
-                    # Create new project
+                    # Create new Construction Budget Project without relying on external project filter
                     parent_doc = frappe.get_doc({
                         "doctype": "Construction Budget Project",
-                        "project": project,
+                        "project": None,
                         "tasks": []
                     })
                     parent_doc.insert()
@@ -225,9 +302,14 @@ def upsert_construction_budget(changes, project=None):
 
                 # Add new tasks
                 for task_data in tasks:
+                    # Ensure the linked Project referenced by each task exists
+                    task_project_name_raw = task_data.get("project_name", "")
+                    task_project_link_name = _get_or_create_project_by_name(task_project_name_raw) if task_project_name_raw else ""
+
                     task_doc = {
                         "doctype": "Construction Budget Task",
-                        "project_name": task_data.get("project_name", ""),
+                        # Link field to Project must store the Project's document name (not title)
+                        "project_name": task_project_link_name if task_project_link_name else None,
                         "task_name": task_data.get("task", ""),
                         "description": task_data.get("description", ""),
                         "status": task_data.get("status", "Not Started"),
@@ -255,6 +337,12 @@ def upsert_construction_budget(changes, project=None):
                     task_doc["underover_budget"] = task_doc["actual_cost"] - task_doc["budget_amount"]
                     
                     parent_doc.append("tasks", task_doc)
+
+                # If any task had a project link, set the parent project's link to the first one (or leave None)
+                if parent_doc.tasks:
+                    first_task_project = parent_doc.tasks[0].get("project_name")
+                    if first_task_project:
+                        parent_doc.project = first_task_project
 
                 # Calculate project totals
                 parent_doc.total_budget = sum(task.get("budget_amount", 0) for task in parent_doc.tasks)
@@ -366,11 +454,8 @@ def delete_construction_budget_task(task_id):
 def get_construction_budget_summary(project=None):
     """Get summary statistics for construction budget"""
     try:
-        # Get basic project count
-        if project:
-            project_count = frappe.db.count("Construction Budget Project", {"project": project})
-        else:
-            project_count = frappe.db.count("Construction Budget Project")
+        # Get basic project count (ignore project filter)
+        project_count = frappe.db.count("Construction Budget Project")
 
         # Get total budget and actual costs
         query = """
@@ -381,11 +466,8 @@ def get_construction_budget_summary(project=None):
             FROM `tabConstruction Budget Project`
         """
         
-        if project:
-            query += " WHERE project = %s"
-            result = frappe.db.sql(query, (project,), as_dict=True)[0]
-        else:
-            result = frappe.db.sql(query, as_dict=True)[0]
+        # Always compute across all projects
+        result = frappe.db.sql(query, as_dict=True)[0]
 
         # Get task count
         task_query = """
@@ -394,11 +476,8 @@ def get_construction_budget_summary(project=None):
             INNER JOIN `tabConstruction Budget Project` p ON t.parent = p.name
         """
         
-        if project:
-            task_query += " WHERE p.project = %s"
-            task_result = frappe.db.sql(task_query, (project,), as_dict=True)[0]
-        else:
-            task_result = frappe.db.sql(task_query, as_dict=True)[0]
+        # Always compute across all tasks
+        task_result = frappe.db.sql(task_query, as_dict=True)[0]
 
         return {
             "success": True,
