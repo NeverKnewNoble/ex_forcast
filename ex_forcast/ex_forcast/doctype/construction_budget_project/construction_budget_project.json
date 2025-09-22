@@ -6,7 +6,6 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "project",
   "section_break_jkgx",
   "total_budget",
   "variance",
@@ -16,12 +15,6 @@
   "tasks"
  ],
  "fields": [
-  {
-   "fieldname": "project",
-   "fieldtype": "Link",
-   "label": "Project",
-   "options": "Forecast Project"
-  },
   {
    "fieldname": "section_break_jkgx",
    "fieldtype": "Section Break"
@@ -61,7 +54,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-03 18:10:12.916738",
+ "modified": "2025-09-22 10:42:40.803596",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Construction Budget Project",

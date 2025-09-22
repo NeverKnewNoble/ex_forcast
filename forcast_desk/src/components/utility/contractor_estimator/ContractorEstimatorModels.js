@@ -11,6 +11,10 @@ export class ContractorEstimatorItem {
     this.party = data.party || ''
     this.status = data.status || 'Not Started'
     this.percentComplete = data.percentComplete || 0
+    // Quantity and pricing
+    this.quantity = typeof data.quantity === 'number' ? data.quantity : 1
+    this.unitType = data.unitType || ''
+    this.rate = typeof data.rate === 'number' ? data.rate : 0
     this.projected = data.projected || 0
     this.actual = data.actual || 0
     this.currentPaid = data.currentPaid || 0
@@ -64,6 +68,9 @@ export class ContractorEstimatorItem {
       party: this.party,
       status: this.status,
       percentComplete: this.percentComplete,
+      quantity: this.quantity,
+      unitType: this.unitType,
+      rate: this.rate,
       projected: this.projected,
       actual: this.actual,
       currentPaid: this.currentPaid,

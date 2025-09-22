@@ -105,13 +105,28 @@ class ContractorEstimatorService {
           order: index + 1 
         })
         
-        // Add items for this category
+        // Add items for this category (supports string or object with stock_uom, valuation_rate)
         const items = itemGroupsData[itemGroup] || []
-        items.forEach(itemName => {
-          category.addItem({ name: itemName })
+        items.forEach(entry => {
+          if (typeof entry === 'string') {
+            category.addItem({ name: entry })
+          } else if (entry && typeof entry === 'object') {
+            const itemName = entry.item_name || entry.name || ''
+            const unitType = entry.stock_uom || ''
+            const rate = typeof entry.valuation_rate === 'number' ? entry.valuation_rate : 0
+            const quantity = 1
+            category.addItem({ 
+              name: itemName, 
+              unitType, 
+              rate, 
+              quantity, 
+              projected: quantity * rate 
+            })
+          }
         })
       })
       
+      estimator.updateTotals()
       return estimator
     } catch (error) {
       console.error('Error creating estimator from item groups:', error)
@@ -168,12 +183,27 @@ class ContractorEstimatorService {
           order: index + 1 
         })
         
-        // Add default items for this category
+        // Add default items for this category (supports enriched item objects)
         const items = itemGroupsData[itemGroup] || []
-        items.forEach(itemName => {
-          category.addItem({ name: itemName })
+        items.forEach(entry => {
+          if (typeof entry === 'string') {
+            category.addItem({ name: entry })
+          } else if (entry && typeof entry === 'object') {
+            const itemName = entry.item_name || entry.name || ''
+            const unitType = entry.stock_uom || ''
+            const rate = typeof entry.valuation_rate === 'number' ? entry.valuation_rate : 0
+            const quantity = 1
+            category.addItem({ 
+              name: itemName, 
+              unitType, 
+              rate, 
+              quantity, 
+              projected: quantity * rate 
+            })
+          }
         })
       })
+      estimator.updateTotals()
       
       // If we have saved data, merge it with the default data
       if (savedEstimator) {
@@ -204,6 +234,10 @@ class ContractorEstimatorService {
                 defaultItem.status = savedItem.status
                 defaultItem.percentComplete = savedItem.percentComplete
                 defaultItem.lineId = savedItem.lineId
+                // New fields
+                if (typeof savedItem.quantity === 'number') defaultItem.quantity = savedItem.quantity
+                if (typeof savedItem.rate === 'number') defaultItem.rate = savedItem.rate
+                if (savedItem.unitType) defaultItem.unitType = savedItem.unitType
                 // Recalculate derived fields
                 defaultItem.variance = defaultItem.actual - defaultItem.projected
                 defaultItem.amountDue = defaultItem.actual - defaultItem.currentPaid
@@ -211,6 +245,9 @@ class ContractorEstimatorService {
                 // This is a new item that was added by user, add it to the category
                 defaultCategory.addItem({
                   name: savedItem.name,
+                  quantity: savedItem.quantity,
+                  unitType: savedItem.unitType,
+                  rate: savedItem.rate,
                   projected: savedItem.projected,
                   actual: savedItem.actual,
                   currentPaid: savedItem.currentPaid,

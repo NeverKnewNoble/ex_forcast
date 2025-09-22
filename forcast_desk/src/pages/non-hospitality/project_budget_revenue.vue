@@ -27,14 +27,7 @@
                 <p class="text-sm text-gray-500">Manage and track your construction project budget</p>
               </div>
 
-              <!-- Project Selection Section -->
-              <div class="mb-6">
-                <h3 class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  <FolderOpen class="w-4 h-4 text-violet-600" />
-                  Selected Project
-                </h3>
-                <ProjectSelector :show-new-project-button="false" @project-changed="handleProjectChange" />
-              </div>
+              
 
               <!-- Save Status Section -->
               <div class="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
@@ -277,13 +270,23 @@
                                placeholder="Project name"
                              />
                            </div>
-                           <button
-                             @click="addTaskToProject(project.id)"
-                             class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-                           >
-                             <Plus class="w-4 h-4" />
-                             Add Task
-                           </button>
+                           <div class="flex items-center gap-2">
+                             <button
+                               @click="addTaskToProject(project.id)"
+                               class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-lg hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                             >
+                               <Plus class="w-4 h-4" />
+                               Add Task
+                             </button>
+                             <button
+                               @click="onDeleteProject(project.id)"
+                               class="inline-flex items-center gap-2 px-3 py-2 border border-red-200 text-red-700 rounded-lg hover:bg-red-50 transition-all text-sm font-medium"
+                               :title="`Delete this project and its tasks`"
+                             >
+                               <Trash class="w-4 h-4" />
+                               Delete Project Tasks
+                             </button>
+                           </div>
                          </div>
                        </td>
                      </tr>
@@ -301,7 +304,7 @@
                             <span class="cursor-grab text-gray-400 hover:text-gray-600 active:cursor-grabbing px-2">
                               <GripVertical class="w-4 h-4" />
                             </span>
-                                                         <input
+                            <input
                                v-model="task.task"
                                type="text"
                                class="flex-1 h-full px-4 py-0 border-0 bg-transparent text-sm focus:ring-2 focus:ring-violet-500 focus:bg-white focus:shadow-sm font-medium transition-all duration-200"
@@ -544,35 +547,19 @@
       @close="closeSettings" 
     />
 
-    <!-- New Project Modal -->
-    <div v-if="showNewProjectModal" class="fixed inset-0 z-50 flex items-center justify-center">
-      <div class="absolute inset-0 bg-black/30"></div>
-      <div class="relative z-10 w-full max-w-md bg-white rounded-xl shadow-2xl border border-violet-200">
-        <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <FolderPlus class="w-5 h-5 text-violet-600" />
-            <h3 class="text-base font-semibold text-gray-800">Create New Project</h3>
-          </div>
-          <button @click="cancelNewProject" class="text-gray-400 hover:text-gray-600">
-            <X class="w-5 h-5" />
-          </button>
-        </div>
-        <div class="p-5 space-y-3">
-          <label class="text-sm font-medium text-gray-700">Project Name</label>
-          <input
-            v-model="newProjectName"
-            type="text"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-            placeholder="Enter project name"
-            @keyup.enter="confirmCreateProject"
-          />
-        </div>
-        <div class="px-5 py-4 border-t border-gray-200 flex items-center justify-end gap-2 bg-gray-50 rounded-b-xl">
-          <button @click="cancelNewProject" class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100">Cancel</button>
-          <button @click="confirmCreateProject" class="px-4 py-2 rounded-md bg-gradient-to-r from-violet-600 to-violet-700 text-white hover:from-violet-700 hover:to-violet-800">Create</button>
-        </div>
-      </div>
-    </div>
+    <!-- New Project Modal (componentized) -->
+    <NewProjectModal
+      :is-visible="showNewProjectModal"
+      :new-project-name="newProjectName"
+      :available-projects="availableProjects"
+      :selected-existing-project="selectedExistingProject"
+      :duplicate-project="duplicateProject"
+      @update:newProjectName="val => (newProjectName = val)"
+      @update:selectedExistingProject="val => (selectedExistingProject = val)"
+      @refresh="reloadAvailableProjects"
+      @confirm="confirmCreateOrAddProject"
+      @close="cancelNewProject"
+    />
   </div>
 </template>
 
@@ -580,7 +567,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import Sidebar from "@/components/ui/Sidebar.vue"
 import SettingsModal from "@/components/ui/SettingsModal.vue"
-import ProjectSelector from "@/components/ui/ProjectSelector.vue"
+import NewProjectModal from "@/components/ui/project_budget/NewProjectModal.vue"
 import alertService from "@/components/ui/ui_utility/alertService.js"
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js'
 import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js'
@@ -612,7 +599,6 @@ import {
   AlertCircle, 
   Plus, 
   FolderPlus, 
-  FolderOpen,
   RefreshCw, 
   Download, 
   BarChart3, 
@@ -630,6 +616,9 @@ const saveError = ref('')
 const showSettingsModal = ref(false)
 const showNewProjectModal = ref(false)
 const newProjectName = ref('')
+const availableProjects = ref([])
+const selectedExistingProject = ref('')
+const duplicateProject = ref(false)
 
 // Construction budget projects using the service
 const projects = ref([])
@@ -664,7 +653,8 @@ const loadData = async (forceReload = false) => {
     
     // Only fetch from API if we don't have data or if force reload is requested
     if (forceReload || constructionBudgetService.getAllProjects().length === 0) {
-      await constructionBudgetService.fetchData(currentProject)
+      // Fetch all data without filtering by forecast project
+      await constructionBudgetService.fetchData()
     }
     
     projects.value = [...constructionBudgetService.getAllProjects()]
@@ -704,8 +694,7 @@ const saveChanges = async () => {
   saveError.value = ''
   
   try {
-    const currentProject = selectedProject.value?.project_name
-    await constructionBudgetService.saveData(projects.value, currentProject)
+    await constructionBudgetService.saveData(projects.value)
     isSaved.value = true
     alertService.success('Construction budget saved successfully')
   } catch (error) {
@@ -854,32 +843,59 @@ const addNewProject = () => {
   const projectNumber = projects.value.length + 1
   newProjectName.value = `PROJECT ${projectNumber}`
   showNewProjectModal.value = true
+  duplicateProject.value = false
+  selectedExistingProject.value = ''
+  reloadAvailableProjects()
 }
 
-const confirmCreateProject = () => {
+const confirmCreateOrAddProject = () => {
+  const typedName = (newProjectName.value || '').trim()
+  // Check duplicate by comparing against existing tasks' project_name values (case-insensitive)
+  const existingNames = new Set(projects.value.flatMap(p => (p.tasks && p.tasks[0] ? [String(p.tasks[0].project_name).toLowerCase()] : [])))
+  if (typedName && existingNames.has(typedName.toLowerCase())) {
+    duplicateProject.value = true
+    alertService.warning('Project already exists. Please select it from the dropdown.')
+    return
+  }
+
+  // If user selected existing ERPNext Project, add a new local project seeded with that name
+  if (selectedExistingProject.value) {
+    const match = availableProjects.value.find(p => p.name === selectedExistingProject.value)
+    const displayName = match ? (match.project_name || match.name) : selectedExistingProject.value
+    const newProject = ConstructionBudgetProject.createEmpty(displayName)
+    if (newProject.tasks.length > 0) {
+      newProject.tasks[0].project_name = displayName
+    }
+    projects.value.push(newProject)
+    projects.value = [...projects.value]
+    showNewProjectModal.value = false
+    newProjectName.value = ''
+    selectedExistingProject.value = ''
+    duplicateProject.value = false
+    markAsUnsaved()
+    return
+  }
+
+  // Otherwise, create a new project with typed name
   const projectNumber = projects.value.length + 1
-  const nameToUse = (newProjectName.value || '').trim() || `PROJECT ${projectNumber}`
+  const nameToUse = typedName || `PROJECT ${projectNumber}`
   const newProject = ConstructionBudgetProject.createEmpty(nameToUse)
-  
-  // Set the project name on the first task as well
   if (newProject.tasks.length > 0) {
     newProject.tasks[0].project_name = nameToUse
   }
-  
-  // Add to local projects array
   projects.value.push(newProject)
-  
-  // Force reactivity update
   projects.value = [...projects.value]
-  
   showNewProjectModal.value = false
   newProjectName.value = ''
+  duplicateProject.value = false
   markAsUnsaved()
 }
 
 const cancelNewProject = () => {
   showNewProjectModal.value = false
   newProjectName.value = ''
+  selectedExistingProject.value = ''
+  duplicateProject.value = false
 }
 
 const refreshTable = async () => {
@@ -906,6 +922,28 @@ const exportToExcel = () => {
     alertService.success('Data exported successfully')
   } catch (error) {
     alertService.error(`Failed to export data: ${error.message}`)
+  }
+}
+
+const reloadAvailableProjects = async () => {
+  try {
+    availableProjects.value = await constructionBudgetService.fetchAvailableProjects()
+  } catch (e) {
+    alertService.error(`Failed to load existing projects: ${e.message}`)
+  }
+}
+
+const onDeleteProject = async (projectId) => {
+  const confirmed = confirm('Delete this Construction Budget Project and all its tasks? This cannot be undone.')
+  if (!confirmed) return
+  try {
+    await constructionBudgetService.deleteProject(projectId)
+    // Update local state to remove the project
+    projects.value = projects.value.filter(p => p.id !== projectId)
+    projects.value = [...projects.value]
+    alertService.success('Project deleted successfully')
+  } catch (e) {
+    alertService.error(`Failed to delete project: ${e.message}`)
   }
 }
 
@@ -950,48 +988,38 @@ const closeSettings = () => {
   showSettingsModal.value = false
 }
 
-// Handle project change from ProjectSelector
-const handleProjectChange = async (newProject) => {
-  try {
-    // Reload data for the new project
-    await loadData(true)
-    alertService.success(`Switched to project: ${newProject?.project_name || 'Unknown'}`)
-  } catch (error) {
-    console.error('Error switching project:', error)
-    alertService.error('Failed to switch project')
-  }
-}
+// Removed handleProjectChange as project selection is no longer used
 
 onMounted(async () => {
-  // Ensure project context is initialized
+  // Ensure project context is initialized so selectedProject is populated
   try {
     await initializeProjectService()
   } catch (e) {
-    // ignore
+    // ignore init errors; page can still function without project context
   }
 
   // Test API connection first
   const apiWorking = await constructionBudgetService.testApiConnection()
 
-  // Load construction budget data
+  // Load all construction budget data (not filtered by project)
   await loadData()
 
-  // Show alert for current project if available
-  const currentName = selectedProject?.value?.project_name
-  if (currentName) {
-    alertService.success(`Switched to project: ${currentName}`)
-  }
+
 })
 
-// React to project changes and reload data
+// React to project changes (recognize current selected project like other pages)
 watch(selectedProject, async (newVal, oldVal) => {
-  if (!newVal?.project_name) return
-  if (newVal?.project_name !== oldVal?.project_name) {
-    alertService.success(`Switched to project: ${newVal.project_name}`)
-    await loadData(true) // Force reload when switching projects
-  }
+  const newName = newVal?.project_name
+  const oldName = oldVal?.project_name
+  if (!newName || newName === oldName) return
+  // Acknowledge the change without refetching (API is not filtered by project)
+  // alertService.success(`Switched to project: ${newName}`)
 })
 </script>
+
+
+
+
 
 <style scoped>
 /* Custom animations */

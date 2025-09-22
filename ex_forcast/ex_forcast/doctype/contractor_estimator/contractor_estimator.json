@@ -23,7 +23,7 @@
    "fieldname": "project",
    "fieldtype": "Link",
    "label": "Project",
-   "options": "Forecast Project"
+   "options": "Project"
   },
   {
    "fieldname": "section_break_pzfm",
@@ -84,7 +84,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-13 15:17:53.875735",
+ "modified": "2025-09-22 11:36:47.116573",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Contractor Estimator",

@@ -553,8 +553,11 @@ def get_items_by_order_of_category():
         
         query = """
             SELECT 
+                name,
                 item_name, 
-                item_group
+                item_group,
+                stock_uom,
+                valuation_rate
             FROM 
                 `tabItem`
             ORDER BY `tabItem`.item_group ASC, `tabItem`.item_name ASC
@@ -565,12 +568,15 @@ def get_items_by_order_of_category():
         grouped_items = {}
         for item in items:
             item_group = item.get("item_group", "Uncategorized")
-            item_name = item.get("item_name", "")
-            
             if item_group not in grouped_items:
                 grouped_items[item_group] = []
-            
-            grouped_items[item_group].append(item_name)
+            # Include unit and rate in response for frontend consumption
+            grouped_items[item_group].append({
+                "name": item.get("name"),
+                "item_name": item.get("item_name", ""),
+                "stock_uom": item.get("stock_uom"),
+                "valuation_rate": float(item.get("valuation_rate") or 0)
+            })
 
         return {
             "success": True,
