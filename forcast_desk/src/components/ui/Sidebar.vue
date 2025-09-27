@@ -363,7 +363,7 @@ const filteredMenuItems = computed(() => {
   // If no project is selected, only show Home and Dashboard
   if (!selectedProject.value || !selectedProject.value.project_name) {
     return menuItems.filter(item => 
-      item.text === "Home" || item.text === "Dashboard"
+      item.text === "Home" || item.text === "Dashboard" || item.text === "Cost Of Sales"
     )
   }
 

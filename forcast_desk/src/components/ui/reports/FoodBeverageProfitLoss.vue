@@ -85,15 +85,6 @@
                   Statistics
                 </div>
               </td>
-              <template v-for="year in visibleYears" :key="'stats-divider-' + year">
-                <template v-if="!isYearCollapsed(year)">
-                  <td v-for="label in getColumnLabelsForYear(year)" :key="'stats-divider-cell-' + year + '-' + label" class="px-1 py-1 text-center border border-green-700 bg-green-800"></td>
-                  <td class="px-1 py-1 text-center border border-green-700 bg-green-800"></td>
-                </template>
-                <template v-else>
-                  <td class="px-1 py-1 text-center border border-green-700 bg-green-800"></td>
-                </template>
-              </template>
             </tr>
 
             <!-- NO OF ROOMS -->
@@ -353,15 +344,6 @@
               <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length + 1), 0)" class="px-3 py-3 font-bold text-white border-r border-green-700">
                 <div class="flex items-center">Revenue</div>
               </td>
-              <template v-for="year in visibleYears" :key="'revenue-divider-' + year">
-                <template v-if="!isYearCollapsed(year)">
-                  <td v-for="label in getColumnLabelsForYear(year)" :key="'revenue-divider-cell-' + year + '-' + label" class="px-1 py-1 text-center border border-green-700 bg-green-800"></td>
-                  <td class="px-1 py-1 text-center border border-green-700 bg-green-800"></td>
-                </template>
-                <template v-else>
-                  <td class="px-1 py-1 text-center border border-green-700 bg-green-800"></td>
-                </template>
-              </template>
             </tr>
 
             <!-- Food Revenue Sub-header -->
@@ -372,15 +354,6 @@
                   Food Revenue
                 </div>
               </td>
-              <template v-for="year in visibleYears" :key="'food-revenue-header-' + year">
-                <template v-if="!isYearCollapsed(year)">
-                  <td v-for="label in getColumnLabelsForYear(year)" :key="'food-revenue-header-cell-' + year + '-' + label" class="px-1 py-1 text-center border border-green-600 bg-green-600"></td>
-                  <td class="px-1 py-1 text-center border border-green-600 bg-green-600"></td>
-                </template>
-                <template v-else>
-                  <td class="px-1 py-1 text-center border border-green-600 bg-green-600"></td>
-                </template>
-              </template>
             </tr>
 
 
@@ -485,15 +458,6 @@
                   Beverage Revenue
                 </div>
               </td>
-              <template v-for="year in visibleYears" :key="'beverage-revenue-header-' + year">
-                <template v-if="!isYearCollapsed(year)">
-                  <td v-for="label in getColumnLabelsForYear(year)" :key="'beverage-revenue-header-cell-' + year + '-' + label" class="px-1 py-1 text-center border border-green-600 bg-green-600"></td>
-                  <td class="px-1 py-1 text-center border border-green-600 bg-green-600"></td>
-                </template>
-                <template v-else>
-                  <td class="px-1 py-1 text-center border border-green-600 bg-green-600"></td>
-                </template>
-              </template>
             </tr>
 
             <!-- Individual Restaurant Beverage Revenue Rows -->
@@ -814,15 +778,6 @@
                   Expenses
                 </div>
               </td>
-              <template v-for="year in visibleYears" :key="'cost-divider-' + year">
-                <template v-if="!isYearCollapsed(year)">
-                  <td v-for="label in getColumnLabelsForYear(year)" :key="'cost-divider-cell-' + year + '-' + label" class="px-1 py-1 text-center border border-green-700 bg-green-800"></td>
-                  <td class="px-1 py-1 text-center border border-green-700 bg-green-800"></td>
-                </template>
-                <template v-else>
-                  <td class="px-1 py-1 text-center border border-green-700 bg-green-800"></td>
-                </template>
-              </template>
             </tr>
 
             <!-- COST OF FOOD & BEVERAGE SALES Divider -->
@@ -833,15 +788,6 @@
                   COST OF FOOD & BEVERAGE SALES
                 </div>
               </td>
-              <template v-for="year in visibleYears" :key="'cost-divider-' + year">
-                <template v-if="!isYearCollapsed(year)">
-                  <td v-for="label in getColumnLabelsForYear(year)" :key="'cost-divider-cell-' + year + '-' + label" class="px-1 py-1 text-center border border-orange-700 bg-orange-800"></td>
-                  <td class="px-1 py-1 text-center border border-orange-700 bg-orange-800"></td>
-                </template>
-                <template v-else>
-                  <td class="px-1 py-1 text-center border border-orange-700 bg-orange-800"></td>
-                </template>
-              </template>
             </tr>
 
             <!-- Cost of Food Sales Row -->
@@ -1030,15 +976,6 @@
                   F&B Expenses
                 </div>
               </td>
-              <template v-for="year in visibleYears" :key="'payroll-divider-' + year">
-                <template v-if="!isYearCollapsed(year)">
-                  <td v-for="label in getColumnLabelsForYear(year)" :key="'payroll-divider-cell-' + year + '-' + label" class="px-1 py-1 text-center border border-orange-700 bg-orange-800"></td>
-                  <td class="px-1 py-1 text-center border border-orange-700 bg-orange-800"></td>
-                </template>
-                <template v-else>
-                  <td class="px-1 py-1 text-center border border-orange-700 bg-orange-800"></td>
-                </template>
-              </template>
             </tr>
 
             <!-- F&B Expenses functions -->
@@ -1095,15 +1032,6 @@
                   PAYROLL
                 </div>
               </td>
-              <template v-for="year in visibleYears" :key="'payroll-divider-' + year">
-                <template v-if="!isYearCollapsed(year)">
-                  <td v-for="label in getColumnLabelsForYear(year)" :key="'payroll-divider-cell-' + year + '-' + label" class="px-1 py-1 text-center border border-orange-700 bg-orange-800"></td>
-                  <td class="px-1 py-1 text-center border border-orange-700 bg-orange-800"></td>
-                </template>
-                <template v-else>
-                  <td class="px-1 py-1 text-center border border-orange-700 bg-orange-800"></td>
-                </template>
-              </template>
             </tr>
 
           </tbody>
@@ -1112,6 +1040,9 @@
     </div>
   </div>
 </template>
+
+
+
 
 
 
