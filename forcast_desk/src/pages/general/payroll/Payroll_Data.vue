@@ -2236,13 +2236,14 @@ function restoreOriginal() {
       // Calculate salary as count * base salary
       const amount = (countValue || 0) * (row.salary || 0);
       
-      // Cache monthly salary per position, designation, and location (> 0 only)
+      // Cache monthly salary per department, position, designation, and location (> 0 only)
       try {
         const projectId = selectedProject.value?.project_name || 'default';
+        const department = (row.department || '').toString();
         const position = (row.position || '').toString();
         const designation = (row.designation || '').toString();
         const location = (row.departmentLocation || '').toString();
-        const rowCode = `MonthlySalary|position:${position}|location:${location}|designation:${designation}`;
+        const rowCode = `MonthlySalary|department:${department}|position:${position}|location:${location}|designation:${designation}`;
         calculationCache.setValue(projectId, 'Payroll', rowCode, year, month, amount);
       } catch (e) {}
       

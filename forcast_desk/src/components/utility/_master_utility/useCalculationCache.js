@@ -13,7 +13,7 @@ export const useCalculationCache = defineStore('calculationCache', {
         if (!this.cache[projectId][pageId][rowCode]) this.cache[projectId][pageId][rowCode] = {};
         if (!this.cache[projectId][pageId][rowCode][year]) this.cache[projectId][pageId][rowCode][year] = {};
         this.cache[projectId][pageId][rowCode][year][label] = value;
-       //  // console.log('[CACHE SET]', { projectId, pageId, rowCode, year, label, value });
+        // console.log('[CACHE SET]', { projectId, pageId, rowCode, year, label, value });
       }
     },
 
