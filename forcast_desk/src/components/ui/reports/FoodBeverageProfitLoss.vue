@@ -1034,6 +1034,146 @@
               </td>
             </tr>
 
+            <!-- Payroll Sub Header -->
+            <tr class="bg-[#5FA8AF] border-b border-[#5FA8AF]">
+              <td class="px-3 py-2 font-semibold border-r border-[#5FA8AF]">
+                <div class="flex items-center gap-1 text-white">
+                  Payroll
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'payroll-subheader-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'payroll-subheader-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
+                    <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
+                  </template>
+                  <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-center border border-[#5FA8AF] bg-[#5FA8AF]"></td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Payroll: Management Group Header -->
+            <tr v-if="hasFnbPayrollGroupData('management')" class="bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-200 border-b border-green-300 dark:border-green-700">
+              <td class="px-3 py-2 font-medium border-r border-green-300 dark:border-green-700">
+                <div class="flex items-center gap-1">
+                  Management
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'mgmt-subheader-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'mgmt-subheader-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-center border border-green-300 dark:border-green-700 bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-200"></td>
+                    <td class="px-2 py-1 text-center border border-green-300 dark:border-green-700 bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-200"></td>
+                  </template>
+                  <td class="px-2 py-1 text-center border border-green-300 dark:border-green-700 bg-green-100 dark:bg-green-800/30"></td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-center border border-green-300 dark:border-green-700 bg-green-100 dark:bg-green-800/30"></td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Payroll: Management per-location rows -->
+            <template v-for="loc in fnbPayrollLocationsManagement" :key="'mgmt-loc-' + loc">
+              <tr class="bg-green-100 dark:bg-green-800/30 border-b border-green-300 dark:border-green-700">
+                <td class="px-3 py-2 font-medium border-r border-green-300 dark:border-green-700">
+                  <div class="flex items-center gap-1 text-green-800 dark:text-green-200">{{ loc }}</div>
+                </td>
+                <template v-for="year in visibleYears" :key="'mgmt-row-' + loc + '-' + year">
+                  <template v-if="!isYearCollapsed(year)">
+                    <td v-for="label in getColumnLabelsForYear(year)" :key="'mgmt-cell-' + loc + '-' + year + '-' + label" class="px-2 py-1 text-right border border-green-300 dark:border-green-700 bg-green-100 dark:bg-green-800/30 dark:text-gray-200">
+                      <span class="font-mono text-xs text-green-700 dark:text-green-300">{{ formatMoney(getFnbPayrollMonthlySalaryByLocation(year, label, loc, 'management')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-green-300 dark:border-green-700 font-semibold bg-green-200 dark:bg-green-700/30">
+                      <span class="font-mono text-xs text-green-800 dark:text-green-200">{{ formatMoney(getFnbPayrollMonthlySalaryTotal(year, loc, 'management')) }}</span>
+                    </td>
+                  </template>
+                  <template v-else>
+                    <td class="px-2 py-1 text-right border border-green-300 dark:border-green-700 font-semibold bg-green-200 dark:bg-green-700/30">
+                      <span class="font-mono text-xs text-green-800 dark:text-green-200">{{ formatMoney(getFnbPayrollMonthlySalaryTotal(year, loc, 'management')) }}</span>
+                    </td>
+                  </template>
+                </template>
+              </tr>
+            </template>
+
+            <!-- Payroll: Non-Management Group Header -->
+            <tr v-if="hasFnbPayrollGroupData('non-management')" class="bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-200 border-b border-green-300 dark:border-green-700">
+              <td class="px-3 py-2 font-medium border-r border-green-300 dark:border-green-700">
+                <div class="flex items-center gap-1">
+                  Non-Management
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'nonmgmt-subheader-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'nonmgmt-subheader-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-center border border-green-300 dark:border-green-700 bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-200"></td>
+                    <td class="px-2 py-1 text-center border border-green-300 dark:border-green-700 bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-200"></td>
+                  </template>
+                  <td class="px-2 py-1 text-center border border-green-300 dark:border-green-700 bg-green-100 dark:bg-green-800/30"></td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-center border border-green-300 dark:border-green-700 bg-green-100 dark:bg-green-800/30"></td>
+                </template>
+              </template>
+            </tr>
+
+            <!-- Payroll: Non-Management per-location rows -->
+            <template v-for="loc in fnbPayrollLocationsNonManagement" :key="'nonmgmt-loc-' + loc">
+              <tr class="bg-green-100 dark:bg-green-800/30 border-b border-green-300 dark:border-green-700">
+                <td class="px-3 py-2 font-medium border-r border-green-300 dark:border-green-700">
+                  <div class="flex items-center gap-1 text-green-800 dark:text-green-200">{{ loc }}</div>
+                </td>
+                <template v-for="year in visibleYears" :key="'nonmgmt-row-' + loc + '-' + year">
+                  <template v-if="!isYearCollapsed(year)">
+                    <td v-for="label in getColumnLabelsForYear(year)" :key="'nonmgmt-cell-' + loc + '-' + year + '-' + label" class="px-2 py-1 text-right border border-green-300 dark:border-green-700 bg-green-100 dark:bg-green-800/30 dark:text-gray-200">
+                      <span class="font-mono text-xs text-green-700 dark:text-green-300">{{ formatMoney(getFnbPayrollMonthlySalaryByLocation(year, label, loc, 'non-management')) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-green-300 dark:border-green-700 font-semibold bg-green-200 dark:bg-green-700/30">
+                      <span class="font-mono text-xs text-green-800 dark:text-green-200">{{ formatMoney(getFnbPayrollMonthlySalaryTotal(year, loc, 'non-management')) }}</span>
+                    </td>
+                  </template>
+                  <template v-else>
+                    <td class="px-2 py-1 text-right border border-green-300 dark:border-green-700 font-semibold bg-green-200 dark:bg-green-700/30">
+                      <span class="font-mono text-xs text-green-800 dark:text-green-200">{{ formatMoney(getFnbPayrollMonthlySalaryTotal(year, loc, 'non-management')) }}</span>
+                    </td>
+                  </template>
+                </template>
+              </tr>
+            </template>
+
+            <!-- Total Payroll -->
+            <tr class="bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-2000 border-b-2 border-green-600">
+              <td class="px-3 py-2 font-bold border-r border-green-600">
+                <div class="flex items-center gap-1 text-white">
+                  Total Payroll
+                </div>
+              </td>
+              <template v-for="year in visibleYears" :key="'total-payroll-' + year">
+                <template v-if="!isYearCollapsed(year)">
+                  <template v-for="label in getColumnLabelsForYear(year)" :key="'total-payroll-cell-' + year + '-' + label">
+                    <td class="px-2 py-1 text-right border border-green-600 font-semibold bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-2000">
+                      <span class="font-mono text-xs text-white">{{ formatMoney(getTotalFnbPayroll(year, label)) }}</span>
+                    </td>
+                    <td class="px-2 py-1 text-right border border-green-600 font-semibold bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-2000">
+                      <span class="font-mono text-xs text-white">{{ formatPercentage(getTotalFnbPayrollPercentage(year, label)) }}%</span>
+                    </td>
+                  </template>
+                  <td class="px-2 py-1 text-right border border-green-600 font-bold bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-2000">
+                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalFnbPayrollYear(year)) }}</span>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="px-2 py-1 text-right border border-green-600 font-bold bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-2000">
+                    <span class="font-mono text-xs text-white">{{ formatMoney(getTotalFnbPayrollYear(year)) }}</span>
+                  </td>
+                </template>
+              </template>
+            </tr>
+
           </tbody>
         </table>
       </div>
@@ -2446,6 +2586,177 @@ function getTotalFnbExpensesYear(year) {
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating total F&B expenses for year ${year}:`, error);
+    return 0;
+  }
+}
+
+// ==========================================================================
+// F&B PAYROLL FUNCTIONS
+// Uses values cached by Payroll page under keys like:
+//   MonthlySalary|department:Food And Beverage|position:...|location:...|designation:...
+// ==========================================================================
+
+function parseFnbMonthlySalaryRowCode(rowCode) {
+  try {
+    if (!rowCode || !rowCode.startsWith('MonthlySalary|')) return null;
+    const regex = /^MonthlySalary\|department:Food And Beverage\|position:(.*?)\|location:(.*?)\|designation:(.*)$/;
+    const match = rowCode.match(regex);
+    if (!match) return null;
+    return {
+      position: (match[1] || '').trim(),
+      location: (match[2] || '').trim(),
+      designation: (match[3] || '').trim()
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+function isFnbManagementPositionName(position) {
+  if (!position) return false;
+  const lower = position.toLowerCase();
+  return (lower.includes('manager') && !lower.includes('non-manager')) || lower.includes('director') || lower.includes('supervisor');
+}
+
+const fnbPayrollLocationsManagement = computed(() => {
+  try {
+    const project = projectName.value;
+    const page = 'Payroll';
+    const pageData = calculationCache?.cache?.[project]?.[page] || {};
+    const locs = new Set();
+    
+    Object.keys(pageData).forEach((rowCode) => {
+      const parsed = parseFnbMonthlySalaryRowCode(rowCode);
+      if (parsed && isFnbManagementPositionName(parsed.position) && parsed.location) {
+        locs.add(parsed.location);
+      }
+    });
+    
+    return Array.from(locs);
+  } catch (e) {
+    console.error('F&B P&L: Error discovering payroll management locations:', e);
+    return [];
+  }
+});
+
+const fnbPayrollLocationsNonManagement = computed(() => {
+  try {
+    const project = projectName.value;
+    const page = 'Payroll';
+    const pageData = calculationCache?.cache?.[project]?.[page] || {};
+    const locs = new Set();
+    
+    Object.keys(pageData).forEach((rowCode) => {
+      const parsed = parseFnbMonthlySalaryRowCode(rowCode);
+      if (parsed && !isFnbManagementPositionName(parsed.position) && parsed.location) {
+        locs.add(parsed.location);
+      }
+    });
+    
+    return Array.from(locs);
+  } catch (e) {
+    console.error('F&B P&L: Error discovering payroll non-management locations:', e);
+    return [];
+  }
+});
+
+function getFnbPayrollMonthlySalaryByLocation(year, label, location, group) {
+  try {
+    const project = projectName.value;
+    const page = 'Payroll';
+    const pageData = calculationCache?.cache?.[project]?.[page] || {};
+    const months = getMonthsForLabel(label);
+    let sum = 0;
+    Object.keys(pageData).forEach((rowCode) => {
+      const parsed = parseFnbMonthlySalaryRowCode(rowCode);
+      if (!parsed || !parsed.location || parsed.location !== location) return;
+      const isMgmt = isFnbManagementPositionName(parsed.position);
+      if ((group === 'management' && !isMgmt) || (group === 'non-management' && isMgmt)) return;
+      for (const m of months) {
+        const val = calculationCache.getValue(project, page, rowCode, year, m);
+        if (val !== undefined && val !== null) sum += getNumber(val);
+      }
+    });
+    return sum;
+  } catch (e) {
+    return 0;
+  }
+}
+
+function getFnbPayrollMonthlySalaryTotal(year, location, group) {
+  try {
+    const labels = getColumnLabelsForYear(year);
+    return labels.reduce((acc, lab) => acc + getNumber(getFnbPayrollMonthlySalaryByLocation(year, lab, location, group)), 0);
+  } catch (e) {
+    return 0;
+  }
+}
+
+function getFnbPayrollMonthlySalaryPercentage(year, label, location, group) {
+  try {
+    const total = getFnbPayrollMonthlySalaryByLocation(year, label, location, group);
+    const yearTotal = getFnbPayrollMonthlySalaryTotal(year, location, group);
+    if (yearTotal === 0) return 0;
+    return (total / yearTotal) * 100;
+  } catch (error) {
+    console.error('Error calculating F&B payroll monthly salary percentage:', error);
+    return 0;
+  }
+}
+
+function hasFnbPayrollGroupData(group) {
+  try {
+    const locs = group === 'management' ? fnbPayrollLocationsManagement.value : fnbPayrollLocationsNonManagement.value;
+    if (!locs || locs.length === 0) return false;
+    for (const year of (Array.isArray(props.visibleYears) ? props.visibleYears : [])) {
+      for (const loc of locs) {
+        const total = getFnbPayrollMonthlySalaryTotal(year, loc, group);
+        if (getNumber(total) > 0) return true;
+      }
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
+function getTotalFnbPayroll(year, label) {
+  try {
+    let total = 0;
+    
+    // Add management payroll
+    for (const loc of fnbPayrollLocationsManagement.value) {
+      total += getNumber(getFnbPayrollMonthlySalaryByLocation(year, label, loc, 'management'));
+    }
+    
+    // Add non-management payroll
+    for (const loc of fnbPayrollLocationsNonManagement.value) {
+      total += getNumber(getFnbPayrollMonthlySalaryByLocation(year, label, loc, 'non-management'));
+    }
+    
+    return total;
+  } catch (e) {
+    return 0;
+  }
+}
+
+function getTotalFnbPayrollYear(year) {
+  try {
+    const labels = getColumnLabelsForYear(year);
+    return labels.reduce((acc, lab) => acc + getNumber(getTotalFnbPayroll(year, lab)), 0);
+  } catch (e) {
+    return 0;
+  }
+}
+
+function getTotalFnbPayrollPercentage(year, label) {
+  try {
+    const totalRevenue = getTotalFnbRevenue(year, label);
+    const totalPayroll = getTotalFnbPayroll(year, label);
+    if (totalRevenue === 0) return 0;
+    return (totalPayroll / totalRevenue) * 100;
+  } catch (error) {
+    console.error('Error calculating F&B payroll percentage:', error);
     return 0;
   }
 }
