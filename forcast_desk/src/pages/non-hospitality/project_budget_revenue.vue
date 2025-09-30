@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <Sidebar @open-settings="openSettings" />
+    <Sidebar @open-settings="openSettings" @project-changed="handleProjectChange" />
 
     <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
       <!-- Main Content Area -->
@@ -1015,6 +1015,20 @@ watch(selectedProject, async (newVal, oldVal) => {
   // Acknowledge the change without refetching (API is not filtered by project)
   // alertService.success(`Switched to project: ${newName}`)
 })
+
+// Handle sidebar project change
+const handleProjectChange = (newProject) => {
+  try {
+    if (newProject && newProject.project_name) {
+      // Sync selection service is already handled by ProjectSelector/Sidebar
+      alertService.success(`Switched to project: ${newProject.project_name}`)
+      // No refetch needed as API is not filtered by project
+    }
+  } catch (e) {
+    // Non-blocking UI notice
+    alertService.error('Failed to acknowledge project change')
+  }
+}
 </script>
 
 
