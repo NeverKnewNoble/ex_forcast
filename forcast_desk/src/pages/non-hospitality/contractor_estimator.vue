@@ -54,7 +54,7 @@
                   @change="onProjectChange($event)"
                   class="w-full px-3 py-2 bg-white border border-violet-200 rounded-lg text-gray-800 focus:ring-2 focus:ring-violet-500 focus:border-violet-400 text-sm shadow-sm hover:border-violet-300 transition-colors"
                 >
-                  <option value="" disabled>Select Project</option>
+                  <option value="">Select Project</option>
                   <option v-for="proj in erpProjects" :key="proj.name" :value="proj.name">
                     {{ proj.project_name || proj.name }}
                   </option>
@@ -199,22 +199,35 @@
             <h2 class="text-lg font-bold text-gray-800">Contractor Estimate Overview</h2>
           </div>
 
+          <!-- Show prompt when no project selected -->
+          <div v-if="!projectSelection" class="bg-white rounded-lg border border-violet-200 shadow-sm p-12">
+            <div class="text-center">
+              <div class="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertTriangle class="w-12 h-12 text-orange-600" />
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-2">Project Required</h3>
+              <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                Please select a project from the Project dropdown to view or edit estimates.
+              </p>
+            </div>
+          </div>
+
           <!-- Empty State or Estimator Table -->
-          <div v-if="!currentEstimator || currentEstimator.categories.length === 0" class="bg-white rounded-lg border border-violet-200 shadow-sm p-12">
+          <div v-else-if="!currentEstimator || currentEstimator.categories.length === 0" class="bg-white rounded-lg border border-violet-200 shadow-sm p-12">
             <div class="text-center">
               <div class="w-24 h-24 bg-gradient-to-br from-violet-100 to-violet-200 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Calculator class="w-12 h-12 text-violet-600" />
               </div>
-              <h3 class="text-xl font-semibold text-gray-900 mb-2">No Estimate Data</h3>
+              <h3 class="text-xl font-semibold text-gray-900 mb-2">No Categories</h3>
               <p class="text-gray-600 mb-8 max-w-md mx-auto">
-                Get started by creating your first contractor estimate. You can add categories, track costs, and monitor progress all in one place.
+                Add your first category to begin building this contractor estimate.
               </p>
               <button 
-                @click="createNewEstimator" 
+                @click="handleEmptyStatePrimaryAction" 
                 class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-violet-700 text-white rounded-xl hover:from-violet-700 hover:to-violet-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 font-medium"
               >
                 <Plus class="w-5 h-5" />
-                Create New Estimate
+                Add Category
               </button>
             </div>
           </div>
@@ -502,47 +515,16 @@
       @create="handleCreateCategory"
     />
 
-    <!-- New Estimator Modal -->
-    <div v-if="showNewEstimatorModal" class="fixed inset-0 z-50 flex items-center justify-center">
-      <div class="absolute inset-0 bg-black/30"></div>
-      <div class="relative z-10 w-full max-w-md bg-white rounded-xl shadow-2xl border border-violet-200">
-        <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <Calculator class="w-5 h-5 text-violet-600" />
-            <h3 class="text-base font-semibold text-gray-800">Create New Estimate</h3>
-          </div>
-          <button @click="cancelNewEstimator" class="text-gray-400 hover:text-gray-600">
-            <X class="w-5 h-5" />
-          </button>
-        </div>
-        <div class="p-5 space-y-3">
-          <div>
-            <label class="text-sm font-medium text-gray-700">Project Title</label>
-            <input
-              v-model="newEstimatorTitle"
-              type="text"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-              placeholder="Enter project title"
-              @keyup.enter="confirmCreateEstimator"
-            />
-          </div>
-          <div>
-            <label class="text-sm font-medium text-gray-700">Location</label>
-            <input
-              v-model="newEstimatorLocation"
-              type="text"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-              placeholder="Enter project location"
-              @keyup.enter="confirmCreateEstimator"
-            />
-          </div>
-        </div>
-        <div class="px-5 py-4 border-t border-gray-200 flex items-center justify-end gap-2 bg-gray-50 rounded-b-xl">
-          <button @click="cancelNewEstimator" class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100">Cancel</button>
-          <button @click="confirmCreateEstimator" class="px-4 py-2 rounded-md bg-gradient-to-r from-violet-600 to-violet-700 text-white hover:from-violet-700 hover:to-violet-800">Create</button>
-        </div>
-      </div>
-    </div>
+    <!-- Additional Modals -->
+    <SelectProjectModal 
+      :is-visible="showSelectProjectModal" 
+      @close="() => (showSelectProjectModal = false)" 
+    />
+    <NoCategoriesModal 
+      :is-visible="showNoCategoriesModal" 
+      @close="() => (showNoCategoriesModal = false)" 
+      @add-category="handleOpenAddCategoryFromModal" 
+    />
   </div>
 </template>
 
@@ -551,6 +533,8 @@ import { ref, computed, onMounted } from 'vue'
 import Sidebar from "@/components/ui/Sidebar.vue"
 import SettingsModal from "@/components/ui/SettingsModal.vue"
 import AddCategoryModal from "@/components/ui/contractor_estimator/AddCategoryModal.vue"
+import SelectProjectModal from "@/components/ui/contractor_estimator/SelectProjectModal.vue"
+import NoCategoriesModal from "@/components/ui/contractor_estimator/NoCategoriesModal.vue"
 import alertService from "@/components/ui/ui_utility/alertService.js"
 import { selectedProject, setSelectedProject, initializeProjectService, getStoredSelectedProject } from '@/components/utility/dashboard/projectService.js'
 import { 
@@ -595,10 +579,9 @@ const isSaved = ref(true)
 const isSaving = ref(false)
 const saveError = ref('')
 const showSettingsModal = ref(false)
-const showNewEstimatorModal = ref(false)
+const showSelectProjectModal = ref(false)
+const showNoCategoriesModal = ref(false)
 const showAddCategoryModalState = ref(false)
-const newEstimatorTitle = ref('')
-const newEstimatorLocation = ref('')
 // Currently selected project name for the sidebar select (kept in sync with service)
 const projectSelection = ref('')
 // ERPNext Project list
@@ -651,6 +634,15 @@ const loadData = async (forceReload = false) => {
   try {
     isSaving.value = true
     const currentProject = selectedProject.value?.name
+
+    // If no project selected, clear estimator and skip loading
+    if (!currentProject) {
+      estimators.value = []
+      currentEstimator.value = null
+      isSaved.value = true
+      saveError.value = ''
+      return
+    }
     
     // Always fetch from API to get latest data
     await contractorEstimatorService.fetchData(currentProject)
@@ -1165,8 +1157,14 @@ onMounted(async () => {
     // ignore
   }
 
-  // Initialize selector to empty so placeholder shows by default
-  projectSelection.value = ''
+  // Restore cached selection if available
+  const stored = getStoredSelectedProject?.() || null
+  if (stored && stored.name) {
+    setSelectedProject(stored)
+    projectSelection.value = stored.name
+  } else {
+    projectSelection.value = ''
+  }
 
   // Load contractor estimator data
   await loadData()
@@ -1184,8 +1182,18 @@ const onProjectChange = async (event) => {
     const newProjectName = event.target.value
     projectSelection.value = newProjectName
 
-  // Find full project object and update selection service
-  const proj = erpProjects.value ? erpProjects.value.find(p => p.name === newProjectName) : null
+    // If placeholder selected, allow local empty selection and prompt without clearing global selection
+    if (!newProjectName) {
+      projectSelection.value = ''
+      // Clear local estimator state to hide table, keep sidebar context intact
+      estimators.value = []
+      currentEstimator.value = null
+      showSelectProjectModal.value = true
+      return
+    }
+
+    // Find full project object and update selection service
+    const proj = erpProjects.value ? erpProjects.value.find(p => p.name === newProjectName) : null
     if (proj) {
       setSelectedProject(proj)
       alertService.success(`Switched to project: ${proj.project_name || proj.name}`)
@@ -1196,6 +1204,22 @@ const onProjectChange = async (event) => {
   } catch (error) {
     alertService.error('Failed to switch project')
   }
+}
+
+// Empty state actions and modal triggers
+const handleEmptyStatePrimaryAction = () => {
+  // If no project selected, show select-project modal
+  if (!projectSelection.value) {
+    showSelectProjectModal.value = true
+    return
+  }
+  // Otherwise, show the add-category modal directly
+  showAddCategoryModal()
+}
+
+const handleOpenAddCategoryFromModal = () => {
+  showNoCategoriesModal.value = false
+  showAddCategoryModal()
 }
 
 //
