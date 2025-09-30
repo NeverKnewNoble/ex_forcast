@@ -184,12 +184,12 @@
           <div class="flex-1 p-4">
             <!-- No Project Selected State -->
             <div v-if="expenseData.status === 'no_project_selected'">
-              <NoProjectSelectedState />
+              <ReportsNoProjectSelectedState />
             </div>
   
             <!-- Error State -->
             <div v-else-if="expenseData.status === 'error'">
-              <ErrorState :message="expenseData.message" @retry="refreshTable" />
+              <ExpenseErrorState :message="expenseData.message" @retry="refreshTable" />
             </div>
   
             <!-- Table Header with Stats -->
@@ -1302,7 +1302,7 @@
   
             <!-- Enhanced No Years Selected State -->
             <template v-else>
-              <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
+              <ReceiptsNoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
             </template>
           </div>
         </div>
@@ -1397,9 +1397,9 @@
   // Component imports
   import Sidebar from "@/components/ui/Sidebar.vue";
 import SettingsModal from "@/components/ui/SettingsModal.vue";
-  import NoProjectSelectedState from '@/components/ui/expense/NoProjectSelectedState.vue';
-  import ErrorState from '@/components/ui/expense/ErrorState.vue';
-  import NoYearsSelectedState from '@/components/ui/receipts/NoYearsSelectedState.vue';
+  import ReportsNoProjectSelectedState from '@/components/ui/reports/ReportsNoProjectSelectedState.vue';
+  import ExpenseErrorState from '@/components/ui/expense/ExpenseErrorState.vue';
+  import ReceiptsNoYearsSelectedState from '@/components/ui/receipts/ReceiptsNoYearsSelectedState.vue';
   
   // Icon imports
   import { 

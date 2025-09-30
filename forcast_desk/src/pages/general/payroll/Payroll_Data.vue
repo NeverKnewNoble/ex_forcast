@@ -823,7 +823,7 @@
   
             <!-- Enhanced No Years Selected State -->
             <template v-else-if="selectedProject">
-              <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
+              <PayrollNoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
             </template>
             
             <!-- Fallback for when project is selected but no years -->
@@ -1336,7 +1336,7 @@
   import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
   import Sidebar from "@/components/ui/Sidebar.vue";
 import SettingsModal from "@/components/ui/SettingsModal.vue";
-  import NoYearsSelectedState from '@/components/ui/payroll/NoYearsSelectedState.vue';
+  import PayrollNoYearsSelectedState from '@/components/ui/payroll/PayrollNoYearsSelectedState.vue';
   import { 
     CircleAlert, 
     AlertTriangle, 

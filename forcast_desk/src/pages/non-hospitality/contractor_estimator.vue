@@ -897,9 +897,9 @@ const deleteItem = async (categoryId, itemId) => {
             const deleteResult = await contractorEstimatorService.deleteItem(currentEstimator.value.id, item.lineId)
             
             if (deleteResult.success) {
-              console.log('Successfully deleted item from database')
+              console.log('Successfully deleted item')
             } else {
-              console.warn('Failed to delete item from database:', deleteResult.error)
+              console.warn('Failed to delete item:', deleteResult.error)
               // Continue with local removal even if database deletion fails
             }
           } else {
@@ -1165,14 +1165,8 @@ onMounted(async () => {
     // ignore
   }
 
-  // Restore selected project from storage (service may clear it if not in its list)
-  const stored = getStoredSelectedProject?.() || null
-  if (stored && stored.name) {
-    setSelectedProject(stored)
-  }
-
-  // Sync initial project selection value from service
-  projectSelection.value = selectedProject?.value?.name || ''
+  // Initialize selector to empty so placeholder shows by default
+  projectSelection.value = ''
 
   // Load contractor estimator data
   await loadData()

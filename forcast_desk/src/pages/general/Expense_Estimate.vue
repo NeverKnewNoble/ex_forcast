@@ -162,7 +162,7 @@
           
           <!-- No Project Selected State -->
           <div v-if="expenseData.status === 'no_project_selected'">
-            <NoProjectSelectedState />
+            <ExpenseNoProjectSelectedState />
           </div>
 
           <!-- No Data State (only when no default expenses exist) -->
@@ -172,7 +172,7 @@
 
           <!-- Error State -->
           <div v-else-if="expenseData.status === 'error'">
-            <ErrorState :message="expenseData.message" @retry="refreshTable" />
+            <ExpenseErrorState :message="expenseData.message" @retry="refreshTable" />
           </div>
 
           <!-- Table Header with Stats -->
@@ -426,7 +426,7 @@
           
           <!-- Enhanced No Years Selected State -->
           <template v-else>
-            <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
+            <ExpenseNoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
           </template>
         </div>
       </div>
@@ -812,10 +812,10 @@ import { saveChanges } from "@/components/utility/expense_assumption/save_change
 import { submitAddExpense } from "@/components/utility/expense_assumption/submit_add_expense.js";
 import { selectedProject, initializeProjectService, getProjectDepartments } from '@/components/utility/dashboard/projectService.js';
 import { loadDepartmentLocationOptions } from '@/components/utility/payroll/payroll_data_service.js';
-import NoProjectSelectedState from '@/components/ui/expense/NoProjectSelectedState.vue';
+import ExpenseNoProjectSelectedState from '@/components/ui/expense/ExpenseNoProjectSelectedState.vue';
 import NoDataState from '@/components/ui/expense/NoDataState.vue';
-import ErrorState from '@/components/ui/expense/ErrorState.vue';
-import NoYearsSelectedState from '@/components/ui/expense/NoYearsSelectedState.vue';
+import ExpenseErrorState from '@/components/ui/expense/ExpenseErrorState.vue';
+import ExpenseNoYearsSelectedState from '@/components/ui/expense/ExpenseNoYearsSelectedState.vue';
 import { allowOnlyNumbers as allowOnlyNumbersFromPayroll } from '@/components/utility/payroll/index.js';
 import SettingsModal from '@/components/ui/SettingsModal.vue';
 
