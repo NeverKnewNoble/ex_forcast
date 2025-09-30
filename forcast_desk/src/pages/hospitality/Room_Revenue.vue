@@ -275,9 +275,9 @@
             <div v-else>
               <!-- Status Messages -->
               <div v-if="roomData.status" class="mb-6">
-                <NoProjectSelectedState v-if="roomData.status === 'no_project_selected'" />
+                <RoomNoProjectSelectedState v-if="roomData.status === 'no_project_selected'" />
                 
-                <ErrorState v-else-if="roomData.status === 'error'" :message="roomData.message" @retry="refreshRoomRevenueData" />
+                <RoomErrorState v-else-if="roomData.status === 'error'" :message="roomData.message" @retry="refreshRoomRevenueData" />
               </div>
 
               <!-- Table Header with Stats -->
@@ -800,7 +800,7 @@
 
               <!-- No Years Selected -->
               <template v-else-if="!roomData.status">
-                <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
+                <RoomNoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
               </template>
             </div>
           </div>
@@ -1468,9 +1468,9 @@ import { createRoomPackage } from '@/components/utility/room_revenue_assumpt./ro
 
 // Import market segmentation utilities
 import { MARKET_SEGMENT_CATEGORIES, MARKET_SEGMENTS } from "@/components/utility/room_revenue_assumpt./market_segments.js";
-import NoProjectSelectedState from '@/components/ui/room/NoProjectSelectedState.vue';
-import ErrorState from '@/components/ui/room/ErrorState.vue';
-import NoYearsSelectedState from '@/components/ui/room/NoYearsSelectedState.vue';
+import RoomNoProjectSelectedState from '@/components/ui/room/RoomNoProjectSelectedState.vue';
+import RoomErrorState from '@/components/ui/room/RoomErrorState.vue';
+import RoomNoYearsSelectedState from '@/components/ui/room/RoomNoYearsSelectedState.vue';
 
 // Import SettingsModal component
 import SettingsModal from '@/components/ui/SettingsModal.vue';

@@ -248,12 +248,12 @@
           <div class="p-0">
           <!-- No Project Selected State -->
             <div v-if="expenseData.status === 'no_project_selected'">
-              <NoProjectSelectedState />
+              <ReportsNoProjectSelectedState />
             </div>
 
             <!-- Error State -->
             <div v-else-if="expenseData.status === 'error'">
-              <ErrorState :message="expenseData.message" @retry="refreshTable" />
+              <ExpenseErrorState :message="expenseData.message" @retry="refreshTable" />
             </div>
 
             <!-- Report Selection State -->
@@ -375,9 +375,9 @@
 
   // Component imports
   import Sidebar from "@/components/ui/Sidebar.vue";
-  import NoProjectSelectedState from '@/components/ui/expense/NoProjectSelectedState.vue';
-  import ErrorState from '@/components/ui/expense/ErrorState.vue';
-  import NoYearsSelectedState from '@/components/ui/reports/NoYearsSelectedState.vue';
+  import ReportsNoProjectSelectedState from '@/components/ui/reports/ReportsNoProjectSelectedState.vue';
+  import ExpenseErrorState from '@/components/ui/expense/ExpenseErrorState.vue';
+  import ReportsNoYearsSelectedState from '@/components/ui/reports/ReportsNoYearsSelectedState.vue';
   import ReportSelector from '@/components/ui/reports/ReportSelector.vue';
   import SettingsModal from "@/components/ui/SettingsModal.vue";
   import RoomProfitLoss from '@/components/ui/reports/RoomProfitLoss.vue';

@@ -265,12 +265,12 @@
           <div class="flex-1 p-4" :key="doubleOccStamp">
             <!-- No Project Selected State -->
             <div v-if="fnbData.status === 'no_project_selected'">
-              <NoProjectSelectedState />
+              <FnbNoProjectSelectedState />
             </div>
 
             <!-- No Data State -->
             <div v-else-if="fnbData.status === 'no_data'">
-              <NoDataState :project="fnbData.project" />
+              <FnbNoDataState :project="fnbData.project" />
             </div>
 
             <!-- Table Header with Stats -->
@@ -594,7 +594,7 @@
 
             <!-- Enhanced No Years Selected State -->
             <template v-else>
-              <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
+              <FnbNoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
             </template>
           </div>
         </div>
@@ -1071,9 +1071,9 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
   // Import project-specific localStorage utilities
   import { getProjectKey } from '@/components/utility/projectLocalStorage.js';
-  import NoProjectSelectedState from '@/components/ui/fnb/NoProjectSelectedState.vue';
-  import NoDataState from '@/components/ui/fnb/NoDataState.vue';
-  import NoYearsSelectedState from '@/components/ui/fnb/NoYearsSelectedState.vue';
+  import FnbNoProjectSelectedState from '@/components/ui/fnb/FnbNoProjectSelectedState.vue';
+  import FnbNoDataState from '@/components/ui/fnb/FnbNoDataState.vue';
+  import FnbNoYearsSelectedState from '@/components/ui/fnb/FnbNoYearsSelectedState.vue';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
   
 

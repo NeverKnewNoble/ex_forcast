@@ -207,7 +207,7 @@
         <div class="flex-1 p-4">
           <!-- No Project Selected State -->
           <template v-if="!selectedProject">
-            <NoProjectSelectedState />
+            <PayrollNoProjectSelectedState />
           </template>
           
           <!-- Table Header with Stats -->
@@ -1132,12 +1132,12 @@
 
           <!-- Enhanced No Years Selected State -->
           <template v-else-if="selectedProject">
-            <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
+            <PayrollNoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
           </template>
           
           <!-- Fallback for when project is selected but no years -->
           <template v-else>
-            <NoProjectSelectedState />
+            <PayrollNoProjectSelectedState />
           </template>
         </div>
       </div>
@@ -1201,8 +1201,8 @@ import { cloneDeep } from 'lodash-es';
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
 import PayrollRelatedTabs from '@/components/ui/payroll/PayrollRelatedTabs.vue';
 import NoPayrollDataState from '@/components/ui/payroll/NoPayrollDataState.vue';
-import NoProjectSelectedState from '@/components/ui/payroll/NoProjectSelectedState.vue';
-import NoYearsSelectedState from '@/components/ui/payroll/NoYearsSelectedState.vue';
+import PayrollNoProjectSelectedState from '@/components/ui/payroll/PayrollNoProjectSelectedState.vue';
+import PayrollNoYearsSelectedState from '@/components/ui/payroll/PayrollNoYearsSelectedState.vue';
 import LoadingState from '@/components/ui/payroll/LoadingState.vue';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
 import { getProjectKey } from '@/components/utility/projectLocalStorage.js';  

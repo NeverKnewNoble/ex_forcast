@@ -131,7 +131,7 @@
           <div class="flex-1 p-4">
             <!-- No Project Selected State -->
             <template v-if="!selectedProject">
-              <NoProjectSelectedState />
+              <OodNoProjectSelectedState />
             </template>
             
             
@@ -1009,7 +1009,7 @@
   
             <!-- Enhanced No Years Selected State -->
             <template v-else-if="selectedProject">
-              <NoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
+              <OodNoYearsSelectedState :from-year="fromYear" :to-year="toYear" />
             </template>
           </div>
         </div>
@@ -1154,8 +1154,8 @@
   
   // Import project service
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
-import NoProjectSelectedState from '@/components/ui/ood/NoProjectSelectedState.vue';
-import NoYearsSelectedState from '@/components/ui/ood/NoYearsSelectedState.vue';
+import OodNoProjectSelectedState from '@/components/ui/ood/OodNoProjectSelectedState.vue';
+import OodNoYearsSelectedState from '@/components/ui/ood/OodNoYearsSelectedState.vue';
 import SettingsModal from '@/components/ui/SettingsModal.vue';
   
   // Reactive state
