@@ -6,7 +6,7 @@
         <!-- Main Content Area -->
         <div class="relative p-4">
           <!-- Top Filters and Controls -->
-          <div v-if="visibleYears.length" class="absolute top-4 left-4 z-30 w-[660px] max-w-[95vw] rounded-2xl overflow-hidden backdrop-blur-xl bg-white/80 border border-violet-200/60 shadow-2xl ring-1 ring-violet-300/30 dark:bg-[#151823]/80 dark:border-violet-900/40 dark:ring-violet-900/30">
+          <div v-if="visibleYears.length" class="absolute top-4 left-4 z-30 w-[660px] max-w-[95vw] rounded-2xl overflow-hidden backdrop-blur-xl bg-white/80 border border-violet-200/60 shadow-2xl ring-1 ring-violet-300/30 dark:bg-[#151823]/80 dark:border-violet-900/40 dark:ring-violet-900/30" @mouseenter="onHoverEnter" @mouseleave="onHoverLeave">
             <div class="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-violet-600 to-violet-700 text-white">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center shadow-sm">
@@ -17,15 +17,6 @@
                   <p class="text-xs opacity-80">Manage and configure your reports</p>
                 </div>
               </div>
-              <!-- Collapse/Expand Button (collapses upward) -->
-              <button 
-                @click="sidebarCollapsed = !sidebarCollapsed" 
-                class="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg transition-all"
-              >
-                <ChevronUp v-if="!sidebarCollapsed" class="w-5 h-5 text-white" />
-                <ChevronDown v-else class="w-5 h-5 text-white" />
-                <span class="text-sm font-medium">{{ sidebarCollapsed ? 'Expand' : 'Collapse' }}</span>
-              </button>
             </div>
   
             <transition name="fade">
@@ -394,10 +385,8 @@
     FolderOpen, 
     Receipt, 
     Tag, 
-    ChevronDown, 
     ChevronRight, 
     ChevronLeft, 
-    ChevronUp,
     Hash, 
     Calendar, 
     ArrowLeft, 
@@ -473,6 +462,7 @@
   const showUnsavedWarning = ref(false);
   const pendingNavigation = ref(null);
   const sidebarCollapsed = ref(true);
+  let hoverCloseTimer = null;
   const departments = ref([]); // Add departments state
   const calculationCache = useCalculationCache();
   
@@ -697,6 +687,25 @@
   // ============================================================================
   // EVENT HANDLERS
   // ============================================================================
+  // Smooth hover open/close for the top filters panel
+  function onHoverEnter() {
+    if (hoverCloseTimer) {
+      clearTimeout(hoverCloseTimer);
+      hoverCloseTimer = null;
+    }
+    sidebarCollapsed.value = false;
+  }
+
+  function onHoverLeave() {
+    if (hoverCloseTimer) {
+      clearTimeout(hoverCloseTimer);
+      hoverCloseTimer = null;
+    }
+    hoverCloseTimer = setTimeout(() => {
+      sidebarCollapsed.value = true;
+      hoverCloseTimer = null;
+    }, 180);
+  }
   function clearYearSelection() {
     clearYearSettings();
     isSaved.value = false;
@@ -1248,10 +1257,11 @@
   
   <style scoped>
   .fade-enter-active, .fade-leave-active {
-    transition: opacity 0.2s ease;
+    transition: opacity 0.18s ease, transform 0.18s ease;
   }
   .fade-enter-from, .fade-leave-to {
     opacity: 0;
+    transform: translateY(-6px);
   }
   </style>
     

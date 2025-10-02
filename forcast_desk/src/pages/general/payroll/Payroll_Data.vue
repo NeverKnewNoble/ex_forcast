@@ -1,5 +1,9 @@
 <template>
-    <div class="flex ">
+    <!-- Skeleton Loading State -->
+    <PayrollSkeleton v-if="isLoading" :sidebar-collapsed="sidebarCollapsed" />
+    
+    <!-- Main Content -->
+    <div v-else class="flex ">
       <Sidebar @open-settings="openSettings" />
   
       <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
@@ -1337,6 +1341,7 @@
   import Sidebar from "@/components/ui/Sidebar.vue";
 import SettingsModal from "@/components/ui/SettingsModal.vue";
   import PayrollNoYearsSelectedState from '@/components/ui/payroll/PayrollNoYearsSelectedState.vue';
+  import PayrollSkeleton from '@/components/ui/skeleton/PayrollSkeleton.vue';
   import { 
     CircleAlert, 
     AlertTriangle, 
@@ -1483,6 +1488,7 @@ import { getProjectDepartments } from '@/components/utility/dashboard/projectSer
   const showSettingsModal = ref(false);
   
 const isComponentReady = ref(false); // Add a flag to track if component is ready
+const isLoading = ref(false); // Add loading state for skeleton
 const projectDepartments = ref([]);
 
 // ************ Payroll Row Management ****************
@@ -1737,6 +1743,7 @@ const deletedPayrollRows = ref(new Set()); // Track deleted payroll rows for res
   // On mount, initialize years
   onMounted(async () => {
     try {
+      isLoading.value = true;
       await initializeProjectService();
       await new Promise(resolve => setTimeout(resolve, 100));
       years.value = await loadYearOptions();
@@ -1773,6 +1780,8 @@ const deletedPayrollRows = ref(new Set()); // Track deleted payroll rows for res
       }
     } catch (err) {
       console.error("Error loading data:", err);
+    } finally {
+      isLoading.value = false;
     }
   });
 
@@ -1782,6 +1791,7 @@ const deletedPayrollRows = ref(new Set()); // Track deleted payroll rows for res
     
     if (newProject) {
       try {
+        isLoading.value = true;
        //  // console.log('Reloading Payroll data for new project:', newProject.project_name);
         
         // Reload Payroll data for the new project
@@ -1805,6 +1815,8 @@ const deletedPayrollRows = ref(new Set()); // Track deleted payroll rows for res
       } catch (error) {
         console.error('Error reloading Payroll data for new project:', error);
         alertService.error("Failed to load project data. Please try again.");
+      } finally {
+        isLoading.value = false;
       }
     } else {
       // Clear data when no project is selected
@@ -1823,6 +1835,7 @@ const deletedPayrollRows = ref(new Set()); // Track deleted payroll rows for res
     if (selectedProject.value && newFromYear && newToYear && 
         (newFromYear !== oldFromYear || newToYear !== oldToYear)) {
       try {
+        isLoading.value = true;
         await fetchPayrollData(selectedProject.value.project_name, newFromYear, newToYear);
         originalPayrollData.value = cloneDeep(payrollRows.value);
         
@@ -1836,6 +1849,8 @@ const deletedPayrollRows = ref(new Set()); // Track deleted payroll rows for res
       } catch (error) {
         console.error('Error reloading Payroll data for new year range:', error);
         alertService.error("Failed to load data for selected year range. Please try again.");
+      } finally {
+        isLoading.value = false;
       }
     }
   }, { deep: true });

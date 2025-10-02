@@ -1,5 +1,9 @@
 <template>
-  <div class="flex">
+  <!-- Skeleton Loading State -->
+  <PayrollSkeleton v-if="isLoading" :sidebar-collapsed="sidebarCollapsed" />
+  
+  <!-- Main Content -->
+  <div v-else class="flex">
     <Sidebar @open-settings="openSettings" />
 
     <div class="flex-1 min-h-screen bg-gradient-to-br from-white to-violet-50">
@@ -1160,6 +1164,7 @@ import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
 import SettingsModal from "@/components/ui/SettingsModal.vue";
+import PayrollSkeleton from '@/components/ui/skeleton/PayrollSkeleton.vue';
 import { 
   CircleAlert, 
   AlertTriangle, 
@@ -1452,6 +1457,7 @@ const changedCells = ref([]); // {rowId, fieldType, year, month, newValue}
 const isSaving = ref(false);
 const saveError = ref("");
 const sidebarCollapsed = ref(false);
+const isLoading = ref(false); // Add loading state for skeleton
 
 // Settings Modal State
 const showSettingsModal = ref(false);
@@ -1651,6 +1657,7 @@ const submitPayrollDataWrapper = async () => {
 // On mount, initialize years
 onMounted(async () => {
   try {
+    isLoading.value = true;
     await initializeProjectService();
     await new Promise(resolve => setTimeout(resolve, 100));
     years.value = await loadYearOptions();
@@ -1688,6 +1695,8 @@ onMounted(async () => {
     }
   } catch (err) {
     console.error("Error loading data:", err);
+  } finally {
+    isLoading.value = false;
   }
 });
 
@@ -1697,6 +1706,7 @@ watch(selectedProject, async (newProject, oldProject) => {
   
   if (newProject) {
     try {
+      isLoading.value = true;
      //  // console.log('Reloading Payroll data for new project:', newProject.project_name);
       
       // Reload Payroll data for the new project
@@ -1721,6 +1731,8 @@ watch(selectedProject, async (newProject, oldProject) => {
     } catch (error) {
       console.error('Error reloading Payroll data for new project:', error);
       alertService.error("Failed to load project data. Please try again.");
+    } finally {
+      isLoading.value = false;
     }
   } else {
     // Clear data when no project is selected
@@ -1739,6 +1751,7 @@ watch([fromYear, toYear], async ([newFromYear, newToYear], [oldFromYear, oldToYe
   if (selectedProject.value && newFromYear && newToYear && 
       (newFromYear !== oldFromYear || newToYear !== oldToYear)) {
     try {
+      isLoading.value = true;
       await fetchPayrollData(selectedProject.value.project_name, newFromYear, newToYear);
       // Also load payroll related data for the new year range
       await fetchPayrollRelatedData(selectedProject.value.project_name, newFromYear, newToYear);
@@ -1757,6 +1770,8 @@ watch([fromYear, toYear], async ([newFromYear, newToYear], [oldFromYear, oldToYe
     } catch (error) {
       console.error('Error reloading Payroll data for new year range:', error);
       alertService.error("Failed to load data for selected year range. Please try again.");
+    } finally {
+      isLoading.value = false;
     }
   }
 }, { deep: true });
