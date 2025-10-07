@@ -6,7 +6,7 @@
         <!-- Main Content Area -->
         <div class="relative p-4">
           <!-- Top Filters and Controls -->
-          <div v-if="visibleYears.length" class="absolute top-4 left-4 z-30 w-[660px] max-w-[95vw] rounded-2xl overflow-hidden backdrop-blur-xl bg-white/80 border border-violet-200/60 shadow-2xl ring-1 ring-violet-300/30 dark:bg-[#151823]/80 dark:border-violet-900/40 dark:ring-violet-900/30" @mouseenter="onHoverEnter" @mouseleave="onHoverLeave">
+          <div class="absolute top-4 left-4 z-30 w-[660px] max-w-[95vw] rounded-2xl overflow-hidden backdrop-blur-xl bg-white/80 border border-violet-200/60 shadow-2xl ring-1 ring-violet-300/30 dark:bg-[#151823]/80 dark:border-violet-900/40 dark:ring-violet-900/30" @mouseenter="onHoverEnter" @mouseleave="onHoverLeave">
             <div class="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-violet-600 to-violet-700 text-white">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center shadow-sm">
@@ -47,7 +47,7 @@
                   <div v-if="selectedReport" class="mt-2 flex gap-2">
                     <button 
                       @click="clearSelectedReport"
-                      class="flex items-center gap-1 px-2 py-1 text-xs text-violet-600 hover:text-violet-700 hover:bg-violet-700 hover:bg-violet-50 rounded transition-all"
+                      class="flex items-center gap-1 px-2 py-1 text-xs text-violet-600 hover:text-violet-700 hover:bg-violet-50 rounded transition-all"
                     >
                       <RefreshCw class="w-3 h-3" />
                       Change Report
@@ -180,7 +180,6 @@
                             From Year
                           </label>
                           <select 
-                            disabled
                             v-model="fromYear" 
                             class="w-full px-3 py-2.5 rounded-lg border border-violet-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-gray-100 text-sm shadow-sm dark:bg-[#111318] dark:text-gray-200 dark:border-violet-900/40"
                           >
@@ -197,7 +196,6 @@
                             To Year
                           </label>
                           <select 
-                            disabled
                             v-model="toYear" 
                             class="w-full px-3 py-2.5 rounded-lg border border-violet-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all bg-gray-100 text-sm shadow-sm dark:bg-[#111318] dark:text-gray-200 dark:border-violet-900/40"
                           >
@@ -368,7 +366,6 @@
   import Sidebar from "@/components/ui/Sidebar.vue";
   import ReportsNoProjectSelectedState from '@/components/ui/reports/ReportsNoProjectSelectedState.vue';
   import ExpenseErrorState from '@/components/ui/expense/ExpenseErrorState.vue';
-  import ReportsNoYearsSelectedState from '@/components/ui/reports/ReportsNoYearsSelectedState.vue';
   import ReportSelector from '@/components/ui/reports/ReportSelector.vue';
   import SettingsModal from "@/components/ui/SettingsModal.vue";
   import RoomProfitLoss from '@/components/ui/reports/RoomProfitLoss.vue';
@@ -378,28 +375,14 @@
   import { 
     AlertTriangle, 
     BookOpen, 
-    Table, 
     Download, 
     Printer,
     RefreshCw, 
-    FolderOpen, 
-    Receipt, 
-    Tag, 
-    ChevronRight, 
-    ChevronLeft, 
-    Hash, 
     Calendar, 
-    ArrowLeft, 
     Settings, 
     X, 
     Check, 
-    PlusCircle,  
-    Trash2, 
-    DollarSign, 
-    Percent,
-    CircleAlert,
     AlertCircle,
-    Save,
     Loader2,
     FileText,
     Plus,
@@ -415,34 +398,16 @@
   import {
     // Core calculations
     getVisibleYears,
-    getColumnLabels,
     
     // Data loading and API services
     loadYearOptions,
-    
-    // Table display and interaction
-    toggleCollapse,
-    isYearCollapsed,
-    
-    // Filter and validation utilities
-    months,
   } from "@/components/utility/expense_assumption/index.js";
   
-  import {
-    calculateCategoryTotal,
-    formatAmountInput,
-    cleanAmountValue,
-    handleCellEdit,
-    handleCellInput,
-    handleCellFocus,
-    calculateCategoryMonthTotal
-  } from "@/components/utility/expense_assumption/expense_estimate_utils.js";
+  
   
   import { selectedProject, initializeProjectService, getProjectDepartments } from '@/components/utility/dashboard/projectService.js';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
-  // Month labels and quarter utilities
-  import { monthLabels as monthlyBaseLabels, quarterToMonths } from '@/components/utility/expense_assumption/expense_formular.js';
-  import { allowOnlyNumbers } from '@/components/utility/payroll/index.js';
+  
   
   // ============================================================================
   // REACTIVE STATE
@@ -508,24 +473,9 @@
     return getFilteredToYears(years.value);
   });
   
-  const groupedExpenses = computed(() => {
-    // Use all expenses data to show all expenses, regardless of year data
-    if (allExpensesData.value.length > 0) {
-      return getAllExpensesGroupedByCategory(allExpensesData.value);
-    }
-    // Fallback to the old method if no all expenses data is available
-    return getExpensesGroupedByCategory(expenseData.value, visibleYears.value);
-  });
+  // Note: Expense grouping utilities removed from Reports page; reports use unified data
   
-  // Computed property to get column labels for a specific year
-  const getColumnLabelsForYearLocal = (year) => {
-    // Get the base column labels
-    const baseLabels = getColumnLabels(advancedModes.value[year] || displayMode.value);
-    
-    // Add the two extra columns (ex1 and ex2) before the Total column
-    // This is specific to the Receipts_Payments page only
-    return [...baseLabels, 'ex1', 'ex2'];
-  };
+  
   
   // =========================================================================
   // ROOMS REVENUE LOOKUP FROM PINIA CALCULATION CACHE
@@ -632,7 +582,7 @@
   });
 
   // Watch for report selection changes to persist in localStorage
-  watch(selectedReport, (newValue) => {
+  watch(selectedReport, async (newValue, oldValue) => {
     try {
       if (newValue) {
         localStorage.setItem('selectedReport', newValue);
@@ -641,6 +591,10 @@
       }
     } catch (e) {
       console.warn('Could not save to localStorage:', e);
+    }
+    // Proactively reload data when report changes and years are selected
+    if (selectedProject.value && visibleYears.value.length) {
+      await loadReportData();
     }
   });
   
@@ -711,77 +665,7 @@
     isSaved.value = false;
   }
   
-  function handleCellEditWrapper({ year, label, expense, event }) {
-    handleCellEdit({
-      year,
-      label,
-      expense,
-      event,
-      originalExpenseData,
-      changedCells,
-      expenseData,
-      isSaved
-    });
-  }
   
-  // Wrapper functions to ensure addExpenseForm is properly initialized
-  const formatAmountInputWrapper = (index, event) => {
-    if (addExpenseForm && addExpenseForm.value && addExpenseForm.value.rows) {
-      formatAmountInput(index, addExpenseForm, event);
-    }
-  };
-  
-  const cleanAmountValueWrapper = (index) => {
-    if (addExpenseForm && addExpenseForm.value && addExpenseForm.value.rows) {
-      cleanAmountValue(index, addExpenseForm);
-    }
-  };
-  
-  // Wrapper function for submitAddExpense
-  const submitAddExpenseWrapper = async () => {
-    if (addExpenseForm && addExpenseForm.value) {
-      await submitAddExpense(addExpenseForm, showAddExpenseModal, resetExpenseForm, isSaved, alertService, async () => {
-        // Reload all expenses and categories
-        const allExpensesResult = await loadAllExpensesAndCategories();
-        if (allExpensesResult.status === 'success') {
-          allExpensesData.value = allExpensesResult.expenses;
-        }
-        
-        // Reload expense data to show newly added expenses
-        expenseData.value = await loadExpenseData();
-        if (!expenseData.value.status) {
-          originalExpenseData.value = cloneDeep(expenseData.value);
-          expenses.value = extractAllExpenses(expenseData.value);
-        }
-      });
-    }
-  };
-  
-  // Wrapper function for saveChanges
-  const saveChangesWrapper = async () => {
-    try {
-      isSaving.value = true;
-      saveError.value = "";
-      const projectName = selectedProject.value?.project_name || null;
-      const changes = buildReceiptsPaymentsChanges();
-      if (!changes.length) {
-        alertService.info('No changes to save');
-        return;
-      }
-      const res = await upsertReceiptsPaymentsItems(changes, projectName);
-      if (res.status === 'error') {
-        throw new Error(res.message || 'Save failed');
-      }
-      alertService.success('Receipts & Payments saved');
-      isSaved.value = true;
-      changedCells.value = [];
-    } catch (e) {
-      saveError.value = e?.message || 'Save failed';
-      alertService.error(saveError.value);
-    } finally {
-      isSaving.value = false;
-    }
-  };
 
 
   
@@ -804,6 +688,9 @@
       
      //  // console.log('Reports: Loading data for project:', selectedProject.value.project_name, 'years:', visibleYears.value);
       
+      // Warm caches for common reports to avoid needing to visit pages
+      await warmCaches();
+
       // Use the unified service to get all data
       const unifiedData = await reportDataService.getReportData(
         selectedProject.value.project_name, 
@@ -826,6 +713,21 @@
       alertService.error(`Failed to load report data: ${error.message}`);
     } finally {
       dataLoading.value = false;
+    }
+  }
+
+  // Warm calculation caches by pre-fetching report-specific data
+  async function warmCaches() {
+    try {
+      const project = selectedProject.value?.project_name;
+      if (!project || !visibleYears.value.length) return;
+      const typesToWarm = ['room-pnl', 'fnb-pnl'];
+      await Promise.allSettled(
+        typesToWarm.map(t => reportDataService.getReportSpecificData(t, project, visibleYears.value))
+      );
+    } catch (e) {
+      // Non-fatal; continue with unified fetch
+      // console.warn('Warm cache failed:', e);
     }
   }
 
@@ -894,54 +796,8 @@
   // EXPORT FUNCTIONALITY
   // ============================================================================
   function exportTableData() {
-    try {
-      // Create CSV content
-      let csvContent = "data:text/csv;charset=utf-8,";
-      
-      // Add headers
-      const headers = ["Receipt/Payment"];
-      visibleYears.value.forEach(year => {
-        if (!isYearCollapsed(year)) {
-          getColumnLabelsForYearLocal(year).forEach(label => {
-            headers.push(`${year} - ${label}`);
-          });
-        }
-        headers.push(`${year} - Total`);
-      });
-      csvContent += headers.join(",") + "\n";
-      
-      // Add data rows
-      groupedExpenses.value.forEach(categoryGroup => {
-        categoryGroup.expenses.forEach(expense => {
-          const row = [
-            expense
-          ];
-          
-          visibleYears.value.forEach(year => {
-            if (!isYearCollapsed(year)) {
-              getColumnLabelsForYearLocal(year).forEach(label => {
-                row.push(getAmountForExpense(expenseData.value, expense, year, label, advancedModes.value[year] || displayMode.value));
-              });
-            }
-            row.push(calculateTotalForExpense(expenseData.value, expense, year, advancedModes.value[year] || displayMode.value, getColumnLabelsForYearLocal));
-          });
-          
-          csvContent += row.join(",") + "\n";
-        });
-      });
-      
-      // Download the file
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `receipts_payments_data_${fromYear.value}_${toYear.value}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Error exporting data:", error);
-      alertService.error("Failed to export data. Please try again.");
-    }
+    // Placeholder until unified report CSV export is implemented
+    alertService.info('Export for reports is coming soon.');
   }
 
   // ==========================================================================
@@ -970,113 +826,26 @@
   // ============================================================================
   // COLLECTION PERCENTAGE HANDLERS
   // ============================================================================
-  function setEditableCellText(event, text) {
-    // Keep DOM structure; update inner span content only
-    const td = event.currentTarget?.closest?.('td[contenteditable="true"]') || event.currentTarget || event.target;
-    if (td && td.querySelector) {
-      const span = td.querySelector('span');
-      if (span) {
-        span.textContent = text;
-      }
-    }
-  }
+  // Receipts/Payments inline edit helpers are not used in Reports
 
-  function getCollectionSumAfter(deptKey, period, newValue) {
-    const current = collectionPercentages.value[deptKey] || { month: 0, following: 0, second: 0 };
-    const toDec = (x) => {
-      const n = Number(x) || 0;
-      return n > 1 ? n / 100 : n;
-    };
-    const monthVal = toDec(period === 'month' ? newValue : current.month);
-    const followingVal = toDec(period === 'following' ? newValue : current.following);
-    const secondVal = toDec(period === 'second' ? newValue : current.second);
-    return monthVal + followingVal + secondVal; // returns decimal sum (0..1)
-  }
+  // Unused collection/payment helpers removed for Reports context
 
-  function updateCollectionPercentage(type, period, event) {
-    const value = parseFloat(event.target.textContent.replace('%', ''));
-    const deptKey = normalizeDepartmentKey(type);
-    ensureDefaultsForKey(deptKey);
-    if (!isNaN(value) && value >= 0 && value <= 100) {
-      // During typing, accept value without enforcing sum; final check on blur
-      collectionPercentages.value[deptKey][period] = value;
-      isSaved.value = false;
-    }
-  }
   
-  function handleCollectionPercentageFocus({ type, period, event }) {}
   
-  function handleCollectionPercentageEdit({ type, period, event }) {
-    // Handle edit completion for collection percentage
-    const value = parseFloat(event.target.textContent.replace('%', ''));
-    const deptKey = normalizeDepartmentKey(type);
-    ensureDefaultsForKey(deptKey);
-    if (!isNaN(value) && value >= 0 && value <= 100) {
-      const totalDec = getCollectionSumAfter(deptKey, period, value);
-      if (totalDec > 1) {
-        const prev = Number(collectionPercentages.value[deptKey][period]) || 0;
-        setEditableCellText(event, prev.toFixed(2) + '%');
-        alertService.error(`Collection percentages cannot exceed 100%. Current total would be ${(totalDec * 100).toFixed(2)}%.`);
-        return;
-      }
-      collectionPercentages.value[deptKey][period] = value;
-      isSaved.value = false;
-    } else {
-      // Reset to previous value if invalid
-      setEditableCellText(event, (Number(collectionPercentages.value[deptKey][period]) || 0).toFixed(2) + '%');
-    }
-  }
+  
+  
+  
   
   // ============================================================================
   // PAYMENT PERCENTAGE HANDLERS
   // ============================================================================
-  function getPaymentSumAfter(deptKey, category, period, newValue) {
-    const currentCategory = (paymentPercentages.value[deptKey] && paymentPercentages.value[deptKey][category]) || { month: 0, following: 0, second: 0 };
-    const monthVal = period === 'month' ? newValue : Number(currentCategory.month) || 0;
-    const followingVal = period === 'following' ? newValue : Number(currentCategory.following) || 0;
-    const secondVal = period === 'second' ? newValue : Number(currentCategory.second) || 0;
-    return monthVal + followingVal + secondVal;
-  }
+  
 
-  function updatePaymentPercentage(type, category, period, event) {
-    const value = parseFloat(event.target.textContent.replace('%', ''));
-    const deptKey = normalizeDepartmentKey(type);
-    ensureDefaultsForKey(deptKey);
-    if (!isNaN(value) && value >= 0 && value <= 100) {
-      const total = getPaymentSumAfter(deptKey, category, period, value);
-      if (total > 100) {
-        const prev = Number(paymentPercentages.value[deptKey][category][period]) || 0;
-        setEditableCellText(event, prev.toFixed(2) + '%');
-        alertService.error(`Payment percentages for ${category} cannot exceed 100%. Current total would be ${total.toFixed(2)}%.`);
-        return;
-      }
-      paymentPercentages.value[deptKey][category][period] = value;
-      isSaved.value = false;
-    }
-  }
   
-  function handlePaymentPercentageFocus({ type, category, period, event }) {}
   
-  function handlePaymentPercentageEdit({ type, category, period, event }) {
-    // Handle edit completion for payment percentage
-    const value = parseFloat(event.target.textContent.replace('%', ''));
-    const deptKey = normalizeDepartmentKey(type);
-    ensureDefaultsForKey(deptKey);
-    if (!isNaN(value) && value >= 0 && value <= 100) {
-      const total = getPaymentSumAfter(deptKey, category, period, value);
-      if (total > 100) {
-        const prev = Number(paymentPercentages.value[deptKey][category][period]) || 0;
-        setEditableCellText(event, prev.toFixed(2) + '%');
-        alertService.error(`Payment percentages for ${category} cannot exceed 100%. Current total would be ${total.toFixed(2)}%.`);
-        return;
-      }
-      paymentPercentages.value[deptKey][category][period] = value;
-      isSaved.value = false;
-    } else {
-      // Reset to previous value if invalid
-      setEditableCellText(event, (Number(paymentPercentages.value[deptKey][category][period]) || 0).toFixed(2) + '%');
-    }
-  }
+  
+  
+  
   
   // ============================================================================
   // REPORT SELECTION HANDLERS

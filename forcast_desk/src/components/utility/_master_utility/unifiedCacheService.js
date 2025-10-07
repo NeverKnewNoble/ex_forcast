@@ -1,5 +1,6 @@
 import { ref, watch } from 'vue'
 import { selectedProject } from '@/components/utility/dashboard/projectService.js'
+import { optimizedLocalStorage } from './optimizedLocalStorage.js'
 
 /**
  * Unified Caching Service for consistent data persistence
@@ -187,18 +188,10 @@ export class UnifiedCacheService {
         return
       }
 
-      // Load from localStorage
+      // Load from localStorage (project-scoped payload only)
       const storageKey = this.getProjectKey('calculationCache')
-      const stored = localStorage.getItem(storageKey)
-      
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        this.cache.value = parsed
-       //  // console.log('[CACHE] Loaded from storage:', storageKey)
-      } else {
-        this.cache.value = {}
-       //  // console.log('[CACHE] No stored cache found for project:', project.project_name)
-      }
+      const parsed = optimizedLocalStorage.getItem(storageKey, null)
+      this.cache.value = parsed && typeof parsed === 'object' ? parsed : {}
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error('[CACHE] Error loading project cache:', error)
@@ -217,7 +210,8 @@ export class UnifiedCacheService {
       if (!project || !project.project_name) return
 
       const storageKey = this.getProjectKey('calculationCache')
-      localStorage.setItem(storageKey, JSON.stringify(this.cache.value))
+      // Debounced write of project-scoped payload only
+      optimizedLocalStorage.setItem(storageKey, this.cache.value)
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error('[CACHE] Error persisting to storage:', error)
@@ -235,14 +229,9 @@ export class UnifiedCacheService {
       if (!project || !project.project_name) return null
 
       const storageKey = this.getProjectKey('calculationCache')
-      const stored = localStorage.getItem(storageKey)
-      
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        return parsed?.[projectId]?.[pageId]?.[rowCode]?.[year]?.[label] ?? null
-      }
-      
-      return null
+      const parsed = optimizedLocalStorage.getItem(storageKey, null)
+      if (!parsed || typeof parsed !== 'object') return null
+      return parsed?.[pageId]?.[rowCode]?.[year]?.[label] ?? null
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error('[CACHE] Error reading from storage:', error)
@@ -260,14 +249,9 @@ export class UnifiedCacheService {
       if (!project || !project.project_name) return {}
 
       const storageKey = this.getProjectKey('calculationCache')
-      const stored = localStorage.getItem(storageKey)
-      
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        return parsed?.[projectId]?.[pageId]?.[rowCode] ?? {}
-      }
-      
-      return {}
+      const parsed = optimizedLocalStorage.getItem(storageKey, null)
+      if (!parsed || typeof parsed !== 'object') return {}
+      return parsed?.[pageId]?.[rowCode] ?? {}
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error('[CACHE] Error reading row from storage:', error)
@@ -300,7 +284,7 @@ export class UnifiedCacheService {
       if (!project || !project.project_name) return
 
       const storageKey = this.getProjectKey('calculationCache')
-      localStorage.removeItem(storageKey)
+      optimizedLocalStorage.removeItem(storageKey)
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error('[CACHE] Error clearing project storage:', error)
@@ -335,11 +319,9 @@ export class UnifiedCacheService {
       if (!project || !project.project_name) return null
 
       const storageKey = this.getProjectKey('calculationCache')
-      const stored = localStorage.getItem(storageKey)
-      
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        const projectCache = parsed[project.project_name] || {}
+      const parsed = optimizedLocalStorage.getItem(storageKey, null)
+      if (parsed && typeof parsed === 'object') {
+        const projectCache = parsed
         
         let totalEntries = 0
         let totalPages = Object.keys(projectCache).length
@@ -356,7 +338,7 @@ export class UnifiedCacheService {
           project: project.project_name,
           pages: totalPages,
           entries: totalEntries,
-          storageSize: stored.length,
+          storageSize: JSON.stringify(parsed).length,
           lastUpdated: new Date().toISOString()
         }
       }
@@ -379,20 +361,13 @@ export class UnifiedCacheService {
       if (!project || !project.project_name) return { valid: false, errors: ['No project selected'] }
 
       const storageKey = this.getProjectKey('calculationCache')
-      const stored = localStorage.getItem(storageKey)
-      
-      if (!stored) return { valid: true, errors: [] }
-      
-      const parsed = JSON.parse(stored)
+      const parsed = optimizedLocalStorage.getItem(storageKey, null)
+      if (!parsed) return { valid: true, errors: [] }
       const errors = []
       
       // Basic validation
       if (typeof parsed !== 'object') {
         errors.push('Cache is not an object')
-      }
-      
-      if (parsed[project.project_name] && typeof parsed[project.project_name] !== 'object') {
-        errors.push('Project cache is not an object')
       }
       
       return {
@@ -413,13 +388,12 @@ export class UnifiedCacheService {
       if (!project || !project.project_name) return null
 
       const storageKey = this.getProjectKey('calculationCache')
-      const stored = localStorage.getItem(storageKey)
-      
-      if (stored) {
+      const parsed = optimizedLocalStorage.getItem(storageKey, null)
+      if (parsed) {
         const data = {
           project: project.project_name,
           timestamp: new Date().toISOString(),
-          data: JSON.parse(stored)
+          data: parsed
         }
         
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })

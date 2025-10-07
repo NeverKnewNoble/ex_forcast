@@ -1463,6 +1463,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   
   import { selectedProject, initializeProjectService, getProjectDepartments } from '@/components/utility/dashboard/projectService.js';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
   // Collections & AR utilities
   import { computeCollectionsForYear, computeAccountsReceivablesForYear, normalizePercents } from '@/components/utility/receipts/collections.js';
   import { computePaymentsForYear, computeCategoryPayablesForYear } from '@/components/utility/receipts/payments.js';
@@ -1892,29 +1893,29 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     const project = getProjectName();
     if (isMarketSegmentationEnabled()) {
       // Use Market Segmentation cached totals (including Service Charge)
-      return calculationCache.getValue(project, 'Market Segmentation', 'Total Rooms Revenue Including SC', year, label);
+      return calculationCache.getValue(project, PAGE.MARKET_SEGMENTATION, ROW.TOTAL_ROOMS_REVENUE_INC_SC, year, label);
     }
     // Use Room Revenue Assumptions page cached monthly total
-    return calculationCache.getValue(project, 'Room Revenue Assumptions', 'Total Room Revenue', year, label);
+    return calculationCache.getValue(project, PAGE.ROOM_REVENUE, ROW.TOTAL_ROOM_REVENUE, year, label);
   }
 
   function getRoomYearTotalFromCache(year) {
     const project = getProjectName();
     if (isMarketSegmentationEnabled()) {
       // Prefer yearly cached total, else sum months
-      const cached = calculationCache.getValue(project, 'Market Segmentation', 'Total Rooms Revenue Including SC Year', year, 'ALL');
-      if (cached > 0) return cached;
+      const cached = calculationCache.getValue(project, PAGE.MARKET_SEGMENTATION, ROW.TOTAL_ROOMS_REVENUE_INC_SC_YEAR, year, 'ALL');
+      if (cached !== null && cached !== undefined) return cached;
       // Sum monthly values as fallback
       return (getColumnLabelsForYearLocal(year) || []).reduce((sum, label) => sum + getNumber(getRoomMonthlyRevenueFromCache(year, label)), 0);
     }
-    const cached = calculationCache.getValue(project, 'Room Revenue Assumptions', 'Total Room Revenue Year', year, 'ALL');
-    if (cached > 0) return cached;
+    const cached = calculationCache.getValue(project, PAGE.ROOM_REVENUE, ROW.TOTAL_ROOM_REVENUE_YEAR, year, 'ALL');
+    if (cached !== null && cached !== undefined) return cached;
     return (getColumnLabelsForYearLocal(year) || []).reduce((sum, label) => sum + getNumber(getRoomMonthlyRevenueFromCache(year, label)), 0);
   }
 
   function getFnbMonthlyRevenueFromCache(year, label) {
     const project = getProjectName();
-    return calculationCache.getValue(project, 'F&B Revenue Assumptions', 'Total F&B Revenue', year, label);
+    return calculationCache.getValue(project, PAGE.FNB_REVENUE, ROW.TOTAL_FNB_REVENUE, year, label);
   }
 
   function getFnbYearTotalFromCache(year) {
@@ -1924,7 +1925,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
 
   function getBanquetMonthlyRevenueFromCache(year, label) {
     const project = getProjectName();
-    return calculationCache.getValue(project, 'Banquet Revenue Assumptions', 'Net Amount', year, label);
+    return calculationCache.getValue(project, PAGE.BANQUET_REVENUE, ROW.NET_AMOUNT, year, label);
   }
 
   function getBanquetYearTotalFromCache(year) {
@@ -1933,8 +1934,8 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
 
   function getOODMonthlyRevenueFromCache(year, label) {
     const project = getProjectName();
-    const laundry = calculationCache.getValue(project, 'OOD Revenue Assumptions', 'Total Laundry Revenue', year, label);
-    const health = calculationCache.getValue(project, 'OOD Revenue Assumptions', 'Total Health Club Rev Including SC', year, label);
+    const laundry = calculationCache.getValue(project, PAGE.OOD_REVENUE, ROW.TOTAL_LAUNDRY_REVENUE, year, label);
+    const health = calculationCache.getValue(project, PAGE.OOD_REVENUE, ROW.TOTAL_HEALTH_CLUB_REV_SC, year, label);
     return getNumber(laundry) + getNumber(health);
   }
 

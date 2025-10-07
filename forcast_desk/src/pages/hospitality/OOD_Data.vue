@@ -1097,6 +1097,7 @@
   import { ref, onMounted, computed, watch, onUnmounted, reactive, nextTick } from "vue";
   import { storeToRefs } from 'pinia';
   import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
+  import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
   import Sidebar from "@/components/ui/Sidebar.vue";
   import { 
     CircleAlert, 
@@ -1743,14 +1744,14 @@ import SettingsModal from '@/components/ui/SettingsModal.vue';
     const total = inHouse + outside + other;
     // Cache monthly total for Receipts/Payments consumption
     const project = getProjectName();
-    calculationCache.setValue(project, 'OOD Revenue Assumptions', 'Total Laundry Revenue', year, label, total);
+  calculationCache.setValue(project, PAGE.OOD_REVENUE, ROW.TOTAL_LAUNDRY_REVENUE, year, label, total);
     return total;
   }
   // Ensure Health Club total including SC gets cached reactively
   function cacheHealthClubIncludingSC(year, label) {
     const total = Number(calculateTotalHealthClubRevIncludingSC(healthClubData, year, label) || 0);
     const project = getProjectName();
-    calculationCache.setValue(project, 'OOD Revenue Assumptions', 'Total Health Club Rev Including SC', year, label, total);
+  calculationCache.setValue(project, PAGE.OOD_REVENUE, ROW.TOTAL_HEALTH_CLUB_REV_SC, year, label, total);
     return total;
   }
 

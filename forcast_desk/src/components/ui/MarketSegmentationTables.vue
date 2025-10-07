@@ -1029,6 +1029,7 @@ import { ref, watch, onMounted, nextTick } from 'vue';
 import { BedDouble, Table, DollarSign, Calculator, ChevronDown, ChevronRight, Plus, X, Trash2, Edit3, RefreshCw } from 'lucide-vue-next';
 import { AverageDailyRateCalculation } from '@/components/utility/room_revenue_assumpt./market_segments.js';
 import { getDaysInMonth, calculateTotalRoomCount } from '@/components/utility/room_revenue_assumpt./room_revenue_utils.js';
+import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
 import { 
   marketSegmentCategories, 
   marketSegments, 
@@ -1407,7 +1408,7 @@ function getProjectName() {
 }
 
 
-const PAGE_KEY = 'Market Segmentation';
+const PAGE_KEY = PAGE.MARKET_SEGMENTATION;
 
 // --- Total Occupied Room helpers ---
 function getTotalOccupiedRoom(year, label) {

@@ -1,4 +1,4 @@
-272.00<template>
+<template>
     <div class="flex ">
       <Sidebar @open-settings="openSettings" />
   
@@ -979,6 +979,7 @@
   import { ref, onMounted, computed, watch, onUnmounted, reactive } from "vue";
   import { storeToRefs } from 'pinia';
   import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
+  import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
   import Sidebar from "@/components/ui/Sidebar.vue";
 import SettingsModal from "@/components/ui/SettingsModal.vue";
   import {  
@@ -1287,11 +1288,11 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         ];
         
         cacheKeys.forEach(baseKey => {
-          if (calculationCache.cache[project]?.['F&B Revenue Assumptions']?.[baseKey]) {
+          if (calculationCache.cache[project]?.[PAGE.FNB_REVENUE]?.[baseKey]) {
             // Clear all restaurant-specific cache entries for this key
-            Object.keys(calculationCache.cache[project]['F&B Revenue Assumptions'][baseKey]).forEach(restaurantKey => {
+            Object.keys(calculationCache.cache[project][PAGE.FNB_REVENUE][baseKey]).forEach(restaurantKey => {
               if (restaurantKey.includes(':')) {
-                delete calculationCache.cache[project]['F&B Revenue Assumptions'][baseKey][restaurantKey];
+                delete calculationCache.cache[project][PAGE.FNB_REVENUE][baseKey][restaurantKey];
               }
             });
           }
@@ -1495,7 +1496,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     // Clear calculation cache for current project
     if (selectedProject.value && selectedProject.value.project_name) {
       const project = selectedProject.value.project_name;
-      if (calculationCache.cache[project]?.['F&B Revenue Assumptions']) {
+      if (calculationCache.cache[project]?.[PAGE.FNB_REVENUE]) {
         // Clear all restaurant-specific cache entries
         const cacheKeys = [
           'Total Cover',
@@ -1505,10 +1506,10 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         ];
         
         cacheKeys.forEach(baseKey => {
-          if (calculationCache.cache[project]['F&B Revenue Assumptions'][baseKey]) {
-            Object.keys(calculationCache.cache[project]['F&B Revenue Assumptions'][baseKey]).forEach(restaurantKey => {
+          if (calculationCache.cache[project][PAGE.FNB_REVENUE][baseKey]) {
+            Object.keys(calculationCache.cache[project][PAGE.FNB_REVENUE][baseKey]).forEach(restaurantKey => {
               if (restaurantKey.includes(':')) {
-                delete calculationCache.cache[project]['F&B Revenue Assumptions'][baseKey][restaurantKey];
+                delete calculationCache.cache[project][PAGE.FNB_REVENUE][baseKey][restaurantKey];
               }
             });
           }
@@ -1650,7 +1651,14 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
             const exchangeRate = exchangeRateStr ? (JSON.parse(exchangeRateStr)[year] || 1) : 1;
             const calculatedValue = breakfastAllocation * exchangeRate;
             if (selectedProject.value && selectedProject.value.project_name) {
-              calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Average check breakfast', year, label, calculatedValue);
+              calculationCache.setFnbMetric(
+                selectedProject.value.project_name,
+                parsed.restaurant,
+                'averageCheckBreakfast',
+                year,
+                label,
+                calculatedValue
+              );
             }
             return calculatedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
           }
@@ -1678,7 +1686,14 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
             }
             const revenue = covers * avgCheck;
             if (selectedProject.value && selectedProject.value.project_name) {
-              calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Breakfast Revenue', year, label, revenue);
+              calculationCache.setFnbMetric(
+                selectedProject.value.project_name,
+                parsed.restaurant,
+                'breakfastRevenue',
+                year,
+                label,
+                revenue
+              );
             }
             return revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
           }
@@ -1693,7 +1708,14 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
           const avg = parseFloat((avgRaw ?? '0').toString().replace(/,/g, '')) || 0;
           const revenue = covers * avg;
           if (selectedProject.value && selectedProject.value.project_name) {
-            calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Breakfast Revenue', year, label, revenue);
+            calculationCache.setFnbMetric(
+              selectedProject.value.project_name,
+              parsed.restaurant,
+              'breakfastRevenue',
+              year,
+              label,
+              revenue
+            );
           }
           return revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
@@ -1755,7 +1777,14 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         const roomsValue = totalRooms?.value || totalRooms || 0;
         const roomsAvailable = days * roomsValue;
         if (selectedProject.value && selectedProject.value.project_name) {
-          calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Number of rooms available', year, label, roomsAvailable);
+          calculationCache.setFnbMetric(
+            selectedProject.value.project_name,
+            '__ALL__',
+            'roomsAvailable',
+            year,
+            label,
+            roomsAvailable
+          );
         }
         return roomsAvailable.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
       }
@@ -1769,7 +1798,14 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         let num = parseFloat(userRaw.toString().replace(/,/g, ''));
         if (isNaN(num)) num = 0;
         if (selectedProject.value && selectedProject.value.project_name) {
-          calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Number of rooms sold (excl.)', year, label, num);
+          calculationCache.setFnbMetric(
+            selectedProject.value.project_name,
+            '__ALL__',
+            'roomsSoldExcl',
+            year,
+            label,
+            num
+          );
         }
         return num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
       }
@@ -1799,7 +1835,14 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
       
       if (val && val > 0) {
         if (selectedProject.value && selectedProject.value.project_name) {
-          calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Number of rooms sold (excl.)', year, label, val);
+          calculationCache.setFnbMetric(
+            selectedProject.value.project_name,
+            '__ALL__',
+            'roomsSoldExcl',
+            year,
+            label,
+            val
+          );
         }
         return val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
       }
@@ -1851,7 +1894,14 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         if (available > 0) {
           const percent = (occupied / available) * 100;
           if (selectedProject.value && selectedProject.value.project_name) {
-            calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Occupancy (excl.) %', year, label, percent);
+            calculationCache.setFnbMetric(
+              selectedProject.value.project_name,
+              '__ALL__',
+              'occupancyExclPct',
+              year,
+              label,
+              percent
+            );
           }
           return percent.toFixed(2) + '%';
         }
@@ -1891,7 +1941,14 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         percent = (occupied / available) * 100;
       }
       if (selectedProject.value && selectedProject.value.project_name) {
-        calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Occupancy (excl.) %', year, label, percent);
+        calculationCache.setFnbMetric(
+          selectedProject.value.project_name,
+          '__ALL__',
+          'occupancyExclPct',
+          year,
+          label,
+          percent
+        );
       }
       return percent.toFixed(2) + '%';
     }
@@ -1931,7 +1988,14 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
       // Calculate number of guests
       const numberOfGuests = doubleOccupancy * roomsSold;
       if (selectedProject.value && selectedProject.value.project_name) {
-        calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Number of guests', year, label, numberOfGuests);
+        calculationCache.setFnbMetric(
+          selectedProject.value.project_name,
+          '__ALL__',
+          'numberOfGuests',
+          year,
+          label,
+          numberOfGuests
+        );
       }
       return numberOfGuests.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
@@ -1942,12 +2006,19 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
       if (selectedProject.value && selectedProject.value.project_name) {
         const project = selectedProject.value.project_name;
         const cacheKey = 'ADR Total';
-        const cachedADR = calculationCache.getValue(project, 'Market Segmentation', cacheKey, year, label);
+        const cachedADR = calculationCache.getValue(project, PAGE.MARKET_SEGMENTATION, ROW.ADR_TOTAL, year, label);
         
         if (cachedADR && cachedADR > 0) {
           // Use the cached ADR Total value from Market Segmentation
           if (selectedProject.value && selectedProject.value.project_name) {
-            calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Average Room Rate', year, label, cachedADR);
+            calculationCache.setFnbMetric(
+              selectedProject.value.project_name,
+              '__ALL__',
+              'averageRoomRate',
+              year,
+              label,
+              cachedADR
+            );
           }
           return cachedADR.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
@@ -1984,7 +2055,14 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
       // Calculate Revenue Per Available Room
       const revpar = occupancyPercent * averageRoomRate;
       if (selectedProject.value && selectedProject.value.project_name) {
-        calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Revenue Per Available Room', year, label, revpar);
+        calculationCache.setFnbMetric(
+          selectedProject.value.project_name,
+          '__ALL__',
+          'revpar',
+          year,
+          label,
+          revpar
+        );
       }
       return revpar.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
@@ -1999,15 +2077,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
       if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Cover') {
         const defaultBreakfastOutlet = localStorage.getItem(getProjectKey('defaultBreakfastOutlet'));
         if (defaultBreakfastOutlet === rowKeyObj.restaurant) {
-          // Check cache first for individual restaurant Total Cover
-          if (selectedProject.value && selectedProject.value.project_name) {
-            const project = selectedProject.value.project_name;
-            const cacheKey = `Total Cover:${rowKeyObj.restaurant}`;
-            const cached = calculationCache.getValue(project, 'F&B Revenue Assumptions', cacheKey, year, label);
-            if (cached && cached > 0) {
-              return cached.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            }
-          }
+          // Use normalized cache only for individual restaurant Total Cover
 
           const breakfastCoversKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast Covers' });
           const lunchMonthlyCoverKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Monthly Cover' });
@@ -2023,12 +2093,10 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
 
           const totalCover = breakfastCovers + lunchCovers + dinnerCovers;
           
-          // Cache the individual restaurant Total Cover
+          // Cache the individual restaurant Total Cover (normalized)
           if (selectedProject.value && selectedProject.value.project_name) {
             const project = selectedProject.value.project_name;
-            const cacheKey = `Total Cover:${rowKeyObj.restaurant}`;
-            // console.log('🔍 Caching Total Cover:', { project, cacheKey, year, label, totalCover });
-            calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalCover);
+            calculationCache.setFnbMetric(project, rowKeyObj.restaurant, 'totalCover', year, label, totalCover);
           } else {
             // console.log('❌ Cannot cache - no project selected:', { selectedProject: selectedProject.value });
           }
@@ -2047,15 +2115,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
       if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Food Revenue') {
         const defaultBreakfastOutlet = localStorage.getItem(getProjectKey('defaultBreakfastOutlet'));
         if (defaultBreakfastOutlet === rowKeyObj.restaurant) {
-          // Check cache first for individual restaurant Total Food Revenue
-          if (selectedProject.value && selectedProject.value.project_name) {
-            const project = selectedProject.value.project_name;
-            const cacheKey = `Total Food Revenue:${rowKeyObj.restaurant}`;
-            const cached = calculationCache.getValue(project, 'F&B Revenue Assumptions', cacheKey, year, label);
-            if (cached && cached > 0) {
-              return cached.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            }
-          }
+          // Use normalized cache only for individual restaurant Total Food Revenue
 
           const breakfastRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast Revenue' });
           const lunchFoodRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Lunch food revenue' });
@@ -2071,12 +2131,10 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
 
           const totalFoodRevenue = breakfastRevenue + lunchFoodRevenue + dinnerFoodRevenue;
           
-          // Cache the individual restaurant Total Food Revenue
+          // Cache the individual restaurant Total Food Revenue (normalized)
           if (selectedProject.value && selectedProject.value.project_name) {
             const project = selectedProject.value.project_name;
-            const cacheKey = `Total Food Revenue:${rowKeyObj.restaurant}`;
-            // console.log('🔍 Caching Total Food Revenue:', { project, cacheKey, year, label, totalFoodRevenue });
-            calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalFoodRevenue);
+            calculationCache.setFnbMetric(project, rowKeyObj.restaurant, 'totalFoodRevenue', year, label, totalFoodRevenue);
           } else {
             // console.log('❌ Cannot cache Total Food Revenue - no project selected:', { selectedProject: selectedProject.value });
           }
@@ -2093,15 +2151,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     try {
       const rowKeyObj = JSON.parse(row);
       if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Food Revenue') {
-        // Check cache first for individual restaurant Total Food Revenue
-        if (selectedProject.value && selectedProject.value.project_name) {
-          const project = selectedProject.value.project_name;
-          const cacheKey = `Total Food Revenue:${rowKeyObj.restaurant}`;
-          const cached = calculationCache.getValue(project, 'F&B Revenue Assumptions', cacheKey, year, label);
-          if (cached && cached > 0) {
-            return cached.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-          }
-        }
+        // Use normalized cache only for individual restaurant Total Food Revenue
 
         const breakfastRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast Revenue' });
         const lunchFoodRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Lunch food revenue' });
@@ -2117,12 +2167,10 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
 
         const totalFoodRevenue = breakfastRevenue + lunchFoodRevenue + dinnerFoodRevenue;
         
-        // Cache the individual restaurant Total Food Revenue
+        // Cache the individual restaurant Total Food Revenue (normalized)
         if (selectedProject.value && selectedProject.value.project_name) {
           const project = selectedProject.value.project_name;
-          const cacheKey = `Total Food Revenue:${rowKeyObj.restaurant}`;
-          // console.log('🔍 Caching Total Food Revenue (all restaurants):', { project, cacheKey, year, label, totalFoodRevenue });
-          calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalFoodRevenue);
+          calculationCache.setFnbMetric(project, rowKeyObj.restaurant, 'totalFoodRevenue', year, label, totalFoodRevenue);
         } else {
           // console.log('❌ Cannot cache Total Food Revenue (all restaurants) - no project selected:', { selectedProject: selectedProject.value });
         }
@@ -2138,15 +2186,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     try {
       const rowKeyObj = JSON.parse(row);
       if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Beverage Revenue') {
-        // Check cache first for individual restaurant Total Beverage Revenue
-        if (selectedProject.value && selectedProject.value.project_name) {
-          const project = selectedProject.value.project_name;
-          const cacheKey = `Total Beverage Revenue:${rowKeyObj.restaurant}`;
-          const cached = calculationCache.getValue(project, 'F&B Revenue Assumptions', cacheKey, year, label);
-          if (cached && cached > 0) {
-            return cached.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-          }
-        }
+        // Use normalized cache only for individual restaurant Total Beverage Revenue
 
         const breakfastBeverageKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Breakfast Revenue', type: 'Breakfast beverage revenue' });
         const lunchBeverageKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Lunch Revenue', type: 'Lunch beverage revenue' });
@@ -2162,12 +2202,10 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
 
         const totalBeverageRevenue = breakfastBeverage + lunchBeverage + dinnerBeverage;
         
-        // Cache the individual restaurant Total Beverage Revenue
+        // Cache the individual restaurant Total Beverage Revenue (normalized)
         if (selectedProject.value && selectedProject.value.project_name) {
           const project = selectedProject.value.project_name;
-          const cacheKey = `Total Beverage Revenue:${rowKeyObj.restaurant}`;
-          // console.log('🔍 Caching Total Beverage Revenue:', { project, cacheKey, year, label, totalBeverageRevenue });
-          calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalBeverageRevenue);
+          calculationCache.setFnbMetric(project, rowKeyObj.restaurant, 'totalBeverageRevenue', year, label, totalBeverageRevenue);
         } else {
           // console.log('❌ Cannot cache Total Beverage Revenue - no project selected:', { selectedProject: selectedProject.value });
         }
@@ -2183,15 +2221,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     try {
       const rowKeyObj = JSON.parse(row);
       if (rowKeyObj && rowKeyObj.section === 'Total' && rowKeyObj.type === 'Total Revenue') {
-        // Check cache first for individual restaurant Total Revenue
-        if (selectedProject.value && selectedProject.value.project_name) {
-          const project = selectedProject.value.project_name;
-          const cacheKey = `Total Revenue:${rowKeyObj.restaurant}`;
-          const cached = calculationCache.getValue(project, 'F&B Revenue Assumptions', cacheKey, year, label);
-          if (cached && cached > 0) {
-            return cached.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-          }
-        }
+        // Use normalized cache only for individual restaurant Total Revenue
 
         const totalFoodRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Total', type: 'Total Food Revenue' });
         const totalBeverageRevenueKey = JSON.stringify({ restaurant: rowKeyObj.restaurant, section: 'Total', type: 'Total Beverage Revenue' });
@@ -2204,12 +2234,10 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
 
         const totalRevenue = totalFoodRevenue + totalBeverageRevenue;
         
-        // Cache the individual restaurant Total Revenue
+        // Cache the individual restaurant Total Revenue (normalized)
         if (selectedProject.value && selectedProject.value.project_name) {
           const project = selectedProject.value.project_name;
-          const cacheKey = `Total Revenue:${rowKeyObj.restaurant}`;
-          // console.log('🔍 Caching Total Revenue:', { project, cacheKey, year, label, totalRevenue });
-          calculationCache.setValue(project, 'F&B Revenue Assumptions', cacheKey, year, label, totalRevenue);
+          calculationCache.setFnbMetric(project, rowKeyObj.restaurant, 'totalRevenue', year, label, totalRevenue);
         } else {
           // console.log('❌ Cannot cache Total Revenue - no project selected:', { selectedProject: selectedProject.value });
         }
@@ -2359,10 +2387,11 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     }
     // Cache the total covers for this year/label
     if (selectedProject.value && selectedProject.value.project_name) {
-      calculationCache.setValue(
+      // Normalized write for aggregate across all restaurants
+      calculationCache.setFnbMetric(
         selectedProject.value.project_name,
-        'F&B Revenue Assumptions',
-        'Total Covers',
+        '__ALL__',
+        'totalCover',
         year,
         label,
         total
@@ -2386,10 +2415,11 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     }
     // Cache the total food revenue for this year/label
     if (selectedProject.value && selectedProject.value.project_name) {
-      calculationCache.setValue(
+      // Normalized write for aggregate across all restaurants
+      calculationCache.setFnbMetric(
         selectedProject.value.project_name,
-        'F&B Revenue Assumptions',
-        'Total Food Revenue',
+        '__ALL__',
+        'totalFoodRevenue',
         year,
         label,
         total
@@ -2413,10 +2443,11 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     }
     // Cache the total beverage revenue for this year/label
     if (selectedProject.value && selectedProject.value.project_name) {
-      calculationCache.setValue(
+      // Normalized write for aggregate across all restaurants
+      calculationCache.setFnbMetric(
         selectedProject.value.project_name,
-        'F&B Revenue Assumptions',
-        'Total Beverage Revenue',
+        '__ALL__',
+        'totalBeverageRevenue',
         year,
         label,
         total
@@ -2440,10 +2471,11 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     }
     // Cache the total F&B revenue for this year/label
     if (selectedProject.value && selectedProject.value.project_name) {
-      calculationCache.setValue(
+      // Normalized write for aggregate across all restaurants
+      calculationCache.setFnbMetric(
         selectedProject.value.project_name,
-        'F&B Revenue Assumptions',
-        'Total F&B Revenue',
+        '__ALL__',
+        'totalRevenue',
         year,
         label,
         total
@@ -2460,13 +2492,13 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     const totalCovers = parseFloat((calculateTotalCovers(year, label) || '0').toString().replace(/,/g, '')) || 0;
     if (totalCovers === 0) {
       if (selectedProject.value && selectedProject.value.project_name) {
-        calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Average Spent Per F&B Customer', year, label, 0.00);
+        calculationCache.setValue(selectedProject.value.project_name, PAGE.FNB_REVENUE, 'Average Spent Per F&B Customer', year, label, 0.00);
       }
       return '0.00';
     }
     const avg = totalFnbRevenue / totalCovers;
     if (selectedProject.value && selectedProject.value.project_name) {
-      calculationCache.setValue(selectedProject.value.project_name, 'F&B Revenue Assumptions', 'Average Spent Per F&B Customer', year, label, avg);
+      calculationCache.setValue(selectedProject.value.project_name, PAGE.FNB_REVENUE, 'Average Spent Per F&B Customer', year, label, avg);
     }
     return avg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
@@ -2612,8 +2644,8 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
         if (selectedProject.value && selectedProject.value.project_name) {
           calculationCache.setValue(
             selectedProject.value.project_name,
-            'F&B Revenue Assumptions',
-            'Number of guests',
+            PAGE.FNB_REVENUE,
+            ROW.NUMBER_OF_GUESTS,
             year,
             label,
             numGuests
@@ -2629,7 +2661,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
       if (selectedProject.value && selectedProject.value.project_name) {
         const project = selectedProject.value.project_name;
         const cacheKey = 'ADR Total Year';
-        const cachedADRYear = calculationCache.getValue(project, 'Market Segmentation', cacheKey, year, 'ALL');
+        const cachedADRYear = calculationCache.getValue(project, PAGE.MARKET_SEGMENTATION, ROW.ADR_TOTAL_YEAR, year, 'ALL');
         
         if (cachedADRYear && cachedADRYear > 0) {
           // Use the cached ADR Total Year value from Market Segmentation

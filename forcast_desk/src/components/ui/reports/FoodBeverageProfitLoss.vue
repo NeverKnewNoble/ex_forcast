@@ -427,7 +427,7 @@
             </tr>
 
             <!-- Total Food Revenue Row -->
-            <tr class="bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-2000 border-b-2 border-green-600">
+            <tr class="bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-200 border-b-2 border-green-600">
               <td class="px-3 py-2 font-bold border-r border-green-600">
                 <div class="flex items-center gap-1 text-white">Total Food Revenue</div>
               </td>
@@ -529,7 +529,7 @@
             </tr>
 
             <!-- Total Beverage Revenue Row -->
-            <tr class="bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-2000 border-b-2 border-green-600">
+            <tr class="bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-200 border-b-2 border-green-600">
               <td class="px-3 py-2 font-bold border-r border-green-600">
                 <div class="flex items-center gap-1 text-white">Total Beverage Revenue</div>
               </td>
@@ -651,7 +651,7 @@
             </tr>
 
             <!-- Total Other Revenue Row -->
-            <tr class="bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-2000 border-b-2 border-green-600">
+            <tr class="bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-200 border-b-2 border-green-600">
               <td class="px-3 py-2 font-bold border-r border-green-600">
                 <div class="flex items-center gap-1 text-white">Total Other Revenue</div>
               </td>
@@ -835,7 +835,7 @@
             </tr>
 
             <!-- Total F&B Cost of Sales Row -->
-            <tr class="bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-2000 border-b-2 border-green-600">
+            <tr class="bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-200 border-b-2 border-green-600">
               <td class="px-3 py-2 font-bold border-r border-green-600">
                 <div class="flex items-center gap-1 text-white">Total F&B Cost of Sales</div>
               </td>
@@ -1192,6 +1192,7 @@ import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import { selectedProject } from '@/components/utility/dashboard/projectService.js';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
 import { getRestaurants } from '@/components/utility/f&b_revenue_assumpt/get_restaurants.js';
 import { 
   ChevronDown, 
@@ -1266,7 +1267,7 @@ function getNoOfRooms(year, label) {
     
     // Get room count from room revenue page via calculation cache
     // Both scenarios (market segmentation on/off) now cache to the same location
-    const roomCount = calculationCache.getValue(projectName.value, 'Room Revenue Assumptions', 'Total Rooms', year, label);
+    const roomCount = calculationCache.getValue(projectName.value, PAGE.ROOM_REVENUE, ROW.TOTAL_ROOMS, year, label);
     
     if (roomCount !== undefined && roomCount !== null) {
       return getNumber(roomCount);
@@ -1314,7 +1315,7 @@ function getNoOfDaysTotal(year) {
 function getAvailableRooms(year, label) {
   try {
     // First try: Get from F&B page - Number of rooms available row
-    let availableRooms = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Number of rooms available', year, label);
+    let availableRooms = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, ROW.NUMBER_OF_ROOMS_AVAILABLE, year, label);
     
     if (availableRooms !== undefined && availableRooms !== null) {
       return getNumber(availableRooms);
@@ -1323,7 +1324,7 @@ function getAvailableRooms(year, label) {
     // Second try: Get from Room Revenue page - Total Available Rooms (if market segmentation is on)
     const isMarketSegmentationEnabled = localStorage.getItem('marketSegmentation') === 'true';
     if (isMarketSegmentationEnabled) {
-      const totalRooms = calculationCache.getValue(projectName.value, 'Room Revenue Assumptions', 'Total Rooms', year, label);
+      const totalRooms = calculationCache.getValue(projectName.value, PAGE.ROOM_REVENUE, ROW.TOTAL_ROOMS, year, label);
       if (totalRooms !== undefined && totalRooms !== null) {
         const days = getNoOfDays(year, label);
         const calculatedValue = getNumber(totalRooms) * days;
@@ -1352,14 +1353,14 @@ function getAvailableRoomsTotal(year) {
 function getSoldRooms(year, label) {
   try {
     // Get from F&B page - Number of rooms sold (excl.) row (note: lowercase in cache)
-    const soldRooms = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Number of rooms sold (excl.)', year, label);
+    const soldRooms = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Number of rooms sold (excl.)', year, label);
     
     if (soldRooms !== undefined && soldRooms !== null) {
       return getNumber(soldRooms);
     }
     
     // Fallback: Calculate based on occupancy percentage if available
-    const occupancy = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Occupancy (excl.) %', year, label);
+    const occupancy = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Occupancy (excl.) %', year, label);
     if (occupancy !== undefined && occupancy !== null) {
       const availableRooms = getAvailableRooms(year, label);
       const calculatedSoldRooms = Math.round((getNumber(occupancy) / 100) * availableRooms);
@@ -1382,7 +1383,7 @@ function getSoldRoomsTotal(year) {
 function getOccupancyPercentage(year, label) {
   try {
     // Get from F&B page - Occupancy (excl.) % row
-    const occupancy = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Occupancy (excl.) %', year, label);
+    const occupancy = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Occupancy (excl.) %', year, label);
     if (occupancy !== undefined && occupancy !== null) {
       return getNumber(occupancy);
     }
@@ -1414,7 +1415,7 @@ function getOccupancyPercentageTotal(year) {
 function getNumberOfGuests(year, label) {
   try {
     // Get from F&B page - Number of guests row
-    const guests = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Number of guests', year, label);
+    const guests = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, ROW.NUMBER_OF_GUESTS, year, label);
     if (guests !== undefined && guests !== null) {
       return getNumber(guests);
     }
@@ -1433,7 +1434,7 @@ function getNumberOfGuestsTotal(year) {
 function getNumberOfCovers(year, label) {
   try {
     // Get from F&B page - Total Covers row
-    const covers = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Total Covers', year, label);
+    const covers = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Total Covers', year, label);
     if (covers !== undefined && covers !== null) {
       return getNumber(covers);
     }
@@ -1452,7 +1453,7 @@ function getNumberOfCoversTotal(year) {
 function getAverageFnbSpent(year, label) {
   try {
     // Get from F&B page - Average Spent Per F&B Customer row
-    const avgSpent = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Average Spent Per F&B Customer', year, label);
+    const avgSpent = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Average Spent Per F&B Customer', year, label);
     if (avgSpent !== undefined && avgSpent !== null) {
       return getNumber(avgSpent);
     }
@@ -1472,7 +1473,7 @@ function getAverageFnbSpentTotal(year) {
 function getAverageRoomRate(year, label) {
   try {
     // Get from F&B page - Average Room Rate row
-    const avgRate = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Average Room Rate', year, label);
+    const avgRate = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, ROW.AVERAGE_ROOM_RATE, year, label);
     if (avgRate !== undefined && avgRate !== null) {
       return getNumber(avgRate);
     }
@@ -1492,7 +1493,7 @@ function getAverageRoomRateTotal(year) {
 function getRevPerAvailableRoom(year, label) {
   try {
     // Get from F&B page - Revenue Per Available Room row
-    const revPerRoom = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Revenue Per Available Room', year, label);
+    const revPerRoom = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Revenue Per Available Room', year, label);
     if (revPerRoom !== undefined && revPerRoom !== null) {
       return getNumber(revPerRoom);
     }
@@ -1521,11 +1522,11 @@ function getRevPerAvailableRoomTotal(year) {
 
 // Revenue
 function getTotalFnbRevenue(year, label) {
-  const val = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Total F&B Revenue', year, label);
+  const val = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, ROW.TOTAL_FNB_REVENUE, year, label);
   if (val !== undefined && val !== null) return getNumber(val);
   // Fallback: sum of food + beverage if available
-  const food = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Total Food Revenue', year, label);
-  const bev = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Total Beverage Revenue', year, label);
+  const food = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, ROW.TOTAL_FOOD_REVENUE, year, label);
+  const bev = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, ROW.TOTAL_BEVERAGE_REVENUE, year, label);
   return getNumber(food) + getNumber(bev);
 }
 function getTotalFnbRevenueYear(year) {
@@ -1672,47 +1673,57 @@ watch(selectedProject, async (newProject) => {
 });
 
 function getRestaurantList() {
-  return restaurants.value;
+  try {
+    const names = new Set();
+    const project = projectName.value;
+    // Prefer normalized F&B cache to auto-discover restaurants
+    (Array.isArray(visibleYears.value) ? visibleYears.value : []).forEach((yr) => {
+      const yearBucket = calculationCache?.fnb?.[project]?.[yr] || {};
+      Object.keys(yearBucket).forEach((restaurantKey) => {
+        if (!restaurantKey || restaurantKey === '__ALL__') return;
+        names.add(restaurantKey);
+      });
+    });
+    if (names.size > 0) {
+      return Array.from(names).map(n => ({ name: n }));
+    }
+    // Fallback to existing list when normalized cache not yet hydrated
+    return restaurants.value;
+  } catch (e) {
+    return restaurants.value;
+  }
 }
 
 function getRestaurantFoodRevenue(restaurant, year, label) {
   try {
     // Get restaurant name (handle both object and string)
     const restaurantName = restaurant.name || restaurant;
-    
-    // Based on the cache structure you showed, the key format is:
-    // "Total Food Revenue:Fine Dining" for the cacheKey
+    const project = projectName.value;
+
+    // Prefer normalized F&B metric
+    const normalized = calculationCache.getFnbMetric(project, restaurantName, 'totalFoodRevenue', year, label);
+    if (normalized !== undefined && normalized !== null && normalized !== 0) return getNumber(normalized);
+
+    // Legacy PAGE cache using concatenated row key
     const cacheKey = `Total Food Revenue:${restaurantName}`;
-    
-   //  // console.log(`🔍 Looking for food revenue: ${cacheKey} for ${year} ${label}`);
-    
-    // Try to get from the calculation cache using the proper page and row structure
-    const val = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', cacheKey, year, label);
-    
-    if (val !== undefined && val !== null) {
-     //  // console.log(`✅ Found food revenue for ${restaurantName}: ${val}`);
-      return getNumber(val);
-    }
+    const val = calculationCache.getValue(project, PAGE.FNB_REVENUE, cacheKey, year, label);
+    if (val !== undefined && val !== null) return getNumber(val);
     
     // Fallback: try to get from the restaurant-specific row structure
     const rowData = {
       restaurant: restaurantName,
       section: 'Total',
-      type: 'Total Food Revenue'
+      type: ROW.TOTAL_FOOD_REVENUE
     };
     
     const fallbackVal = calculationCache.getValue(
-      projectName.value, 
-      'F&B Revenue Assumptions', 
+      project, 
+      PAGE.FNB_REVENUE, 
       JSON.stringify(rowData), 
       year, 
       label
     );
-    
-    if (fallbackVal !== undefined && fallbackVal !== null) {
-     //  // console.log(`✅ Found food revenue (fallback) for ${restaurantName}: ${fallbackVal}`);
-      return getNumber(fallbackVal);
-    }
+    if (fallbackVal !== undefined && fallbackVal !== null) return getNumber(fallbackVal);
     
    //  // console.log(`❌ No food revenue data found for ${restaurantName} in ${year} ${label}`);
     return 0;
@@ -1730,40 +1741,32 @@ function getRestaurantBeverageRevenue(restaurant, year, label) {
   try {
     // Get restaurant name (handle both object and string)
     const restaurantName = restaurant.name || restaurant;
-    
-    // Based on the cache structure you showed, the key format is:
-    // "Total Beverage Revenue:Fine Dining" for the cacheKey
+    const project = projectName.value;
+
+    // Prefer normalized F&B metric
+    const normalized = calculationCache.getFnbMetric(project, restaurantName, 'totalBeverageRevenue', year, label);
+    if (normalized !== undefined && normalized !== null && normalized !== 0) return getNumber(normalized);
+
+    // Legacy PAGE cache using concatenated row key
     const cacheKey = `Total Beverage Revenue:${restaurantName}`;
-    
-   //  // console.log(`🔍 Looking for beverage revenue: ${cacheKey} for ${year} ${label}`);
-    
-    // Try to get from the calculation cache using the proper page and row structure
-    const val = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', cacheKey, year, label);
-    
-    if (val !== undefined && val !== null) {
-     //  // console.log(`✅ Found beverage revenue for ${restaurantName}: ${val}`);
-      return getNumber(val);
-    }
+    const val = calculationCache.getValue(project, PAGE.FNB_REVENUE, cacheKey, year, label);
+    if (val !== undefined && val !== null) return getNumber(val);
     
     // Fallback: try to get from the restaurant-specific row structure
     const rowData = {
       restaurant: restaurantName,
       section: 'Total',
-      type: 'Total Beverage Revenue'
+      type: ROW.TOTAL_BEVERAGE_REVENUE
     };
     
     const fallbackVal = calculationCache.getValue(
-      projectName.value, 
-      'F&B Revenue Assumptions', 
+      project, 
+      PAGE.FNB_REVENUE, 
       JSON.stringify(rowData), 
       year, 
       label
     );
-    
-    if (fallbackVal !== undefined && fallbackVal !== null) {
-     //  // console.log(`✅ Found beverage revenue (fallback) for ${restaurantName}: ${val}`);
-      return getNumber(fallbackVal);
-    }
+    if (fallbackVal !== undefined && fallbackVal !== null) return getNumber(fallbackVal);
     
     // console.log(`❌ No beverage revenue data found for ${restaurantName} in ${year} ${label}`);
     return 0;
@@ -1782,7 +1785,7 @@ function getBanquetFoodRevenue(year, label) {
   try {
     // Get from Banquet Revenue Assumptions page cache
     // Based on your cache logs, this uses the exact row code: "Food"
-    const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'Food', year, label);
+    const val = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, ROW.FOOD, year, label);
     
     if (val !== undefined && val !== null) {
      //  // console.log(`✅ Found banquet food revenue: ${val} for ${year} ${label}`);
@@ -1815,7 +1818,7 @@ function getOutsideCateringFoodRevenue(year, label) {
     ];
     
     for (const rowCode of possibleRowCodes) {
-      const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', rowCode, year, label);
+      const val = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, rowCode, year, label);
       if (val !== undefined && val !== null) {
        //  // console.log(`✅ Found outside catering food revenue from ${rowCode}: ${val} for ${year} ${label}`);
         return getNumber(val);
@@ -1840,8 +1843,8 @@ function getBanquetBeverageRevenue(year, label) {
   try {
     // Get from Banquet Revenue Assumptions page cache
     // Sum up Liquor + Soft Drinks for the month
-    const liquorValue = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'Liquor', year, label);
-    const softDrinksValue = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'Soft Drinks', year, label);
+    const liquorValue = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, ROW.LIQUOR, year, label);
+    const softDrinksValue = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, ROW.SOFT_DRINKS, year, label);
     
     const liquor = getNumber(liquorValue) || 0;
     const softDrinks = getNumber(softDrinksValue) || 0;
@@ -1869,7 +1872,7 @@ function getOutsideCateringBeverageRevenue(year, label) {
   try {
     // Get from Banquet Revenue Assumptions page cache
     // Based on your cache logs, this uses the exact row code: "outside_service_beverage_catering"
-    const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'outside_service_beverage_catering', year, label);
+    const val = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, 'outside_service_beverage_catering', year, label);
     
     if (val !== undefined && val !== null) {
      //  // console.log(`✅ Found outside catering beverage revenue: ${val} for ${year} ${label}`);
@@ -1894,7 +1897,7 @@ function getFunctionRoomRentalRevenue(year, label) {
   try {
     // Get from Banquet Revenue Assumptions page cache
     // Based on your cache logs, this uses the exact row code: "Hall Space Charges"
-    const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'Hall Space Charges', year, label);
+    const val = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, 'Hall Space Charges', year, label);
     
     if (val !== undefined && val !== null) {
      //  // console.log(`✅ Found function room rental revenue: ${val} for ${year} ${label}`);
@@ -1918,9 +1921,9 @@ function getMiscellaneousOtherRevenue(year, label) {
   try {
     // Get from Banquet Revenue Assumptions page cache
     // Sum up Tobacco + non_fnb + Others for the month
-    const tobaccoValue = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'tobacco', year, label);
-    const nonFnbValue = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'non_fnb', year, label);
-    const othersValue = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', 'others', year, label);
+    const tobaccoValue = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, 'tobacco', year, label);
+    const nonFnbValue = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, 'non_fnb', year, label);
+    const othersValue = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, 'others', year, label);
     
     const tobacco = getNumber(tobaccoValue) || 0;
     const nonFnb = getNumber(nonFnbValue) || 0;
@@ -1937,7 +1940,7 @@ function getMiscellaneousOtherRevenue(year, label) {
     
     let additionalTotal = 0;
     for (const rowCode of additionalRowCodes) {
-      const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', rowCode, year, label);
+      const val = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, rowCode, year, label);
       if (val !== undefined && val !== null) {
         const additionalValue = getNumber(val) || 0;
         additionalTotal += additionalValue;
@@ -1977,7 +1980,7 @@ function getAudiovisualRevenue(year, label) {
       'av_revenue'
     ];
     for (const rowCode of possibleRowCodes) {
-      const val = calculationCache.getValue(projectName.value, 'Banquet Revenue Assumptions', rowCode, year, label);
+      const val = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, rowCode, year, label);
       if (val !== undefined && val !== null) {
         return getNumber(val);
       }
@@ -2159,7 +2162,7 @@ function getServiceCharge(year, label) {
   try {
     // Get from calculation cache - you can adjust the page and row code as needed
     // For now, returning 0 as placeholder - you'll need to connect this to your data source
-    const serviceCharge = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Service Charge', year, label);
+    const serviceCharge = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Service Charge', year, label);
     
     if (serviceCharge !== undefined && serviceCharge !== null) {
       return getNumber(serviceCharge);
@@ -2231,7 +2234,7 @@ function getCostOfFoodSales(year, label) {
     // Fetch rate from Expense Assumptions:Food And Beverage as percentage/ratio
     const rateRaw = calculationCache.getValue(
       projectName.value,
-      'Expense Assumptions:Food And Beverage',
+      `${PAGE.EXPENSE_ASSUMPTIONS}:Food And Beverage`,
       'Cost of Food sales',
       year,
       label
@@ -2269,7 +2272,7 @@ function getCostOfBeverageSales(year, label) {
     // Fetch rate from Expense Assumptions:Food And Beverage as percentage/ratio
     const rateRaw = calculationCache.getValue(
       projectName.value,
-      'Expense Assumptions:Food And Beverage',
+      `${PAGE.EXPENSE_ASSUMPTIONS}:Food And Beverage`,
       'Cost of Beverage sales',
       year,
       label
@@ -2339,7 +2342,7 @@ function getAudiovisualCost(year, label) {
     // Rate source: Expense Assumptions:Food And Beverage -> "Audiovisual Cost"
     const rateRaw = calculationCache.getValue(
       projectName.value,
-      'Expense Assumptions:Food And Beverage',
+      `${PAGE.EXPENSE_ASSUMPTIONS}:Food And Beverage`,
       'Cost of Beverage sales',
       year,
       label
@@ -2378,7 +2381,7 @@ function getMiscellaneousCost(year, label) {
     // Rate source: Expense Assumptions:Food And Beverage -> "Miscellaneous Cost"
     const rateRaw = calculationCache.getValue(
       projectName.value,
-      'Expense Assumptions:Food And Beverage',
+      `${PAGE.EXPENSE_ASSUMPTIONS}:Food And Beverage`,
       'Cost of Beverage sales',
       year,
       label
@@ -2508,7 +2511,7 @@ function getFnbExpenses() {
   // Dynamically read F&B expense categories from the calculation cache page
   // pageId: "Expense Assumptions:Food And Beverage" (scoped to current project)
   try {
-    const pageId = 'Expense Assumptions:Food And Beverage';
+    const pageId = `${PAGE.EXPENSE_ASSUMPTIONS}:Food And Beverage`;
     const projectId = projectName.value;
     const pageCache = calculationCache.cache?.[projectId]?.[pageId] || {};
     // Exclude Cost of Food sales and Cost of Beverage sales rows from F&B expenses list
@@ -2526,7 +2529,7 @@ function getFnbExpenses() {
 function getFnbExpense(expense, year, label) {
   try {
     // Get the expense value from the "Expense Assumptions:Food And Beverage" cache page
-    const value = calculationCache.getValue(projectName.value, 'Expense Assumptions:Food And Beverage', expense, year, label);
+    const value = calculationCache.getValue(projectName.value, `${PAGE.EXPENSE_ASSUMPTIONS}:Food And Beverage`, expense, year, label);
     
     if (value !== undefined && value !== null) {
       return getNumber(value);
@@ -2620,18 +2623,33 @@ function isFnbManagementPositionName(position) {
 
 const fnbPayrollLocationsManagement = computed(() => {
   try {
-    const project = projectName.value;
-    const page = 'Payroll';
-    const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const locs = new Set();
-    
+    const project = projectName.value;
+    const depts = ['Food And Beverage', 'F&B'];
+    // Prefer normalized payroll structure across visible years
+    (Array.isArray(props.visibleYears) ? props.visibleYears : []).forEach((yr) => {
+      const yearBucket = calculationCache?.payroll?.[project]?.[yr] || {};
+      Object.keys(yearBucket).forEach((departmentKey) => {
+        if (!depts.includes(departmentKey)) return;
+        const byLocation = yearBucket[departmentKey] || {};
+        Object.keys(byLocation).forEach((locationKey) => {
+          const byPosition = byLocation[locationKey] || {};
+          const hasMgmt = Object.keys(byPosition).some((pos) => isFnbManagementPositionName(pos));
+          if (hasMgmt && locationKey) locs.add(locationKey);
+        });
+      });
+    });
+    if (locs.size > 0) return Array.from(locs);
+
+    // Fallback to legacy PAGE cache
+    const page = PAGE.PAYROLL;
+    const pageData = calculationCache?.cache?.[project]?.[page] || {};
     Object.keys(pageData).forEach((rowCode) => {
       const parsed = parseFnbMonthlySalaryRowCode(rowCode);
       if (parsed && isFnbManagementPositionName(parsed.position) && parsed.location) {
         locs.add(parsed.location);
       }
     });
-    
     return Array.from(locs);
   } catch (e) {
     console.error('F&B P&L: Error discovering payroll management locations:', e);
@@ -2641,18 +2659,33 @@ const fnbPayrollLocationsManagement = computed(() => {
 
 const fnbPayrollLocationsNonManagement = computed(() => {
   try {
-    const project = projectName.value;
-    const page = 'Payroll';
-    const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const locs = new Set();
-    
+    const project = projectName.value;
+    const depts = ['Food And Beverage', 'F&B'];
+    // Prefer normalized payroll structure across visible years
+    (Array.isArray(props.visibleYears) ? props.visibleYears : []).forEach((yr) => {
+      const yearBucket = calculationCache?.payroll?.[project]?.[yr] || {};
+      Object.keys(yearBucket).forEach((departmentKey) => {
+        if (!depts.includes(departmentKey)) return;
+        const byLocation = yearBucket[departmentKey] || {};
+        Object.keys(byLocation).forEach((locationKey) => {
+          const byPosition = byLocation[locationKey] || {};
+          const hasNonMgmt = Object.keys(byPosition).some((pos) => !isFnbManagementPositionName(pos));
+          if (hasNonMgmt && locationKey) locs.add(locationKey);
+        });
+      });
+    });
+    if (locs.size > 0) return Array.from(locs);
+
+    // Fallback to legacy PAGE cache
+    const page = PAGE.PAYROLL;
+    const pageData = calculationCache?.cache?.[project]?.[page] || {};
     Object.keys(pageData).forEach((rowCode) => {
       const parsed = parseFnbMonthlySalaryRowCode(rowCode);
       if (parsed && !isFnbManagementPositionName(parsed.position) && parsed.location) {
         locs.add(parsed.location);
       }
     });
-    
     return Array.from(locs);
   } catch (e) {
     console.error('F&B P&L: Error discovering payroll non-management locations:', e);
@@ -2663,10 +2696,35 @@ const fnbPayrollLocationsNonManagement = computed(() => {
 function getFnbPayrollMonthlySalaryByLocation(year, label, location, group) {
   try {
     const project = projectName.value;
-    const page = 'Payroll';
-    const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const months = getMonthsForLabel(label);
+    const depts = ['Food And Beverage', 'F&B'];
     let sum = 0;
+
+    // Prefer normalized payroll structure for F&B
+    const yearBucket = calculationCache?.payroll?.[project]?.[year] || {};
+    Object.keys(yearBucket).forEach((departmentKey) => {
+      if (!depts.includes(departmentKey)) return;
+      const byLocation = yearBucket[departmentKey] || {};
+      const locBucket = byLocation?.[location];
+      if (!locBucket) return;
+      Object.keys(locBucket).forEach((positionKey) => {
+        const isMgmt = isFnbManagementPositionName(positionKey);
+        if ((group === 'management' && !isMgmt) || (group === 'non-management' && isMgmt)) return;
+        const byDesignation = locBucket[positionKey] || {};
+        Object.keys(byDesignation).forEach((designationKey) => {
+          const byLabel = byDesignation[designationKey] || {};
+          for (const m of months) {
+            const v = byLabel?.[m];
+            if (v !== undefined && v !== null) sum += getNumber(v);
+          }
+        });
+      });
+    });
+    if (sum > 0) return sum;
+
+    // Fallback to legacy PAGE cache
+    const page = PAGE.PAYROLL;
+    const pageData = calculationCache?.cache?.[project]?.[page] || {};
     Object.keys(pageData).forEach((rowCode) => {
       const parsed = parseFnbMonthlySalaryRowCode(rowCode);
       if (!parsed || !parsed.location || parsed.location !== location) return;
