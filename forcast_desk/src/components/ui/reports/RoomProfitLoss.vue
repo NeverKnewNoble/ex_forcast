@@ -1432,6 +1432,7 @@ import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import { selectedProject } from '@/components/utility/dashboard/projectService.js';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
 import { 
   ChevronDown, 
   ChevronRight, 
@@ -1485,14 +1486,47 @@ watch(selectedProject, () => {
   loadRoomExpensesFromApi();
 }, { deep: true });
 
+// Watch for visible years changes to reload data
+watch(() => props.visibleYears, async (newYears) => {
+  if (newYears && newYears.length > 0) {
+    await ensureDataLoaded();
+  }
+}, { deep: true });
+
+// Function to ensure data is loaded in cache
+async function ensureDataLoaded() {
+  try {
+    if (!projectName.value || !props.visibleYears?.length) return;
+    
+    // Check if we have any revenue data in cache
+    const hasRevenueData = roomRevenueSegments.value.length > 0 || roomTypePackages.value.length > 0;
+    
+    if (!hasRevenueData) {
+      console.log('Room P&L: No revenue data found, loading from report service...');
+      
+      // Load data for room profit & loss report
+      await reportDataService.getReportSpecificData(
+        'room-pnl',
+        projectName.value,
+        props.visibleYears
+      );
+    }
+  } catch (error) {
+    console.warn('Room P&L: Failed to ensure data loaded:', error);
+  }
+}
+
 // Add debugging for cache access
-onMounted(() => {
+onMounted(async () => {
   // Load Room department expenses from Expense Assumptions API
   loadRoomExpensesFromApi();
   
   // The parent component (Reports.vue) now handles data loading via the unified service
   // This eliminates the need to visit other pages first
   // console.log('Room P&L: Component mounted, data should be loaded by parent component');
+  
+  // Force data loading if cache is empty
+  await ensureDataLoaded();
   
   // Debug: Log what's available in cache
   if (selectedProject.value?.project_name) {
@@ -1511,28 +1545,24 @@ const expenseDataCache = ref({});
 const roomDepartmentExpenses = computed(() => {
   try {
     const expensesSet = new Set();
+    const project = projectName.value;
     
-    // First try to get from calculation cache
-    if (projectName.value) {
-      const cachedRoomExpenses = calculationCache.getRowValues(projectName.value, 'Expense Assumptions:Room');
-      if (cachedRoomExpenses && Object.keys(cachedRoomExpenses).length > 0) {
-        // Extract unique expense names from cached data
-        Object.values(cachedRoomExpenses).forEach(yearData => {
-          Object.values(yearData).forEach(monthData => {
-            Object.keys(monthData).forEach(expenseName => {
-              if (expenseName) expensesSet.add(expenseName);
-            });
-          });
+    // Prefer new normalized expenses structure if available
+    if (project && calculationCache?.expenses?.[project]) {
+      const projectExpenses = calculationCache.expenses[project];
+      // Collect from any department key that maps to Room/Rooms
+      Object.keys(projectExpenses).forEach((deptKey) => {
+        const isRoomDept = ['room', 'rooms'].includes((deptKey || '').toLowerCase());
+        if (!isRoomDept) return;
+        const byExpenseName = projectExpenses[deptKey] || {};
+        Object.keys(byExpenseName).forEach((expenseName) => {
+          if (expenseName) expensesSet.add(expenseName);
         });
-        
-        if (expensesSet.size > 0) {
-          // console.log('[ROOM P&L] Found', expensesSet.size, 'room expenses in calculation cache');
-          return Array.from(expensesSet);
-        }
-      }
+      });
+      if (expensesSet.size > 0) return Array.from(expensesSet);
     }
     
-    // Fallback to local cache if calculation cache doesn't have data
+    // Fallback to local cache if normalized cache is not populated yet
     const data = expenseDataCache.value || {};
     for (const [year, months] of Object.entries(data)) {
       for (const [month, entries] of Object.entries(months)) {
@@ -1559,7 +1589,7 @@ async function loadRoomExpensesFromApi() {
   try {
     // First check if we have cached expense data
     if (projectName.value) {
-      const cachedRoomExpenses = calculationCache.getRowValues(projectName.value, 'Expense Assumptions:Room');
+      const cachedRoomExpenses = calculationCache.getRowValues(projectName.value, `${PAGE.EXPENSE_ASSUMPTIONS}:Room`);
       if (cachedRoomExpenses && Object.keys(cachedRoomExpenses).length > 0) {
         // console.log('[ROOM P&L] Using cached expense data for room department');
         // Convert cached data back to the format expected by the component
@@ -1626,19 +1656,22 @@ function getColumnLabelsForYear(year) {
 // Data retrieval functions - these will be connected to your calculation cache
 function getRoomExpenseAmount(year, label, expenseName) {
   try {
-    // First try to get from calculation cache
+    // Prefer normalized expenses cache first
     const monthKeys = getMonthsForLabel(label);
     let sum = 0;
+    const project = projectName.value;
     
     for (const m of monthKeys) {
-      // Try to get from calculation cache first
-      const cachedAmount = calculationCache.getValue(projectName.value, 'Expense Assumptions:Room', expenseName, year, m);
-      if (cachedAmount > 0) {
-        sum += cachedAmount;
+      // Try normalized lookups under both 'Room' and 'Rooms' department keys
+      const amtRoom = calculationCache.getExpense(project, 'Room', expenseName, year, m);
+      const amtRooms = calculationCache.getExpense(project, 'Rooms', expenseName, year, m);
+      const normalizedAmt = getNumber(amtRoom || amtRooms || 0);
+      if (normalizedAmt > 0) {
+        sum += normalizedAmt;
         continue;
       }
       
-      // Fallback to local cache if calculation cache doesn't have it
+      // Fallback to local API-shaped cache
       const entries = expenseDataCache.value?.[year]?.[m] || [];
       const filtered = entries.filter(e => {
         const dept = (e.department || '').toLowerCase();
@@ -1786,7 +1819,7 @@ function getNoOfRooms(year, label) {
     
     // Get room count from room revenue page via calculation cache
     // Both scenarios (market segmentation on/off) now cache to the same location
-    const roomCount = calculationCache.getValue(projectName.value, 'Room Revenue Assumptions', 'Total Rooms', year, label);
+    const roomCount = calculationCache.getValue(projectName.value, PAGE.ROOM_REVENUE, ROW.TOTAL_ROOMS, year, label);
     
     if (roomCount !== undefined && roomCount !== null) {
       // console.log(`Room P&L: Retrieved room count for ${year}/${label}:`, roomCount, 'Market segmentation:', isMarketSegmentationEnabled);
@@ -1874,7 +1907,7 @@ function getNoOfDaysPercentage(year, label) {
 function getAvailableRooms(year, label) {
   try {
     // First try: Get from F&B page - Number of rooms available row
-    let availableRooms = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Number of rooms available', year, label);
+    let availableRooms = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Number of rooms available', year, label);
     
     // console.log(`Room P&L: Available Rooms cache lookup for ${year}/${label}:`, {
     //   projectName: projectName.value,
@@ -1890,7 +1923,7 @@ function getAvailableRooms(year, label) {
     // Second try: Get from Room Revenue page - Total Available Rooms (if market segmentation is on)
     const isMarketSegmentationEnabled = localStorage.getItem('marketSegmentation') === 'true';
     if (isMarketSegmentationEnabled) {
-      const totalRooms = calculationCache.getValue(projectName.value, 'Room Revenue Assumptions', 'Total Rooms', year, label);
+      const totalRooms = calculationCache.getValue(projectName.value, PAGE.ROOM_REVENUE, ROW.TOTAL_ROOMS, year, label);
       if (totalRooms !== undefined && totalRooms !== null) {
         const days = getNoOfDays(year, label);
         const calculatedValue = getNumber(totalRooms) * days;
@@ -1947,7 +1980,7 @@ function getAvailableRoomsPercentage(year, label) {
 function getSoldRooms(year, label) {
   try {
     // Get from F&B page - Number of rooms sold (excl.) row (note: lowercase in cache)
-    const soldRooms = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Number of rooms sold (excl.)', year, label);
+    const soldRooms = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Number of rooms sold (excl.)', year, label);
     
     // console.log(`Room P&L: Sold Rooms cache lookup for ${year}/${label}:`, {
     //   projectName: projectName.value,
@@ -1961,7 +1994,7 @@ function getSoldRooms(year, label) {
     }
     
     // Fallback: Calculate based on occupancy percentage if available
-    const occupancy = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Occupancy (excl.) %', year, label);
+    const occupancy = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Occupancy (excl.) %', year, label);
     if (occupancy !== undefined && occupancy !== null) {
       const availableRooms = getAvailableRooms(year, label);
       const calculatedSoldRooms = Math.round((getNumber(occupancy) / 100) * availableRooms);
@@ -2010,7 +2043,7 @@ function getSoldRoomsPercentage(year, label) {
 function getOccupancyPercentage(year, label) {
   try {
     // Get from F&B page - Occupancy (excl.) % row
-    const occupancy = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Occupancy (excl.) %', year, label);
+    const occupancy = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Occupancy (excl.) %', year, label);
     if (occupancy !== undefined && occupancy !== null) {
       return getNumber(occupancy);
     }
@@ -2059,7 +2092,7 @@ function getOccupancyPercentagePercentage(year, label) {
 function getNumberOfGuests(year, label) {
   try {
     // Get from F&B page - Number of guests row
-    const guests = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Number of guests', year, label);
+    const guests = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, ROW.NUMBER_OF_GUESTS, year, label);
     if (guests !== undefined && guests !== null) {
       return getNumber(guests);
     }
@@ -2095,7 +2128,7 @@ function getNumberOfGuestsPercentage(year, label) {
 function getNumberOfCovers(year, label) {
   try {
     // Get from F&B page - Total Covers row
-    const covers = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Total Covers', year, label);
+    const covers = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Total Covers', year, label);
     if (covers !== undefined && covers !== null) {
       return getNumber(covers);
     }
@@ -2131,7 +2164,7 @@ function getNumberOfCoversPercentage(year, label) {
 function getAverageFnbSpent(year, label) {
   try {
     // Get from F&B page - Average Spent Per F&B Customer row
-    const avgSpent = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Average Spent Per F&B Customer', year, label);
+    const avgSpent = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Average Spent Per F&B Customer', year, label);
     if (avgSpent !== undefined && avgSpent !== null) {
       return getNumber(avgSpent);
     }
@@ -2168,7 +2201,7 @@ function getAverageFnbSpentPercentage(year, label) {
 function getAverageRoomRate(year, label) {
   try {
     // Get from F&B page - Average Room Rate row
-    const avgRate = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Average Room Rate', year, label);
+    const avgRate = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, ROW.AVERAGE_ROOM_RATE, year, label);
     if (avgRate !== undefined && avgRate !== null) {
       return getNumber(avgRate);
     }
@@ -2205,7 +2238,7 @@ function getAverageRoomRatePercentage(year, label) {
 function getRevPerAvailableRoom(year, label) {
   try {
     // Get from F&B page - Revenue Per Available Room row
-    const revPerRoom = calculationCache.getValue(projectName.value, 'F&B Revenue Assumptions', 'Revenue Per Available Room', year, label);
+    const revPerRoom = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Revenue Per Available Room', year, label);
     if (revPerRoom !== undefined && revPerRoom !== null) {
       return getNumber(revPerRoom);
     }
@@ -2412,13 +2445,14 @@ function getMonthsForLabel(label) {
 function parseMonthlySalaryRowCode(rowCode) {
   try {
     if (!rowCode || !rowCode.startsWith('MonthlySalary|')) return null;
-    const regex = /^MonthlySalary\|position:(.*?)\|location:(.*?)\|designation:(.*)$/;
+    const regex = /^MonthlySalary\|department:(.*?)\|position:(.*?)\|location:(.*?)\|designation:(.*)$/;
     const match = rowCode.match(regex);
     if (!match) return null;
     return {
-      position: (match[1] || '').trim(),
-      location: (match[2] || '').trim(),
-      designation: (match[3] || '').trim()
+      department: (match[1] || '').trim(),
+      position: (match[2] || '').trim(),
+      location: (match[3] || '').trim(),
+      designation: (match[4] || '').trim()
     };
   } catch (e) {
     return null;
@@ -2433,22 +2467,31 @@ function isManagementPositionName(position) {
 
 const payrollLocationsManagement = computed(() => {
   try {
-    const project = projectName.value;
-    const page = 'Payroll';
-    const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const locs = new Set();
-    
-    // console.log(`Room P&L: Looking for payroll management data in page "${page}"`);
-    // console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
-    
+    const project = projectName.value;
+    // Prefer normalized payroll cache across visible years
+    (Array.isArray(props.visibleYears) ? props.visibleYears : []).forEach((yr) => {
+      const yearBucket = calculationCache?.payroll?.[project]?.[yr] || {};
+      Object.keys(yearBucket).forEach((departmentKey) => {
+        const byLocation = yearBucket[departmentKey] || {};
+        Object.keys(byLocation).forEach((locationKey) => {
+          const byPosition = byLocation[locationKey] || {};
+          const hasMgmt = Object.keys(byPosition).some((pos) => isManagementPositionName(pos));
+          if (hasMgmt && locationKey) locs.add(locationKey);
+        });
+      });
+    });
+    if (locs.size > 0) return Array.from(locs);
+
+    // Fallback to legacy PAGE cache
+    const page = PAGE.PAYROLL;
+    const pageData = calculationCache?.cache?.[project]?.[page] || {};
     Object.keys(pageData).forEach((rowCode) => {
       const parsed = parseMonthlySalaryRowCode(rowCode);
       if (parsed && isManagementPositionName(parsed.position) && parsed.location) {
         locs.add(parsed.location);
       }
     });
-    
-    // console.log(`Room P&L: Found ${locs.size} management locations:`, Array.from(locs));
     return Array.from(locs);
   } catch (e) {
     console.error('Room P&L: Error discovering payroll management locations:', e);
@@ -2458,22 +2501,31 @@ const payrollLocationsManagement = computed(() => {
 
 const payrollLocationsNonManagement = computed(() => {
   try {
-    const project = projectName.value;
-    const page = 'Payroll';
-    const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const locs = new Set();
-    
-    // console.log(`Room P&L: Looking for payroll non-management data in page "${page}"`);
-    // console.log(`Room P&L: Available row codes:`, Object.keys(pageData));
-    
+    const project = projectName.value;
+    // Prefer normalized payroll cache across visible years
+    (Array.isArray(props.visibleYears) ? props.visibleYears : []).forEach((yr) => {
+      const yearBucket = calculationCache?.payroll?.[project]?.[yr] || {};
+      Object.keys(yearBucket).forEach((departmentKey) => {
+        const byLocation = yearBucket[departmentKey] || {};
+        Object.keys(byLocation).forEach((locationKey) => {
+          const byPosition = byLocation[locationKey] || {};
+          const hasNonMgmt = Object.keys(byPosition).some((pos) => !isManagementPositionName(pos));
+          if (hasNonMgmt && locationKey) locs.add(locationKey);
+        });
+      });
+    });
+    if (locs.size > 0) return Array.from(locs);
+
+    // Fallback to legacy PAGE cache
+    const page = PAGE.PAYROLL;
+    const pageData = calculationCache?.cache?.[project]?.[page] || {};
     Object.keys(pageData).forEach((rowCode) => {
       const parsed = parseMonthlySalaryRowCode(rowCode);
       if (parsed && !isManagementPositionName(parsed.position) && parsed.location) {
         locs.add(parsed.location);
       }
     });
-    
-    // console.log(`Room P&L: Found ${locs.size} non-management locations:`, Array.from(locs));
     return Array.from(locs);
   } catch (e) {
     console.error('Room P&L: Error discovering payroll non-management locations:', e);
@@ -2484,10 +2536,36 @@ const payrollLocationsNonManagement = computed(() => {
 function getPayrollMonthlySalaryByLocation(year, label, location, group) {
   try {
     const project = projectName.value;
-    const page = 'Payroll';
-    const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const months = getMonthsForLabel(label);
     let sum = 0;
+
+    // Prefer normalized payroll structure
+    const payrollNorm = calculationCache?.payroll?.[project]?.[year] || {};
+    const isMgmtGroup = group === 'management';
+    const isNonMgmtGroup = group === 'non-management';
+    Object.keys(payrollNorm).forEach((departmentKey) => {
+      const byLocation = payrollNorm[departmentKey] || {};
+      const locBucket = byLocation?.[location];
+      if (!locBucket) return;
+      Object.keys(locBucket).forEach((positionKey) => {
+        const mgmt = isManagementPositionName(positionKey);
+        if ((isMgmtGroup && !mgmt) || (isNonMgmtGroup && mgmt)) return;
+        const byDesignation = locBucket[positionKey] || {};
+        Object.keys(byDesignation).forEach((designationKey) => {
+          const byLabel = byDesignation[designationKey] || {};
+          for (const m of months) {
+            const v = byLabel?.[m];
+            if (v !== undefined && v !== null) sum += getNumber(v);
+          }
+        });
+      });
+    });
+
+    if (sum > 0) return sum;
+
+    // Fallback to legacy PAGE-based cache
+    const page = PAGE.PAYROLL;
+    const pageData = calculationCache?.cache?.[project]?.[page] || {};
     Object.keys(pageData).forEach((rowCode) => {
       const parsed = parseMonthlySalaryRowCode(rowCode);
       if (!parsed || !parsed.location || parsed.location !== location) return;
@@ -2596,7 +2674,7 @@ function getTotalPayrollPercentage(year, label) {
 const roomRevenueSegments = computed(() => {
   try {
     const project = projectName.value;
-    const page = 'Market Segmentation';
+    const page = PAGE.MARKET_SEGMENTATION;
     const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const segments = new Set();
     
@@ -2624,7 +2702,7 @@ function getSegmentRevenue(year, label, segmentName) {
     const months = getMonthsForLabel(label);
     let sum = 0;
     for (const m of months) {
-      const val = calculationCache.getValue(project, 'Market Segmentation', `Room Revenue:${segmentName}`, year, m);
+      const val = calculationCache.getValue(project, PAGE.MARKET_SEGMENTATION, `Room Revenue:${segmentName}`, year, m);
       if (val !== undefined && val !== null) {
         sum += getNumber(val);
       }
@@ -2639,7 +2717,7 @@ function getSegmentRevenue(year, label, segmentName) {
 function getSegmentRevenueTotal(year, segmentName) {
   try {
     const project = projectName.value;
-    const yearly = calculationCache.getValue(project, 'Market Segmentation', `Room Revenue Year:${segmentName}`, year, 'ALL');
+    const yearly = calculationCache.getValue(project, PAGE.MARKET_SEGMENTATION, `Room Revenue Year:${segmentName}`, year, 'ALL');
     if (yearly !== undefined && yearly !== null) {
       return getNumber(yearly);
     }
@@ -2686,7 +2764,7 @@ function getDirectRetailRevenue(year, label) {
     const months = getMonthsForLabel(label);
     let sum = 0;
     for (const m of months) {
-      const val = calculationCache.getValue(project, 'Market Segmentation', 'Room Revenue:Direct Retail', year, m);
+      const val = calculationCache.getValue(project, PAGE.MARKET_SEGMENTATION, 'Room Revenue:Direct Retail', year, m);
       if (val !== undefined && val !== null) {
         sum += getNumber(val);
       }
@@ -2695,7 +2773,7 @@ function getDirectRetailRevenue(year, label) {
       return sum;
     }
     // Fallback: Room Revenue Assumptions if segmentation not available
-    const fallback = calculationCache.getValue(project, 'Room Revenue Assumptions', 'Direct Retail', year, label);
+    const fallback = calculationCache.getValue(project, PAGE.ROOM_REVENUE, 'Direct Retail', year, label);
     if (fallback !== undefined && fallback !== null) {
       return getNumber(fallback);
     }
@@ -2710,7 +2788,7 @@ function getDirectRetailRevenueTotal(year) {
   try {
     const project = projectName.value;
     // If yearly total exists in cache, prefer it
-    const yearly = calculationCache.getValue(project, 'Market Segmentation', 'Room Revenue Year:Direct Retail', year, 'ALL');
+    const yearly = calculationCache.getValue(project, PAGE.MARKET_SEGMENTATION, 'Room Revenue Year:Direct Retail', year, 'ALL');
     if (yearly !== undefined && yearly !== null) {
       return getNumber(yearly);
     }
@@ -2726,7 +2804,7 @@ function getDirectRetailRevenueTotal(year) {
 function getCorporateRevenue(year, label) {
   try {
     // Get from Room Revenue page - Corporate revenue
-    const revenue = calculationCache.getValue(projectName.value, 'Room Revenue Assumptions', 'Corporate', year, label);
+    const revenue = calculationCache.getValue(projectName.value, PAGE.ROOM_REVENUE, 'Corporate', year, label);
     if (revenue !== undefined && revenue !== null) {
       return getNumber(revenue);
     }
@@ -2745,7 +2823,7 @@ function getCorporateRevenueTotal(year) {
 function getOTARevenue(year, label) {
   try {
     // Get from Room Revenue page - OTA revenue
-    const revenue = calculationCache.getValue(projectName.value, 'Room Revenue Assumptions', 'OTA', year, label);
+    const revenue = calculationCache.getValue(projectName.value, PAGE.ROOM_REVENUE, 'OTA', year, label);
     if (revenue !== undefined && revenue !== null) {
       return getNumber(revenue);
     }
@@ -2764,7 +2842,7 @@ function getOTARevenueTotal(year) {
 function getTravelAgentRevenue(year, label) {
   try {
     // Get from Room Revenue page - Travel Agent revenue
-    const revenue = calculationCache.getValue(projectName.value, 'Room Revenue Assumptions', 'Travel Agent', year, label);
+    const revenue = calculationCache.getValue(projectName.value, PAGE.ROOM_REVENUE, 'Travel Agent', year, label);
     if (revenue !== undefined && revenue !== null) {
       return getNumber(revenue);
     }
@@ -2784,7 +2862,7 @@ function getTravelAgentRevenueTotal(year) {
 const roomTypePackages = computed(() => {
   try {
     const project = projectName.value;
-    const page = 'Room Revenue Assumptions';
+    const page = PAGE.ROOM_REVENUE;
     const pageData = calculationCache?.cache?.[project]?.[page] || {};
     const types = new Set();
     
@@ -2812,7 +2890,7 @@ function getRoomTypeRevenue(year, label, typeName) {
     const months = getMonthsForLabel(label);
     let sum = 0;
     for (const m of months) {
-      const val = calculationCache.getValue(project, 'Room Revenue Assumptions', `Room Type:${typeName}`, year, m);
+      const val = calculationCache.getValue(project, PAGE.ROOM_REVENUE, `Room Type:${typeName}`, year, m);
       if (val !== undefined && val !== null) {
         sum += getNumber(val);
       }
@@ -2827,7 +2905,7 @@ function getRoomTypeRevenue(year, label, typeName) {
 function getRoomTypeRevenueTotal(year, typeName) {
   try {
     const project = projectName.value;
-    const yearly = calculationCache.getValue(project, 'Room Revenue Assumptions', `Room Type Year:${typeName}`, year, 'ALL');
+    const yearly = calculationCache.getValue(project, PAGE.ROOM_REVENUE, `Room Type Year:${typeName}`, year, 'ALL');
     if (yearly !== undefined && yearly !== null) {
       return getNumber(yearly);
     }
@@ -2870,13 +2948,31 @@ function hasRoomTypeData(typeName) {
 // Total Rooms Revenue Functions (works for both market segmentation and room packages)
 function getTotalRoomsRevenue(year, label) {
   try {
-    if (isMarketSegmentationEnabled()) {
-      // Sum all discovered market segments
-      return roomRevenueSegments.value.reduce((sum, seg) => sum + getNumber(getSegmentRevenue(year, label, seg)), 0);
-    } else {
-      // Sum all discovered room packages
-      return roomTypePackages.value.reduce((sum, pkg) => sum + getNumber(getRoomTypeRevenue(year, label, pkg)), 0);
+    // Prefer normalized F&B totals if present (aggregated across restaurants)
+    const months = getMonthsForLabel(label);
+    let totalFromFnb = 0;
+    try {
+      const project = projectName.value;
+      const yearBucket = calculationCache?.fnb?.[project]?.[year] || {};
+      // Sum restaurant metric 'totalRevenue' and also include __ALL__/totalRevenue if present
+      Object.keys(yearBucket).forEach((restaurantKey) => {
+        const metrics = yearBucket[restaurantKey] || {};
+        const revenueSeries = metrics?.totalRevenue || {};
+        for (const m of months) {
+          const v = revenueSeries?.[m];
+          if (v !== undefined && v !== null) totalFromFnb += getNumber(v);
+        }
+      });
+    } catch (e) {
+      // ignore and fallback below
     }
+    if (totalFromFnb > 0) return totalFromFnb;
+
+    // Fallbacks: market segmentation or room packages caches
+    if (isMarketSegmentationEnabled()) {
+      return roomRevenueSegments.value.reduce((sum, seg) => sum + getNumber(getSegmentRevenue(year, label, seg)), 0);
+    }
+    return roomTypePackages.value.reduce((sum, pkg) => sum + getNumber(getRoomTypeRevenue(year, label, pkg)), 0);
   } catch (error) {
     console.error('Error calculating total rooms revenue:', error);
     return 0;
@@ -2884,13 +2980,26 @@ function getTotalRoomsRevenue(year, label) {
 }
 
 function getTotalRoomsRevenueTotal(year) {
+  // Prefer normalized F&B yearly totals if present
+  try {
+    const project = projectName.value;
+    const yearBucket = calculationCache?.fnb?.[project]?.[year] || {};
+    let total = 0;
+    Object.keys(yearBucket).forEach((restaurantKey) => {
+      const metrics = yearBucket[restaurantKey] || {};
+      const yearly = metrics?.totalRevenue?.ALL;
+      if (yearly !== undefined && yearly !== null) total += getNumber(yearly);
+    });
+    if (total > 0) return total;
+  } catch (e) {
+    // ignore and fallback below
+  }
+
   if (isMarketSegmentationEnabled()) {
-    // Prefer yearly totals per segment if available
     const perSegmentTotals = roomRevenueSegments.value.map(seg => getSegmentRevenueTotal(year, seg));
     const sumSegments = perSegmentTotals.reduce((a, b) => a + getNumber(b), 0);
     if (sumSegments > 0) return sumSegments;
   } else {
-    // Prefer yearly totals per room type if available
     const perTypeTotals = roomTypePackages.value.map(pkg => getRoomTypeRevenueTotal(year, pkg));
     const sumTypes = perTypeTotals.reduce((a, b) => a + getNumber(b), 0);
     if (sumTypes > 0) return sumTypes;
@@ -3025,36 +3134,51 @@ function getPayrollRelatedValue(year, label, benefitType) {
     const project = projectName.value;
     const months = getMonthsForLabel(label);
     let sum = 0;
-    
-    // Map benefit types to their corresponding page and rowCode in the cache
-    // Updated to match the actual cached row codes from SupplementaryPayTable.vue and EmployeeBenefitsTable.vue
-    const fieldMapping = {
-      'NSSIT': { page: 'Payroll Taxes', rowCode: 'NSSIT' },
-      'Vacation': { page: 'Payroll Related', rowCode: 'hotel | vacation' },
-      'Relocation': { page: 'Payroll Related', rowCode: 'hotel | relocation' },
-      'Severence & Indemnity': { page: 'Payroll Related', rowCode: 'hotel | severence & indemnity' },
-      'Other': { page: 'Payroll Related', rowCode: 'hotel | other' },
-      'Medical': { page: 'Payroll Related', rowCode: 'category: Rooms | medical' },
-      'Uniforms': { page: 'Payroll Related', rowCode: 'category: Rooms | uniforms' },
-      'Employee Meal': { page: 'Payroll Related', rowCode: 'category: Rooms | employee_meal' },
-      'Transport': { page: 'Payroll Related', rowCode: 'category: Rooms | transport' },
-      'Telephone': { page: 'Payroll Related', rowCode: 'category: Rooms | telephone' },
-      'Air Ticket': { page: 'Payroll Related', rowCode: 'category: Rooms | air_ticket' },
-      'Other Benefits': { page: 'Payroll Related', rowCode: 'category: Rooms | other_benefits' }
-    };
-    
-    const mapping = fieldMapping[benefitType];
-    if (!mapping) return 0;
-    
-    // Get data from the appropriate page cache using rowCode
-    for (const month of months) {
-      const val = calculationCache.getValue(project, mapping.page, mapping.rowCode, year, month);
-      
-      if (val !== undefined && val !== null) {
-        sum += getNumber(val);
+
+    // Prefer normalized payrollRelated structure sum across all positions/locations/designations
+    const normYearBucket = calculationCache?.payrollRelated?.[project]?.[year];
+    if (normYearBucket) {
+      const typeBucket = normYearBucket[benefitType] || normYearBucket[benefitType.toUpperCase()] || normYearBucket[benefitType.toLowerCase()];
+      if (typeBucket) {
+        Object.keys(typeBucket).forEach((positionKey) => {
+          const byLocation = typeBucket[positionKey] || {};
+          Object.keys(byLocation).forEach((locationKey) => {
+            const byDesignation = byLocation[locationKey] || {};
+            Object.keys(byDesignation).forEach((designationKey) => {
+              const byLabel = byDesignation[designationKey] || {};
+              for (const m of months) {
+                const v = byLabel?.[m];
+                if (v !== undefined && v !== null) sum += getNumber(v);
+              }
+            });
+          });
+        });
       }
     }
-    
+
+    if (sum > 0) return sum;
+
+    // Fallback to legacy PAGE/rowCode cache
+    const fieldMapping = {
+      'NSSIT': { page: PAGE.PAYROLL_TAXES, rowCode: 'NSSIT' },
+      'Vacation': { page: PAGE.PAYROLL_RELATED, rowCode: 'vacation' },
+      'Relocation': { page: PAGE.PAYROLL_RELATED, rowCode: 'relocation' },
+      'Severence & Indemnity': { page: PAGE.PAYROLL_RELATED, rowCode: 'severence & indemnity' },
+      'Other': { page: PAGE.PAYROLL_RELATED, rowCode: 'other' },
+      'Medical': { page: PAGE.PAYROLL_RELATED, rowCode: 'medical' },
+      'Uniforms': { page: PAGE.PAYROLL_RELATED, rowCode: 'uniforms' },
+      'Employee Meal': { page: PAGE.PAYROLL_RELATED, rowCode: 'employee_meal' },
+      'Transport': { page: PAGE.PAYROLL_RELATED, rowCode: 'transport' },
+      'Telephone': { page: PAGE.PAYROLL_RELATED, rowCode: 'telephone' },
+      'Air Ticket': { page: PAGE.PAYROLL_RELATED, rowCode: 'air_ticket' },
+      'Other Benefits': { page: PAGE.PAYROLL_RELATED, rowCode: 'other_benefits' }
+    };
+    const mapping = fieldMapping[benefitType];
+    if (!mapping) return 0;
+    for (const month of months) {
+      const val = calculationCache.getValue(project, mapping.page, mapping.rowCode, year, month);
+      if (val !== undefined && val !== null) sum += getNumber(val);
+    }
     return sum;
   } catch (error) {
     console.error('Error fetching payroll related value:', benefitType, error);
@@ -3112,7 +3236,7 @@ function getBonusValue(year, label) {
     
     // Get data from Bonus page cache using "Total Hotel" row code
     for (const month of months) {
-      const val = calculationCache.getValue(project, 'Bonus', 'Total Hotel', year, month);
+      const val = calculationCache.getValue(project, PAGE.BONUS, 'Total Hotel', year, month);
       if (val !== undefined && val !== null) {
         sum += getNumber(val);
       }
@@ -3131,7 +3255,7 @@ function getBonusTotal(year) {
     const project = projectName.value;
     
     // First try to get the yearly total directly from cache
-    const yearlyTotal = calculationCache.getValue(project, 'Bonus', 'Total Hotel', year, 'Total');
+    const yearlyTotal = calculationCache.getValue(project, PAGE.BONUS, 'Total Hotel', year, 'Total');
     if (yearlyTotal !== undefined && yearlyTotal !== null) {
       return getNumber(yearlyTotal);
     }

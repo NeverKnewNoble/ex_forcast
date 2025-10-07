@@ -1400,6 +1400,7 @@ import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
 import { CircleAlert, BadgeCent, Coffee, Table, AlertTriangle, BedDouble, Plus, PlusCircle, DollarSign, Calculator, Settings, Calendar, X, Check, Save, Loader2, RefreshCw, ChevronDown, ChevronRight, ArrowLeft, ChevronLeft, FolderOpen, Database, AlertCircle, ArrowRight, Percent, RotateCcw } from 'lucide-vue-next';
 import alertService from "@/components/ui/ui_utility/alertService.js";
@@ -1612,7 +1613,7 @@ function updateRoomRevenueCache() {
       for (const year of visibleYears.value) {
         const labels = getColumnLabelsForYearLocal(year);
         for (const label of labels) {
-          calculationCache.setValue(project, 'Room Revenue Assumptions', 'Total Rooms', year, label, totalNumberOfRooms.value);
+          calculationCache.setValue(project, PAGE.ROOM_REVENUE, ROW.TOTAL_ROOMS, year, label, totalNumberOfRooms.value);
         }
       }
     } else {
@@ -1622,7 +1623,7 @@ function updateRoomRevenueCache() {
       for (const year of visibleYears.value) {
         const labels = getColumnLabelsForYearLocal(year);
         for (const label of labels) {
-          calculationCache.setValue(project, 'Room Revenue Assumptions', 'Total Rooms', year, label, totalRoomsFromPackages);
+          calculationCache.setValue(project, PAGE.ROOM_REVENUE, ROW.TOTAL_ROOMS, year, label, totalRoomsFromPackages);
         }
       }
     }
@@ -1634,14 +1635,14 @@ function updateRoomRevenueCache() {
         const formatted = calculateMonthlyTotal(roomData.value, year, label, advancedModes.value[year] || displayMode.value, 'revenue', filteredRoomPackages.value);
         const numeric = parseCurrencyToNumber(formatted);
         if (numeric > 0) {
-          calculationCache.setValue(project, 'Room Revenue Assumptions', 'Total Room Revenue', year, label, numeric);
+          calculationCache.setValue(project, PAGE.ROOM_REVENUE, ROW.TOTAL_ROOM_REVENUE, year, label, numeric);
         }
       }
       // Year total
       const yearFormatted = calculateGrandTotal(roomData.value, year, advancedModes.value[year] || displayMode.value, 'revenue', filteredRoomPackages.value);
       const yearNumeric = parseCurrencyToNumber(yearFormatted);
       if (yearNumeric > 0) {
-        calculationCache.setValue(project, 'Room Revenue Assumptions', 'Total Room Revenue Year', year, 'ALL', yearNumeric);
+        calculationCache.setValue(project, PAGE.ROOM_REVENUE, ROW.TOTAL_ROOM_REVENUE_YEAR, year, 'ALL', yearNumeric);
       }
     }
   } catch (e) {

@@ -1385,6 +1385,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
 import { getProjectDepartments } from '@/components/utility/dashboard/projectService.js';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
   import { getProjectKey } from '@/components/utility/projectLocalStorage.js';  
   import {
     showAddPayrollModal,
@@ -2258,8 +2259,16 @@ function restoreOriginal() {
         const position = (row.position || '').toString();
         const designation = (row.designation || '').toString();
         const location = (row.departmentLocation || '').toString();
-        const rowCode = `MonthlySalary|department:${department}|position:${position}|location:${location}|designation:${designation}`;
-        calculationCache.setValue(projectId, 'Payroll', rowCode, year, month, amount);
+        calculationCache.setPayrollMonthly(
+          projectId,
+          department,
+          location,
+          position,
+          designation,
+          year,
+          month,
+          amount
+        );
       } catch (e) {}
       
       return amount;

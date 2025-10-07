@@ -1210,6 +1210,7 @@ import PayrollNoProjectSelectedState from '@/components/ui/payroll/PayrollNoProj
 import PayrollNoYearsSelectedState from '@/components/ui/payroll/PayrollNoYearsSelectedState.vue';
 import LoadingState from '@/components/ui/payroll/LoadingState.vue';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
 import { getProjectKey } from '@/components/utility/projectLocalStorage.js';  
 import {
   showAddPayrollModal,
@@ -1635,6 +1636,9 @@ watch(payrollRows, (newRows, oldRows) => {
   
   // No need to initialize monthly count cells since we're using getter/setter pattern
   // The monthly count cells will automatically get the main count value when no override exists
+  
+  // Cache the calculated values when payroll data changes
+  cachePayrollRelatedValues();
 }, { deep: true });
 
 // When opening the modal, copy the current settings
@@ -1693,6 +1697,9 @@ onMounted(async () => {
       localStorage.removeItem('showRefreshSuccess');
       alertService.success("Page refreshed successfully");
     }
+    
+    // Cache the calculated values after data is loaded
+    cachePayrollRelatedValues();
   } catch (err) {
     console.error("Error loading data:", err);
   } finally {
@@ -2097,6 +2104,67 @@ function safeCalculateHotelTotalTaxPercentageLocal() {
     return '0.00';
   }
   return calculateHotelTotalTaxPercentageLocal(payrollRows.value);
+}
+
+// Function to get column labels for a specific year
+const getColumnLabelsForYear = (year) => {
+  return getColumnLabels(advancedModes.value[year] || displayMode.value);
+};
+
+// Function to cache payroll related values
+function cachePayrollRelatedValues() {
+  try {
+    if (!selectedProject.value?.project_name || !visibleYears.value?.length) return;
+    
+    const project = selectedProject.value.project_name;
+    const years = visibleYears.value;
+    
+    // Cache NSSIT (Payroll Taxes)
+    const nssitValue = parseFloat(safeCalculateHotelTotalTaxTotalLocal().replace(/[,$]/g, '') || '0');
+    if (nssitValue > 0) {
+      years.forEach(year => {
+        const labels = getColumnLabelsForYear(year);
+        labels.forEach(label => {
+          calculationCache.setValue(project, PAGE.PAYROLL_TAXES, 'NSSIT', year, label, nssitValue);
+        });
+        // Cache yearly total
+        calculationCache.setValue(project, PAGE.PAYROLL_TAXES, 'NSSIT', year, 'ALL', nssitValue * labels.length);
+      });
+    }
+    
+    // Cache Payroll Related values
+    const payrollRelatedValues = {
+      'vacation': parseFloat(safeCalculateHotelTotalVacationLocal().replace(/[,$]/g, '') || '0'),
+      'relocation': parseFloat(safeCalculateHotelTotalRelocationLocal().replace(/[,$]/g, '') || '0'),
+      'severence & indemnity': parseFloat(safeCalculateHotelTotalSeverenceIndemnityLocal().replace(/[,$]/g, '') || '0'),
+      'other': parseFloat(safeCalculateHotelTotalOtherLocal().replace(/[,$]/g, '') || '0'),
+      'medical': parseFloat(safeCalculateHotelTotalMedicalLocal().replace(/[,$]/g, '') || '0'),
+      'uniforms': parseFloat(safeCalculateHotelTotalUniformsLocal().replace(/[,$]/g, '') || '0'),
+      'employee_meal': parseFloat(safeCalculateHotelTotalEmployeeMealLocal().replace(/[,$]/g, '') || '0'),
+      'transport': parseFloat(safeCalculateHotelTotalTransportLocal().replace(/[,$]/g, '') || '0'),
+      'telephone': parseFloat(safeCalculateHotelTotalTelephoneLocal().replace(/[,$]/g, '') || '0'),
+      'air_ticket': parseFloat(safeCalculateHotelTotalAirTicketLocal().replace(/[,$]/g, '') || '0'),
+      'other_benefits': parseFloat(safeCalculateHotelTotalBenefitsOtherLocal().replace(/[,$]/g, '') || '0')
+    };
+    
+    // Cache each payroll related value
+    Object.entries(payrollRelatedValues).forEach(([rowCode, value]) => {
+      if (value > 0) {
+        years.forEach(year => {
+          const labels = getColumnLabelsForYear(year);
+          labels.forEach(label => {
+            calculationCache.setValue(project, PAGE.PAYROLL_RELATED, rowCode, year, label, value);
+          });
+          // Cache yearly total
+          calculationCache.setValue(project, PAGE.PAYROLL_RELATED, rowCode, year, 'ALL', value * labels.length);
+        });
+      }
+    });
+    
+    console.log('Payroll Related: Cached values to calculationCache');
+  } catch (error) {
+    console.error('Payroll Related: Error caching values:', error);
+  }
 }
 
 function safeCalculateHotelTotalTaxTotalLocal() {

@@ -554,6 +554,7 @@
   import NoProjectSelectedState from '@/components/ui/banquet/NoProjectSelectedState.vue';
   import NoYearsSelectedState from '@/components/ui/banquet/NoYearsSelectedState.vue';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
   import SettingsModal from '@/components/ui/SettingsModal.vue';
   
   
@@ -985,8 +986,8 @@
     // Check cache first for calculated fields
     if (['food', 'liquor', 'soft_drinks', 'hall_space_charges', 'gross', 'net_amount', 'amount_per_event', 'amount_per_pax', 'avg_pax_per_event'].includes(fieldCode)) {
       if (context.projectName && context.calculationCache) {
-        const cached = context.calculationCache.getValue(context.projectName, 'Banquet Revenue Assumptions', fieldCode, context.year, context.label);
-        if (cached !== undefined && cached !== null && cached > 0) {
+        const cached = context.calculationCache.getValue(context.projectName, PAGE.BANQUET_REVENUE, fieldCode, context.year, context.label);
+        if (cached !== undefined && cached !== null) {
           return cached;
         }
       }
@@ -997,55 +998,55 @@
       case 'food':
         value = calcFood(row);
         if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
-          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Food', context.year, context.label, value);
+          context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.FOOD, context.year, context.label, value);
         }
         break;
       case 'liquor':
         value = calcLiquor(row);
         if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
-          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Liquor', context.year, context.label, value);
+          context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.LIQUOR, context.year, context.label, value);
         }
         break;
       case 'soft_drinks':
         value = calcSoftDrinks(row);
         if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
-          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Soft Drinks', context.year, context.label, value);
+          context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.SOFT_DRINKS, context.year, context.label, value);
         }
         break;
       case 'hall_space_charges':
         value = calcHallSpaceCharges(row);
         if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
-          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Hall Space Charges', context.year, context.label, value);
+          context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.HALL_SPACE_CHARGES, context.year, context.label, value);
         }
         break;
       case 'gross':
         value = calcGross(row, allFieldCodes);
         if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
-          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Gross', context.year, context.label, value);
+          context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.GROSS, context.year, context.label, value);
         }
         break;
       case 'net_amount':
         value = calcNetAmount(row, allFieldCodes);
         if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
-          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Net Amount', context.year, context.label, value);
+          context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.NET_AMOUNT, context.year, context.label, value);
         }
         break;
       case 'amount_per_event':
         value = calcAmountPerEvent(row);
         if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
-          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Amount Per Event', context.year, context.label, value);
+          context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.AMOUNT_PER_EVENT, context.year, context.label, value);
         }
         break;
       case 'amount_per_pax':
         value = calcAmountPerPax(row);
         if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
-          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Amount Per Pax', context.year, context.label, value);
+          context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.AMOUNT_PER_PAX, context.year, context.label, value);
         }
         break;
       case 'avg_pax_per_event':
         value = calcAvgPaxPerEvent(row);
         if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
-          context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', 'Avg Pax Per Event', context.year, context.label, value);
+          context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.AVG_PAX_PER_EVENT, context.year, context.label, value);
         }
         break;
       default:
@@ -1063,7 +1064,7 @@
               fieldCode.toLowerCase().includes('others') ||
               // Cache any other custom banquet details
               customBanquetFields.value.some(f => f.code === fieldCode)) {
-            context.calculationCache.setValue(context.projectName, 'Banquet Revenue Assumptions', fieldCode, context.year, context.label, value);
+            context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, fieldCode, context.year, context.label, value);
           }
         }
     }

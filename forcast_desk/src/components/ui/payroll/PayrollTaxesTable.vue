@@ -249,6 +249,7 @@
 <script setup>
 import { FolderOpen, CheckCircle, BarChart3, Building2, Users } from 'lucide-vue-next';
 import { ref, computed, watch } from 'vue';
+import { PAGE } from '@/components/utility/_master_utility/cacheKeys.js';
 import { getPayrollRowsForLocation } from '@/components/utility/payroll/payroll_data_utils.js';
 // Import the standardized calculation functions from payroll utility
 import {
@@ -503,10 +504,18 @@ function calculateNSSITMonthlyValue(row, month) {
     const location = (row.departmentLocation || '').toString();
     
     if (nssitValue > 0) {
-      const rowCode = `NSSIT|position:${position}|location:${location}|designation:${designation}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, nssitValue);
+      calculationCache.setPayrollRelatedMonthly(
+        projectId,
+        'NSSIT',
+        position,
+        location,
+        designation,
+        year,
+        month,
+        nssitValue
+      );
     }
   } catch (e) {
     // Silently handle caching errors
@@ -534,10 +543,18 @@ function calculateNSSITTotalValue(row) {
     const location = (row.departmentLocation || '').toString();
     
     if (totalNSSIT > 0) {
-      const rowCode = `NSSIT Year|position:${position}|location:${location}|designation:${designation}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSIT);
+      calculationCache.setPayrollRelatedMonthly(
+        projectId,
+        'NSSIT',
+        position,
+        location,
+        designation,
+        year,
+        'Total',
+        totalNSSIT
+      );
     }
   } catch (e) {
     // Silently handle caching errors
@@ -564,10 +581,18 @@ function calculateSubTotalManagementNSSITMonthly(category, location, month) {
   try {
     const projectId = selectedProject.value?.project_name || 'default';
     if (totalNSSIT > 0) {
-      const rowCode = `NSSIT Management Subtotal|category:${category}|location:${location}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSIT);
+      calculationCache.setPayrollRelatedMonthly(
+        projectId,
+        'NSSIT',
+        'Manager',
+        location,
+        'ALL',
+        year,
+        month,
+        totalNSSIT
+      );
     }
   } catch (e) {
     // Silently handle caching errors
@@ -587,10 +612,18 @@ function calculateSubTotalManagementNSSITTotal(category, location) {
   try {
     const projectId = selectedProject.value?.project_name || 'default';
     if (totalNSSIT > 0) {
-      const rowCode = `NSSIT Management Subtotal Year|category:${category}|location:${location}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSIT);
+      calculationCache.setPayrollRelatedMonthly(
+        projectId,
+        'NSSIT',
+        'Manager',
+        location,
+        'ALL',
+        year,
+        'Total',
+        totalNSSIT
+      );
     }
   } catch (e) {
     // Silently handle caching errors
@@ -615,10 +648,18 @@ function calculateSubTotalNonManagementNSSITMonthly(category, location, month) {
   try {
     const projectId = selectedProject.value?.project_name || 'default';
     if (totalNSSIT > 0) {
-      const rowCode = `NSSIT Non-Management Subtotal|category:${category}|location:${location}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSIT);
+      calculationCache.setPayrollRelatedMonthly(
+        projectId,
+        'NSSIT',
+        'Non-Management',
+        location,
+        'ALL',
+        year,
+        month,
+        totalNSSIT
+      );
     }
   } catch (e) {
     // Silently handle caching errors
@@ -638,10 +679,18 @@ function calculateSubTotalNonManagementNSSITTotal(category, location) {
   try {
     const projectId = selectedProject.value?.project_name || 'default';
     if (totalNSSIT > 0) {
-      const rowCode = `NSSIT Non-Management Subtotal Year|category:${category}|location:${location}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSIT);
+      calculationCache.setPayrollRelatedMonthly(
+        projectId,
+        'NSSIT',
+        'Non-Management',
+        location,
+        'ALL',
+        year,
+        'Total',
+        totalNSSIT
+      );
     }
   } catch (e) {
     // Silently handle caching errors
@@ -664,10 +713,18 @@ function calculateLocationTotalNSSITMonthly(category, location, month) {
   try {
     const projectId = selectedProject.value?.project_name || 'default';
     if (totalNSSIT > 0) {
-      const rowCode = `NSSIT Location Total|category:${category}|location:${location}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSIT);
+      calculationCache.setPayrollRelatedMonthly(
+        projectId,
+        'NSSIT',
+        'ALL',
+        location,
+        'ALL',
+        year,
+        month,
+        totalNSSIT
+      );
     }
   } catch (e) {
     // Silently handle caching errors
@@ -687,10 +744,18 @@ function calculateLocationTotalNSSITTotal(category, location) {
   try {
     const projectId = selectedProject.value?.project_name || 'default';
     if (totalNSSIT > 0) {
-      const rowCode = `NSSIT Location Total Year|category:${category}|location:${location}`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSIT);
+      calculationCache.setPayrollRelatedMonthly(
+        projectId,
+        'NSSIT',
+        'ALL',
+        location,
+        'ALL',
+        year,
+        'Total',
+        totalNSSIT
+      );
     }
   } catch (e) {
     // Silently handle caching errors
@@ -712,10 +777,18 @@ function calculateHotelTotalNSSITMonthly(month) {
   try {
     const projectId = selectedProject.value?.project_name || 'default';
     if (totalNSSIT > 0) {
-      const rowCode = `NSSIT`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, totalNSSIT);
+      calculationCache.setPayrollRelatedMonthly(
+        projectId,
+        'NSSIT',
+        'ALL',
+        'ALL',
+        'ALL',
+        year,
+        month,
+        totalNSSIT
+      );
     }
   } catch (e) {
     // Silently handle caching errors
@@ -735,10 +808,18 @@ function calculateHotelTotalNSSITTotal() {
   try {
     const projectId = selectedProject.value?.project_name || 'default';
     if (totalNSSIT > 0) {
-      const rowCode = `NSSIT Hotel Total Year`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', totalNSSIT);
+      calculationCache.setPayrollRelatedMonthly(
+        projectId,
+        'NSSIT',
+        'ALL',
+        'ALL',
+        'ALL',
+        year,
+        'Total',
+        totalNSSIT
+      );
     }
   } catch (e) {
     // Silently handle caching errors
@@ -760,10 +841,18 @@ function calculateEmployeeRoomRatioNSSITMonthly(month) {
   try {
     const projectId = selectedProject.value?.project_name || 'default';
     if (ratioNSSIT > 0) {
-      const rowCode = `NSSIT Employee Room Ratio`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, month, ratioNSSIT);
+      calculationCache.setPayrollRelatedMonthly(
+        projectId,
+        'NSSIT',
+        'ALL',
+        'ALL',
+        'ALL',
+        year,
+        month,
+        ratioNSSIT
+      );
     }
   } catch (e) {
     // Silently handle caching errors
@@ -785,10 +874,18 @@ function calculateEmployeeRoomRatioNSSITTotal() {
   try {
     const projectId = selectedProject.value?.project_name || 'default';
     if (ratioNSSIT > 0) {
-      const rowCode = `NSSIT Employee Room Ratio Year`;
       // Use the correct year from visibleYears instead of current year
       const year = props.visibleYears && props.visibleYears.length > 0 ? props.visibleYears[0] : new Date().getFullYear();
-      calculationCache.setValue(projectId, 'Payroll Taxes', rowCode, year, 'Total', ratioNSSIT);
+      calculationCache.setPayrollRelatedMonthly(
+        projectId,
+        'NSSIT',
+        'ALL',
+        'ALL',
+        'ALL',
+        year,
+        'Total',
+        ratioNSSIT
+      );
     }
   } catch (e) {
     // Silently handle caching errors

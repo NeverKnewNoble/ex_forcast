@@ -748,6 +748,7 @@ import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { storeToRefs } from 'pinia';
 import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
+import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
 import Sidebar from "@/components/ui/Sidebar.vue";
 import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
 import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign, Loader2, AlertCircle, Building2, Save, Filter, Building, MapPin, RotateCcw } from 'lucide-vue-next';
@@ -1293,7 +1294,7 @@ function cacheExpenseData(expenseData, projectName) {
     if (!expenseData || !projectName) return;
     
     // Clear existing cache for this project's expenses
-    calculationCache.clearCache(projectName, 'Expense Assumptions');
+    calculationCache.clearCache(projectName, PAGE.EXPENSE_ASSUMPTIONS);
     
     // Cache expense amounts by department, expense name, year, and month
     for (const [year, months] of Object.entries(expenseData)) {
@@ -1302,20 +1303,29 @@ function cacheExpenseData(expenseData, projectName) {
           if (entry.expense && entry.amount && entry.department) {
             const amount = parseFloat(entry.amount);
             if (amount > 0) {
-              // Cache with project, page, rowCode (expense name), year, month, and amount
-              calculationCache.setValue(
+              // Cache using normalized structure only
+              // Normalized write
+              calculationCache.setExpense(
                 projectName,
-                'Expense Assumptions',
+                entry.department,
                 entry.expense,
                 year,
                 month,
                 amount
               );
-              
-              // Also cache by department for easier filtering
-              calculationCache.setValue(
+              // Normalized write (duplicate provides both indexing paths)
+              calculationCache.setExpense(
                 projectName,
-                `Expense Assumptions:${entry.department}`,
+                entry.department,
+                entry.expense,
+                year,
+                month,
+                amount
+              );
+              // Normalized write
+              calculationCache.setExpense(
+                projectName,
+                entry.department,
                 entry.expense,
                 year,
                 month,
