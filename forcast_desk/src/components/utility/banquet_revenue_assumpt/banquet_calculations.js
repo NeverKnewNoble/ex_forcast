@@ -62,20 +62,20 @@ export function calcNetAmount(row, allFieldCodes = []) {
   return net;
 }
 
-export function calcAmountPerEvent(row) {
+export function calcAmountPerEvent(row, allFieldCodes = []) {
   const events = toNum(row.events);
 
   if (events === 0) return 0;
 
-  const amount = calcGross(row) / events;
+  const amount = calcGross(row, allFieldCodes) / events;
   return amount;
 }
 
-export function calcAmountPerPax(row) {
+export function calcAmountPerPax(row, allFieldCodes = []) {
   const pax = toNum(row.pax);
   if (pax === 0) return 0;
   
-  const amount = calcGross(row) / pax;
+  const amount = calcGross(row, allFieldCodes) / pax;
   return amount;
 }
 

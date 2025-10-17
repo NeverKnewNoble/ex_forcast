@@ -560,6 +560,8 @@ def get_items_by_order_of_category():
                 valuation_rate
             FROM 
                 `tabItem`
+            WHERE
+                COALESCE(custom_module, '') = 'Ex Forcast'
             ORDER BY `tabItem`.item_group ASC, `tabItem`.item_name ASC
         """
         items = frappe.db.sql(query, as_dict=True)
@@ -604,6 +606,7 @@ def get_item_groups():
                 `tabItem Group`
             WHERE 
                 is_group = 0
+                AND COALESCE(custom_module, '') = 'Ex Forcast'
             ORDER BY 
                 item_group_name ASC
         """

@@ -314,7 +314,7 @@
                                   :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-700 text-white font-bold' : ''"
                                 >
                                   <span class=" text-xs">
-                                    {{ formatBanquetValue(field.code, getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}
+                                    {{ formatBanquetValue(field.code, computedBanquetCellValues[year]?.[label]?.[field.code] ?? getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}
                                   </span>
                                 </td>
                                 <td
@@ -328,18 +328,18 @@
                                   @focus="handleBanquetCellFocus({ year, label, expense: field.code, event: $event })"
                                   @blur="handleCellEditWrapper({ year, label, expense: field.code, event: $event })"
                                 >
-                                  <span class=" text-xs">{{ formatBanquetValue(field.code, getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
+                                  <span class=" text-xs">{{ formatBanquetValue(field.code, computedBanquetCellValues[year]?.[label]?.[field.code] ?? getBanquetCellValue(banquetData, field.code, year, label, advancedModes[year] || displayMode)) }}</span>
                                 </td>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
                                   <span class=" text-xs text-violet-700 dark:text-violet-200" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
-                                    {{ formatBanquetValue(field.code, calculateBanquetTotal(banquetData, field.code, year, advancedModes[year] || displayMode)) }}
+                                    {{ formatBanquetValue(field.code, computedBanquetTotals[year]?.[field.code] ?? calculateBanquetTotal(banquetData, field.code, year, advancedModes[year] || displayMode)) }}
                                   </span>
                                 </td>
                               </template>
                               <template v-else>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-600 dark:bg-violet-800/30" :class="['gross','net_amount'].includes(field.code) ? 'bg-violet-800 text-white font-bold' : ''">
                                   <span class=" text-xs text-violet-700 dark:text-violet-200" :class="['gross','net_amount'].includes(field.code) ? 'text-white' : ''">
-                                    {{ formatBanquetValue(field.code, calculateBanquetTotal(banquetData, field.code, year, advancedModes[year] || displayMode)) }}
+                                    {{ formatBanquetValue(field.code, computedBanquetTotals[year]?.[field.code] ?? calculateBanquetTotal(banquetData, field.code, year, advancedModes[year] || displayMode)) }}
                                   </span>
                                 </td>
                               </template>
@@ -939,35 +939,104 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
     return row;
   }
 
+  // Computed property to make auto-calculated fields reactive
+  const computedBanquetCellValues = computed(() => {
+    const values = {};
+    
+    if (!selectedProject.value || !visibleYears.value.length) {
+      return values;
+    }
+
+    for (const year of visibleYears.value) {
+      values[year] = {};
+      const labels = getColumnLabelsForYearLocal(year);
+      
+      for (const label of labels) {
+        values[year][label] = {};
+        const row = getBanquetRowData(banquetData, year, label);
+        const allFieldCodes = computedBanquetFields.value.map(f => f.code);
+        
+        // Calculate all auto-calculated fields
+        values[year][label].food = calcFood(row);
+        values[year][label].liquor = calcLiquor(row);
+        values[year][label].soft_drinks = calcSoftDrinks(row);
+        values[year][label].hall_space_charges = calcHallSpaceCharges(row);
+        values[year][label].gross = calcGross(row, allFieldCodes);
+        values[year][label].net_amount = calcNetAmount(row, allFieldCodes);
+        values[year][label].amount_per_event = calcAmountPerEvent(row, allFieldCodes);
+        values[year][label].amount_per_pax = calcAmountPerPax(row, allFieldCodes);
+        values[year][label].avg_pax_per_event = calcAvgPaxPerEvent(row);
+        
+        // Debug logging for food calculation
+        if (toNum(row.pax) > 0 || toNum(row.avg_food_check) > 0) {
+          console.log(`Computed values for ${year}/${label}:`, {
+            pax: toNum(row.pax),
+            avg_food_check: toNum(row.avg_food_check),
+            calculated_food: values[year][label].food,
+            all_data: row
+          });
+        }
+      }
+    }
+    
+    return values;
+  });
+
+  // Computed property for totals
+  const computedBanquetTotals = computed(() => {
+    const totals = {};
+    
+    if (!selectedProject.value || !visibleYears.value.length) {
+      return totals;
+    }
+
+    for (const year of visibleYears.value) {
+      totals[year] = {};
+      const labels = getColumnLabelsForYearLocal(year);
+      
+      // Calculate totals for each field
+      for (const field of computedBanquetFields.value) {
+        let total = 0;
+        
+        for (const label of labels) {
+          if (computedBanquetCellValues.value[year]?.[label]?.[field.code] !== undefined) {
+            total += computedBanquetCellValues.value[year][label][field.code];
+          } else {
+            total += getBanquetCellValue(banquetData, field.code, year, label, advancedModes.value[year] || displayMode.value);
+          }
+        }
+        
+        totals[year][field.code] = total;
+      }
+    }
+    
+    return totals;
+  });
+
   // Computed helper for calculated values
   function getCalculatedValue(fieldCode, year, label) {
     const row = getBanquetRowData(banquetData, year, label);
     const allFieldCodes = computedBanquetFields.value.map(f => f.code);
-    const context = {
-      projectName: selectedProject.value?.project_name,
-      calculationCache,
-      year,
-      label
-    };
+    
     switch (fieldCode) {
       case 'food':
-        return calcFood(row, context);
+        return calcFood(row);
       case 'liquor':
-        return calcLiquor(row, context);
+        return calcLiquor(row);
       case 'soft_drinks':
-        return calcSoftDrinks(row, context);
+        return calcSoftDrinks(row);
       case 'hall_space_charges':
-        return calcHallSpaceCharges(row, context);
+        return calcHallSpaceCharges(row);
       case 'gross':
-        return calcGross(row, allFieldCodes, context);
+        return calcGross(row, allFieldCodes);
       case 'net_amount':
-        return calcNetAmount(row, allFieldCodes, context);
+        return calcNetAmount(row, allFieldCodes);
       case 'amount_per_event':
-        return calcAmountPerEvent(row, context);
+        return calcAmountPerEvent(row, allFieldCodes);
       case 'amount_per_pax':
-        return calcAmountPerPax(row, context);
+        return calcAmountPerPax(row, allFieldCodes);
       case 'avg_pax_per_event':
-        return calcAvgPaxPerEvent(row, context);
+        return calcAvgPaxPerEvent(row);
       default:
         return 0;
     }
@@ -986,7 +1055,20 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
     // Check cache first for calculated fields
     if (['food', 'liquor', 'soft_drinks', 'hall_space_charges', 'gross', 'net_amount', 'amount_per_event', 'amount_per_pax', 'avg_pax_per_event'].includes(fieldCode)) {
       if (context.projectName && context.calculationCache) {
-        const cached = context.calculationCache.getValue(context.projectName, PAGE.BANQUET_REVENUE, fieldCode, context.year, context.label);
+        // Map field codes to ROW constants for cache retrieval
+        const fieldToRowMap = {
+          'food': ROW.FOOD,
+          'liquor': ROW.LIQUOR,
+          'soft_drinks': ROW.SOFT_DRINKS,
+          'hall_space_charges': ROW.HALL_SPACE_CHARGES,
+          'gross': ROW.GROSS,
+          'net_amount': ROW.NET_AMOUNT,
+          'amount_per_event': ROW.AMOUNT_PER_EVENT,
+          'amount_per_pax': ROW.AMOUNT_PER_PAX,
+          'avg_pax_per_event': ROW.AVG_PAX_PER_EVENT
+        };
+        const rowKey = fieldToRowMap[fieldCode] || fieldCode;
+        const cached = context.calculationCache.getValue(context.projectName, PAGE.BANQUET_REVENUE, rowKey, context.year, context.label);
         if (cached !== undefined && cached !== null) {
           return cached;
         }
@@ -997,55 +1079,55 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
     switch (fieldCode) {
       case 'food':
         value = calcFood(row);
-        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+        if (context.projectName && context.calculationCache && context.year && context.label) {
           context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.FOOD, context.year, context.label, value);
         }
         break;
       case 'liquor':
         value = calcLiquor(row);
-        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+        if (context.projectName && context.calculationCache && context.year && context.label) {
           context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.LIQUOR, context.year, context.label, value);
         }
         break;
       case 'soft_drinks':
         value = calcSoftDrinks(row);
-        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+        if (context.projectName && context.calculationCache && context.year && context.label) {
           context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.SOFT_DRINKS, context.year, context.label, value);
         }
         break;
       case 'hall_space_charges':
         value = calcHallSpaceCharges(row);
-        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+        if (context.projectName && context.calculationCache && context.year && context.label) {
           context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.HALL_SPACE_CHARGES, context.year, context.label, value);
         }
         break;
       case 'gross':
         value = calcGross(row, allFieldCodes);
-        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+        if (context.projectName && context.calculationCache && context.year && context.label) {
           context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.GROSS, context.year, context.label, value);
         }
         break;
       case 'net_amount':
         value = calcNetAmount(row, allFieldCodes);
-        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+        if (context.projectName && context.calculationCache && context.year && context.label) {
           context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.NET_AMOUNT, context.year, context.label, value);
         }
         break;
       case 'amount_per_event':
-        value = calcAmountPerEvent(row);
-        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+        value = calcAmountPerEvent(row, allFieldCodes);
+        if (context.projectName && context.calculationCache && context.year && context.label) {
           context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.AMOUNT_PER_EVENT, context.year, context.label, value);
         }
         break;
       case 'amount_per_pax':
-        value = calcAmountPerPax(row);
-        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+        value = calcAmountPerPax(row, allFieldCodes);
+        if (context.projectName && context.calculationCache && context.year && context.label) {
           context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.AMOUNT_PER_PAX, context.year, context.label, value);
         }
         break;
       case 'avg_pax_per_event':
         value = calcAvgPaxPerEvent(row);
-        if (context.projectName && context.calculationCache && context.year && context.label && value > 0) {
+        if (context.projectName && context.calculationCache && context.year && context.label) {
           context.calculationCache.setValue(context.projectName, PAGE.BANQUET_REVENUE, ROW.AVG_PAX_PER_EVENT, context.year, context.label, value);
         }
         break;

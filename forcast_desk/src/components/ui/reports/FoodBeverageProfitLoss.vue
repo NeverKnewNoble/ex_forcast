@@ -2697,19 +2697,19 @@ function getFnbPayrollMonthlySalaryByLocation(year, label, location, group) {
   try {
     const project = projectName.value;
     const months = getMonthsForLabel(label);
-    const depts = ['Food And Beverage', 'F&B'];
     let sum = 0;
 
-    // Prefer normalized payroll structure for F&B
-    const yearBucket = calculationCache?.payroll?.[project]?.[year] || {};
-    Object.keys(yearBucket).forEach((departmentKey) => {
-      if (!depts.includes(departmentKey)) return;
-      const byLocation = yearBucket[departmentKey] || {};
+    // Prefer normalized payroll structure - same approach as RoomProfitLoss.vue
+    const payrollNorm = calculationCache?.payroll?.[project]?.[year] || {};
+    const isMgmtGroup = group === 'management';
+    const isNonMgmtGroup = group === 'non-management';
+    Object.keys(payrollNorm).forEach((departmentKey) => {
+      const byLocation = payrollNorm[departmentKey] || {};
       const locBucket = byLocation?.[location];
       if (!locBucket) return;
       Object.keys(locBucket).forEach((positionKey) => {
-        const isMgmt = isFnbManagementPositionName(positionKey);
-        if ((group === 'management' && !isMgmt) || (group === 'non-management' && isMgmt)) return;
+        const mgmt = isFnbManagementPositionName(positionKey);
+        if ((isMgmtGroup && !mgmt) || (isNonMgmtGroup && mgmt)) return;
         const byDesignation = locBucket[positionKey] || {};
         Object.keys(byDesignation).forEach((designationKey) => {
           const byLabel = byDesignation[designationKey] || {};
@@ -2720,9 +2720,10 @@ function getFnbPayrollMonthlySalaryByLocation(year, label, location, group) {
         });
       });
     });
+
     if (sum > 0) return sum;
 
-    // Fallback to legacy PAGE cache
+    // Fallback to legacy PAGE-based cache
     const page = PAGE.PAYROLL;
     const pageData = calculationCache?.cache?.[project]?.[page] || {};
     Object.keys(pageData).forEach((rowCode) => {
