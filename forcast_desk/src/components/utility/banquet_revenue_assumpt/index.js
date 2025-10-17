@@ -89,7 +89,7 @@ export function getAmountForBanquet(banquetData, code, year, label, displayMode 
 }
 
 //! Utility: Calculate total for a field in a year
-export function calculateTotalForBanquet(banquetData, code, year, displayMode, getColumnLabelsForYear) {
+export function calculateTotalForBanquet(banquetData, code, year, displayMode, getColumnLabelsForYear, allFieldCodes = []) {
   const months = getColumnLabelsForYear(year);
   let total = 0.00;
   
@@ -108,14 +108,14 @@ export function calculateTotalForBanquet(banquetData, code, year, displayMode, g
           total += calcSoftDrinks(row); break;
         case 'hall_space_charges':
           total += calcHallSpaceCharges(row); break;
-        case 'gross':
-          total += calcGross(row, []); break;
-        case 'net_amount':
-          total += calcNetAmount(row, []); break;
+      case 'gross':
+        total += calcGross(row, allFieldCodes); break;
+      case 'net_amount':
+        total += calcNetAmount(row, allFieldCodes); break;
         case 'amount_per_event':
-          total += calcAmountPerEvent(row); break;
+          total += calcAmountPerEvent(row, allFieldCodes); break;
         case 'amount_per_pax':
-          total += calcAmountPerPax(row); break;
+          total += calcAmountPerPax(row, allFieldCodes); break;
         case 'avg_pax_per_event':
           total += calcAvgPaxPerEvent(row); break;
       }
@@ -269,6 +269,10 @@ export function handleBanquetCellFocus({ year, label, expense, event }) {
 export function getBanquetCellValue(banquetData, fieldCode, year, label, displayMode = 'monthly') {
   // Get the row data for this year/label
   const row = getBanquetRowData(banquetData, year, label);
+  
+  // Extract all field codes from banquet data for gross/net calculations
+  const allFieldCodes = extractAllBanquetExpenses(banquetData);
+  
   switch (fieldCode) {
     case 'food':
       return calcFood(row);
@@ -279,13 +283,13 @@ export function getBanquetCellValue(banquetData, fieldCode, year, label, display
     case 'hall_space_charges':
       return calcHallSpaceCharges(row);
     case 'gross':
-      return calcGross(row);
+      return calcGross(row, allFieldCodes);
     case 'net_amount':
-      return calcNetAmount(row);
+      return calcNetAmount(row, allFieldCodes);
     case 'amount_per_event':
-      return calcAmountPerEvent(row);
+      return calcAmountPerEvent(row, allFieldCodes);
     case 'amount_per_pax':
-      return calcAmountPerPax(row);
+      return calcAmountPerPax(row, allFieldCodes);
     case 'avg_pax_per_event':
       return calcAvgPaxPerEvent(row);
     default:

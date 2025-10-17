@@ -264,14 +264,16 @@ doc_events = {
 # }
 
 fixtures = [
-            # {"doctype": "Room Packages", "filters": [["module" , "in" , ("Ex Forcast" )]]},
-            {"doctype": "Segment Category", "filters": [["module" , "in" , ("Ex Forcast" )]]},
-            {"doctype": "Room Market Segment", "filters": [["module" , "in" , ("Ex Forcast" )]]},
-            {"doctype": "Expense Category", "filters": [["module" , "in" , ("Ex Forcast" )]]},
-            {"doctype": "Payroll Department Location", "filters": [["module" , "in" , ("Ex Forcast" )]]},
-            {"doctype": "Default Expenses", "filters": [["module" , "in" , ("Ex Forcast" )]]},
-            {"doctype": "Payroll Default Data", "filters": [["module" , "in" , ("Ex Forcast" )]]},
+    {"doctype": "Segment Category", "filters": [["module", "in", ["Ex Forcast"]]]},
+    {"doctype": "Room Market Segment", "filters": [["module", "in", ["Ex Forcast"]]]},
+    {"doctype": "Expense Category", "filters": [["module", "in", ["Ex Forcast"]]]},
+    {"doctype": "Payroll Department Location", "filters": [["module", "in", ["Ex Forcast"]]]},
+    {"doctype": "Default Expenses", "filters": [["module", "in", ["Ex Forcast"]]]},
+    {"doctype": "Payroll Default Data", "filters": [["module", "in", ["Ex Forcast"]]]},
+    {"doctype": "Item Group", "filters": [["custom_module", "=", "Ex Forcast"]]},
+    {"doctype": "Item", "filters": [["custom_module", "in", ["Ex Forcast"]]]},
 ]
+
 
 
 website_route_rules = [{'from_route': '/forcast_desk/<path:app_path>', 'to_route': 'forcast_desk'},]

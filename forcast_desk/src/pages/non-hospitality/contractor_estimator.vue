@@ -240,7 +240,7 @@
                 <thead class="bg-violet-500 text-white shadow-lg">
                   <tr class="border-b border-white/20">
                     <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-16">Line ID</th>
-                    <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-80">Category & Items</th>
+                    <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-[20rem]">Category & Items</th>
                     <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-24">Qty</th>
                     <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-28">Unit Type</th>
                     <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider w-32">Rate</th>
@@ -325,7 +325,7 @@
                         </td>
                         
                         <!-- Item Name -->
-                        <td class="p-0 text-sm">
+                        <td class="p-0 text-sm min-w-[20rem]">
                           <input
                             v-model="item.name"
                             type="text"
