@@ -780,7 +780,7 @@ class ContractorEstimatorService {
         throw new Error(result.message?.error || 'Failed to fetch GL balance');
       }
     } catch (error) {
-      console.error('Error fetching GL balance:', error);
+      // console.error('Error fetching GL balance:', error);
       throw error;
     }
   }
@@ -821,7 +821,7 @@ class ContractorEstimatorService {
           }
         }
       } catch (itemError) {
-        console.warn('Item-specific GL balance failed:', itemError.message);
+        // console.warn('Item-specific GL balance failed:', itemError.message);
       }
       
       // If item-specific lookup failed, try to find exact account match by name
@@ -851,7 +851,7 @@ class ContractorEstimatorService {
           }
         }
       } catch (generalError) {
-        console.warn('General account lookup failed:', generalError.message);
+        // console.warn('General account lookup failed:', generalError.message);
       }
       
       // If no GL data found for this item, don't assign any balance
@@ -899,7 +899,7 @@ class ContractorEstimatorService {
         throw new Error(result.message?.error || 'Failed to fetch general account balances');
       }
     } catch (error) {
-      console.error('Error fetching general account balances:', error);
+      // console.error('Error fetching general account balances:', error);
       throw error;
     }
   }
@@ -929,7 +929,7 @@ class ContractorEstimatorService {
         throw new Error(result.message?.error || 'Failed to fetch default company');
       }
     } catch (error) {
-      console.error('Error fetching default company:', error);
+      // console.error('Error fetching default company:', error);
       throw error;
     }
   }
