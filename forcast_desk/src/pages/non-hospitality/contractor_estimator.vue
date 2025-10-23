@@ -50,11 +50,10 @@
                   Project
                 </h3>
                 <select
-                  :value="projectSelection"
-                  @change="onProjectChange($event)"
-                  class="w-full px-3 py-2 bg-white border border-violet-200 rounded-lg text-gray-800 focus:ring-2 focus:ring-violet-500 focus:border-violet-400 text-sm shadow-sm hover:border-violet-300 transition-colors"
+                  v-model="projectSelection"
+                  class="w-full px-3 py-2 bg-white border border-violet-200 rounded-lg text-black focus:ring-2 focus:ring-violet-500 focus:border-violet-400 text-sm shadow-sm hover:border-violet-300 transition-colors"
                 >
-                  <option value="">Select Project</option>
+                  <option value="Select Project">Select Project</option>
                   <option v-for="proj in erpProjects" :key="proj.name" :value="proj.name">
                     {{ proj.project_name || proj.name }}
                   </option>
@@ -200,7 +199,7 @@
           </div>
 
           <!-- Show prompt when no project selected -->
-          <div v-if="!projectSelection" class="bg-white rounded-lg border border-violet-200 shadow-sm p-12">
+          <div v-if="!projectSelection || projectSelection === 'Select Project'" class="bg-white rounded-lg border border-violet-200 shadow-sm p-12">
             <div class="text-center">
               <div class="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full flex items-center justify-center mx-auto mb-6">
                 <AlertTriangle class="w-12 h-12 text-orange-600" />
@@ -515,11 +514,6 @@
       @create="handleCreateCategory"
     />
 
-    <!-- Additional Modals -->
-    <SelectProjectModal 
-      :is-visible="showSelectProjectModal" 
-      @close="() => (showSelectProjectModal = false)" 
-    />
     <NoCategoriesModal 
       :is-visible="showNoCategoriesModal" 
       @close="() => (showNoCategoriesModal = false)" 
@@ -529,11 +523,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import Sidebar from "@/components/ui/Sidebar.vue"
 import SettingsModal from "@/components/ui/SettingsModal.vue"
 import AddCategoryModal from "@/components/ui/contractor_estimator/AddCategoryModal.vue"
-import SelectProjectModal from "@/components/ui/contractor_estimator/SelectProjectModal.vue"
 import NoCategoriesModal from "@/components/ui/contractor_estimator/NoCategoriesModal.vue"
 import alertService from "@/components/ui/ui_utility/alertService.js"
 import { selectedProject, setSelectedProject, initializeProjectService, getStoredSelectedProject } from '@/components/utility/dashboard/projectService.js'
@@ -583,7 +576,7 @@ const showSelectProjectModal = ref(false)
 const showNoCategoriesModal = ref(false)
 const showAddCategoryModalState = ref(false)
 // Currently selected project name for the sidebar select (kept in sync with service)
-const projectSelection = ref('')
+const projectSelection = ref('Select Project')
 // ERPNext Project list
 const erpProjects = ref([])
 
@@ -1097,7 +1090,7 @@ const loadDefaultCompany = async () => {
     const company = await contractorEstimatorService.getDefaultCompany()
     defaultCompany.value = company
   } catch (error) {
-    console.warn('Failed to load default company:', error.message)
+    // console.warn('Failed to load default company:', error.message)
     defaultCompany.value = null
   }
 }
@@ -1135,6 +1128,8 @@ const autoLoadGLBalances = async () => {
   }
 }
 
+
+
 onMounted(async () => {
   // Ensure project context is initialized
   try {
@@ -1157,17 +1152,9 @@ onMounted(async () => {
     // ignore
   }
 
-  // Restore cached selection if available
-  const stored = getStoredSelectedProject?.() || null
-  if (stored && stored.name) {
-    setSelectedProject(stored)
-    projectSelection.value = stored.name
-  } else {
-    projectSelection.value = ''
-  }
-
-  // Load contractor estimator data
-  await loadData()
+  // Don't auto-restore cached selection - always start with placeholder
+  // User must explicitly select a project each time they load the page
+  projectSelection.value = 'Select Project'
 
   // Show alert for current project if available
   const currentName = selectedProject?.value?.project_name
@@ -1176,19 +1163,20 @@ onMounted(async () => {
   }
 })
 
-// Handle sidebar project change
-const onProjectChange = async (event) => {
-  try {
-    const newProjectName = event.target.value
-    projectSelection.value = newProjectName
 
-    // If placeholder selected, allow local empty selection and prompt without clearing global selection
-    if (!newProjectName) {
-      projectSelection.value = ''
+
+
+// Watch for project selection changes
+watch(projectSelection, async (newProjectName, oldProjectName) => {
+  // Skip if this is the initial mount setting
+  if (oldProjectName === undefined) return
+  
+  try {
+    // If placeholder selected, clear estimator state
+    if (!newProjectName || newProjectName === 'Select Project') {
       // Clear local estimator state to hide table, keep sidebar context intact
       estimators.value = []
       currentEstimator.value = null
-      showSelectProjectModal.value = true
       return
     }
 
@@ -1204,7 +1192,9 @@ const onProjectChange = async (event) => {
   } catch (error) {
     alertService.error('Failed to switch project')
   }
-}
+})
+
+
 
 // Empty state actions and modal triggers
 const handleEmptyStatePrimaryAction = () => {
