@@ -270,8 +270,16 @@ fixtures = [
     {"doctype": "Payroll Department Location", "filters": [["module", "in", ["Ex Forcast"]]]},
     {"doctype": "Default Expenses", "filters": [["module", "in", ["Ex Forcast"]]]},
     {"doctype": "Payroll Default Data", "filters": [["module", "in", ["Ex Forcast"]]]},
-    {"doctype": "Item Group", "filters": [["custom_module", "=", "Ex Forcast"]]},
-    {"doctype": "Item", "filters": [["custom_module", "in", ["Ex Forcast"]]]},
+    {
+        "doctype": "Item Group",
+        "filters": [["custom_module", "=", "Ex Forcast"]],
+        "fields": ["name", "item_group_name", "parent_item_group", "is_group", "custom_module"]
+    },
+    {
+        "doctype": "Item",
+        "filters": [["custom_module", "in", ["Ex Forcast"]]],
+        "fields": ["name", "item_name", "item_group", "stock_uom", "valuation_rate", "custom_module"]
+    },
 ]
 
 
