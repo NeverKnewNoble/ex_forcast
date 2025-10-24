@@ -1072,15 +1072,21 @@ def get_item_gl_balance(item_name, from_date=None, to_date=None, company=None):
             conditions = ["gle.company = %s"]
             params = [company]
             
+            # Get company abbreviation for matching accounts with company suffix
+            company_abbr = frappe.db.get_value("Company", company, "abbr") or ""
+            
             # Look for accounts that match the item name or code
             # Use ONLY exact or contains matching - NO broad account type matching
+            # Account names in Frappe often include company suffix like "Admin Fees - N"
             item_related_conditions = [
                 "acc.account_name = %s",  # Exact match first
+                "acc.account_name = %s",  # Match with company suffix (e.g., "Admin Fees - N")
                 "acc.account_name LIKE %s",  # Contains item name
                 "acc.account_name LIKE %s"  # Contains item code
             ]
             params.extend([
                 item_name,  # Exact match
+                f"{item_name} - {company_abbr}",  # Match with company suffix
                 f"%{item_name}%",  # Contains item name
                 f"%{item_code}%"  # Contains item code
             ])
