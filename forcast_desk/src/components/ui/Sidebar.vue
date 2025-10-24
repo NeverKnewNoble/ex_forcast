@@ -1,117 +1,136 @@
 <template>
-  <aside :class="['flex-shrink-0 flex-col min-h-screen transition-all duration-300 ease-in-out border border-r-violet-400 bg-white text-gray-800 shadow dark:bg-black dark:text-white dark:border-violet-900/30', is_expanded ? 'w-64' : 'w-16']" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
+  <aside :class="['flex-shrink-0 flex flex-col min-h-screen transition-all duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] border border-r-violet-400 bg-white text-gray-800 shadow dark:bg-black dark:text-white dark:border-violet-900/30', is_expanded ? 'w-64' : 'w-16']" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
     <!-- Logo -->
-    <div class="p-4 justify-center">
-      <img v-if="!is_expanded" :src="logoURL" alt="Ex Forecast" class="w-8 mx-auto" />
-	  <img v-if="is_expanded" :src="logoURL2" alt="Ex Forecast" class="w-[140px] mx-auto" />
+    <div class="p-4 justify-center relative h-[40px]">
+      <img v-show="!is_expanded" :src="logoURL" alt="Ex Forecast" class="w-8 mx-auto absolute inset-0 m-auto transition-opacity duration-300" :class="is_expanded ? 'opacity-0' : 'opacity-100'" />
+      <!-- <img v-show="is_expanded" :src="logoURL2" alt="Ex Forecast" class="w-[140px] mx-auto pt-2 absolute inset-0 m-auto transition-opacity duration-300 delay-150" :class="is_expanded ? 'opacity-100' : 'opacity-0'" /> -->
     </div>
 
     
 
     <!-- Toggle -->
-    <div class="flex justify-center px-2">
-      <span v-if="is_expanded" class="font-bold mr-6 text-[16px] dark:text-white">Welcome, {{ session.user }}</span>
-      <button v-if="!is_expanded" @click="ToggleMenu" class="transition-transform duration-200 hover:text-violet-400 dark:text-white dark:hover:text-violet-300">
-        <CircleArrowRight />
-      </button>
-	  <button v-if="is_expanded" @click="ToggleMenu" class="transition-transform duration-200 hover:text-violet-400 dark:text-white dark:hover:text-violet-300">
-        <CircleArrowLeft />
+    <div class="flex justify-center px-4 items-center h-[28px]">
+      <span v-show="is_expanded" class="font-bold mr-6 text-[16px] dark:text-white transition-opacity duration-300 delay-150" :class="is_expanded ? 'opacity-100' : 'opacity-0'">Welcome, {{ session.user }}</span>
+      <button @click="ToggleMenu" class="transition-all duration-200 hover:text-violet-400 dark:text-white dark:hover:text-violet-300">
+        <CircleArrowRight v-show="!is_expanded" class="transition-opacity duration-200" :class="!is_expanded ? 'opacity-100' : 'opacity-0'" />
+        <CircleArrowLeft v-show="is_expanded" class="transition-opacity duration-200 delay-100" :class="is_expanded ? 'opacity-100' : 'opacity-0'" />
       </button>
     </div>
 
     
 
     <!-- Menu Heading -->
-    <h3 v-if="is_expanded" class="text-gray-500 uppercase text-sm px-4 pt-4 dark:text-white">Menu</h3>
+    <div class="overflow-hidden">
+      <h3 v-show="is_expanded" class="text-gray-500 uppercase text-sm px-4 pt-4 dark:text-white transition-all duration-300 delay-150" :class="is_expanded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'">Menu</h3>
+    </div>
 
     <!-- Menu Links -->
 	<div class="mt-2 flex-1 space-y-1">
 		<template v-for="item in filteredMenuItems" :key="item.text">
-    <div v-if="item.children" class="relative" @mouseenter="onParentEnter(item.text)" @mouseleave="onParentLeave(item.text)">
+    <div v-if="item.children" class="relative">
       <button
         @click="toggleMenuExpand(item.text)"
-        class="flex items-center w-full space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white dark:text-white"
+        class="flex items-center w-full space-x-3 px-4 py-2 rounded transition-all duration-200 hover:bg-violet-500 hover:text-white dark:text-white overflow-hidden"
         :class="[{ 'justify-center': !is_expanded }]"
       >
-        <component :is="item.icon" class="w-6 h-6 dark:text-white" />
-        <span v-if="is_expanded" class="text-sm flex-1 text-left dark:text-white">{{ item.text }}</span>
+        <component :is="item.icon" class="w-6 h-6 dark:text-white flex-shrink-0" />
+        <span v-show="is_expanded" class="text-sm flex-1 text-left dark:text-white transition-opacity duration-300 delay-150 whitespace-nowrap" :class="is_expanded ? 'opacity-100' : 'opacity-0'">{{ item.text }}</span>
         <component
-          v-if="is_expanded"
+          v-show="is_expanded"
           :is="expandedMenus[item.text] ? ChevronUp : ChevronDown"
-          class="w-4 h-4 ml-auto dark:text-white"
+          class="w-4 h-4 ml-auto dark:text-white flex-shrink-0 transition-opacity duration-300 delay-150"
+          :class="is_expanded ? 'opacity-100' : 'opacity-0'"
         />
       </button>
       
       <!-- Expanded state for full sidebar -->
-      <div v-if="expandedMenus[item.text] && is_expanded" class="pl-8">
-        <router-link
-          v-for="child in item.children"
-          :key="child.text"
-          :to="child.route"
-          class="flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white dark:text-white"
-          :class="[
-            $route.path === child.route
-              ? 'bg-violet-600 border-r-4 border-violet-800 text-white font-semibold'
-              : ''
-          ]"
-        >
-          <component :is="child.icon" class="w-5 h-5 dark:text-white" />
-          <span class="text-sm dark:text-white">{{ child.text }}</span>
-        </router-link>
-      </div>
-      
-      <!-- Popup for minimized sidebar -->
-      <div 
-        v-if="expandedMenus[item.text] && !is_expanded" 
-        class="absolute left-full top-0 ml-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-48 dark:bg-black dark:border-[#1F2430] dark:shadow-black/40 dark:text-white transition-all duration-200 ease-in-out"
+      <transition
+        enter-active-class="transition-all duration-400 ease-out"
+        leave-active-class="transition-all duration-250 ease-in"
+        enter-from-class="opacity-0 max-h-0"
+        enter-to-class="opacity-100 max-h-[500px]"
+        leave-from-class="opacity-100 max-h-[500px]"
+        leave-to-class="opacity-0 max-h-0"
       >
-        <div class="p-2">
-          <div class="text-xs font-semibold text-gray-500 px-3 py-2 border-b border-gray-100 dark:text-white dark:border-[#1F2430]">
-            {{ item.text }}
-          </div>
+        <div v-if="expandedMenus[item.text] && is_expanded" class="pl-8 overflow-hidden">
           <router-link
             v-for="child in item.children"
             :key="child.text"
             :to="child.route"
-            class="flex items-center space-x-3 px-3 py-2 rounded transition hover:bg-violet-500 hover:text-white text-sm dark:hover:bg-violet-600 dark:text-white"
+            class="flex items-center space-x-3 px-4 py-2 rounded transition-all duration-200 hover:bg-violet-500 hover:text-white dark:text-white"
             :class="[
               $route.path === child.route
-                ? 'bg-violet-600 text-white font-semibold'
+                ? 'bg-violet-600 border-r-4 border-violet-800 text-white font-semibold'
                 : ''
             ]"
-            @click="expandedMenus[item.text] = false"
           >
-            <component :is="child.icon" class="w-4 h-4 dark:text-white" />
-            <span class="dark:text-white">{{ child.text }}</span>
+            <component :is="child.icon" class="w-5 h-5 dark:text-white flex-shrink-0" />
+            <span class="text-sm dark:text-white">{{ child.text }}</span>
           </router-link>
         </div>
-      </div>
+      </transition>
+      
+      <!-- Popup for minimized sidebar -->
+      <transition
+        enter-active-class="transition-all duration-300 ease-out"
+        leave-active-class="transition-all duration-200 ease-in"
+        enter-from-class="opacity-0 scale-95 -translate-x-2"
+        enter-to-class="opacity-100 scale-100 translate-x-0"
+        leave-from-class="opacity-100 scale-100 translate-x-0"
+        leave-to-class="opacity-0 scale-95 -translate-x-2"
+      >
+        <div 
+          v-if="expandedMenus[item.text] && !is_expanded" 
+          class="absolute left-full top-0 ml-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-48 dark:bg-black dark:border-[#1F2430] dark:shadow-black/40 dark:text-white"
+        >
+          <div class="p-2">
+            <div class="text-xs font-semibold text-gray-500 px-3 py-2 border-b border-gray-100 dark:text-white dark:border-[#1F2430]">
+              {{ item.text }}
+            </div>
+            <router-link
+              v-for="child in item.children"
+              :key="child.text"
+              :to="child.route"
+              class="flex items-center space-x-3 px-3 py-2 rounded transition-all duration-200 hover:bg-violet-500 hover:text-white text-sm dark:hover:bg-violet-600 dark:text-white"
+              :class="[
+                $route.path === child.route
+                  ? 'bg-violet-600 text-white font-semibold'
+                  : ''
+              ]"
+              @click="expandedMenus[item.text] = false"
+            >
+              <component :is="child.icon" class="w-4 h-4 dark:text-white" />
+              <span class="dark:text-white">{{ child.text }}</span>
+            </router-link>
+          </div>
+        </div>
+      </transition>
     </div>
     <router-link
       v-else-if="!item.action"
       :to="item.route"
       :class="[
-        'flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white dark:text-white',
+        'flex items-center space-x-3 px-4 py-2 rounded transition-all duration-200 hover:bg-violet-500 hover:text-white dark:text-white overflow-hidden',
         { 'justify-center': !is_expanded },
         $route.path === item.route
           ? 'bg-violet-600 border-r-4 border-violet-800 text-white font-semibold'
           : ''
       ]"
     >
-      <component :is="item.icon" class="w-6 h-6 dark:text-white" />
-      <span v-if="is_expanded" class="text-sm dark:text-white">{{ item.text }}</span>
+      <component :is="item.icon" class="w-6 h-6 dark:text-white flex-shrink-0" />
+      <span v-show="is_expanded" class="text-sm dark:text-white transition-opacity duration-300 delay-150 whitespace-nowrap" :class="is_expanded ? 'opacity-100' : 'opacity-0'">{{ item.text }}</span>
     </router-link>
     
     <button
       v-else
       @click="handleItemAction(item.action)"
       :class="[
-        'flex items-center space-x-3 px-4 py-2 rounded transition hover:bg-violet-500 hover:text-white w-full dark:text-white',
+        'flex items-center space-x-3 px-4 py-2 rounded transition-all duration-200 hover:bg-violet-500 hover:text-white w-full dark:text-white overflow-hidden',
         { 'justify-center': !is_expanded }
       ]"
     >
-      <component :is="item.icon" class="w-6 h-6 dark:text-white" />
-      <span v-if="is_expanded" class="text-sm dark:text-white">{{ item.text }}</span>
+      <component :is="item.icon" class="w-6 h-6 dark:text-white flex-shrink-0" />
+      <span v-show="is_expanded" class="text-sm dark:text-white transition-opacity duration-300 delay-150 whitespace-nowrap" :class="is_expanded ? 'opacity-100' : 'opacity-0'">{{ item.text }}</span>
     </button>
   </template>
 </div>
@@ -159,6 +178,10 @@ import {
   DollarSign,
   Wallet,
   HardHat,
+  FileText,
+  CircleDollarSign,
+  TrendingUp,
+  Wrench,
 } from 'lucide-vue-next'
 
 // Get the current route
@@ -180,18 +203,18 @@ watch(autoExpandSidebar, (newVal) => {
 // Hover handlers for auto expand with smooth transitions
 const handleMouseEnter = () => {
   if (autoExpandSidebar.value) {
-    // Add a small delay to prevent flickering
+    // Delay for premium feel
     setTimeout(() => {
       is_expanded.value = true
-    }, 50)
+    }, 150)
   }
 }
 const handleMouseLeave = () => {
   if (autoExpandSidebar.value) {
-    // Add a small delay to prevent flickering
+    // Delay for premium feel
     setTimeout(() => {
       is_expanded.value = false
-    }, 100)
+    }, 200)
   }
 }
 
@@ -227,7 +250,19 @@ const menuItems = [
     ]
   },
   { text: "Receipts & Payments", route: "/receipts_payments", icon: ReceiptText },
-  { text: "Reports", route: "/reports", icon: BookOpen },
+  {
+    text: "Reports",
+    icon: BookOpen,
+    children: [
+      { text: "Room Profit & Loss", route: "/reports/room-pnl", icon: BedDouble },
+      { text: "F&B Profit & Loss", route: "/reports/fnb-pnl", icon: UtensilsCrossed },
+      { text: "OOD Profit & Loss", route: "/reports/ood-pnl", icon: Building2 },
+      { text: "P&L Statement", route: "/reports/pl-statement", icon: FileText },
+      { text: "Balance Sheet", route: "/reports/balance-sheet", icon: CircleDollarSign },
+      { text: "Cashflow", route: "/reports/cashflow", icon: TrendingUp },
+      { text: "Capex Schedule", route: "/reports/capex-schedule", icon: Wrench },
+    ]
+  },
   { text: "Settings", route: "#", icon: Settings, action: "openSettings" },
 ]
 
@@ -242,30 +277,6 @@ const toggleMenuExpand = (text) => {
     })
   }
   expandedMenus.value[text] = !expandedMenus.value[text]
-}
-
-// Auto open/close parent groups on hover when auto is enabled
-const onParentEnter = (text) => {
-  if (autoExpandSidebar.value) {
-    // Close all other menus first to prevent overlap
-    Object.keys(expandedMenus.value).forEach(key => {
-      if (key !== text) {
-        expandedMenus.value[key] = false
-      }
-    })
-    // Small delay for smooth transition
-    setTimeout(() => {
-      expandedMenus.value[text] = true
-    }, 50)
-  }
-}
-const onParentLeave = (text) => {
-  if (autoExpandSidebar.value) {
-    // Small delay to prevent flickering
-    setTimeout(() => {
-      expandedMenus.value[text] = false
-    }, 100)
-  }
 }
 
 const hospitalityExperience = ref(
@@ -360,13 +371,6 @@ watch(selectedProject, async (project) => {
 
 
 const filteredMenuItems = computed(() => {
-  // If no project is selected, only show Home and Dashboard
-  if (!selectedProject.value || !selectedProject.value.project_name) {
-    return menuItems.filter(item => 
-      item.text === "Home" || item.text === "Dashboard" || item.text === "Cost Of Sales"
-    )
-  }
-
   // Recursively filter children if needed
   function filterItems(items) {
     return items
@@ -388,6 +392,10 @@ const filteredMenuItems = computed(() => {
                 child.route === '/ood_data_input'
               )) {
                 return false
+              }
+              // If no project selected, show all revenue items
+              if (!selectedProject.value || !selectedProject.value.project_name) {
+                return true
               }
               if (child.text.includes('Room Revenue')) {
                 return depts.includes('Rooms')

@@ -58,3 +58,57 @@
 .dark .text-red-700 { color: #FCA5A5 !important; }
 .dark .text-blue-700 { color: #93C5FD !important; }
 .dark .text-yellow-700 { color: #FDE68A !important; }
+
+/* ============================================================================
+   GLOBAL REPORT TRANSITIONS
+   Centralized transition styles for modal animations across all report pages
+   ============================================================================ */
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* Modal backdrop transition */
+.modal-backdrop-enter-active, .modal-backdrop-leave-active {
+  transition: opacity 0.18s ease;
+}
+
+.modal-backdrop-enter-from, .modal-backdrop-leave-to {
+  opacity: 0;
+}
+
+/* ============================================================================
+   ACCESSIBILITY IMPROVEMENTS
+   Focus indicators and keyboard navigation styles
+   ============================================================================ */
+
+/* Enhanced focus indicators for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, 0.6);
+  outline-offset: 2px;
+}
+
+.dark *:focus-visible {
+  outline-color: rgba(167, 139, 250, 0.8);
+}
+
+/* Skip to content link for screen readers */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #8B5CF6;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
