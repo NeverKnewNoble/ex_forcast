@@ -75,9 +75,39 @@ const routes = [
     component: () => import('@/pages/general/Receipts_Payments.vue'),
   },
   {
-    name: 'Reports',
-    path: '/reports',
-    component: () => import('@/pages/general/Reports.vue'),
+    name: 'Room Profit & Loss',
+    path: '/reports/room-pnl',
+    component: () => import('@/pages/reports/RoomPnL.vue'),
+  },
+  {
+    name: 'F&B Profit & Loss',
+    path: '/reports/fnb-pnl',
+    component: () => import('@/pages/reports/FnBPnL.vue'),
+  },
+  {
+    name: 'OOD Profit & Loss',
+    path: '/reports/ood-pnl',
+    component: () => import('@/pages/reports/OODPnL.vue'),
+  },
+  {
+    name: 'P&L Statement',
+    path: '/reports/pl-statement',
+    component: () => import('@/pages/reports/PLStatement.vue'),
+  },
+  {
+    name: 'Balance Sheet',
+    path: '/reports/balance-sheet',
+    component: () => import('@/pages/reports/BalanceSheet.vue'),
+  },
+  {
+    name: 'Cashflow',
+    path: '/reports/cashflow',
+    component: () => import('@/pages/reports/Cashflow.vue'),
+  },
+  {
+    name: 'Capex Schedule',
+    path: '/reports/capex-schedule',
+    component: () => import('@/pages/reports/CapexSchedule.vue'),
   },
   {
     name: 'Project Budget',

@@ -346,6 +346,15 @@
               </td>
             </tr>
 
+            <!-- No F&B Revenue Data Message -->
+            <ReportSectionNoDataRow
+              :has-data="hasFnbRevenueSectionData()"
+              :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length + 1), 0)"
+              section-name="F&B Revenue"
+              :icon="Utensils"
+              message="No food & beverage revenue data available for the selected period."
+            />
+
             <!-- Food Revenue Sub-header -->
             <tr class="bg-green-600 border-b border-green-700">
               <td :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length + 1), 0)" class="px-3 py-2 font-semibold text-white border-r border-green-700">
@@ -978,6 +987,15 @@
               </td>
             </tr>
 
+            <!-- No F&B Expenses Data Message -->
+            <ReportSectionNoDataRow
+              :has-data="hasFnbExpenseSubsectionData()"
+              :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length + 1), 0)"
+              section-name="F&B Expenses"
+              :icon="DollarSign"
+              message="No food & beverage expense data available for the selected period."
+            />
+
             <!-- F&B Expenses functions -->
             <template v-for="expense in getFnbExpenses()" :key="'fnb-expense-' + expense">
               <tr class="bg-green-100 dark:bg-green-800/30 border-b border-green-300 dark:border-green-700">
@@ -1054,6 +1072,15 @@
                 </template>
               </template>
             </tr>
+
+            <!-- No F&B Payroll Data Message -->
+            <ReportSectionNoDataRow
+              :has-data="hasFnbPayrollSubsectionData()"
+              :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length + 1), 0)"
+              section-name="Payroll"
+              :icon="Users"
+              message="No payroll data available for Food & Beverage department in the selected period."
+            />
 
             <!-- Payroll: Management Group Header -->
             <tr v-if="hasFnbPayrollGroupData('management')" class="bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-200 border-b border-green-300 dark:border-green-700">
@@ -1194,6 +1221,7 @@ import { selectedProject } from '@/components/utility/dashboard/projectService.j
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
 import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
 import { getRestaurants } from '@/components/utility/f&b_revenue_assumpt/get_restaurants.js';
+import ReportSectionNoDataRow from '@/components/ui/reports/ReportSectionNoDataRow.vue';
 import { 
   ChevronDown, 
   ChevronRight, 
@@ -2819,6 +2847,56 @@ function getTotalFnbPayrollPercentage(year, label) {
     return 0;
   }
 }
+
+// ============================================================================
+// SECTION-LEVEL DATA CHECKS for F&B
+// ============================================================================
+
+// Check if F&B Revenue section has any data
+function hasFnbRevenueSectionData() {
+  if (!props.visibleYears || props.visibleYears.length === 0) return false;
+  
+  for (const year of props.visibleYears) {
+    const labels = getColumnLabelsForYear(year);
+    for (const label of labels) {
+      if (getTotalFnbRevenue(year, label) > 0) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Check if F&B Expenses subsection has any data
+function hasFnbExpenseSubsectionData() {
+  if (!props.visibleYears || props.visibleYears.length === 0) return false;
+  
+  for (const year of props.visibleYears) {
+    const labels = getColumnLabelsForYear(year);
+    for (const label of labels) {
+      if (getTotalFnbExpenses(year, label) > 0) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Check if F&B Payroll subsection has any data
+function hasFnbPayrollSubsectionData() {
+  if (!props.visibleYears || props.visibleYears.length === 0) return false;
+  
+  for (const year of props.visibleYears) {
+    const labels = getColumnLabelsForYear(year);
+    for (const label of labels) {
+      if (getTotalFnbPayroll(year, label) > 0) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 </script>
 
 <style scoped>

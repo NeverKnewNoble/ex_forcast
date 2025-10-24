@@ -451,6 +451,15 @@
               </td>
             </tr>
 
+            <!-- No Room Revenue Data Message -->
+            <ReportSectionNoDataRow
+              :has-data="hasRoomRevenueSectionData()"
+              :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length * 2 + 1), 0)"
+              section-name="Room Revenue"
+              :icon="Bed"
+              message="No room revenue data available for the selected period."
+            />
+
             <!-- Market Segmentation Revenue Rows -->
             <template v-if="isMarketSegmentationEnabled()">
               <!-- Dynamic segments from Market Segmentation cache (keys starting with 'Room Revenue:') -->
@@ -665,6 +674,15 @@
               </template>
             </tr>
 
+            <!-- No Expense Data Message -->
+            <ReportSectionNoDataRow
+              :has-data="hasExpenseSubsectionData()"
+              :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length * 2 + 1), 0)"
+              section-name="Expense"
+              :icon="DollarSign"
+              message="No expense data available for Room department in the selected period."
+            />
+
             <!-- Dynamic Room Department Expenses -->
             <template v-for="exp in roomDepartmentExpenses" :key="'room-expense-' + exp">
               <tr v-if="hasRoomExpenseData(exp)" class="bg-white border-b border-blue-300 dark:border-blue-700">
@@ -745,6 +763,15 @@
                 </template>
               </template>
             </tr>
+
+            <!-- No Payroll Data Message -->
+            <ReportSectionNoDataRow
+              :has-data="hasPayrollSubsectionData()"
+              :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length * 2 + 1), 0)"
+              section-name="Payroll"
+              :icon="Bed"
+              message="No payroll data available for Room department in the selected period."
+            />
 
             <!-- Payroll: Management Group Header -->
             <tr v-if="hasPayrollGroupData('management')" class="bg-blue-500 dark:bg-blue-900/20 text-white dark:text-gray-200 border-b border-blue-300 dark:border-blue-700">
@@ -900,6 +927,15 @@
                 </template>
               </template>
             </tr>
+
+            <!-- No Payroll Related Data Message -->
+            <ReportSectionNoDataRow
+              :has-data="hasPayrollRelatedSubsectionData()"
+              :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length * 2 + 1), 0)"
+              section-name="Payroll Related"
+              :icon="Bed"
+              message="No payroll related data available for Room department in the selected period."
+            />
 
             <!-- NSSIT Row -->
             <tr v-if="hasPayrollRelatedData('NSSIT')" class="bg-white border-b border-blue-300 dark:border-blue-700">
@@ -1299,6 +1335,15 @@
               </template>
             </tr>
 
+            <!-- No Bonus Data Message -->
+            <ReportSectionNoDataRow
+              :has-data="hasBonusSubsectionData()"
+              :colspan="1 + visibleYears.reduce((acc, year) => acc + (isYearCollapsed(year) ? 1 : getColumnLabelsForYear(year).length * 2 + 1), 0)"
+              section-name="Bonus"
+              :icon="Bed"
+              message="No bonus data available for Room department in the selected period."
+            />
+
             <!-- Bonus Details Row -->
             <tr v-if="hasBonusData()" class="bg-white border-b border-blue-300 dark:border-blue-700">
               <td class="px-3 py-2 border-r border-blue-300 dark:border-blue-700">
@@ -1443,6 +1488,7 @@ import {
 } from 'lucide-vue-next';
 import { loadExpenseData } from '@/components/utility/expense_assumption/index.js';
 import reportDataService from '@/components/utility/reports/reportDataService.js';
+import ReportSectionNoDataRow from '@/components/ui/reports/ReportSectionNoDataRow.vue';
 
 // Props
 const props = defineProps({
@@ -3443,6 +3489,87 @@ function hasBonusData() {
     }
   }
   return false;
+}
+
+// ============================================================================
+// SECTION-LEVEL DATA CHECKS
+// ============================================================================
+
+// Check if entire Room Revenue section has any data
+function hasRoomRevenueSectionData() {
+  if (!props.visibleYears || props.visibleYears.length === 0) return false;
+  
+  // Check if any segment has data
+  for (const segment of roomRevenueSegments.value) {
+    if (hasSegmentData(segment)) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+// Check if entire Expenses subsection has any data
+function hasExpenseSubsectionData() {
+  if (!roomDepartmentExpenses.value || roomDepartmentExpenses.value.length === 0) return false;
+  
+  for (const exp of roomDepartmentExpenses.value) {
+    if (hasRoomExpenseData(exp)) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+// Check if entire Payroll subsection has any data
+function hasPayrollSubsectionData() {
+  if (!props.visibleYears || props.visibleYears.length === 0) return false;
+  
+  // Check if any payroll group has data
+  const groups = ['management', 'staff', 'supervisors'];
+  for (const group of groups) {
+    if (hasPayrollGroupData(group)) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+// Check if entire Payroll Related subsection has any data
+function hasPayrollRelatedSubsectionData() {
+  if (!props.visibleYears || props.visibleYears.length === 0) return false;
+  
+  // List of all actual payroll related items displayed in the report
+  const payrollRelatedItems = [
+    'NSSIT',
+    'Vacation',
+    'Relocation',
+    'Severence & Indemnity',
+    'Other',
+    'Medical',
+    'Uniforms',
+    'Employee Meal',
+    'Transport',
+    'Telephone',
+    'Air Ticket',
+    'Other Benefits'
+  ];
+  
+  // Check if any payroll related item has data
+  for (const item of payrollRelatedItems) {
+    if (hasPayrollRelatedData(item)) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+// Check if entire Bonus subsection has any data
+function hasBonusSubsectionData() {
+  return hasBonusData();
 }
 
 </script>

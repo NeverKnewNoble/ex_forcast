@@ -1072,20 +1072,17 @@ def get_item_gl_balance(item_name, from_date=None, to_date=None, company=None):
             conditions = ["gle.company = %s"]
             params = [company]
             
-            # Look for accounts that might contain the item name or be inventory-related
-            # Try multiple matching strategies for better accuracy
+            # Look for accounts that match the item name or code
+            # Use ONLY exact or contains matching - NO broad account type matching
             item_related_conditions = [
                 "acc.account_name = %s",  # Exact match first
                 "acc.account_name LIKE %s",  # Contains item name
-                "acc.account_name LIKE %s",  # Contains item code
-                "acc.account_name LIKE %s",  # Case-insensitive match
-                "acc.account_type IN ('Asset', 'Expense', 'Cost of Goods Sold', 'Income')"
+                "acc.account_name LIKE %s"  # Contains item code
             ]
             params.extend([
                 item_name,  # Exact match
                 f"%{item_name}%",  # Contains item name
-                f"%{item_code}%",  # Contains item code
-                f"%{item_name.lower()}%"  # Case-insensitive
+                f"%{item_code}%"  # Contains item code
             ])
             
             conditions.append(f"({' OR '.join(item_related_conditions)})")
