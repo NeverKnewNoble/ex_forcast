@@ -39,7 +39,7 @@ const props = defineProps({
   },
   // Icon to display
   icon: {
-    type: Object,
+    type: [Object, Function],
     default: () => Database
   },
   // Whether to show the hint

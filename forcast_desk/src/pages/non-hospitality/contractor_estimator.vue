@@ -524,8 +524,8 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import Sidebar from "@/components/ui/Sidebar.vue"
-import SettingsModal from "@/components/ui/SettingsModal.vue"
+import Sidebar from "@/components/ui/_general/Sidebar.vue"
+import SettingsModal from "@/components/ui/_general/SettingsModal.vue"
 import AddCategoryModal from "@/components/ui/contractor_estimator/AddCategoryModal.vue"
 import NoCategoriesModal from "@/components/ui/contractor_estimator/NoCategoriesModal.vue"
 import alertService from "@/components/ui/ui_utility/alertService.js"

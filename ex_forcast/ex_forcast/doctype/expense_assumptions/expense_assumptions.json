@@ -51,13 +51,14 @@
   {
    "fieldname": "project",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Project ",
    "options": "Forecast Project"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-27 00:54:18.829110",
+ "modified": "2025-11-06 23:40:38.424579",
  "modified_by": "Administrator",
  "module": "Ex Forcast",
  "name": "Expense Assumptions",

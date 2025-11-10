@@ -9,7 +9,7 @@
 
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js'
+import { useYearSettingsStore } from '@/components/utility/_master_utility/yearSettingsStore.js'
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js'
 import { getVisibleYears, loadYearOptions } from '@/components/utility/expense_assumption/index.js'
 import alertService from '@/components/ui/ui_utility/alertService.js'

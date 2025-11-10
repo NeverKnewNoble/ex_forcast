@@ -1398,10 +1398,10 @@
 <script setup>
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { storeToRefs } from 'pinia';
-import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
+import { useYearSettingsStore } from '@/components/utility/_master_utility/yearSettingsStore.js';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
 import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
-import Sidebar from "@/components/ui/Sidebar.vue";
+import Sidebar from "@/components/ui/_general/Sidebar.vue";
 import { CircleAlert, BadgeCent, Coffee, Table, AlertTriangle, BedDouble, Plus, PlusCircle, DollarSign, Calculator, Settings, Calendar, X, Check, Save, Loader2, RefreshCw, ChevronDown, ChevronRight, ArrowLeft, ChevronLeft, FolderOpen, Database, AlertCircle, ArrowRight, Percent, RotateCcw } from 'lucide-vue-next';
 import alertService from "@/components/ui/ui_utility/alertService.js";
 
@@ -1460,7 +1460,7 @@ import { loadYearOptions, months } from "@/components/utility/expense_assumption
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
 
 // Import project-specific localStorage utilities
-import { getProjectKey, clearOldLocalStorageKeys } from '@/components/utility/projectLocalStorage.js';
+import { getProjectKey, clearOldLocalStorageKeys } from '@/components/utility/_master_utility/projectLocalStorage.js';
 
 import { cloneDeep } from 'lodash-es';
 
@@ -1474,7 +1474,7 @@ import RoomErrorState from '@/components/ui/room/RoomErrorState.vue';
 import RoomNoYearsSelectedState from '@/components/ui/room/RoomNoYearsSelectedState.vue';
 
 // Import SettingsModal component
-import SettingsModal from '@/components/ui/SettingsModal.vue';
+import SettingsModal from '@/components/ui/_general/SettingsModal.vue';
 
 // Pinia store for year settings
 const yearSettingsStore = useYearSettingsStore();
@@ -2270,7 +2270,7 @@ function handleMarketSegmentCellEditWrapper({ year, label, segment, field, event
   isSaved.value = false;
 }
 
-import MarketSegmentationTables from '@/components/ui/MarketSegmentationTables.vue';
+import MarketSegmentationTables from '@/components/ui/_general/MarketSegmentationTables.vue';
 
 // Preserve caret position while updating reactive data from contenteditable cells
 function handleRoomCellInputWrapper({ year, label, roomType, field, event }) {

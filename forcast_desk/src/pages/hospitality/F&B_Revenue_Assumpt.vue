@@ -978,10 +978,10 @@
   <script setup>
   import { ref, onMounted, computed, watch, onUnmounted, reactive } from "vue";
   import { storeToRefs } from 'pinia';
-  import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
+  import { useYearSettingsStore } from '@/components/utility/_master_utility/yearSettingsStore.js';
   import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
-  import Sidebar from "@/components/ui/Sidebar.vue";
-import SettingsModal from "@/components/ui/SettingsModal.vue";
+  import Sidebar from "@/components/ui/_general/Sidebar.vue";
+import SettingsModal from "@/components/ui/_general/SettingsModal.vue";
   import {  
     AlertTriangle, 
     UtensilsCrossed, 
@@ -1071,7 +1071,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   // Import project service
   import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
   // Import project-specific localStorage utilities
-  import { getProjectKey } from '@/components/utility/projectLocalStorage.js';
+  import { getProjectKey } from '@/components/utility/_master_utility/projectLocalStorage.js';
   import FnbNoProjectSelectedState from '@/components/ui/fnb/FnbNoProjectSelectedState.vue';
   import FnbNoDataState from '@/components/ui/fnb/FnbNoDataState.vue';
   import FnbNoYearsSelectedState from '@/components/ui/fnb/FnbNoYearsSelectedState.vue';

@@ -287,6 +287,30 @@ export function getExpensesGroupedByDepartmentAndLocation(expenseData, visibleYe
     for (const [location, expensesMap] of locationMap) {
       // Convert Map values to Array and sort by default status (defaults first) then alphabetically
       const expensesArray = Array.from(expensesMap.values()).sort((a, b) => {
+        // Special handling for Food And Beverage department - prioritize Cost of Food/Beverage Sales
+        const deptLower = department.toLowerCase();
+        const isFoodAndBeverage = (deptLower.includes('food') && deptLower.includes('beverage')) || 
+                                  deptLower === 'food and beverage' ||
+                                  deptLower === 'f&b';
+        
+        if (isFoodAndBeverage) {
+          const aExpenseLower = a.expense.toLowerCase();
+          const bExpenseLower = b.expense.toLowerCase();
+          
+          const aCostOfFood = aExpenseLower.includes('cost of food');
+          const bCostOfFood = bExpenseLower.includes('cost of food');
+          const aCostOfBeverage = aExpenseLower.includes('cost of beverage');
+          const bCostOfBeverage = bExpenseLower.includes('cost of beverage');
+          
+          // Cost of Food Sales always first
+          if (aCostOfFood && !bCostOfFood) return -1;
+          if (!aCostOfFood && bCostOfFood) return 1;
+          
+          // Cost of Beverage Sales always second (if neither is Cost of Food)
+          if (aCostOfBeverage && !bCostOfBeverage) return -1;
+          if (!aCostOfBeverage && bCostOfBeverage) return 1;
+        }
+        
         // Default expenses come first
         if (a.isDefault && !b.isDefault) return -1
         if (!a.isDefault && b.isDefault) return 1

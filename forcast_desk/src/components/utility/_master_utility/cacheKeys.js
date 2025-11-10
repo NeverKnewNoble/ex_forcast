@@ -11,6 +11,28 @@ export const PAGE = {
   BANQUET_REVENUE: 'Banquet Revenue Assumptions',
   MARKET_SEGMENTATION: 'Market Segmentation',
   BONUS: 'Bonus',
+  ROOM_REPORT: 'RoomP&L',
+  FNB_REPORT: 'F&BP&L',
+  OOD_REPORT: 'OODP&L',
+}
+
+export const DEPARTMENT = {
+  FOOD_AND_BEVERAGE: 'Food And Beverage',
+  ROOMS: 'Rooms',
+  MARKETING: 'Marketing',
+  PROPERTY_OPERATIONS: 'Property Operations',
+  ADMINISTRATIVE_GENERAL: 'Administrative & General',
+  REPAIRS_MAINTENANCE: 'Repairs & Maintenance',
+  ENERGY_COSTS: 'Energy Costs',
+  MANAGEMENT_FEES: 'Management Fees',
+  OTHER_OPERATING_DEPARTMENTS: 'Other Operating Departments',
+}
+
+export const EXPENSE = {
+  COST_OF_FOOD_SALES: 'Cost of Food sales',
+  COST_OF_BEVERAGE_SALES: 'Cost of Beverage sales',
+  AUDIOVISUAL_COST: 'Audiovisual Cost',
+  MISCELLANEOUS_COST: 'Miscellaneous Cost',
 }
 
 export const ROW = {
@@ -52,6 +74,6 @@ export const ROW = {
   TOTAL_ROOMS_REVENUE_INC_SC_YEAR: 'Total Rooms Revenue Including SC Year',
 }
 
-export default { PAGE, ROW }
+export default { PAGE, ROW, DEPARTMENT, EXPENSE }
 
 

@@ -674,9 +674,9 @@
   <script setup>
   import { ref, onMounted, computed, watch, onUnmounted, reactive, nextTick } from "vue";
   import { storeToRefs } from 'pinia';
-  import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
-  import Sidebar from "@/components/ui/Sidebar.vue";
-import SettingsModal from "@/components/ui/SettingsModal.vue";
+  import { useYearSettingsStore } from '@/components/utility/_master_utility/yearSettingsStore.js';
+  import Sidebar from "@/components/ui/_general/Sidebar.vue";
+import SettingsModal from "@/components/ui/_general/SettingsModal.vue";
   import PayrollSkeleton from '@/components/ui/skeleton/PayrollSkeleton.vue';
   import { 
     CircleAlert, 
@@ -723,7 +723,7 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
   import PayrollNoYearsSelectedState from '@/components/ui/payroll/PayrollNoYearsSelectedState.vue';
   import LoadingState from '@/components/ui/payroll/LoadingState.vue';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
-  import { getProjectKey } from '@/components/utility/projectLocalStorage.js';  
+  import { getProjectKey } from '@/components/utility/_master_utility/projectLocalStorage.js';  
   import {
     showAddPayrollModal,
     isSubmittingPayroll,
