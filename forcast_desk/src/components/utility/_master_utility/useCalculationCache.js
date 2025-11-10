@@ -199,9 +199,11 @@ export const useCalculationCache = defineStore('calculationCache', {
     },
 
     setExpense(projectId, department, expenseName, year, label, amount) {
+      // Allow caching of 0 values, but not null/undefined/NaN
       const isNullish = amount === null || amount === undefined || Number.isNaN(amount);
       if (isNullish) return;
       const target = this._ensureExpensePath(projectId, department, expenseName, year);
+      // Store the amount even if it's 0
       target[this._normalizeKeyPart(label)] = Number(amount) || 0;
       console.log('[EXPENSE CACHE SET]', { projectId, department, expenseName, year, label, amount });
     },

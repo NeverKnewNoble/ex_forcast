@@ -500,8 +500,8 @@
   <script setup>
   import { ref, onMounted, computed, watch, onUnmounted, reactive } from "vue";
   import { storeToRefs } from 'pinia';
-  import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
-  import Sidebar from "@/components/ui/Sidebar.vue";
+  import { useYearSettingsStore } from '@/components/utility/_master_utility/yearSettingsStore.js';
+  import Sidebar from "@/components/ui/_general/Sidebar.vue";
   import { 
     CircleAlert, 
     AlertTriangle, 
@@ -555,7 +555,7 @@
   import NoYearsSelectedState from '@/components/ui/banquet/NoYearsSelectedState.vue';
   import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
 import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
-  import SettingsModal from '@/components/ui/SettingsModal.vue';
+  import SettingsModal from '@/components/ui/_general/SettingsModal.vue';
   
   
   // Reactive state
@@ -947,6 +947,8 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
       return values;
     }
 
+    const project = selectedProject.value.project_name;
+
     for (const year of visibleYears.value) {
       values[year] = {};
       const labels = getColumnLabelsForYearLocal(year);
@@ -956,20 +958,55 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
         const row = getBanquetRowData(banquetData, year, label);
         const allFieldCodes = computedBanquetFields.value.map(f => f.code);
         
-        // Calculate all auto-calculated fields
+        // Calculate all auto-calculated fields AND cache them
         values[year][label].food = calcFood(row);
+        if (values[year][label].food !== null && values[year][label].food !== undefined && !Number.isNaN(values[year][label].food)) {
+          calculationCache.setValue(project, PAGE.BANQUET_REVENUE, ROW.FOOD, year, label, values[year][label].food);
+        }
+        
         values[year][label].liquor = calcLiquor(row);
+        if (values[year][label].liquor !== null && values[year][label].liquor !== undefined && !Number.isNaN(values[year][label].liquor)) {
+          calculationCache.setValue(project, PAGE.BANQUET_REVENUE, ROW.LIQUOR, year, label, values[year][label].liquor);
+        }
+        
         values[year][label].soft_drinks = calcSoftDrinks(row);
+        if (values[year][label].soft_drinks !== null && values[year][label].soft_drinks !== undefined && !Number.isNaN(values[year][label].soft_drinks)) {
+          calculationCache.setValue(project, PAGE.BANQUET_REVENUE, ROW.SOFT_DRINKS, year, label, values[year][label].soft_drinks);
+        }
+        
         values[year][label].hall_space_charges = calcHallSpaceCharges(row);
+        if (values[year][label].hall_space_charges !== null && values[year][label].hall_space_charges !== undefined && !Number.isNaN(values[year][label].hall_space_charges)) {
+          calculationCache.setValue(project, PAGE.BANQUET_REVENUE, ROW.HALL_SPACE_CHARGES, year, label, values[year][label].hall_space_charges);
+        }
+        
         values[year][label].gross = calcGross(row, allFieldCodes);
+        if (values[year][label].gross !== null && values[year][label].gross !== undefined && !Number.isNaN(values[year][label].gross)) {
+          calculationCache.setValue(project, PAGE.BANQUET_REVENUE, ROW.GROSS, year, label, values[year][label].gross);
+        }
+        
         values[year][label].net_amount = calcNetAmount(row, allFieldCodes);
+        if (values[year][label].net_amount !== null && values[year][label].net_amount !== undefined && !Number.isNaN(values[year][label].net_amount)) {
+          calculationCache.setValue(project, PAGE.BANQUET_REVENUE, ROW.NET_AMOUNT, year, label, values[year][label].net_amount);
+        }
+        
         values[year][label].amount_per_event = calcAmountPerEvent(row, allFieldCodes);
+        if (values[year][label].amount_per_event !== null && values[year][label].amount_per_event !== undefined && !Number.isNaN(values[year][label].amount_per_event)) {
+          calculationCache.setValue(project, PAGE.BANQUET_REVENUE, ROW.AMOUNT_PER_EVENT, year, label, values[year][label].amount_per_event);
+        }
+        
         values[year][label].amount_per_pax = calcAmountPerPax(row, allFieldCodes);
+        if (values[year][label].amount_per_pax !== null && values[year][label].amount_per_pax !== undefined && !Number.isNaN(values[year][label].amount_per_pax)) {
+          calculationCache.setValue(project, PAGE.BANQUET_REVENUE, ROW.AMOUNT_PER_PAX, year, label, values[year][label].amount_per_pax);
+        }
+        
         values[year][label].avg_pax_per_event = calcAvgPaxPerEvent(row);
+        if (values[year][label].avg_pax_per_event !== null && values[year][label].avg_pax_per_event !== undefined && !Number.isNaN(values[year][label].avg_pax_per_event)) {
+          calculationCache.setValue(project, PAGE.BANQUET_REVENUE, ROW.AVG_PAX_PER_EVENT, year, label, values[year][label].avg_pax_per_event);
+        }
         
         // Debug logging for food calculation
         if (toNum(row.pax) > 0 || toNum(row.avg_food_check) > 0) {
-          console.log(`Computed values for ${year}/${label}:`, {
+          console.log(`[Banquet] ✅ Cached values for ${year}/${label}:`, {
             pax: toNum(row.pax),
             avg_food_check: toNum(row.avg_food_check),
             calculated_food: values[year][label].food,

@@ -153,11 +153,11 @@ import { computed } from 'vue'
 import { useReportPage } from '@/composables/useReportPage.js'
 
 // Components
-import Sidebar from '@/components/ui/Sidebar.vue'
-import ReportControls from '@/components/ui/reports/ReportControls.vue'
-import ReportsNoProjectSelectedState from '@/components/ui/reports/ReportsNoProjectSelectedState.vue'
-import ReportsNoYearsSelectedState from '@/components/ui/reports/ReportsNoYearsSelectedState.vue'
-import SettingsModal from '@/components/ui/SettingsModal.vue'
+import Sidebar from '@/components/ui/_general/Sidebar.vue'
+import ReportControls from '@/components/ui/reports/general/ReportControls.vue'
+import ReportsNoProjectSelectedState from '@/components/ui/reports/general/ReportsNoProjectSelectedState.vue'
+import ReportsNoYearsSelectedState from '@/components/ui/reports/general/ReportsNoYearsSelectedState.vue'
+import SettingsModal from '@/components/ui/_general/SettingsModal.vue'
 
 // Icons
 import { 

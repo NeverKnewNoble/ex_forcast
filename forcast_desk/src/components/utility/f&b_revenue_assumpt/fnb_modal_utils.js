@@ -1,7 +1,7 @@
 import { ref, watch } from 'vue';
 import { currentDoubleOccupancyByYear } from './fnb_table_utils.js';
 import alertService from "@/components/ui/ui_utility/alertService.js";
-import { getProjectKey } from '@/components/utility/projectLocalStorage.js';
+import { getProjectKey } from '@/components/utility/_master_utility/projectLocalStorage.js';
 
 // Modal state management
 export const showAdvanced = ref(false);

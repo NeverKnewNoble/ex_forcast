@@ -638,7 +638,7 @@
             </tr>
 
             <!-- Audiovisual Revenue Row -->
-            <tr class="bg-green-100 dark:bg-green-800/30 border-b border-green-300 dark:border-green-700">
+            <!-- <tr class="bg-green-100 dark:bg-green-800/30 border-b border-green-300 dark:border-green-700">
               <td class="px-3 py-2 font-medium border-r border-green-300 dark:border-green-700">
                 <div class="flex items-center gap-1 text-green-800 dark:text-green-200">Audiovisual</div>
               </td>
@@ -657,7 +657,7 @@
                   </td>
                 </template>
               </template>
-            </tr>
+            </tr> -->
 
             <!-- Total Other Revenue Row -->
             <tr class="bg-green-500 dark:bg-green-900/20 text-white dark:text-gray-200 border-b-2 border-green-600">
@@ -1210,21 +1210,17 @@
 
 
 
-
-
-
 <script setup>
 import { computed, ref, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
+import { useYearSettingsStore } from '@/components/utility/_master_utility/yearSettingsStore.js';
 import { selectedProject } from '@/components/utility/dashboard/projectService.js';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
-import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
 import { getRestaurants } from '@/components/utility/f&b_revenue_assumpt/get_restaurants.js';
-import ReportSectionNoDataRow from '@/components/ui/reports/ReportSectionNoDataRow.vue';
-import { 
-  ChevronDown, 
-  ChevronRight, 
+import ReportSectionNoDataRow from '@/components/ui/reports/general/ReportSectionNoDataRow.vue';
+import {
+  ChevronDown,
+  ChevronRight,
   BookOpen,
   Building2,
   DollarSign,
@@ -1232,6 +1228,9 @@ import {
   Coffee,
   Users
 } from 'lucide-vue-next';
+
+// Import all utility functions from the fnb utility folder
+import * as FnbUtils from './utility/index.js';
 
 // Props
 const props = defineProps({
@@ -1249,229 +1248,404 @@ const calculationCache = useCalculationCache();
 // Computed properties
 const projectName = computed(() => selectedProject.value?.project_name || 'Project Name');
 
-// UI helpers
+// UI state management helpers
 function toggleCollapse(year) {
   yearSettingsStore.toggleCollapse(year);
 }
+
 function isYearCollapsed(year) {
   return yearSettingsStore.isYearCollapsed(year);
 }
+
+// Helper to get column labels based on advanced mode (monthly/quarterly)
 function getColumnLabelsForYear(year) {
-  const mode = advancedModes.value[year] || 'monthly';
-  if (mode === 'monthly') return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  if (mode === 'quarterly') return ['Jan-Mar', 'Apr-Jun', 'Jul-Sep', 'Oct-Dec'];
-  return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return FnbUtils.getColumnLabelsForYear(year, advancedModes.value);
 }
 
-// Utilities
-function getNumber(value) {
-  const num = Number(value);
-  return isNaN(num) ? 0 : num;
-}
+// Restaurant list computed property
+const restaurantList = computed(() => {
+  return FnbUtils.getRestaurantList(calculationCache, projectName.value, props.visibleYears, getRestaurants());
+});
+
+// ============================================================================
+// FORMATTING UTILITIES - Wrapper functions for utility formatters
+// ============================================================================
 function formatMoney(value) {
-  return getNumber(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return FnbUtils.formatMoney(value);
 }
+
 function formatNumber(value) {
-  return getNumber(value).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  return FnbUtils.formatNumber(value);
 }
+
 function formatPercentage(value) {
-  return getNumber(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return FnbUtils.formatPercentage(value);
 }
 
-// Period mapping for quarterly labels
-function getMonthsForLabel(label) {
-  if (label === 'Jan-Mar') return ['Jan', 'Feb', 'Mar'];
-  if (label === 'Apr-Jun') return ['Apr', 'May', 'Jun'];
-  if (label === 'Jul-Sep') return ['Jul', 'Aug', 'Sep'];
-  if (label === 'Oct-Dec') return ['Oct', 'Nov', 'Dec'];
-  return [label];
-}
-
-// Statistics from F&B page cache
+// ============================================================================
+// STATISTICS DATA - Wrapper functions for statistics utilities
+// ============================================================================
 function getNoOfRooms(year, label) {
-  try {
-    // Check if market segmentation is enabled
-    const isMarketSegmentationEnabled = localStorage.getItem('marketSegmentation') === 'true';
-    
-    // Get room count from room revenue page via calculation cache
-    // Both scenarios (market segmentation on/off) now cache to the same location
-    const roomCount = calculationCache.getValue(projectName.value, PAGE.ROOM_REVENUE, ROW.TOTAL_ROOMS, year, label);
-    
-    if (roomCount !== undefined && roomCount !== null) {
-      return getNumber(roomCount);
-    }
-    
-    // Default fallback
-    return 100;
-  } catch (error) {
-    console.error('Error fetching room count:', error);
-    return 100; // Default fallback
-  }
+  return FnbUtils.getNoOfRooms(calculationCache, projectName.value, year, label);
 }
+
 function getNoOfRoomsTotal(year) {
-  try {
-    const labels = getColumnLabelsForYear(year);
-    let total = 0;
-    
-    for (const label of labels) {
-      const roomCount = getNoOfRooms(year, label);
-      total += getNumber(roomCount);
-    }
-    
-    return total;
-  } catch (error) {
-    console.error('Error calculating total rooms:', error);
-      return 0;
-  }
+  return FnbUtils.getNoOfRoomsTotal(calculationCache, projectName.value, year, getColumnLabelsForYear);
 }
+
 function getNoOfDays(year, label) {
-  // TODO: Connect to calculation cache for days in month/quarter
-  if (label === 'Jan' || label === 'Mar' || label === 'May' || label === 'Jul' || 
-      label === 'Aug' || label === 'Oct' || label === 'Dec') return 31;
-  if (label === 'Apr' || label === 'Jun' || label === 'Sep' || label === 'Nov') return 30;
-  if (label === 'Feb') return 28; // Simplified leap year logic
-  if (label === 'Jan-Mar') return 90;
-  if (label === 'Apr-Jun') return 91;
-  if (label === 'Jul-Sep') return 92;
-  if (label === 'Oct-Dec') return 92;
-  return 30;
+  return FnbUtils.getNoOfDays(year, label);
 }
+
 function getNoOfDaysTotal(year) {
-  const labels = getColumnLabelsForYear(year);
-  return labels.reduce((sum, label) => sum + getNumber(getNoOfDays(year, label)), 0);
+  return FnbUtils.getNoOfDaysTotal(year, getColumnLabelsForYear);
 }
+
 function getAvailableRooms(year, label) {
-  try {
-    // First try: Get from F&B page - Number of rooms available row
-    let availableRooms = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, ROW.NUMBER_OF_ROOMS_AVAILABLE, year, label);
-    
-    if (availableRooms !== undefined && availableRooms !== null) {
-      return getNumber(availableRooms);
-    }
-    
-    // Second try: Get from Room Revenue page - Total Available Rooms (if market segmentation is on)
-    const isMarketSegmentationEnabled = localStorage.getItem('marketSegmentation') === 'true';
-    if (isMarketSegmentationEnabled) {
-      const totalRooms = calculationCache.getValue(projectName.value, PAGE.ROOM_REVENUE, ROW.TOTAL_ROOMS, year, label);
-      if (totalRooms !== undefined && totalRooms !== null) {
-        const days = getNoOfDays(year, label);
-        const calculatedValue = getNumber(totalRooms) * days;
-        return calculatedValue;
-      }
-    }
-    
-    // Fallback calculation: Use cached room count × days
-    const rooms = getNoOfRooms(year, label);
-    const days = getNoOfDays(year, label);
-    const fallbackValue = rooms * days;
-    
-    return fallbackValue;
-  } catch (error) {
-    console.error('Error fetching available rooms:', error);
-    // Fallback calculation
-    const rooms = getNoOfRooms(year, label);
-    const days = getNoOfDays(year, label);
-    return rooms * days;
-  }
+  return FnbUtils.getAvailableRooms(calculationCache, projectName.value, year, label);
 }
+
 function getAvailableRoomsTotal(year) {
-  const labels = getColumnLabelsForYear(year);
-  return labels.reduce((sum, label) => sum + getNumber(getAvailableRooms(year, label)), 0);
+  return FnbUtils.getAvailableRoomsTotal(calculationCache, projectName.value, year, getColumnLabelsForYear);
 }
+
 function getSoldRooms(year, label) {
-  try {
-    // Get from F&B page - Number of rooms sold (excl.) row (note: lowercase in cache)
-    const soldRooms = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Number of rooms sold (excl.)', year, label);
-    
-    if (soldRooms !== undefined && soldRooms !== null) {
-      return getNumber(soldRooms);
-    }
-    
-    // Fallback: Calculate based on occupancy percentage if available
-    const occupancy = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Occupancy (excl.) %', year, label);
-    if (occupancy !== undefined && occupancy !== null) {
-      const availableRooms = getAvailableRooms(year, label);
-      const calculatedSoldRooms = Math.round((getNumber(occupancy) / 100) * availableRooms);
-      return calculatedSoldRooms;
-    }
-    
-    // Default fallback: Use 75% occupancy as placeholder
-    const availableRooms = getAvailableRooms(year, label);
-    const placeholderSoldRooms = Math.round(availableRooms * 0.75);
-    return placeholderSoldRooms;
-  } catch (error) {
-    console.error('Error fetching sold rooms:', error);
-    return 0;
-  }
+  return FnbUtils.getSoldRooms(calculationCache, projectName.value, year, label);
 }
+
 function getSoldRoomsTotal(year) {
-  const labels = getColumnLabelsForYear(year);
-  return labels.reduce((sum, label) => sum + getNumber(getSoldRooms(year, label)), 0);
+  return FnbUtils.getSoldRoomsTotal(calculationCache, projectName.value, year, getColumnLabelsForYear);
 }
+
 function getOccupancyPercentage(year, label) {
-  try {
-    // Get from F&B page - Occupancy (excl.) % row
-    const occupancy = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Occupancy (excl.) %', year, label);
-    if (occupancy !== undefined && occupancy !== null) {
-      return getNumber(occupancy);
-    }
-    
-    // Calculate occupancy percentage if we have sold rooms and available rooms
-    const soldRooms = getSoldRooms(year, label);
-    const availableRooms = getAvailableRooms(year, label);
-    if (availableRooms > 0) {
-      return Number(((soldRooms / availableRooms) * 100).toFixed(2));
-    }
-    
-    // Default fallback
-    return 0;
-  } catch (error) {
-    console.error('Error fetching occupancy percentage:', error);
-    return 0;
-  }
+  return FnbUtils.getOccupancyPercentage(calculationCache, projectName.value, year, label);
 }
+
 function getOccupancyPercentageTotal(year) {
-  const labels = getColumnLabelsForYear(year);
-  const totalSold = labels.reduce((sum, label) => sum + getNumber(getSoldRooms(year, label)), 0);
-  const totalAvailable = labels.reduce((sum, label) => sum + getNumber(getAvailableRooms(year, label)), 0);
-  
-  if (totalAvailable > 0) {
-    return Number(((totalSold / totalAvailable) * 100).toFixed(2));
-  }
-  return 0;
+  return FnbUtils.getOccupancyPercentageTotal(calculationCache, projectName.value, year, getColumnLabelsForYear);
 }
+
 function getNumberOfGuests(year, label) {
-  try {
-    // Get from F&B page - Number of guests row
-    const guests = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, ROW.NUMBER_OF_GUESTS, year, label);
-    if (guests !== undefined && guests !== null) {
-      return getNumber(guests);
-    }
-    
-    // Default fallback
-    return 0;
-  } catch (error) {
-    console.error('Error fetching number of guests:', error);
-    return 0;
-  }
+  return FnbUtils.getNumberOfGuests(calculationCache, projectName.value, year, label);
 }
+
 function getNumberOfGuestsTotal(year) {
-  const labels = getColumnLabelsForYear(year);
-  return labels.reduce((sum, label) => sum + getNumber(getNumberOfGuests(year, label)), 0);
+  return FnbUtils.getNumberOfGuestsTotal(calculationCache, projectName.value, year, getColumnLabelsForYear);
 }
+
 function getNumberOfCovers(year, label) {
-  try {
-    // Get from F&B page - Total Covers row
-    const covers = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Total Covers', year, label);
-    if (covers !== undefined && covers !== null) {
-      return getNumber(covers);
-    }
-    
+  return FnbUtils.getNumberOfCovers(calculationCache, projectName.value, year, label, () => restaurantList.value);
+}
+
+function getNumberOfCoversTotal(year) {
+  return FnbUtils.getNumberOfCoversTotal(calculationCache, projectName.value, year, getColumnLabelsForYear, () => restaurantList.value);
+}
+
+function getAverageFnbSpent(year, label) {
+  return FnbUtils.getAverageFnbSpent(calculationCache, projectName.value, year, label);
+}
+
+function getAverageFnbSpentTotal(year) {
+  return FnbUtils.getAverageFnbSpentTotal(calculationCache, projectName.value, year, getColumnLabelsForYear);
+}
+
+function getAverageRoomRate(year, label) {
+  return FnbUtils.getAverageRoomRate(calculationCache, projectName.value, year, label);
+}
+
+function getAverageRoomRateTotal(year) {
+  return FnbUtils.getAverageRoomRateTotal(calculationCache, projectName.value, year, getColumnLabelsForYear);
+}
+
+function getRevPerAvailableRoom(year, label) {
+  return FnbUtils.getRevPerAvailableRoom(calculationCache, projectName.value, year, label);
+}
+
+function getRevPerAvailableRoomTotal(year) {
+  return FnbUtils.getRevPerAvailableRoomTotal(calculationCache, projectName.value, year, getColumnLabelsForYear);
+}
+
+// Data availability checks for statistics
+function hasNoOfRoomsData() {
+  return FnbUtils.hasNoOfRoomsData(calculationCache, projectName.value, props.visibleYears, getColumnLabelsForYear);
+}
+
+function hasNoOfDaysData() {
+  return FnbUtils.hasNoOfDaysData(props.visibleYears, getColumnLabelsForYear);
+}
+
+function hasAvailableRoomsData() {
+  return FnbUtils.hasAvailableRoomsData(calculationCache, projectName.value, props.visibleYears, getColumnLabelsForYear);
+}
+
+function hasSoldRoomsData() {
+  return FnbUtils.hasSoldRoomsData(calculationCache, projectName.value, props.visibleYears, getColumnLabelsForYear);
+}
+
+function hasOccupancyData() {
+  return FnbUtils.hasOccupancyData(calculationCache, projectName.value, props.visibleYears, getColumnLabelsForYear);
+}
+
+function hasGuestsData() {
+  return FnbUtils.hasGuestsData(calculationCache, projectName.value, props.visibleYears, getColumnLabelsForYear);
+}
+
+function hasCoversData() {
+  return FnbUtils.hasCoversData(calculationCache, projectName.value, props.visibleYears, getColumnLabelsForYear, () => restaurantList.value);
+}
+
+function hasFnbSpentData() {
+  return FnbUtils.hasFnbSpentData(calculationCache, projectName.value, props.visibleYears, getColumnLabelsForYear);
+}
+
+function hasRoomRateData() {
+  return FnbUtils.hasRoomRateData(calculationCache, projectName.value, props.visibleYears, getColumnLabelsForYear);
+}
+
+function hasRevPerRoomData() {
+  return FnbUtils.hasRevPerRoomData(calculationCache, projectName.value, props.visibleYears, getColumnLabelsForYear);
+}
+
+// ============================================================================
+// REVENUE DATA
+// ============================================================================
+function getRestaurantFoodRevenue(restaurant, year, label) {
+  return FnbUtils.getRestaurantFoodRevenue(calculationCache, projectName.value, restaurant, year, label);
+}
+
+function getRestaurantFoodRevenueYear(restaurant, year) {
+  return FnbUtils.getRestaurantFoodRevenueYear(calculationCache, projectName.value, restaurant, year, getColumnLabelsForYear);
+}
+
+function getRestaurantBeverageRevenue(restaurant, year, label) {
+  return FnbUtils.getRestaurantBeverageRevenue(calculationCache, projectName.value, restaurant, year, label);
+}
+
+function getRestaurantBeverageRevenueYear(restaurant, year) {
+  return FnbUtils.getRestaurantBeverageRevenueYear(calculationCache, projectName.value, restaurant, year, getColumnLabelsForYear);
+}
+
+function getBanquetFoodRevenue(year, label) {
+  return FnbUtils.getBanquetFoodRevenue(calculationCache, projectName.value, year, label);
+}
+
+function getBanquetFoodRevenueYear(year) {
+  return FnbUtils.getBanquetFoodRevenueYear(calculationCache, projectName.value, year, getColumnLabelsForYear);
+}
+
+function getBanquetBeverageRevenue(year, label) {
+  return FnbUtils.getBanquetBeverageRevenue(calculationCache, projectName.value, year, label);
+}
+
+function getBanquetBeverageRevenueYear(year) {
+  return FnbUtils.getBanquetBeverageRevenueYear(calculationCache, projectName.value, year, getColumnLabelsForYear);
+}
+
+function getOutsideCateringFoodRevenue(year, label) {
+  return FnbUtils.getOutsideCateringFoodRevenue(calculationCache, projectName.value, year, label);
+}
+
+function getOutsideCateringFoodRevenueYear(year) {
+  return FnbUtils.getOutsideCateringFoodRevenueYear(calculationCache, projectName.value, year, getColumnLabelsForYear);
+}
+
+function getOutsideCateringBeverageRevenue(year, label) {
+  return FnbUtils.getOutsideCateringBeverageRevenue(calculationCache, projectName.value, year, label);
+}
+
+function getOutsideCateringBeverageRevenueYear(year) {
+  return FnbUtils.getOutsideCateringBeverageRevenueYear(calculationCache, projectName.value, year, getColumnLabelsForYear);
+}
+
+function getFunctionRoomRentalRevenue(year, label) {
+  return FnbUtils.getFunctionRoomRentalRevenue(calculationCache, projectName.value, year, label);
+}
+
+function getFunctionRoomRentalRevenueYear(year) {
+  return FnbUtils.getFunctionRoomRentalRevenueYear(calculationCache, projectName.value, year, getColumnLabelsForYear);
+}
+
+function getMiscellaneousOtherRevenue(year, label) {
+  return FnbUtils.getMiscellaneousOtherRevenue(calculationCache, projectName.value, year, label);
+}
+
+function getMiscellaneousOtherRevenueYear(year) {
+  return FnbUtils.getMiscellaneousOtherRevenueYear(calculationCache, projectName.value, year, getColumnLabelsForYear);
+}
+
+function getTotalFoodRevenue(year, label) {
+  return FnbUtils.getTotalFoodRevenue(calculationCache, projectName.value, year, label, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getTotalFoodRevenueYear(year) {
+  return FnbUtils.getTotalFoodRevenueYear(calculationCache, projectName.value, year, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getTotalBeverageRevenue(year, label) {
+  return FnbUtils.getTotalBeverageRevenue(calculationCache, projectName.value, year, label, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getTotalBeverageRevenueYear(year) {
+  return FnbUtils.getTotalBeverageRevenueYear(calculationCache, projectName.value, year, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getTotalFnbRevenue(year, label) {
+  return FnbUtils.getTotalFoodAndBeverageRevenue(calculationCache, projectName.value, year, label, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getTotalFnbRevenueYear(year) {
+  return FnbUtils.getTotalFoodAndBeverageRevenueYear(calculationCache, projectName.value, year, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getTotalOtherRevenue(year, label) {
+  return FnbUtils.getTotalOtherRevenue(calculationCache, projectName.value, year, label);
+}
+
+function getTotalOtherRevenueYear(year) {
+  return FnbUtils.getTotalOtherRevenueYear(calculationCache, projectName.value, year, getColumnLabelsForYear);
+}
+
+function getTotalRevenue(year, label) {
+  return FnbUtils.getTotalRevenue(calculationCache, projectName.value, year, label, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getTotalRevenueYear(year) {
+  return FnbUtils.getTotalRevenueYear(calculationCache, projectName.value, year, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getServiceCharge(year, label) {
+  return FnbUtils.getServiceCharge(calculationCache, projectName.value, year, label, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getServiceChargeYear(year) {
+  return FnbUtils.getServiceChargeYear(calculationCache, projectName.value, year, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getTotalRevenueInclServiceCharge(year, label) {
+  return FnbUtils.getTotalRevenueInclServiceCharge(calculationCache, projectName.value, year, label, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getTotalRevenueInclServiceChargeYear(year) {
+  return FnbUtils.getTotalRevenueInclServiceChargeYear(calculationCache, projectName.value, year, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+// ============================================================================
+// EXPENSES DATA
+// ============================================================================
+function getCostOfFoodSales(year, label) {
+  return FnbUtils.getCostOfFoodSales(calculationCache, projectName.value, year, label, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getCostOfFoodSalesYear(year) {
+  return FnbUtils.getCostOfFoodSalesYear(calculationCache, projectName.value, year, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getCostOfBeverageSales(year, label) {
+  return FnbUtils.getCostOfBeverageSales(calculationCache, projectName.value, year, label, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getCostOfBeverageSalesYear(year) {
+  return FnbUtils.getCostOfBeverageSalesYear(calculationCache, projectName.value, year, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getTotalFnbCostOfSales(year, label) {
+  return FnbUtils.getTotalFnbCostOfSales(calculationCache, projectName.value, year, label, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getTotalFnbCostOfSalesYear(year) {
+  return FnbUtils.getTotalFnbCostOfSalesYear(calculationCache, projectName.value, year, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getTotalCostOfSales(year, label) {
+  return FnbUtils.getTotalCostOfSales(calculationCache, projectName.value, year, label, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getTotalCostOfSalesYear(year) {
+  return FnbUtils.getTotalCostOfSalesYear(calculationCache, projectName.value, year, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getGrossProfit(year, label) {
+  return FnbUtils.getGrossProfit(calculationCache, projectName.value, year, label, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+function getGrossProfitYear(year) {
+  return FnbUtils.getGrossProfitYear(calculationCache, projectName.value, year, () => restaurantList.value, getColumnLabelsForYear);
+}
+
+// F&B Expenses
+const fnbExpenses = computed(() => FnbUtils.getFnbExpenses(calculationCache, projectName.value));
+
+function getFnbExpense(expense, year, label) {
+  return FnbUtils.getFnbExpense(calculationCache, projectName.value, expense, year, label);
+}
+
+function getFnbExpenseYear(expense, year) {
+  return FnbUtils.getFnbExpenseYear(calculationCache, projectName.value, expense, year, getColumnLabelsForYear);
+}
+
+function getTotalFnbExpenses(year, label) {
+  return FnbUtils.getTotalFnbExpenses(calculationCache, projectName.value, year, label);
+}
+
+function getTotalFnbExpensesYear(year) {
+  return FnbUtils.getTotalFnbExpensesYear(calculationCache, projectName.value, year, getColumnLabelsForYear);
+}
+
+// ============================================================================
+// PAYROLL DATA
+// ============================================================================
+const fnbPayrollLocationsManagement = computed(() => 
+  FnbUtils.getFnbPayrollLocationsManagement(calculationCache, projectName.value, props.visibleYears)
+);
+
+const fnbPayrollLocationsNonManagement = computed(() =>
+  FnbUtils.getFnbPayrollLocationsNonManagement(calculationCache, projectName.value, props.visibleYears)
+);
+
+function getFnbPayrollMonthlySalaryByLocation(year, label, location, group) {
+  return FnbUtils.getFnbPayrollMonthlySalaryByLocation(calculationCache, projectName.value, year, label, location, group, getColumnLabelsForYear);
+}
+
+function getFnbPayrollMonthlySalaryTotal(year, location, group) {
+  return FnbUtils.getFnbPayrollMonthlySalaryTotal(calculationCache, projectName.value, year, location, group, getColumnLabelsForYear);
+}
+
+function hasFnbPayrollGroupData(group) {
+  return FnbUtils.hasFnbPayrollGroupData(calculationCache, projectName.value, props.visibleYears, group, getColumnLabelsForYear);
+}
+
+function getTotalFnbPayroll(year, label) {
+  return FnbUtils.getTotalFnbPayroll(calculationCache, projectName.value, year, label, getColumnLabelsForYear, props.visibleYears);
+}
+
+function getTotalFnbPayrollYear(year) {
+  return FnbUtils.getTotalFnbPayrollYear(calculationCache, projectName.value, year, getColumnLabelsForYear, props.visibleYears);
+}
+
+function getTotalFnbPayrollPercentage(year, label) {
+  return FnbUtils.getTotalFnbPayrollPercentage(calculationCache, projectName.value, year, label, getColumnLabelsForYear, props.visibleYears, () => restaurantList.value);
+}
+
+// ============================================================================
+// DATA VALIDATION
+// ============================================================================
+function hasFnbRevenueSectionData() {
+  return FnbUtils.hasFnbRevenueSectionData(calculationCache, projectName.value, props.visibleYears, getColumnLabelsForYear, () => restaurantList.value);
+}
+
+function hasFnbExpenseSubsectionData() {
+  return FnbUtils.hasFnbExpenseSubsectionData(calculationCache, projectName.value, props.visibleYears, getColumnLabelsForYear);
+}
+
+function hasFnbPayrollSubsectionData() {
+  return FnbUtils.hasFnbPayrollSubsectionData(calculationCache, projectName.value, props.visibleYears, getColumnLabelsForYear);
+}
+
     // Default fallback
     return 0;
   } catch (error) {
     console.error('Error fetching number of covers:', error);
-      return 0;
+    return 0;
   }
 }
 function getNumberOfCoversTotal(year) {
@@ -1485,7 +1659,7 @@ function getAverageFnbSpent(year, label) {
     if (avgSpent !== undefined && avgSpent !== null) {
       return getNumber(avgSpent);
     }
-    
+
     // Default fallback
     return 0;
   } catch (error) {
@@ -1505,7 +1679,7 @@ function getAverageRoomRate(year, label) {
     if (avgRate !== undefined && avgRate !== null) {
       return getNumber(avgRate);
     }
-    
+
     // Default fallback
     return 0;
   } catch (error) {
@@ -1520,21 +1694,21 @@ function getAverageRoomRateTotal(year) {
 }
 function getRevPerAvailableRoom(year, label) {
   try {
-    // Get from F&B page - Revenue Per Available Room row
-    const revPerRoom = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Revenue Per Available Room', year, label);
-    if (revPerRoom !== undefined && revPerRoom !== null) {
+    // Get from normalized F&B cache (stored as '__ALL__' restaurant)
+    const revPerRoom = calculationCache.getFnbMetric(projectName.value, '__ALL__', 'revpar', year, label);
+    if (revPerRoom !== undefined && revPerRoom !== null && revPerRoom !== 0) {
       return getNumber(revPerRoom);
     }
-    
+
     // Calculate if we have the components
     const soldRooms = getSoldRooms(year, label);
     const avgRate = getAverageRoomRate(year, label);
     const availableRooms = getAvailableRooms(year, label);
-    
+
     if (availableRooms > 0) {
       return (soldRooms * avgRate) / availableRooms;
     }
-    
+
     // Default fallback
     return 0;
   } catch (error) {
@@ -1550,12 +1724,10 @@ function getRevPerAvailableRoomTotal(year) {
 
 // Revenue
 function getTotalFnbRevenue(year, label) {
-  const val = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, ROW.TOTAL_FNB_REVENUE, year, label);
-  if (val !== undefined && val !== null) return getNumber(val);
-  // Fallback: sum of food + beverage if available
-  const food = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, ROW.TOTAL_FOOD_REVENUE, year, label);
-  const bev = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, ROW.TOTAL_BEVERAGE_REVENUE, year, label);
-  return getNumber(food) + getNumber(bev);
+  // Calculate from restaurant revenues (normalized cache)
+  const foodRevenue = getTotalFoodRevenue(year, label);
+  const beverageRevenue = getTotalBeverageRevenue(year, label);
+  return getNumber(foodRevenue) + getNumber(beverageRevenue);
 }
 function getTotalFnbRevenueYear(year) {
   const labels = getColumnLabelsForYear(year);
@@ -1673,11 +1845,11 @@ onMounted(async () => {
     if (selectedProject.value?.project_name) {
       const restaurantList = await getRestaurants(selectedProject.value.project_name);
       restaurants.value = restaurantList;
-     //  // console.log('🍽️ Loaded restaurants from API:', restaurantList);
-      
+      //  // console.log('🍽️ Loaded restaurants from API:', restaurantList);
+
       // Log each restaurant to see the structure
       restaurantList.forEach((restaurant, index) => {
-       //  // console.log(`Restaurant ${index + 1}:`, restaurant);
+        //  // console.log(`Restaurant ${index + 1}:`, restaurant);
       });
     }
   } catch (error) {
@@ -1705,19 +1877,32 @@ function getRestaurantList() {
     const names = new Set();
     const project = projectName.value;
     // Prefer normalized F&B cache to auto-discover restaurants
-    (Array.isArray(visibleYears.value) ? visibleYears.value : []).forEach((yr) => {
+    (Array.isArray(props.visibleYears) ? props.visibleYears : []).forEach((yr) => {
       const yearBucket = calculationCache?.fnb?.[project]?.[yr] || {};
       Object.keys(yearBucket).forEach((restaurantKey) => {
         if (!restaurantKey || restaurantKey === '__ALL__') return;
         names.add(restaurantKey);
       });
     });
+
+    // Debug logging
+    if (names.size === 0) {
+      console.log('[FNB PnL] No restaurants found in normalized cache');
+      console.log('[FNB PnL] Project:', project);
+      console.log('[FNB PnL] Years:', props.visibleYears);
+      console.log('[FNB PnL] FNB Cache structure:', calculationCache?.fnb?.[project]);
+      console.log('[FNB PnL] Fallback restaurants:', restaurants.value);
+    } else {
+      // console.log('[FNB PnL] Found restaurants:', Array.from(names));
+    }
+
     if (names.size > 0) {
       return Array.from(names).map(n => ({ name: n }));
     }
     // Fallback to existing list when normalized cache not yet hydrated
     return restaurants.value;
   } catch (e) {
+    console.error('[FNB PnL] Error getting restaurant list:', e);
     return restaurants.value;
   }
 }
@@ -1730,33 +1915,39 @@ function getRestaurantFoodRevenue(restaurant, year, label) {
 
     // Prefer normalized F&B metric
     const normalized = calculationCache.getFnbMetric(project, restaurantName, 'totalFoodRevenue', year, label);
+
+    // Debug logging for first call
+    // if (label === 'Jan' && props.visibleYears && year === props.visibleYears[0]) {
+    //   console.log(`[FNB PnL] Getting food revenue for ${restaurantName} (${year}-${label}):`, normalized);
+    // }
+
     if (normalized !== undefined && normalized !== null && normalized !== 0) return getNumber(normalized);
 
     // Legacy PAGE cache using concatenated row key
     const cacheKey = `Total Food Revenue:${restaurantName}`;
     const val = calculationCache.getValue(project, PAGE.FNB_REVENUE, cacheKey, year, label);
     if (val !== undefined && val !== null) return getNumber(val);
-    
+
     // Fallback: try to get from the restaurant-specific row structure
     const rowData = {
       restaurant: restaurantName,
       section: 'Total',
       type: ROW.TOTAL_FOOD_REVENUE
     };
-    
+
     const fallbackVal = calculationCache.getValue(
-      project, 
-      PAGE.FNB_REVENUE, 
-      JSON.stringify(rowData), 
-      year, 
+      project,
+      PAGE.FNB_REVENUE,
+      JSON.stringify(rowData),
+      year,
       label
     );
     if (fallbackVal !== undefined && fallbackVal !== null) return getNumber(fallbackVal);
-    
-   //  // console.log(`❌ No food revenue data found for ${restaurantName} in ${year} ${label}`);
+
+    console.log(`[FNB PnL] ❌ No food revenue data found for ${restaurantName} in ${year} ${label}`);
     return 0;
   } catch (error) {
-    console.error(`Error getting food revenue for ${restaurant}:`, error);
+    console.error(`[FNB PnL] Error getting food revenue for ${restaurant}:`, error);
     return 0;
   }
 }
@@ -1779,23 +1970,23 @@ function getRestaurantBeverageRevenue(restaurant, year, label) {
     const cacheKey = `Total Beverage Revenue:${restaurantName}`;
     const val = calculationCache.getValue(project, PAGE.FNB_REVENUE, cacheKey, year, label);
     if (val !== undefined && val !== null) return getNumber(val);
-    
+
     // Fallback: try to get from the restaurant-specific row structure
     const rowData = {
       restaurant: restaurantName,
       section: 'Total',
       type: ROW.TOTAL_BEVERAGE_REVENUE
     };
-    
+
     const fallbackVal = calculationCache.getValue(
-      project, 
-      PAGE.FNB_REVENUE, 
-      JSON.stringify(rowData), 
-      year, 
+      project,
+      PAGE.FNB_REVENUE,
+      JSON.stringify(rowData),
+      year,
       label
     );
     if (fallbackVal !== undefined && fallbackVal !== null) return getNumber(fallbackVal);
-    
+
     // console.log(`❌ No beverage revenue data found for ${restaurantName} in ${year} ${label}`);
     return 0;
   } catch (error) {
@@ -1812,18 +2003,16 @@ function getRestaurantBeverageRevenueYear(restaurant, year) {
 function getBanquetFoodRevenue(year, label) {
   try {
     // Get from Banquet Revenue Assumptions page cache
-    // Based on your cache logs, this uses the exact row code: "Food"
     const val = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, ROW.FOOD, year, label);
     
-    if (val !== undefined && val !== null) {
-     //  // console.log(`✅ Found banquet food revenue: ${val} for ${year} ${label}`);
+    if (val !== undefined && val !== null && val !== 0) {
       return getNumber(val);
     }
     
-    // console.log(`❌ No banquet food revenue data found for ${year} ${label}`);
     return 0;
+
   } catch (error) {
-    console.error(`Error getting banquet food revenue for ${year} ${label}:`, error);
+    console.error(`[FNB PnL] Error getting banquet food revenue for ${year} ${label}:`, error);
     return 0;
   }
 }
@@ -1844,15 +2033,15 @@ function getOutsideCateringFoodRevenue(year, label) {
       'outside_food_service',
       'external_catering_food'
     ];
-    
+
     for (const rowCode of possibleRowCodes) {
       const val = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, rowCode, year, label);
       if (val !== undefined && val !== null) {
-       //  // console.log(`✅ Found outside catering food revenue from ${rowCode}: ${val} for ${year} ${label}`);
+        //  // console.log(`✅ Found outside catering food revenue from ${rowCode}: ${val} for ${year} ${label}`);
         return getNumber(val);
       }
     }
-    
+
     // console.log(`❌ No outside catering food revenue data found for ${year} ${label}`);
     return 0;
   } catch (error) {
@@ -1873,17 +2062,17 @@ function getBanquetBeverageRevenue(year, label) {
     // Sum up Liquor + Soft Drinks for the month
     const liquorValue = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, ROW.LIQUOR, year, label);
     const softDrinksValue = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, ROW.SOFT_DRINKS, year, label);
-    
+
     const liquor = getNumber(liquorValue) || 0;
     const softDrinks = getNumber(softDrinksValue) || 0;
     const total = liquor + softDrinks;
-    
+
     if (liquor > 0 || softDrinks > 0) {
-     //  // console.log(`✅ Found banquet beverage revenue for ${year} ${label}: Liquor: ${liquor}, Soft Drinks: ${softDrinks}, Total: ${total}`);
+      //  // console.log(`✅ Found banquet beverage revenue for ${year} ${label}: Liquor: ${liquor}, Soft Drinks: ${softDrinks}, Total: ${total}`);
       return total;
     }
-    
-   //  // console.log(`❌ No banquet beverage revenue data found for ${year} ${label}`);
+
+    //  // console.log(`❌ No banquet beverage revenue data found for ${year} ${label}`);
     return 0;
   } catch (error) {
     console.error(`Error getting banquet beverage revenue for ${year} ${label}:`, error);
@@ -1901,12 +2090,12 @@ function getOutsideCateringBeverageRevenue(year, label) {
     // Get from Banquet Revenue Assumptions page cache
     // Based on your cache logs, this uses the exact row code: "outside_service_beverage_catering"
     const val = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, 'outside_service_beverage_catering', year, label);
-    
+
     if (val !== undefined && val !== null) {
-     //  // console.log(`✅ Found outside catering beverage revenue: ${val} for ${year} ${label}`);
+      //  // console.log(`✅ Found outside catering beverage revenue: ${val} for ${year} ${label}`);
       return getNumber(val);
     }
-    
+
     // console.log(`❌ No outside catering beverage revenue data found for ${year} ${label}`);
     return 0;
   } catch (error) {
@@ -1926,13 +2115,13 @@ function getFunctionRoomRentalRevenue(year, label) {
     // Get from Banquet Revenue Assumptions page cache
     // Based on your cache logs, this uses the exact row code: "Hall Space Charges"
     const val = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, 'Hall Space Charges', year, label);
-    
+
     if (val !== undefined && val !== null) {
-     //  // console.log(`✅ Found function room rental revenue: ${val} for ${year} ${label}`);
+      //  // console.log(`✅ Found function room rental revenue: ${val} for ${year} ${label}`);
       return getNumber(val);
     }
-    
-   //  // console.log(`❌ No function room rental revenue data found for ${year} ${label}`);
+
+    //  // console.log(`❌ No function room rental revenue data found for ${year} ${label}`);
     return 0;
   } catch (error) {
     console.error(`Error getting function room rental revenue for ${year} ${label}:`, error);
@@ -1952,11 +2141,11 @@ function getMiscellaneousOtherRevenue(year, label) {
     const tobaccoValue = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, 'tobacco', year, label);
     const nonFnbValue = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, 'non_fnb', year, label);
     const othersValue = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, 'others', year, label);
-    
+
     const tobacco = getNumber(tobaccoValue) || 0;
     const nonFnb = getNumber(nonFnbValue) || 0;
     const others = getNumber(othersValue) || 0;
-    
+
     // Try to find any additional banquet detail rows that might exist
     const additionalRowCodes = [
       'additional_revenue',
@@ -1965,25 +2154,25 @@ function getMiscellaneousOtherRevenue(year, label) {
       'additional_income',
       'extra_income'
     ];
-    
+
     let additionalTotal = 0;
     for (const rowCode of additionalRowCodes) {
       const val = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, rowCode, year, label);
       if (val !== undefined && val !== null) {
         const additionalValue = getNumber(val) || 0;
         additionalTotal += additionalValue;
-       //  // console.log(`✅ Found additional revenue from ${rowCode}: ${additionalValue} for ${year} ${label}`);
+        //  // console.log(`✅ Found additional revenue from ${rowCode}: ${additionalValue} for ${year} ${label}`);
       }
     }
-    
+
     const total = tobacco + nonFnb + others + additionalTotal;
-    
+
     if (total > 0) {
-     //  // console.log(`✅ Found miscellaneous other revenue for ${year} ${label}: Tobacco: ${tobacco}, non_fnb: ${nonFnb}, Others: ${others}, Additional: ${additionalTotal}, Total: ${total}`);
+      //  // console.log(`✅ Found miscellaneous other revenue for ${year} ${label}: Tobacco: ${tobacco}, non_fnb: ${nonFnb}, Others: ${others}, Additional: ${additionalTotal}, Total: ${total}`);
       return total;
     }
-    
-   //  // console.log(`❌ No miscellaneous other revenue data found for ${year} ${label}`);
+
+    //  // console.log(`❌ No miscellaneous other revenue data found for ${year} ${label}`);
     return 0;
   } catch (error) {
     console.error(`Error getting miscellaneous other revenue for ${year} ${label}:`, error);
@@ -1996,43 +2185,15 @@ function getMiscellaneousOtherRevenueYear(year) {
   return labels.reduce((sum, label) => sum + getNumber(getMiscellaneousOtherRevenue(year, label)), 0);
 }
 
-// Audiovisual Revenue functions
-function getAudiovisualRevenue(year, label) {
-  try {
-    // Try common audiovisual revenue row codes on Banquet Revenue Assumptions page
-    const possibleRowCodes = [
-      'Audiovisual',
-      'Audio Visual',
-      'audiovisual',
-      'audio_visual',
-      'av_revenue'
-    ];
-    for (const rowCode of possibleRowCodes) {
-      const val = calculationCache.getValue(projectName.value, PAGE.BANQUET_REVENUE, rowCode, year, label);
-      if (val !== undefined && val !== null) {
-        return getNumber(val);
-      }
-    }
-    return 0;
-  } catch (error) {
-    console.error(`Error getting audiovisual revenue for ${year} ${label}:`, error);
-    return 0;
-  }
-}
 
-function getAudiovisualRevenueYear(year) {
-  const labels = getColumnLabelsForYear(year);
-  return labels.reduce((sum, label) => sum + getNumber(getAudiovisualRevenue(year, label)), 0);
-}
 
 // Total Other Revenue functions
 function getTotalOtherRevenue(year, label) {
   try {
     const functionRoomRental = getFunctionRoomRentalRevenue(year, label);
     const miscellaneousOther = getMiscellaneousOtherRevenue(year, label);
-    const audiovisual = getAudiovisualRevenue(year, label);
-    const total = getNumber(functionRoomRental) + getNumber(miscellaneousOther) + getNumber(audiovisual);
-    
+    const total = getNumber(functionRoomRental) + getNumber(miscellaneousOther);
+
     return total;
   } catch (error) {
     console.error(`Error calculating total other revenue for ${year} ${label}:`, error);
@@ -2044,12 +2205,12 @@ function getTotalOtherRevenueYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthTotal = getTotalOtherRevenue(year, label);
       yearTotal += getNumber(monthTotal);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating total other revenue for year ${year}:`, error);
@@ -2062,12 +2223,12 @@ function getTotalFoodRevenue(year, label) {
   try {
     const restaurantList = getRestaurantList();
     let total = 0;
-    
+
     for (const restaurant of restaurantList) {
       const revenue = getRestaurantFoodRevenue(restaurant, year, label);
       total += getNumber(revenue);
     }
-    
+
     return total;
   } catch (error) {
     console.error(`Error calculating total food revenue for ${year} ${label}:`, error);
@@ -2079,12 +2240,12 @@ function getTotalFoodRevenueYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthTotal = getTotalFoodRevenue(year, label);
       yearTotal += getNumber(monthTotal);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating total food revenue for year ${year}:`, error);
@@ -2097,12 +2258,12 @@ function getTotalBeverageRevenue(year, label) {
   try {
     const restaurantList = getRestaurantList();
     let total = 0;
-    
+
     for (const restaurant of restaurantList) {
       const revenue = getRestaurantBeverageRevenue(restaurant, year, label);
       total += getNumber(revenue);
     }
-    
+
     return total;
   } catch (error) {
     console.error(`Error calculating total beverage revenue for ${year} ${label}:`, error);
@@ -2114,12 +2275,12 @@ function getTotalBeverageRevenueYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthTotal = getTotalBeverageRevenue(year, label);
       yearTotal += getNumber(monthTotal);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating total beverage revenue for year ${year}:`, error);
@@ -2133,7 +2294,7 @@ function getTotalFoodAndBeverageRevenue(year, label) {
     const foodRevenue = getTotalFoodRevenue(year, label);
     const beverageRevenue = getTotalBeverageRevenue(year, label);
     const total = getNumber(foodRevenue) + getNumber(beverageRevenue);
-    
+
     return total;
   } catch (error) {
     console.error(`Error calculating total food & beverage revenue for ${year} ${label}:`, error);
@@ -2146,7 +2307,7 @@ function getTotalFoodAndBeverageRevenueYear(year) {
     const foodYearTotal = getTotalFoodRevenueYear(year);
     const beverageYearTotal = getTotalBeverageRevenueYear(year);
     const yearTotal = getNumber(foodYearTotal) + getNumber(beverageYearTotal);
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating total food & beverage revenue for year ${year}:`, error);
@@ -2160,7 +2321,7 @@ function getTotalRevenue(year, label) {
     const fnbRevenue = getTotalFoodAndBeverageRevenue(year, label);
     const otherRevenue = getTotalOtherRevenue(year, label);
     const total = getNumber(fnbRevenue) + getNumber(otherRevenue);
-    
+
     return total;
   } catch (error) {
     console.error(`Error calculating total revenue for ${year} ${label}:`, error);
@@ -2172,12 +2333,12 @@ function getTotalRevenueYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthTotal = getTotalRevenue(year, label);
       yearTotal += getNumber(monthTotal);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating total revenue for year ${year}:`, error);
@@ -2191,16 +2352,16 @@ function getServiceCharge(year, label) {
     // Get from calculation cache - you can adjust the page and row code as needed
     // For now, returning 0 as placeholder - you'll need to connect this to your data source
     const serviceCharge = calculationCache.getValue(projectName.value, PAGE.FNB_REVENUE, 'Service Charge', year, label);
-    
+
     if (serviceCharge !== undefined && serviceCharge !== null) {
       return getNumber(serviceCharge);
     }
-    
+
     // Default fallback - you can adjust this calculation as needed
     // For example, if service charge is typically 10% of total revenue
     const totalRevenue = getTotalRevenue(year, label);
     const defaultServiceCharge = totalRevenue * 0.10; // 10% service charge
-    
+
     return defaultServiceCharge;
   } catch (error) {
     console.error(`Error getting service charge for ${year} ${label}:`, error);
@@ -2212,12 +2373,12 @@ function getServiceChargeYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthServiceCharge = getServiceCharge(year, label);
       yearTotal += getNumber(monthServiceCharge);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating service charge for year ${year}:`, error);
@@ -2231,7 +2392,7 @@ function getTotalRevenueInclServiceCharge(year, label) {
     const totalRevenue = getTotalRevenue(year, label);
     const serviceCharge = getServiceCharge(year, label);
     const total = getNumber(totalRevenue) + getNumber(serviceCharge);
-    
+
     return total;
   } catch (error) {
     console.error(`Error calculating total revenue including service charge for ${year} ${label}:`, error);
@@ -2243,12 +2404,12 @@ function getTotalRevenueInclServiceChargeYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthTotal = getTotalRevenueInclServiceCharge(year, label);
       yearTotal += getNumber(monthTotal);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating total revenue including service charge for year ${year}:`, error);
@@ -2259,11 +2420,11 @@ function getTotalRevenueInclServiceChargeYear(year) {
 // Cost of Food Sales functions
 function getCostOfFoodSales(year, label) {
   try {
-    // Fetch rate from Expense Assumptions:Food And Beverage as percentage/ratio
-    const rateRaw = calculationCache.getValue(
+    // Fetch rate from normalized expense cache as percentage/ratio
+    const rateRaw = calculationCache.getExpense(
       projectName.value,
-      `${PAGE.EXPENSE_ASSUMPTIONS}:Food And Beverage`,
-      'Cost of Food sales',
+      DEPARTMENT.FOOD_AND_BEVERAGE,
+      EXPENSE.COST_OF_FOOD_SALES,
       year,
       label
     );
@@ -2281,12 +2442,12 @@ function getCostOfFoodSalesYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthCostOfFoodSales = getCostOfFoodSales(year, label);
       yearTotal += getNumber(monthCostOfFoodSales);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating cost of food sales for year ${year}:`, error);
@@ -2297,11 +2458,11 @@ function getCostOfFoodSalesYear(year) {
 // Cost of Beverage Sales functions
 function getCostOfBeverageSales(year, label) {
   try {
-    // Fetch rate from Expense Assumptions:Food And Beverage as percentage/ratio
-    const rateRaw = calculationCache.getValue(
+    // Fetch rate from normalized expense cache as percentage/ratio
+    const rateRaw = calculationCache.getExpense(
       projectName.value,
-      `${PAGE.EXPENSE_ASSUMPTIONS}:Food And Beverage`,
-      'Cost of Beverage sales',
+      DEPARTMENT.FOOD_AND_BEVERAGE,
+      EXPENSE.COST_OF_BEVERAGE_SALES,
       year,
       label
     );
@@ -2319,12 +2480,12 @@ function getCostOfBeverageSalesYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthCostOfBeverageSales = getCostOfBeverageSales(year, label);
       yearTotal += getNumber(monthCostOfBeverageSales);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating cost of beverage sales for year ${year}:`, error);
@@ -2338,7 +2499,7 @@ function getTotalFnbCostOfSales(year, label) {
     const costOfFoodSales = getCostOfFoodSales(year, label);
     const costOfBeverageSales = getCostOfBeverageSales(year, label);
     const total = getNumber(costOfFoodSales) + getNumber(costOfBeverageSales);
-    
+
     return total;
   } catch (error) {
     console.error(`Error calculating total F&B cost of sales for ${year} ${label}:`, error);
@@ -2350,12 +2511,12 @@ function getTotalFnbCostOfSalesYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthTotal = getTotalFnbCostOfSales(year, label);
       yearTotal += getNumber(monthTotal);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating total F&B cost of sales for year ${year}:`, error);
@@ -2367,11 +2528,11 @@ function getTotalFnbCostOfSalesYear(year) {
 function getAudiovisualCost(year, label) {
   try {
     // Audiovisual Cost = Cost of Beverage sales * (Audiovisual Revenue)
-    // Rate source: Expense Assumptions:Food And Beverage -> "Audiovisual Cost"
-    const rateRaw = calculationCache.getValue(
+    // Rate source: normalized expense cache -> Cost of Beverage sales
+    const rateRaw = calculationCache.getExpense(
       projectName.value,
-      `${PAGE.EXPENSE_ASSUMPTIONS}:Food And Beverage`,
-      'Cost of Beverage sales',
+      DEPARTMENT.FOOD_AND_BEVERAGE,
+      EXPENSE.COST_OF_BEVERAGE_SALES,
       year,
       label
     );
@@ -2389,12 +2550,12 @@ function getAudiovisualCostYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthAudiovisuals = getAudiovisualCost(year, label);
       yearTotal += getNumber(monthAudiovisuals);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating audiovisual costs for year ${year}:`, error);
@@ -2406,11 +2567,11 @@ function getAudiovisualCostYear(year) {
 function getMiscellaneousCost(year, label) {
   try {
     // Miscellaneous Cost = Cost of Beverage sales * (Miscellaneous Other Revenue)
-    // Rate source: Expense Assumptions:Food And Beverage -> "Miscellaneous Cost"
-    const rateRaw = calculationCache.getValue(
+    // Rate source: normalized expense cache -> Cost of Beverage sales
+    const rateRaw = calculationCache.getExpense(
       projectName.value,
-      `${PAGE.EXPENSE_ASSUMPTIONS}:Food And Beverage`,
-      'Cost of Beverage sales',
+      DEPARTMENT.FOOD_AND_BEVERAGE,
+      EXPENSE.COST_OF_BEVERAGE_SALES,
       year,
       label
     );
@@ -2428,12 +2589,12 @@ function getMiscellaneousCostYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthMiscellaneous = getMiscellaneousCost(year, label);
       yearTotal += getNumber(monthMiscellaneous);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating miscellaneous costs for year ${year}:`, error);
@@ -2447,7 +2608,7 @@ function getTotalCostOfOtherRevenue(year, label) {
     const miscellaneousCost = getMiscellaneousCost(year, label);
     const audiovisualCost = getAudiovisualCost(year, label);
     const total = getNumber(miscellaneousCost) + getNumber(audiovisualCost);
-    
+
     return total;
   } catch (error) {
     console.error(`Error calculating total cost of other revenue for ${year} ${label}:`, error);
@@ -2459,12 +2620,12 @@ function getTotalCostOfOtherRevenueYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthTotal = getTotalCostOfOtherRevenue(year, label);
       yearTotal += getNumber(monthTotal);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating total cost of other revenue for year ${year}:`, error);
@@ -2478,7 +2639,7 @@ function getTotalCostOfSales(year, label) {
     const totalFnbCostOfSales = getTotalFnbCostOfSales(year, label);
     const totalCostOfOtherRevenue = getTotalCostOfOtherRevenue(year, label);
     const total = getNumber(totalFnbCostOfSales) + getNumber(totalCostOfOtherRevenue);
-    
+
     return total;
   } catch (error) {
     console.error(`Error calculating total cost of sales for ${year} ${label}:`, error);
@@ -2490,12 +2651,12 @@ function getTotalCostOfSalesYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthTotal = getTotalCostOfSales(year, label);
       yearTotal += getNumber(monthTotal);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating total cost of sales for year ${year}:`, error);
@@ -2509,7 +2670,7 @@ function getGrossProfit(year, label) {
     const totalRevenue = getTotalRevenue(year, label);
     const totalCostOfSales = getTotalCostOfSales(year, label);
     const grossProfit = getNumber(totalRevenue) - getNumber(totalCostOfSales);
-    
+
     return grossProfit;
   } catch (error) {
     console.error(`Error calculating gross profit for ${year} ${label}:`, error);
@@ -2521,12 +2682,12 @@ function getGrossProfitYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthGrossProfit = getGrossProfit(year, label);
       yearTotal += getNumber(monthGrossProfit);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating gross profit for year ${year}:`, error);
@@ -2536,18 +2697,21 @@ function getGrossProfitYear(year) {
 
 // F&B Expenses functions
 function getFnbExpenses() {
-  // Dynamically read F&B expense categories from the calculation cache page
-  // pageId: "Expense Assumptions:Food And Beverage" (scoped to current project)
+  // Dynamically read F&B expense categories from the normalized expense cache
   try {
-    const pageId = `${PAGE.EXPENSE_ASSUMPTIONS}:Food And Beverage`;
     const projectId = projectName.value;
-    const pageCache = calculationCache.cache?.[projectId]?.[pageId] || {};
+    const fnbExpenses = calculationCache.expenses?.[projectId]?.[DEPARTMENT.FOOD_AND_BEVERAGE] || {};
+
+    // Get all expense names (keys) from the F&B department
+    const expenseNames = Object.keys(fnbExpenses);
+
     // Exclude Cost of Food sales and Cost of Beverage sales rows from F&B expenses list
     const normalize = (s) => String(s).toLowerCase().replace(/\s+/g, ' ').trim();
     const excluded = new Set(['cost of food sales', 'cost of beverage sales', 'miscellaneous cost', 'audiovisual cost']);
-    const rowCodes = Object.keys(pageCache).filter(code => !excluded.has(normalize(code)));
-    // Optionally sort for stable display
-    return rowCodes.sort();
+    const filteredExpenses = expenseNames.filter(name => !excluded.has(normalize(name)));
+
+    // Sort for stable display
+    return filteredExpenses.sort();
   } catch (error) {
     console.error('Error reading F&B expense categories from cache:', error);
     return [];
@@ -2556,13 +2720,13 @@ function getFnbExpenses() {
 
 function getFnbExpense(expense, year, label) {
   try {
-    // Get the expense value from the "Expense Assumptions:Food And Beverage" cache page
-    const value = calculationCache.getValue(projectName.value, `${PAGE.EXPENSE_ASSUMPTIONS}:Food And Beverage`, expense, year, label);
-    
+    // Get the expense value from the normalized expense cache
+    const value = calculationCache.getExpense(projectName.value, DEPARTMENT.FOOD_AND_BEVERAGE, expense, year, label);
+
     if (value !== undefined && value !== null) {
       return getNumber(value);
     }
-    
+
     return 0;
   } catch (error) {
     console.error(`Error getting F&B expense ${expense} for ${year} ${label}:`, error);
@@ -2574,12 +2738,12 @@ function getFnbExpenseYear(expense, year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthExpense = getFnbExpense(expense, year, label);
       yearTotal += getNumber(monthExpense);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating F&B expense ${expense} for year ${year}:`, error);
@@ -2591,12 +2755,12 @@ function getTotalFnbExpenses(year, label) {
   try {
     const expenses = getFnbExpenses();
     let total = 0;
-    
+
     for (const expense of expenses) {
       const expenseValue = getFnbExpense(expense, year, label);
       total += getNumber(expenseValue);
     }
-    
+
     return total;
   } catch (error) {
     console.error(`Error calculating total F&B expenses for ${year} ${label}:`, error);
@@ -2608,12 +2772,12 @@ function getTotalFnbExpensesYear(year) {
   try {
     const labels = getColumnLabelsForYear(year);
     let yearTotal = 0;
-    
+
     for (const label of labels) {
       const monthTotal = getTotalFnbExpenses(year, label);
       yearTotal += getNumber(monthTotal);
     }
-    
+
     return yearTotal;
   } catch (error) {
     console.error(`Error calculating total F&B expenses for year ${year}:`, error);
@@ -2810,17 +2974,17 @@ function hasFnbPayrollGroupData(group) {
 function getTotalFnbPayroll(year, label) {
   try {
     let total = 0;
-    
+
     // Add management payroll
     for (const loc of fnbPayrollLocationsManagement.value) {
       total += getNumber(getFnbPayrollMonthlySalaryByLocation(year, label, loc, 'management'));
     }
-    
+
     // Add non-management payroll
     for (const loc of fnbPayrollLocationsNonManagement.value) {
       total += getNumber(getFnbPayrollMonthlySalaryByLocation(year, label, loc, 'non-management'));
     }
-    
+
     return total;
   } catch (e) {
     return 0;
@@ -2855,7 +3019,7 @@ function getTotalFnbPayrollPercentage(year, label) {
 // Check if F&B Revenue section has any data
 function hasFnbRevenueSectionData() {
   if (!props.visibleYears || props.visibleYears.length === 0) return false;
-  
+
   for (const year of props.visibleYears) {
     const labels = getColumnLabelsForYear(year);
     for (const label of labels) {
@@ -2870,7 +3034,7 @@ function hasFnbRevenueSectionData() {
 // Check if F&B Expenses subsection has any data
 function hasFnbExpenseSubsectionData() {
   if (!props.visibleYears || props.visibleYears.length === 0) return false;
-  
+
   for (const year of props.visibleYears) {
     const labels = getColumnLabelsForYear(year);
     for (const label of labels) {
@@ -2885,7 +3049,7 @@ function hasFnbExpenseSubsectionData() {
 // Check if F&B Payroll subsection has any data
 function hasFnbPayrollSubsectionData() {
   if (!props.visibleYears || props.visibleYears.length === 0) return false;
-  
+
   for (const year of props.visibleYears) {
     const labels = getColumnLabelsForYear(year);
     for (const label of labels) {

@@ -3,7 +3,7 @@ import { unifiedCacheService } from '@/components/utility/_master_utility/unifie
 import { selectedProject } from '@/components/utility/dashboard/projectService.js'
 
 /**
- * Unified Report Data Service
+ *! Unified Report Data Service
  * Provides centralized data loading for all report types
  * Eliminates the need to visit other pages first to populate cache
  */
@@ -14,18 +14,18 @@ class ReportDataService {
   }
 
   /**
-   * Debug function to inspect what's actually cached
+   *! Debug function to inspect what's actually cached
    * @param {string} projectName - Name of the project
    * @returns {Object} Cache inspection results
    */
   debugCache(projectName) {
     try {
-     //  // console.log('[REPORT SERVICE DEBUG] Inspecting cache for project:', projectName)
+      // console.log('[REPORT SERVICE DEBUG] Inspecting cache for project:', projectName)
       
       const cache = this.calculationCache.cache[projectName] || {}
       const pages = Object.keys(cache)
       
-     //  // console.log('[REPORT SERVICE DEBUG] Available pages:', pages)
+      //  console.log('[REPORT SERVICE DEBUG] Available pages:', pages)
       
       const inspection = {}
       
@@ -58,7 +58,7 @@ class ReportDataService {
         })
       })
       
-     //  // console.log('[REPORT SERVICE DEBUG] Cache inspection:', inspection)
+      // console.log('[REPORT SERVICE DEBUG] Cache inspection:', inspection)
       return inspection
       
     } catch (error) {
@@ -68,7 +68,7 @@ class ReportDataService {
   }
 
   /**
-   * Get comprehensive data for all report types
+   *! Get comprehensive data for all report types
    * @param {string} projectName - Name of the project
    * @param {Array} years - Array of years to load data for
    * @returns {Object} Unified data object with metadata
@@ -229,6 +229,40 @@ class ReportDataService {
             data[year] = {
               oodRevenue: await this.loadOODRevenueData(projectName, year),
               expenses: await this.loadExpenseData(projectName, year)
+            }
+          }
+          break
+        
+        case 'pl-statement':
+          for (const year of years) {
+            data[year] = {
+              roomRevenue: await this.loadRoomRevenueData(projectName, year),
+              fnbRevenue: await this.loadFnBRevenueData(projectName, year),
+              oodRevenue: await this.loadOODRevenueData(projectName, year),
+              expenses: await this.loadExpenseData(projectName, year),
+              payroll: await this.loadPayrollData(projectName, year),
+              payrollRelated: await this.loadPayrollRelatedData(projectName, year),
+              bonus: await this.loadBonusData(projectName, year)
+            }
+          }
+          break
+          
+        case 'balance-sheet':
+          for (const year of years) {
+            data[year] = {
+              assets: await this.loadAssetsData(projectName, year),
+              liabilities: await this.loadLiabilitiesData(projectName, year),
+              equity: await this.loadEquityData(projectName, year)
+            }
+          }
+          break
+          
+        case 'cashflow':
+          for (const year of years) {
+            data[year] = {
+              inflows: await this.loadCashInflowsData(projectName, year),
+              outflows: await this.loadCashOutflowsData(projectName, year),
+              balances: await this.loadCashBalancesData(projectName, year)
             }
           }
           break
@@ -595,6 +629,163 @@ class ReportDataService {
     } catch (error) {
       console.error('[REPORT SERVICE] Error exporting data:', error)
       return false
+    }
+  }
+
+  /**
+   * Load Assets data for Balance Sheet
+   */
+  async loadAssetsData(projectName, year) {
+    try {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      const data = {}
+      
+      // Load asset-related data from cache
+      // TODO: Implement actual asset data fetching
+      for (const month of months) {
+        data[month] = {
+          tangibleAssets: 0,
+          currentAssets: 0,
+          accountsReceivable: 0,
+          cashAndBank: 0
+        }
+      }
+      
+      return data
+      
+    } catch (error) {
+      console.error('[REPORT SERVICE] Error loading assets data:', error)
+      return {}
+    }
+  }
+
+  /**
+   * Load Liabilities data for Balance Sheet
+   */
+  async loadLiabilitiesData(projectName, year) {
+    try {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      const data = {}
+      
+      // Load liability-related data from cache
+      // TODO: Implement actual liabilities data fetching
+      for (const month of months) {
+        data[month] = {
+          currentLiabilities: 0,
+          longTermLoan: 0
+        }
+      }
+      
+      return data
+      
+    } catch (error) {
+      console.error('[REPORT SERVICE] Error loading liabilities data:', error)
+      return {}
+    }
+  }
+
+  /**
+   * Load Equity data for Balance Sheet
+   */
+  async loadEquityData(projectName, year) {
+    try {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      const data = {}
+      
+      // Load equity-related data from cache
+      // TODO: Implement actual equity data fetching
+      for (const month of months) {
+        data[month] = {
+          retainedEarnings: 0,
+          currentProfit: 0
+        }
+      }
+      
+      return data
+      
+    } catch (error) {
+      console.error('[REPORT SERVICE] Error loading equity data:', error)
+      return {}
+    }
+  }
+
+  /**
+   * Load Cash Inflows data for Cashflow Statement
+   */
+  async loadCashInflowsData(projectName, year) {
+    try {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      const data = {}
+      
+      // Load cash inflow data from cache
+      // TODO: Implement actual inflow data fetching
+      for (const month of months) {
+        data[month] = {
+          operatingReceipts: 0,
+          accountsReceivableReceipts: 0,
+          otherReceipts: 0,
+          interestReceived: 0,
+          loanDrawdown: 0
+        }
+      }
+      
+      return data
+      
+    } catch (error) {
+      console.error('[REPORT SERVICE] Error loading cash inflows data:', error)
+      return {}
+    }
+  }
+
+  /**
+   * Load Cash Outflows data for Cashflow Statement
+   */
+  async loadCashOutflowsData(projectName, year) {
+    try {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      const data = {}
+      
+      // Load cash outflow data from cache
+      // TODO: Implement actual outflow data fetching
+      for (const month of months) {
+        data[month] = {
+          salariesPayments: 0,
+          expensesPayments: 0,
+          loanRepayment: 0,
+          taxPayments: 0
+        }
+      }
+      
+      return data
+      
+    } catch (error) {
+      console.error('[REPORT SERVICE] Error loading cash outflows data:', error)
+      return {}
+    }
+  }
+
+  /**
+   * Load Cash Balances data for Cashflow Statement
+   */
+  async loadCashBalancesData(projectName, year) {
+    try {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      const data = {}
+      
+      // Load opening and closing balances
+      // TODO: Implement actual balance data fetching
+      for (const month of months) {
+        data[month] = {
+          openingBalance: 0,
+          closingBalance: 0
+        }
+      }
+      
+      return data
+      
+    } catch (error) {
+      console.error('[REPORT SERVICE] Error loading cash balances data:', error)
+      return {}
     }
   }
 

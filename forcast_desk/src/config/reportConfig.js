@@ -22,8 +22,12 @@ import {
 } from 'lucide-vue-next'
 
 // Import implemented report components
-import RoomProfitLoss from '@/components/ui/reports/RoomProfitLoss.vue'
-import FoodBeverageProfitLoss from '@/components/ui/reports/FoodBeverageProfitLoss.vue'
+import RoomProfitLoss from '@/components/ui/reports/room/RoomProfitLoss.vue'
+import FoodBeverageProfitLoss from '@/components/ui/reports/fnb/FoodBeverageProfitLoss.vue'
+import OODProfitLoss from '@/components/ui/reports/ood/OODProfitLoss.vue'
+import ProfitLossStatement from '@/components/ui/reports/pl/ProfitLossStatement.vue'
+import BalanceSheet from '@/components/ui/reports/balance_sheet/BalanceSheet.vue'
+import Cashflow from '@/components/ui/reports/cashflow/Cashflow.vue'
 
 /**
  * Design tokens for consistent styling across reports
@@ -90,10 +94,10 @@ export const REPORT_CONFIGS = {
     title: 'Other Operating Departments Profit & Loss',
     subtitle: 'Revenue and expense analysis for OOD operations',
     icon: Building2,
-    component: null,
-    isImplemented: false,
+    component: OODProfitLoss,
+    isImplemented: true,
     enableAdvancedSettings: true,
-    loadDataOnMount: false,
+    loadDataOnMount: true,
     routeName: 'OOD Profit & Loss',
     routePath: '/reports/ood-pnl'
   },
@@ -103,10 +107,10 @@ export const REPORT_CONFIGS = {
     title: 'Profit & Loss Statement',
     subtitle: 'Complete profit and loss statement',
     icon: FileText,
-    component: null,
-    isImplemented: false,
-    enableAdvancedSettings: false,
-    loadDataOnMount: false,
+    component: ProfitLossStatement,
+    isImplemented: true,
+    enableAdvancedSettings: true,
+    loadDataOnMount: true,
     routeName: 'P&L Statement',
     routePath: '/reports/pl-statement'
   },
@@ -116,10 +120,10 @@ export const REPORT_CONFIGS = {
     title: 'Balance Sheet',
     subtitle: 'Assets, liabilities and equity statement',
     icon: Scale,
-    component: null,
-    isImplemented: false,
-    enableAdvancedSettings: false,
-    loadDataOnMount: false,
+    component: BalanceSheet,
+    isImplemented: true,
+    enableAdvancedSettings: true,
+    loadDataOnMount: true,
     routeName: 'Balance Sheet',
     routePath: '/reports/balance-sheet'
   },
@@ -129,10 +133,10 @@ export const REPORT_CONFIGS = {
     title: 'Cashflow',
     subtitle: 'Cash inflows and outflows analysis',
     icon: TrendingUp,
-    component: null,
-    isImplemented: false,
-    enableAdvancedSettings: false,
-    loadDataOnMount: false,
+    component: Cashflow,
+    isImplemented: true,
+    enableAdvancedSettings: true,
+    loadDataOnMount: true,
     routeName: 'Cashflow',
     routePath: '/reports/cashflow'
   },

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
 import { selectedProject } from '@/components/utility/dashboard/projectService.js';
-import { getProjectKey, clearOldLocalStorageKeys, getAllProjectKeys } from '@/components/utility/projectLocalStorage.js';
+import { getProjectKey, clearOldLocalStorageKeys, getAllProjectKeys } from '@/components/utility/_master_utility/projectLocalStorage.js';
 
 export const useYearSettingsStore = defineStore('yearSettings', () => {
 

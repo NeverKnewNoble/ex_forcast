@@ -542,8 +542,12 @@
                         <!-- Net Salary & Wages -->
                         <tr class="bg-red-50 border-b border-red-200">
                           <td colspan="2" class="px-3 py-2 font-medium border-r border-red-200">
-                            <div class="flex items-center gap-1">
+                            <div class="flex items-center justify-between gap-1">
                               Net Salary & Wages
+                              <div v-if="getDeptKey(department) === 'rooms' || getDeptKey(department) === 'fnb' || getDeptKey(department) === 'ood'" class="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                                <Calculator class="w-2 h-2" />
+                                AUTO
+                              </div>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-salary-wages-' + deptIndex + '-' + year">
@@ -551,11 +555,11 @@
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
                                 :key="'dept-salary-wages-cell-' + deptIndex + '-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-red-200 bg-red-50"
-                                contenteditable="true"
-                                @keypress="allowOnlyNumbers($event)"
-                                @input="handlePaymentBaseInput(department, 'salary', year, label, $event)"
-                                @blur="handlePaymentBaseBlur(department, 'salary', year, label, $event)"
+                                :class="(getDeptKey(department) === 'rooms' || getDeptKey(department) === 'fnb' || getDeptKey(department) === 'ood') ? 'px-2 py-1 text-right border border-red-200 bg-red-100' : 'px-2 py-1 text-right border border-red-200 bg-red-50'"
+                                :contenteditable="getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood'"
+                                @keypress="(getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood') ? allowOnlyNumbers($event) : null"
+                                @input="(getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood') ? handlePaymentBaseInput(department, 'salary', year, label, $event) : null"
+                                @blur="(getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood') ? handlePaymentBaseBlur(department, 'salary', year, label, $event) : null"
                               >
                                 <span class=" text-xs">{{ formatMoney(getPaymentBaseValue(department, 'salary', year, label)) }}</span>
                               </td>
@@ -734,8 +738,12 @@
                         <!-- Bonus -->
                         <tr class="bg-red-50 border-b border-red-200">
                           <td colspan="2" class="px-3 py-2 font-medium border-r border-red-200">
-                            <div class="flex items-center gap-1">
+                            <div class="flex items-center justify-between gap-1">
                               Bonus
+                              <div v-if="getDeptKey(department) === 'rooms' || getDeptKey(department) === 'fnb' || getDeptKey(department) === 'ood'" class="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                                <Calculator class="w-2 h-2" />
+                                AUTO
+                              </div>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'dept-' + deptIndex + '-bonus-' + year">
@@ -743,11 +751,11 @@
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
                                 :key="'dept-' + deptIndex + '-bonus-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-red-200 bg-red-50"
-                                contenteditable="true"
-                                @keypress="allowOnlyNumbers($event)"
-                                @input="handlePaymentBaseInput(department, 'bonus', year, label, $event)"
-                                @blur="handlePaymentBaseBlur(department, 'bonus', year, label, $event)"
+                                :class="(getDeptKey(department) === 'rooms' || getDeptKey(department) === 'fnb' || getDeptKey(department) === 'ood') ? 'px-2 py-1 text-right border border-red-200 bg-red-100' : 'px-2 py-1 text-right border border-red-200 bg-red-50'"
+                                :contenteditable="getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood'"
+                                @keypress="(getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood') ? allowOnlyNumbers($event) : null"
+                                @input="(getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood') ? handlePaymentBaseInput(department, 'bonus', year, label, $event) : null"
+                                @blur="(getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood') ? handlePaymentBaseBlur(department, 'bonus', year, label, $event) : null"
                               >
                                 <span class=" text-xs">{{ formatMoney(getPaymentBaseValue(department, 'bonus', year, label)) }}</span>
                               </td>
@@ -921,8 +929,12 @@
                         <!-- Payroll Related -->
                         <tr class="bg-red-50 border-b border-red-200">
                           <td colspan="2" class="px-3 py-2 font-medium border-r border-red-200">
-                            <div class="flex items-center gap-1">
+                            <div class="flex items-center justify-between gap-1">
                               Payroll Related
+                              <div v-if="getDeptKey(department) === 'rooms' || getDeptKey(department) === 'fnb' || getDeptKey(department) === 'ood'" class="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                                <Calculator class="w-2 h-2" />
+                                AUTO
+                              </div>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-payroll-related-' + year">
@@ -930,11 +942,11 @@
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
                                 :key="'rooms-payroll-related-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-red-200 bg-red-50"
-                                contenteditable="true"
-                                @keypress="allowOnlyNumbers($event)"
-                                @input="handlePaymentBaseInput(department, 'payroll', year, label, $event)"
-                                @blur="handlePaymentBaseBlur(department, 'payroll', year, label, $event)"
+                                :class="(getDeptKey(department) === 'rooms' || getDeptKey(department) === 'fnb' || getDeptKey(department) === 'ood') ? 'px-2 py-1 text-right border border-red-200 bg-red-100' : 'px-2 py-1 text-right border border-red-200 bg-red-50'"
+                                :contenteditable="getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood'"
+                                @keypress="(getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood') ? allowOnlyNumbers($event) : null"
+                                @input="(getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood') ? handlePaymentBaseInput(department, 'payroll', year, label, $event) : null"
+                                @blur="(getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood') ? handlePaymentBaseBlur(department, 'payroll', year, label, $event) : null"
                               >
                                 <span class=" text-xs">{{ formatMoney(getPaymentBaseValue(department, 'payroll', year, label)) }}</span>
                               </td>
@@ -1108,8 +1120,12 @@
                         <!-- Expenses -->
                         <tr class="bg-red-50 border-b border-red-200">
                           <td colspan="2" class="px-3 py-2 font-medium border-r border-red-200">
-                            <div class="flex items-center gap-1">
+                            <div class="flex items-center justify-between gap-1">
                               Expenses
+                              <div v-if="getDeptKey(department) === 'rooms' || getDeptKey(department) === 'fnb' || getDeptKey(department) === 'ood'" class="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                                <Calculator class="w-2 h-2" />
+                                AUTO
+                              </div>
                             </div>
                           </td>
                           <template v-for="year in visibleYears" :key="'rooms-expenses-' + year">
@@ -1117,11 +1133,11 @@
                               <td
                                 v-for="label in getColumnLabelsForYearLocal(year)"
                                 :key="'rooms-expenses-cell-' + year + '-' + label"
-                                class="px-2 py-1 text-right border border-red-200 bg-red-50"
-                                contenteditable="true"
-                                @keypress="allowOnlyNumbers($event)"
-                                @input="handlePaymentBaseInput(department, 'expenses', year, label, $event)"
-                                @blur="handlePaymentBaseBlur(department, 'expenses', year, label, $event)"
+                                :class="(getDeptKey(department) === 'rooms' || getDeptKey(department) === 'fnb' || getDeptKey(department) === 'ood') ? 'px-2 py-1 text-right border border-red-200 bg-red-100' : 'px-2 py-1 text-right border border-red-200 bg-red-50'"
+                                :contenteditable="getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood'"
+                                @keypress="(getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood') ? allowOnlyNumbers($event) : null"
+                                @input="(getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood') ? handlePaymentBaseInput(department, 'expenses', year, label, $event) : null"
+                                @blur="(getDeptKey(department) !== 'rooms' && getDeptKey(department) !== 'fnb' && getDeptKey(department) !== 'ood') ? handlePaymentBaseBlur(department, 'expenses', year, label, $event) : null"
                               >
                                 <span class=" text-xs">{{ formatMoney(getPaymentBaseValue(department, 'expenses', year, label)) }}</span>
                               </td>
@@ -1291,6 +1307,197 @@
                             </template>
                           </template>
                         </tr>
+  
+                        <!-- Costs (only for F&B and OOD) -->
+                        <template v-if="getDeptKey(department) === 'fnb' || getDeptKey(department) === 'ood'">
+                          <!-- Costs -->
+                          <tr class="bg-red-50 border-b border-red-200">
+                            <td colspan="2" class="px-3 py-2 font-medium border-r border-red-200">
+                              <div class="flex items-center justify-between gap-1">
+                                Costs
+                                <div class="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                                  <Calculator class="w-2 h-2" />
+                                  AUTO
+                                </div>
+                              </div>
+                            </td>
+                            <template v-for="year in visibleYears" :key="'dept-costs-' + deptIndex + '-' + year">
+                              <template v-if="!isYearCollapsed(year)">
+                                <td
+                                  v-for="label in getColumnLabelsForYearLocal(year)"
+                                  :key="'dept-costs-cell-' + deptIndex + '-' + year + '-' + label"
+                                  class="px-2 py-1 text-right border border-red-200 bg-red-100"
+                                  :contenteditable="false"
+                                >
+                                  <span class=" text-xs">{{ formatMoney(getPaymentBaseValue(department, 'costs', year, label)) }}</span>
+                                </td>
+                                <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
+                                  <span class=" text-xs text-red-700">{{ formatMoney(getPaymentBaseTotal(department, 'costs', year)) }}</span>
+                                </td>
+                              </template>
+                              <template v-else>
+                                <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
+                                  <span class=" text-xs text-red-700">0.00</span>
+                                </td>
+                              </template>
+                            </template>
+                          </tr>
+  
+                          <!-- Payment - 80% in the month of Payroll run (Costs) -->
+                          <tr class="bg-red-50 border-b border-red-200">
+                            <td class="px-3 py-2 font-medium border-r border-red-200">
+                              <div class="flex items-center gap-1">
+                               Payment- {{ paymentPercentages[getDeptKey(department)].costs.month.toFixed(0) }}% in the month of Payroll run
+                              </div>
+                            </td>
+                            <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'costs', 'month', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'costs', period: 'month', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'costs', period: 'month', event: $event })">
+                              <div class="flex items-center justify-end gap-1">
+                                <span class=" text-xs">{{ (paymentPercentages[getDeptKey(department)].costs?.month || 0).toFixed(2) }}%</span>
+                              </div>
+                            </td>
+                            <template v-for="year in visibleYears" :key="'dept-costs-payment-80-' + deptIndex + '-' + year">
+                              <template v-if="!isYearCollapsed(year)">
+                                <td
+                                  v-for="label in getColumnLabelsForYearLocal(year)"
+                                  :key="'dept-costs-payment-80-cell-' + deptIndex + '-' + year + '-' + label"
+                                  class="px-2 py-1 text-right border border-red-200 bg-red-50"
+                                >
+                                  <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'costs', year, label, 'sameMonth')) }}</span>
+                                </td>
+                                <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
+                                  <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'costs', year, 'sameMonth')) }}</span>
+                                </td>
+                              </template>
+                              <template v-else>
+                                <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
+                                  <span class=" text-xs text-red-700">0.00</span>
+                                </td>
+                              </template>
+                            </template>
+                          </tr>
+  
+                          <!-- Payment - 15% in the month of Payroll run (Costs) -->
+                          <tr class="bg-red-50 border-b border-red-200">
+                            <td class="px-3 py-2 font-medium border-r border-red-200">
+                              <div class="flex items-center gap-1">
+                               Payment- {{ paymentPercentages[getDeptKey(department)].costs.following.toFixed(0) }}% in the month of Payroll run
+                              </div>
+                            </td>
+                            <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'costs', 'following', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'costs', period: 'following', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'costs', period: 'following', event: $event })">
+                              <div class="flex items-center justify-end gap-1">
+                                <span class=" text-xs">{{ (paymentPercentages[getDeptKey(department)].costs?.following || 0).toFixed(2) }}%</span>
+                              </div>
+                            </td>
+                            <template v-for="year in visibleYears" :key="'dept-costs-payment-15-' + deptIndex + '-' + year">
+                              <template v-if="!isYearCollapsed(year)">
+                                <td
+                                  v-for="label in getColumnLabelsForYearLocal(year)"
+                                  :key="'dept-costs-payment-15-cell-' + deptIndex + '-' + year + '-' + label"
+                                  class="px-2 py-1 text-right border border-red-200 bg-red-50"
+                                >
+                                  <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'costs', year, label, 'following')) }}</span>
+                                </td>
+                                <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
+                                  <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'costs', year, 'following')) }}</span>
+                                </td>
+                              </template>
+                              <template v-else>
+                                <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
+                                  <span class=" text-xs text-red-700">0.00</span>
+                                </td>
+                              </template>
+                            </template>
+                          </tr>
+  
+                          <!-- Payment - 5% in the month of Payroll run (Costs) -->
+                          <tr class="bg-red-50 border-b border-red-200">
+                            <td class="px-3 py-2 font-medium border-r border-red-200">
+                              <div class="flex items-center gap-1">
+                               Payment- {{ paymentPercentages[getDeptKey(department)].costs.second.toFixed(0) }}% in the month of Payroll run
+                              </div>
+                            </td>
+                            <td class="px-3 py-2 font-medium border-r border-red-200 text-red-900 hover:bg-red-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent transition-all duration-200" contenteditable="true" @keypress="allowOnlyNumbers($event)" @input="updatePaymentPercentage(getDeptKey(department), 'costs', 'second', $event)" @focus="handlePaymentPercentageFocus({ type: getDeptKey(department), category: 'costs', period: 'second', event: $event })" @blur="handlePaymentPercentageEdit({ type: getDeptKey(department), category: 'costs', period: 'second', event: $event })">
+                              <div class="flex items-center justify-end gap-1">
+                                <span class=" text-xs">{{ (paymentPercentages[getDeptKey(department)].costs?.second || 0).toFixed(2) }}%</span>
+                              </div>
+                            </td>
+                            <template v-for="year in visibleYears" :key="'dept-costs-payment-5-' + deptIndex + '-' + year">
+                              <template v-if="!isYearCollapsed(year)">
+                                <td
+                                  v-for="label in getColumnLabelsForYearLocal(year)"
+                                  :key="'dept-costs-payment-5-cell-' + deptIndex + '-' + year + '-' + label"
+                                  class="px-2 py-1 text-right border border-red-200 bg-red-50"
+                                >
+                                  <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'costs', year, label, 'second')) }}</span>
+                                </td>
+                                <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
+                                  <span class=" text-xs text-red-700">{{ formatMoney(getPaymentTotal(department, 'costs', year, 'second')) }}</span>
+                                </td>
+                              </template>
+                              <template v-else>
+                                <td class="px-2 py-1 text-right border border-red-200 font-semibold bg-red-100">
+                                  <span class=" text-xs text-red-700">0.00</span>
+                                </td>
+                              </template>
+                            </template>
+                          </tr>
+  
+                          <!-- Cash Outflow (Costs) -->
+                          <tr class="bg-gradient-to-r from-red-100 to-red-200 border-b-2 border-red-400">
+                            <td colspan="2" class="px-3 py-2 font-bold border-r border-red-300 text-red-900 text-right">
+                              <div class="flex items-center gap-1 justify-end">
+                                Cash Outflow
+                              </div>
+                            </td>
+                            <template v-for="year in visibleYears" :key="'dept-costs-cash-outflow-' + deptIndex + '-' + year">
+                              <template v-if="!isYearCollapsed(year)">
+                                <td
+                                  v-for="label in getColumnLabelsForYearLocal(year)"
+                                  :key="'dept-costs-cash-outflow-cell-' + deptIndex + '-' + year + '-' + label"
+                                  class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
+                                >
+                                  <span class=" text-xs">{{ formatMoney(getPaymentValue(department, 'costs', year, label, 'cashOutflow')) }}</span>
+                                </td>
+                                <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
+                                  <span class=" text-xs">{{ formatMoney(getPaymentTotal(department, 'costs', year, 'cashOutflow')) }}</span>
+                                </td>
+                              </template>
+                              <template v-else>
+                                <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
+                                  <span class=" text-xs">0.00</span>
+                                </td>
+                              </template>
+                            </template>
+                          </tr>
+  
+                          <!-- {{ department }} Costs Payables -->
+                          <tr class="bg-gradient-to-r from-red-100 to-red-200 border-b-2 border-red-400">
+                            <td colspan="2" class="px-3 py-2 font-bold border-r border-red-300 text-red-900 text-right">
+                              <div class="flex items-center gap-1 justify-end">
+                                {{ department }} Costs Payables
+                              </div>
+                            </td>
+                            <template v-for="year in visibleYears" :key="'dept-costs-payables-' + deptIndex + '-' + year">
+                              <template v-if="!isYearCollapsed(year)">
+                                <td
+                                  v-for="label in getColumnLabelsForYearLocal(year)"
+                                  :key="'dept-costs-payables-cell-' + deptIndex + '-' + year + '-' + label"
+                                  class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900"
+                                >
+                                  <span class=" text-xs">{{ formatMoney(getPayablesValue(department, 'costs', year, label)) }}</span>
+                                </td>
+                                <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
+                                  <span class=" text-xs">{{ formatMoney(getPayablesTotal(department, 'costs', year)) }}</span>
+                                </td>
+                              </template>
+                              <template v-else>
+                                <td class="px-2 py-1 text-right border border-red-300 bg-red-200 font-bold text-red-900">
+                                  <span class=" text-xs">0.00</span>
+                                </td>
+                              </template>
+                            </template>
+                          </tr>
+                        </template>
                             </template>
   
                       </tbody>
@@ -1387,17 +1594,17 @@
   // ============================================================================
   // IMPORTS
   // ============================================================================
-  import { ref, onMounted, computed, watch, onUnmounted } from "vue";
+  import { ref, onMounted, computed, watch, onUnmounted, nextTick } from "vue";
   import { storeToRefs } from 'pinia';
   import { cloneDeep } from 'lodash-es';
   
   // Store imports
-  import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
+  import { useYearSettingsStore } from '@/components/utility/_master_utility/yearSettingsStore.js';
   
   // Component imports
-  import Sidebar from "@/components/ui/Sidebar.vue";
-import SettingsModal from "@/components/ui/SettingsModal.vue";
-  import ReportsNoProjectSelectedState from '@/components/ui/reports/ReportsNoProjectSelectedState.vue';
+  import Sidebar from "@/components/ui/_general/Sidebar.vue";
+import SettingsModal from "@/components/ui/_general/SettingsModal.vue";
+  import ReportsNoProjectSelectedState from '@/components/ui/reports/general/ReportsNoProjectSelectedState.vue';
   import ExpenseErrorState from '@/components/ui/expense/ExpenseErrorState.vue';
   import ReceiptsNoYearsSelectedState from '@/components/ui/receipts/ReceiptsNoYearsSelectedState.vue';
   
@@ -1428,7 +1635,8 @@ import SettingsModal from "@/components/ui/SettingsModal.vue";
     CircleAlert,
     AlertCircle,
     Save,
-    Loader2
+    Loader2,
+    Calculator
   } from 'lucide-vue-next';
   
   // Service imports
@@ -1560,6 +1768,11 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
         month: 0.00,
         following: 0.00,
         second: 0.00
+      },
+      costs: {
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       }
     },
     ood: {
@@ -1582,6 +1795,11 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
         month: 0.00,
         following: 0.00,
         second: 0.00
+      },
+      costs: {
+        month: 0.00,
+        following: 0.00,
+        second: 0.00
       }
     }
   });
@@ -1598,6 +1816,90 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
     if (!paymentBases.value[deptKey][category][year]) paymentBases.value[deptKey][category][year] = {};
   }
 
+  // Sync Rooms, F&B, and OOD salary, bonus, payroll, expenses, and costs from cache to paymentBases for payment calculations
+  function syncRoomsPaymentBasesFromCache() {
+    const project = getProjectName();
+    if (!project) return;
+    
+    // Sync Rooms department
+    const roomsDeptKey = 'rooms';
+    if (!paymentBases.value[roomsDeptKey]) paymentBases.value[roomsDeptKey] = {};
+    
+    const roomsCategoriesToSync = [
+      { category: 'salary', cacheRow: 'Total Payroll', page: PAGE.ROOM_REPORT },
+      { category: 'bonus', cacheRow: 'Bonus Details', page: PAGE.ROOM_REPORT },
+      { category: 'payroll', cacheRow: 'Total Payroll Related Expenses', page: PAGE.ROOM_REPORT },
+      { category: 'expenses', cacheRow: 'Gross Total Expenses', page: PAGE.ROOM_REPORT }
+    ];
+    
+    syncDepartmentPaymentBases(roomsDeptKey, roomsCategoriesToSync);
+    
+    // Sync F&B department
+    const fnbDeptKey = 'fnb';
+    if (!paymentBases.value[fnbDeptKey]) paymentBases.value[fnbDeptKey] = {};
+    
+    const fnbCategoriesToSync = [
+      { category: 'salary', cacheRow: 'Total Payroll', page: PAGE.FNB_REPORT },
+      { category: 'bonus', cacheRow: 'Bonus Details', page: PAGE.FNB_REPORT },
+      { category: 'payroll', cacheRow: 'Total Payroll Related Expenses', page: PAGE.FNB_REPORT },
+      { category: 'expenses', cacheRow: 'Total F&B Expenses', page: PAGE.FNB_REPORT },
+      { category: 'costs', cacheRow: 'TOTAL COST OF SALES', page: PAGE.FNB_REPORT }
+    ];
+    
+    syncDepartmentPaymentBases(fnbDeptKey, fnbCategoriesToSync);
+    
+    // Sync OOD department
+    const oodDeptKey = 'ood';
+    if (!paymentBases.value[oodDeptKey]) paymentBases.value[oodDeptKey] = {};
+    
+    const oodCategoriesToSync = [
+      { category: 'salary', cacheRow: 'Total Payroll', page: PAGE.OOD_REPORT },
+      { category: 'bonus', cacheRow: 'Bonus Details', page: PAGE.OOD_REPORT },
+      { category: 'payroll', cacheRow: 'Total Payroll Related Expenses', page: PAGE.OOD_REPORT },
+      { category: 'expenses', cacheRow: 'TOTAL OOD EXPENSES', page: PAGE.OOD_REPORT },
+      { category: 'costs', cacheRow: 'TOTAL COST OF SALES', page: PAGE.OOD_REPORT }
+    ];
+    
+    syncDepartmentPaymentBases(oodDeptKey, oodCategoriesToSync);
+  }
+  
+  // Helper function to sync payment bases for a department
+  function syncDepartmentPaymentBases(deptKey, categoriesToSync) {
+    const project = getProjectName();
+    if (!project) return;
+    
+    for (const { category, cacheRow, page } of categoriesToSync) {
+      if (!paymentBases.value[deptKey][category]) {
+        paymentBases.value[deptKey][category] = {};
+      }
+      
+      // Populate paymentBases from cache for all visible years and monthly labels
+      // Use monthlyLabels because payment calculations need monthly data
+      for (const year of visibleYears.value) {
+        if (!paymentBases.value[deptKey][category][year]) {
+          paymentBases.value[deptKey][category][year] = {};
+        }
+        
+        // Sync all monthly labels (Jan, Feb, Mar, etc.) for payment calculations
+        for (const label of monthlyLabels) {
+          const cachedValue = calculationCache.getValue(
+            project,
+            page,
+            cacheRow,
+            year,
+            label
+          );
+          if (cachedValue !== null && cachedValue !== undefined) {
+            paymentBases.value[deptKey][category][year][label] = getNumber(cachedValue);
+          } else {
+            // If no cached value, set to 0 to ensure calculations work
+            paymentBases.value[deptKey][category][year][label] = 0;
+          }
+        }
+      }
+    }
+  }
+
   function parseNumber(text) {
     if (text == null) return 0;
     const n = Number(String(text).replace(/,/g, '').trim());
@@ -1606,12 +1908,378 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
 
   function getPaymentBaseValue(department, category, year, label) {
     const key = getDeptKey(department);
+    
+    // For Rooms department Net Salary & Wages, get data from cache
+    if (key === 'rooms' && category === 'salary') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.ROOM_REPORT,
+        'Total Payroll',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
+    // For Rooms department Bonus, get data from cache
+    if (key === 'rooms' && category === 'bonus') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.ROOM_REPORT,
+        'Bonus Details',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
+    // For Rooms department Payroll Related, get data from cache
+    if (key === 'rooms' && category === 'payroll') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.ROOM_REPORT,
+        'Total Payroll Related Expenses',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
+    // For Rooms department Expenses, get data from cache
+    if (key === 'rooms' && category === 'expenses') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.ROOM_REPORT,
+        'Gross Total Expenses',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
+    // For F&B department Net Salary & Wages, get data from cache
+    if (key === 'fnb' && category === 'salary') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.FNB_REPORT,
+        'Total Payroll',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
+    // For F&B department Bonus, get data from cache
+    if (key === 'fnb' && category === 'bonus') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.FNB_REPORT,
+        'Bonus Details',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
+    // For F&B department Payroll Related, get data from cache
+    if (key === 'fnb' && category === 'payroll') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.FNB_REPORT,
+        'Total Payroll Related Expenses',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
+    // For F&B department Expenses, get data from cache
+    if (key === 'fnb' && category === 'expenses') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.FNB_REPORT,
+        'Total F&B Expenses',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
+    // For F&B department Costs, get data from cache
+    if (key === 'fnb' && category === 'costs') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.FNB_REPORT,
+        'TOTAL COST OF SALES',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
+    // For OOD department Net Salary & Wages, get data from cache
+    if (key === 'ood' && category === 'salary') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.OOD_REPORT,
+        'Total Payroll',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
+    // For OOD department Bonus, get data from cache
+    if (key === 'ood' && category === 'bonus') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.OOD_REPORT,
+        'Bonus Details',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
+    // For OOD department Payroll Related, get data from cache
+    if (key === 'ood' && category === 'payroll') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.OOD_REPORT,
+        'Total Payroll Related Expenses',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
+    // For OOD department Expenses, get data from cache
+    if (key === 'ood' && category === 'expenses') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.OOD_REPORT,
+        'TOTAL OOD EXPENSES',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
+    // For OOD department Costs, get data from cache
+    if (key === 'ood' && category === 'costs') {
+      const project = getProjectName();
+      const cachedValue = calculationCache.getValue(
+        project,
+        PAGE.OOD_REPORT,
+        'TOTAL COST OF SALES',
+        year,
+        label
+      );
+      return getNumber(cachedValue);
+    }
+    
     const val = paymentBases.value?.[key]?.[category]?.[year]?.[label];
     return getNumber(val);
   }
 
   function getPaymentBaseTotal(department, category, year) {
     const key = getDeptKey(department);
+    
+    // For Rooms department Net Salary & Wages, get data from cache
+    if (key === 'rooms' && category === 'salary') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.ROOM_REPORT,
+        'Total Payroll',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
+    // For Rooms department Bonus, get data from cache
+    if (key === 'rooms' && category === 'bonus') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.ROOM_REPORT,
+        'Bonus Details',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
+    // For Rooms department Payroll Related, get data from cache
+    if (key === 'rooms' && category === 'payroll') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.ROOM_REPORT,
+        'Total Payroll Related Expenses',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
+    // For Rooms department Expenses, get data from cache
+    if (key === 'rooms' && category === 'expenses') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.ROOM_REPORT,
+        'Gross Total Expenses',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
+    // For F&B department Net Salary & Wages, get data from cache
+    if (key === 'fnb' && category === 'salary') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.FNB_REPORT,
+        'Total Payroll',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
+    // For F&B department Bonus, get data from cache
+    if (key === 'fnb' && category === 'bonus') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.FNB_REPORT,
+        'Bonus Details',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
+    // For F&B department Payroll Related, get data from cache
+    if (key === 'fnb' && category === 'payroll') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.FNB_REPORT,
+        'Total Payroll Related Expenses',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
+    // For F&B department Expenses, get data from cache
+    if (key === 'fnb' && category === 'expenses') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.FNB_REPORT,
+        'Total F&B Expenses',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
+    // For F&B department Costs, get data from cache
+    if (key === 'fnb' && category === 'costs') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.FNB_REPORT,
+        'TOTAL COST OF SALES',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
+    // For OOD department Net Salary & Wages, get data from cache
+    if (key === 'ood' && category === 'salary') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.OOD_REPORT,
+        'Total Payroll',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
+    // For OOD department Bonus, get data from cache
+    if (key === 'ood' && category === 'bonus') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.OOD_REPORT,
+        'Bonus Details',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
+    // For OOD department Payroll Related, get data from cache
+    if (key === 'ood' && category === 'payroll') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.OOD_REPORT,
+        'Total Payroll Related Expenses',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
+    // For OOD department Expenses, get data from cache
+    if (key === 'ood' && category === 'expenses') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.OOD_REPORT,
+        'TOTAL OOD EXPENSES',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
+    // For OOD department Costs, get data from cache
+    if (key === 'ood' && category === 'costs') {
+      const project = getProjectName();
+      const cachedTotal = calculationCache.getValue(
+        project,
+        PAGE.OOD_REPORT,
+        'TOTAL COST OF SALES',
+        year,
+        'Total'
+      );
+      return getNumber(cachedTotal);
+    }
+    
     const mode = advancedModes.value[year] || displayMode.value;
     const labels = getColumnLabels(mode); // excludes ex1/ex2
     const yearMap = paymentBases.value?.[key]?.[category]?.[year] || {};
@@ -1620,6 +2288,12 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
 
   function handlePaymentBaseInput(department, category, year, label, event) {
     const key = getDeptKey(department);
+    
+    // Skip for Rooms, F&B, and OOD departments salary, bonus, payroll, expenses, and costs (they're auto-calculated from cache)
+    if ((key === 'rooms' || key === 'fnb' || key === 'ood') && (category === 'salary' || category === 'bonus' || category === 'payroll' || category === 'expenses' || category === 'costs')) {
+      return;
+    }
+    
     ensurePaymentBaseStruct(key, category, year);
     const value = parseNumber(event.target.textContent);
     paymentBases.value[key][category][year][label] = value;
@@ -1628,6 +2302,12 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
 
   function handlePaymentBaseBlur(department, category, year, label, event) {
     const key = getDeptKey(department);
+    
+    // Skip for Rooms, F&B, and OOD departments salary, bonus, payroll, expenses, and costs (they're auto-calculated from cache)
+    if ((key === 'rooms' || key === 'fnb' || key === 'ood') && (category === 'salary' || category === 'bonus' || category === 'payroll' || category === 'expenses' || category === 'costs')) {
+      return;
+    }
+    
     ensurePaymentBaseStruct(key, category, year);
     const value = parseNumber(event.target.textContent);
     paymentBases.value[key][category][year][label] = value;
@@ -1915,7 +2595,8 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
 
   function getFnbMonthlyRevenueFromCache(year, label) {
     const project = getProjectName();
-    return calculationCache.getValue(project, PAGE.FNB_REVENUE, ROW.TOTAL_FNB_REVENUE, year, label);
+    // Use F&B P&L report for Revenue (TOTAL REVENUE Incl. SC)
+    return calculationCache.getValue(project, PAGE.FNB_REPORT, 'TOTAL REVENUE Incl. SC', year, label);
   }
 
   function getFnbYearTotalFromCache(year) {
@@ -1934,9 +2615,8 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
 
   function getOODMonthlyRevenueFromCache(year, label) {
     const project = getProjectName();
-    const laundry = calculationCache.getValue(project, PAGE.OOD_REVENUE, ROW.TOTAL_LAUNDRY_REVENUE, year, label);
-    const health = calculationCache.getValue(project, PAGE.OOD_REVENUE, ROW.TOTAL_HEALTH_CLUB_REV_SC, year, label);
-    return getNumber(laundry) + getNumber(health);
+    // Use OOD P&L report for Revenue (TOTAL OOD REVENUE)
+    return calculationCache.getValue(project, PAGE.OOD_REPORT, 'TOTAL OOD REVENUE', year, label);
   }
 
   function getOODYearTotalFromCache(year) {
@@ -1993,7 +2673,11 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
         yearSettingsStore.setAdvancedMode(year, displayMode.value);
       }
     });
-  });
+    // Sync Rooms salary and bonus from cache when years change (after Vue updates)
+    nextTick(() => {
+      syncRoomsPaymentBasesFromCache();
+    });
+  }, { immediate: false });
   
   // Watch for project changes to reload data
   watch(selectedProject, async (newProject, oldProject) => {
@@ -2007,6 +2691,10 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
         // Load departments for the new project
         await loadDepartments();
         await loadReceiptsAndHydrate();
+        
+        // Sync Rooms salary from cache after loading data (after Vue updates)
+        await nextTick();
+        syncRoomsPaymentBasesFromCache();
         
         // Reset any unsaved changes
         changedCells.value = [];
@@ -2026,6 +2714,13 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
       tempAdvancedModes.value = { ...advancedModes.value };
     }
   });
+  
+  // Watch for advanced modes changes to resync Rooms salary
+  watch(advancedModes, () => {
+    nextTick(() => {
+      syncRoomsPaymentBasesFromCache();
+    });
+  }, { deep: true });
   
   // Watch for unsaved changes to show warning on page refresh
   watch(isSaved, (newValue) => {
@@ -2057,6 +2752,9 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
       if (selectedProject.value) {
         await loadDepartments();
         await loadReceiptsAndHydrate();
+        // Sync Rooms salary from cache after loading data (after Vue updates)
+        await nextTick();
+        syncRoomsPaymentBasesFromCache();
       }
       
       // Check if we should show refresh success alert
@@ -2158,6 +2856,7 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
     if (categoryKey === 'bonus') return 'Bonus';
     if (categoryKey === 'payroll') return 'Payroll related';
     if (categoryKey === 'expenses') return 'Expenses';
+    if (categoryKey === 'costs') return 'Costs';
     return categoryKey;
   }
 
@@ -2167,6 +2866,7 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
     if (row === 'bonus' || row.includes('bonus')) return 'bonus';
     if (row === 'payroll related' || row.includes('payroll')) return 'payroll';
     if (row === 'expenses' || row.includes('expense')) return 'expenses';
+    if (row === 'costs' || row.includes('cost')) return 'costs';
     return row;
   }
 
@@ -2192,7 +2892,8 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
                 }
                 paymentPercentages.value[deptKey][catKey][it.percent_position] = Number(it.percent) || 0;
               }
-              if (Number(it.amount) > 0) {
+              // Skip loading Rooms, F&B, and OOD salary, bonus, payroll, expenses, and costs amounts since they come from cache
+              if (Number(it.amount) > 0 && !((deptKey === 'rooms' || deptKey === 'fnb' || deptKey === 'ood') && (catKey === 'salary' || catKey === 'bonus' || catKey === 'payroll' || catKey === 'expenses' || catKey === 'costs'))) {
                 ensurePaymentBaseStruct(deptKey, catKey, year);
                 paymentBases.value[deptKey][catKey][year][label] = Number(it.amount) || 0;
               }
@@ -2251,6 +2952,11 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
         // Payment base amounts per label
         const yearMap = paymentBases.value?.[deptKey] || {};
         Object.keys(yearMap).forEach((cat) => {
+          // Skip Rooms, F&B, and OOD salary, bonus, payroll, expenses, and costs since they're auto-calculated from cache
+          if ((deptKey === 'rooms' || deptKey === 'fnb' || deptKey === 'ood') && (cat === 'salary' || cat === 'bonus' || cat === 'payroll' || cat === 'expenses' || cat === 'costs')) {
+            return;
+          }
+          
           const perYear = yearMap[cat]?.[year] || {};
           Object.keys(perYear).forEach((label) => {
             const amt = Number(perYear[label] || 0);
@@ -2493,16 +3199,19 @@ import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
       if (selectedProject.value) {
         const response = await getProjectDepartments(selectedProject.value.name);
         // Extract department names from the API response structure
+        let deptList = [];
         if (response && response.data && response.data.data) {
-          departments.value = response.data.data;
-          ensureDepartmentConfigs(departments.value);
+          deptList = response.data.data;
         } else if (Array.isArray(response)) {
           // Fallback for direct array response
-          departments.value = response;
-          ensureDepartmentConfigs(departments.value);
-        } else {
-          departments.value = [];
+          deptList = response;
         }
+        // Filter out Banquet department (case-insensitive)
+        departments.value = deptList.filter(dept => {
+          const deptName = (dept || '').toString().trim().toLowerCase();
+          return deptName !== 'banquet' && !deptName.includes('banquet');
+        });
+        ensureDepartmentConfigs(departments.value);
       } else {
         departments.value = [];
       }

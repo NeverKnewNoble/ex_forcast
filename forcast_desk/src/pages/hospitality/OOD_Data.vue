@@ -1096,9 +1096,9 @@
   <script setup>
   import { ref, onMounted, computed, watch, onUnmounted, reactive, nextTick } from "vue";
   import { storeToRefs } from 'pinia';
-  import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
+  import { useYearSettingsStore } from '@/components/utility/_master_utility/yearSettingsStore.js';
   import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
-  import Sidebar from "@/components/ui/Sidebar.vue";
+  import Sidebar from "@/components/ui/_general/Sidebar.vue";
   import { 
     CircleAlert, 
     AlertTriangle, 
@@ -1157,7 +1157,7 @@
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js';
 import OodNoProjectSelectedState from '@/components/ui/ood/OodNoProjectSelectedState.vue';
 import OodNoYearsSelectedState from '@/components/ui/ood/OodNoYearsSelectedState.vue';
-import SettingsModal from '@/components/ui/SettingsModal.vue';
+import SettingsModal from '@/components/ui/_general/SettingsModal.vue';
   
   // Reactive state
   const years = ref([]);

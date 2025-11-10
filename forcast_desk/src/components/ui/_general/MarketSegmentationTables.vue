@@ -1144,8 +1144,11 @@ watch(() => props.marketSegmentData, (newData) => {
       calculationCache.cache[project][PAGE_KEY]['Total Occupied Room'] = {};
       calculationCache.cache[project][PAGE_KEY]['Total Occupied Room Year'] = {};
       // Clear ADR Total cache since it depends on market segment data
-      calculationCache.cache[project][PAGE_KEY]['ADR Total'] = {};
-      calculationCache.cache[project][PAGE_KEY]['ADR Total Year'] = {};
+      calculationCache.cache[project][PAGE_KEY][ROW.ADR_TOTAL] = {};
+      calculationCache.cache[project][PAGE_KEY][ROW.ADR_TOTAL_YEAR] = {};
+      // Clear Total Rooms Revenue Including SC cache
+      calculationCache.cache[project][PAGE_KEY][ROW.TOTAL_ROOMS_REVENUE_INC_SC] = {};
+      calculationCache.cache[project][PAGE_KEY][ROW.TOTAL_ROOMS_REVENUE_INC_SC_YEAR] = {};
     }
     
 
@@ -1297,8 +1300,7 @@ function updateMarketSegmentData({ year, label, segment, field, value }) {
 // --- Total Revenue Functions (Room Revenue + Service Charge) ---
 function getTotalRevenue(year, label) {
   const project = getProjectName();
-  const cacheKey = 'Total Rooms Revenue Including SC';
-  const cached = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, label);
+  const cached = calculationCache.getValue(project, PAGE_KEY, ROW.TOTAL_ROOMS_REVENUE_INC_SC, year, label);
   if (cached && cached > 0) {
     return cached.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
@@ -1306,15 +1308,14 @@ function getTotalRevenue(year, label) {
   const serviceCharge = parseFloat(getServiceChargeValue(year, label).replace(/,/g, ''));
   const totalRevenue = roomRevenue + serviceCharge;
   if (totalRevenue > 0) {
-    calculationCache.setValue(project, PAGE_KEY, cacheKey, year, label, totalRevenue);
+    calculationCache.setValue(project, PAGE_KEY, ROW.TOTAL_ROOMS_REVENUE_INC_SC, year, label, totalRevenue);
   }
   return totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function getTotalRevenueYear(year) {
   const project = getProjectName();
-  const cacheKey = 'Total Rooms Revenue Including SC Year';
-  const cached = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, 'ALL');
+  const cached = calculationCache.getValue(project, PAGE_KEY, ROW.TOTAL_ROOMS_REVENUE_INC_SC_YEAR, year, 'ALL');
   if (cached && cached > 0) {
     return cached.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
@@ -1322,7 +1323,7 @@ function getTotalRevenueYear(year) {
   const serviceCharge = parseFloat(getServiceChargeTotal(year).replace(/,/g, ''));
   const totalRevenue = roomRevenue + serviceCharge;
   if (totalRevenue > 0) {
-    calculationCache.setValue(project, PAGE_KEY, cacheKey, year, 'ALL', totalRevenue);
+    calculationCache.setValue(project, PAGE_KEY, ROW.TOTAL_ROOMS_REVENUE_INC_SC_YEAR, year, 'ALL', totalRevenue);
   }
   return totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -1683,8 +1684,7 @@ function getServiceChargeTotal(year) {
 function getADRTotal(year, label) {
   // Cache lookup for ADR Total (weighted average)
   const project = getProjectName();
-  const cacheKey = 'ADR Total';
-  const cacheVal = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, label);
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, ROW.ADR_TOTAL, year, label);
   if (cacheVal && cacheVal > 0) {
     return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
@@ -1702,21 +1702,20 @@ function getADRTotal(year, label) {
   
   if (!totalOccupied) {
     // Cache 0 value to avoid recalculation
-    calculationCache.setValue(project, PAGE_KEY, cacheKey, year, label, 0);
+    calculationCache.setValue(project, PAGE_KEY, ROW.ADR_TOTAL, year, label, 0);
     return '0.00';
   }
   
   const weightedADR = totalRevenue / totalOccupied;
   // Cache the calculated weighted ADR
-  calculationCache.setValue(project, PAGE_KEY, cacheKey, year, label, weightedADR);
+  calculationCache.setValue(project, PAGE_KEY, ROW.ADR_TOTAL, year, label, weightedADR);
   return weightedADR.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function getADRTotalYear(year) {
   // Cache lookup for ADR Total Year (weighted average across all periods)
   const project = getProjectName();
-  const cacheKey = 'ADR Total Year';
-  const cacheVal = calculationCache.getValue(project, PAGE_KEY, cacheKey, year, 'ALL');
+  const cacheVal = calculationCache.getValue(project, PAGE_KEY, ROW.ADR_TOTAL_YEAR, year, 'ALL');
   if (cacheVal && cacheVal > 0) {
     return cacheVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
@@ -1735,13 +1734,13 @@ function getADRTotalYear(year) {
   
   if (!totalOccupied) {
     // Cache 0 value to avoid recalculation
-    calculationCache.setValue(project, PAGE_KEY, cacheKey, year, 'ALL', 0);
+    calculationCache.setValue(project, PAGE_KEY, ROW.ADR_TOTAL_YEAR, year, 'ALL', 0);
     return '0.00';
   }
   
   const weightedADR = totalRevenue / totalOccupied;
   // Cache the calculated weighted ADR for the year
-  calculationCache.setValue(project, PAGE_KEY, cacheKey, year, 'ALL', weightedADR);
+  calculationCache.setValue(project, PAGE_KEY, ROW.ADR_TOTAL_YEAR, year, 'ALL', weightedADR);
   return weightedADR.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
@@ -1803,8 +1802,11 @@ function refreshCache() {
     calculationCache.cache[project][PAGE_KEY]['Total Available Rooms'] = {};
     calculationCache.cache[project][PAGE_KEY]['Total Available Rooms Year'] = {};
     // Clear ADR Total cache since it depends on market segment data
-    calculationCache.cache[project][PAGE_KEY]['ADR Total'] = {};
-    calculationCache.cache[project][PAGE_KEY]['ADR Total Year'] = {};
+    calculationCache.cache[project][PAGE_KEY][ROW.ADR_TOTAL] = {};
+    calculationCache.cache[project][PAGE_KEY][ROW.ADR_TOTAL_YEAR] = {};
+    // Clear Total Rooms Revenue Including SC cache
+    calculationCache.cache[project][PAGE_KEY][ROW.TOTAL_ROOMS_REVENUE_INC_SC] = {};
+    calculationCache.cache[project][PAGE_KEY][ROW.TOTAL_ROOMS_REVENUE_INC_SC_YEAR] = {};
   }
   
   // Force a re-render

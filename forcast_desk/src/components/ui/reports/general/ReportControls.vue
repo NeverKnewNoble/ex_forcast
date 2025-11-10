@@ -205,7 +205,7 @@ const props = defineProps({
     default: ''
   },
   icon: {
-    type: Object,
+    type: [Object, Function],
     required: true
   },
   years: {

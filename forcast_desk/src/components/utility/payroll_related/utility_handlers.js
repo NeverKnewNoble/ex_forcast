@@ -1,7 +1,7 @@
 // Payroll Related Utility Handlers
 // Handles utility functions for payroll related data
 
-import { getProjectKey } from '@/components/utility/projectLocalStorage.js';
+import { getProjectKey } from '@/components/utility/_master_utility/projectLocalStorage.js';
 import alertService from "@/components/ui/ui_utility/alertService.js";
 
 /**

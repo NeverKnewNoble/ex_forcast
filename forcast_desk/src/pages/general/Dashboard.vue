@@ -162,9 +162,9 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import Sidebar from "@/components/ui/Sidebar.vue"
-import ProjectSelector from "@/components/ui/ProjectSelector.vue"
-import SettingsModal from "@/components/ui/SettingsModal.vue"
+import Sidebar from "@/components/ui/_general/Sidebar.vue"
+import ProjectSelector from "@/components/ui/_general/ProjectSelector.vue"
+import SettingsModal from "@/components/ui/_general/SettingsModal.vue"
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js'
 import { BarChart3, CalendarDays, AlertTriangle, FileText, TrendingUp, TrendingDown, Users, DollarSign } from "lucide-vue-next"
 

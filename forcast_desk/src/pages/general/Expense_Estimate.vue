@@ -360,19 +360,19 @@
                                   @blur="handleCellEditWrapper({ year, label, expense, event: $event, department: departmentGroup.department })"
                                 >
                                   <span class=" text-xs">
-                                    {{ year === 'Default' ? (isPercentageExpense(expense) ? '0.00%' : '0.00') : formatExpenseValue(getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode, departmentGroup.department), expense) }}
+                                    {{ year === 'Default' ? '0.00' : getAmountForExpense(expenseData, expense, year, label, advancedModes[year] || displayMode, departmentGroup.department) }}
                                   </span>
                                 </td>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-700 dark:bg-violet-900/20">
                                   <span class=" text-xs text-violet-700 dark:text-violet-300">
-                                    {{ year === 'Default' ? (isPercentageExpense(expense) ? '0.00%' : '0.00') : formatExpenseValue(calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal, departmentGroup.department), expense) }}
+                                    {{ year === 'Default' ? '0.00' : calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal, departmentGroup.department) }}
                                   </span>
                                 </td>
                               </template>
                               <template v-else>
                                 <td class="px-2 py-1 text-right border border-violet-200 font-semibold bg-violet-50 dark:border-violet-700 dark:bg-violet-900/20">
                                   <span class=" text-xs text-violet-700 dark:text-violet-300">
-                                    {{ year === 'Default' ? (isPercentageExpense(expense) ? '0.00%' : '0.00') : formatExpenseValue(calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal, departmentGroup.department), expense) }}
+                                    {{ year === 'Default' ? '0.00' : calculateTotalForExpense(expenseData, expense, year, advancedModes[year] || displayMode, getColumnLabelsForYearLocal, departmentGroup.department) }}
                                   </span>
                                 </td>
                               </template>
@@ -746,10 +746,10 @@
 <script setup>
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { storeToRefs } from 'pinia';
-import { useYearSettingsStore } from '@/components/utility/yearSettingsStore.js';
+import { useYearSettingsStore } from '@/components/utility/_master_utility/yearSettingsStore.js';
 import { useCalculationCache } from '@/components/utility/_master_utility/useCalculationCache.js';
 import { PAGE, ROW } from '@/components/utility/_master_utility/cacheKeys.js';
-import Sidebar from "@/components/ui/Sidebar.vue";
+import Sidebar from "@/components/ui/_general/Sidebar.vue";
 import { getCSRFToken } from '@/components/utility/dashboard/apiUtils.js';
 import { CircleAlert, AlertTriangle, Calculator, Table, Download, RefreshCw, FolderOpen, Receipt, Tag, ChevronDown, ChevronRight, ChevronLeft, Hash, Calendar, ArrowLeft, Settings, X, Check, PlusCircle, Plus, Trash2, DollarSign, Loader2, AlertCircle, Building2, Save, Filter, Building, MapPin, RotateCcw } from 'lucide-vue-next';
 import alertService from "@/components/ui/ui_utility/alertService.js";
@@ -818,7 +818,7 @@ import NoDataState from '@/components/ui/expense/NoDataState.vue';
 import ExpenseErrorState from '@/components/ui/expense/ExpenseErrorState.vue';
 import ExpenseNoYearsSelectedState from '@/components/ui/expense/ExpenseNoYearsSelectedState.vue';
 import { allowOnlyNumbers as allowOnlyNumbersFromPayroll } from '@/components/utility/payroll/index.js';
-import SettingsModal from '@/components/ui/SettingsModal.vue';
+import SettingsModal from '@/components/ui/_general/SettingsModal.vue';
 
 
 // Reactive state
@@ -1300,41 +1300,51 @@ function cacheExpenseData(expenseData, projectName) {
     for (const [year, months] of Object.entries(expenseData)) {
       for (const [month, entries] of Object.entries(months)) {
         entries.forEach(entry => {
-          if (entry.expense && entry.amount && entry.department) {
-            const amount = parseFloat(entry.amount);
-            if (amount > 0) {
-              // Cache using normalized structure only
-              // Normalized write
-              calculationCache.setExpense(
-                projectName,
-                entry.department,
-                entry.expense,
-                year,
-                month,
-                amount
-              );
-              // Normalized write (duplicate provides both indexing paths)
-              calculationCache.setExpense(
-                projectName,
-                entry.department,
-                entry.expense,
-                year,
-                month,
-                amount
-              );
-              // Normalized write
-              calculationCache.setExpense(
-                projectName,
-                entry.department,
-                entry.expense,
-                year,
-                month,
-                amount
-              );
-            }
+          if (entry.expense && entry.amount !== undefined && entry.amount !== null && entry.department) {
+            const amount = parseFloat(entry.amount) || 0;
+            // Cache using normalized structure (caches even if amount is 0)
+            calculationCache.setExpense(
+              projectName,
+              entry.department,
+              entry.expense,
+              year,
+              month,
+              amount
+            );
           }
         });
       }
+    }
+    
+    // Also cache default expenses with 0.00 values for years in visibleYears
+    // This ensures OOD and other departments with default expenses but no actual data get cached
+    if (defaultExpenses.value && defaultExpenses.value.length > 0 && visibleYears.value.length > 0) {
+      defaultExpenses.value.forEach(defExp => {
+        visibleYears.value.forEach(year => {
+          const labels = getColumnLabels(advancedModes.value[year] || displayMode.value);
+          labels.forEach(label => {
+            // Only cache if this expense doesn't already have a value cached
+            const existingValue = calculationCache.getExpense(
+              projectName,
+              defExp.department,
+              defExp.expense,
+              year,
+              label
+            );
+            // If no existing value was found in the actual data, cache it as 0
+            if (existingValue === 0) {
+              calculationCache.setExpense(
+                projectName,
+                defExp.department,
+                defExp.expense,
+                year,
+                label,
+                0
+              );
+            }
+          });
+        });
+      });
     }
     
     // console.log(`[EXPENSE CACHE] Cached ${Object.keys(expenseData).length} years of expense data for project: ${projectName}`);
@@ -1375,11 +1385,11 @@ function exportTableData() {
             if (!isYearCollapsed(year)) {
               getColumnLabelsForYearLocal(year).forEach(label => {
                 const amount = getAmountForExpense(expenseData.value, expense, year, label, advancedModes.value[year] || displayMode.value, departmentGroup.department);
-                row.push(formatExpenseValue(amount, expense));
+                row.push(amount);
               });
             }
             const total = calculateTotalForExpense(expenseData.value, expense, year, advancedModes.value[year] || displayMode.value, getColumnLabelsForYearLocal, departmentGroup.department);
-            row.push(formatExpenseValue(total, expense));
+            row.push(total);
           });
           
           csvContent += row.join(",") + "\n";
@@ -1501,26 +1511,6 @@ function openSettings() {
 
 function closeSettings() {
   showSettingsModal.value = false;
-}
-
-// Helper function to determine if an expense should be displayed as a percentage
-function isPercentageExpense(expenseName) {
-  const percentageExpenses = [
-    'Cost of Beverage sales',
-    'Cost of Food sales'
-  ];
-  return percentageExpenses.includes(expenseName);
-}
-
-// Helper function to format expense value as percentage or currency
-function formatExpenseValue(value, expenseName) {
-  if (isPercentageExpense(expenseName)) {
-    // Convert decimal to percentage (e.g., 0.25 -> 25.00%)
-    const percentage = (parseFloat(value) * 100).toFixed(2);
-    return `${percentage}%`;
-  }
-  // Return as currency (existing behavior)
-  return value;
 }
 </script>
 

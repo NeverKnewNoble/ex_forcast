@@ -565,8 +565,8 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import Sidebar from "@/components/ui/Sidebar.vue"
-import SettingsModal from "@/components/ui/SettingsModal.vue"
+import Sidebar from "@/components/ui/_general/Sidebar.vue"
+import SettingsModal from "@/components/ui/_general/SettingsModal.vue"
 import NewProjectModal from "@/components/ui/project_budget/NewProjectModal.vue"
 import alertService from "@/components/ui/ui_utility/alertService.js"
 import { selectedProject, initializeProjectService } from '@/components/utility/dashboard/projectService.js'

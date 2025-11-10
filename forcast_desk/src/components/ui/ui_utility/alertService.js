@@ -1,5 +1,5 @@
 import { createApp, h } from 'vue'
-import Alert from '../Alert.vue'
+import Alert from '../_general/Alert.vue'
 
 class AlertService {
   constructor() {

@@ -17,7 +17,7 @@ import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 
 // Import project-specific localStorage utilities for debugging
-import { debugLocalStorage, migrateToProjectSpecificKeys, getAllProjectKeys } from '@/components/utility/projectLocalStorage.js'
+import { debugLocalStorage, migrateToProjectSpecificKeys, getAllProjectKeys } from '@/components/utility/_master_utility/projectLocalStorage.js'
 
 // Import unified cache service
 import { unifiedCacheService } from '@/components/utility/_master_utility/unifiedCacheService.js'
